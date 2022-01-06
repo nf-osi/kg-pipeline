@@ -1,0 +1,330 @@
+@prefix :      <http://nf-osi.github.com/terms#> .
+@prefix o-rdf: <http://tpl.ottr.xyz/rdf/0.1/> .
+@prefix o-rdfs: <http://tpl.ottr.xyz/rdfs/0.2/> .
+@prefix pav:   <http://purl.org/pav/> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix nfgraph: <http://nf-osi.github.com/templates/0.1/> .
+@prefix o-docttr: <http://tpl.ottr.xyz/p/docttr/0.1/> .
+@prefix dct:   <http://purl.org/dc/terms/> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml:   <http://www.w3.org/XML/1998/namespace> .
+@prefix ottr:  <http://ns.ottr.xyz/0.4/> .
+@prefix obo:   <http://purl.obolibrary.org/obo/> .
+@prefix prov:  <http://www.w3.org/ns/prov#> .
+
+:assayParameterAnnotation
+        rdfs:subPropertyOF  :assayAnnotation ;
+        rdf:type            owl:ObjectProperty .
+
+:assayType  rdfs:subPropertyOF  :assayAnnotation ;
+        rdfs:range          :Assay ;
+        rdfs:comment        "The technology used to generate the data in this file" ;
+        rdf:type            owl:ObjectProperty .
+
+:drugScreenType  rdfs:subPropertyOF  :assayAnnotation ;
+        rdf:type            owl:ObjectProperty ;
+        rdfs:comment        "String describing general class of drug screen" .
+
+:platform  rdfs:subPropertyOF  :assayAnnotation ;
+        rdfs:comment        "A sequencing platform, microscope, spectroscope/plate reader, or other platform for collecting data." ;
+        rdfs:range          :Platform ;
+        rdf:type            owl:ObjectProperty .
+
+:assayTarget  rdfs:comment  "The HUGO gene symbol that represents the target analyte assayed." ;
+        rdfs:subPropertyOF  :assayparameterAnnotation ;
+        rdf:type            owl:ObjectProperty .
+
+:libraryPrep  rdfs:range    :Library_Prep ;
+        rdfs:subPropertyOF  :assayparameterAnnotation ;
+        rdfs:comment        "The general strategy by which the library was prepared" ;
+        rdf:type            owl:ObjectProperty .
+
+:libraryPreparationMethod
+        rdfs:range          :Library_Preparation_Method ;
+        rdfs:subPropertyOF  :assayparameterAnnotation ;
+        rdfs:comment        "Method by which library was prepared" ;
+        rdf:type            owl:ObjectProperty .
+
+:proteinExtractSource
+        rdfs:subPropertyOF  :assayparameterAnnotation ;
+        rdfs:comment        "Source of the extracted protein used in the experiment" ;
+        rdf:type            owl:ObjectProperty .
+
+:readPair  rdfs:comment     "The read of origin" ;
+        rdfs:range          :Read_Pair ;
+        rdf:type            owl:ObjectProperty ;
+        rdfs:subPropertyOF  :assayparameterAnnotation .
+
+:readPairOrientation  rdfs:subPropertyOF  :assayparameterAnnotation ;
+        rdfs:range          :Read_Pair_Orientation ;
+        rdfs:comment        "The relative orientation of the reads in a paired-end protocol" ;
+        rdf:type            owl:ObjectProperty .
+
+:readStrandOrigin  rdfs:subPropertyOF  :assayparameterAnnotation ;
+        rdfs:range          :Read_Strand_Origin ;
+        rdf:type            owl:ObjectProperty ;
+        rdfs:comment        "The strand from which the read originates in a strand-specific protocol" .
+
+:referenceSequence  rdfs:comment  "Syntactic sequences that has a role as reference of an annotation." ;
+        rdf:type            owl:ObjectProperty ;
+        rdfs:subPropertyOF  :assayparameterAnnotation .
+
+:referenceSet  rdfs:comment  "A set of references (e.g., canonical assembled contigs) which defines a common coordinate space for comparing reference-aligned experimental data." ;
+        rdf:type            owl:ObjectProperty ;
+        rdfs:subPropertyOF  :assayparameterAnnotation .
+
+:reporterGene  rdf:type     owl:ObjectProperty ;
+        rdfs:comment        "A biological material (clone, oligo, etc.) on an array which will report on some biosequence or biosequences." ;
+        rdfs:subPropertyOF  :assayparameterAnnotation .
+
+:reporterSubstance  rdf:type  owl:ObjectProperty ;
+        rdfs:subPropertyOF  :assayparameterAnnotation ;
+        rdfs:comment        "A gene which produces an easily assayed phenotype. Often used for expression studies of heterologous promoters." .
+
+:runType  rdf:type          owl:ObjectProperty ;
+        rdfs:range          :Run_Type ;
+        rdfs:subPropertyOF  :assayparameterAnnotation ;
+        rdfs:comment        "Is the sequencing run single or paired end?" .
+
+:isStranded  rdfs:comment   "Whether or not the library is stranded. (Note: TRUE = Yes; FALSE = No)" ;
+        rdf:type            owl:ObjectProperty ;
+        rdfs:subPropertyOF  :assayparameterAnnotation .
+
+:nucleicAcidSource  rdfs:range  :Nucleic_Acid_Source ;
+        rdfs:subPropertyOF  :assayparameterAnnotation ;
+        rdf:type            owl:ObjectProperty ;
+        rdfs:comment        "Source of the extracted nucleic acid used in the experiment" .
+
+:biosampleIndividualAnnotation
+        rdfs:subPropertyOF  :biosampleAnnotation ;
+        rdf:type            owl:ObjectProperty .
+
+:biosampleSpecimenAnnotation
+        rdfs:subPropertyOF  :biosampleAnnotation ;
+        rdf:type            owl:ObjectProperty .
+
+:diagnosis  rdfs:comment    "A diagnosis is the result of a medical investigation to identify a disorder from its signs and symptoms." ;
+        rdfs:range          :Diagnosis ;
+        rdfs:subPropertyOF  :biosampleIndividualAnnotation ;
+        rdf:type            owl:ObjectProperty .
+
+:genotypeAnnotation  rdf:type  owl:ObjectProperty ;
+        rdfs:subPropertyOF  :biosampleIndividualAnnotation .
+
+:individualID  rdfs:comment  "A unique identifier (non-PII) that represents the individual from which the data came. This could be a patient or animal ID." ;
+        rdfs:subPropertyOF  :biosampleIndividualAnnotation ;
+        rdf:type            owl:ObjectProperty .
+
+:individualIdSource  rdfs:subPropertyOF  :biosampleIndividualAnnotation ;
+        rdfs:comment        "Database or repository to which individual ID maps" ;
+        rdf:type            owl:ObjectProperty .
+
+:sex    rdf:type            owl:ObjectProperty ;
+        rdfs:range          :Sex ;
+        rdfs:comment        "Phenotypic expression of chromosomal makeup that defines a study subject as male, female, or other." ;
+        rdfs:subPropertyOF  :biosampleIndividualAnnotation .
+
+:species  rdfs:subPropertyOF  :biosampleIndividualAnnotation ;
+        rdf:type            owl:ObjectProperty ;
+        rdfs:range          :Species ;
+        rdfs:comment        "The name of a species (typically a taxonomic group) of organism." .
+
+:dissociationMethod  rdfs:range  :Dissociation_Method ;
+        rdfs:subPropertyOF  :biosampleSpecimenAnnotation ;
+        rdfs:comment        "Procedure by which a biological specimen is dissociated into individual cells or a cell suspension" ;
+        rdf:type            owl:ObjectProperty .
+
+:sampleSite  rdfs:comment   "Sample location referring to a named area of the body, inclusive of gross anatomical structures and organ parts." ;
+        rdfs:subPropertyOF  :biosampleSpecimenAnnotation ;
+        rdfs:range          :Body_Part ;
+        rdf:type            owl:ObjectProperty .
+
+:specimenID  rdfs:subPropertyOF  :biosampleSpecimenAnnotation ;
+        rdf:type            owl:ObjectProperty ;
+        rdfs:comment        "A unique identifier (non-PII) that represents the specimen (sample) from which the data came. e.g. an ID that indicates a specific tumor specimen." .
+
+:specimenState  rdf:type    owl:ObjectProperty ;
+        rdfs:subPropertyOF  :biosampleSpecimenAnnotation .
+
+:tissueType  rdfs:comment   "A tissue is a mereologically maximal collection of cells that together perform physiological function." ;
+        rdf:type            owl:ObjectProperty ;
+        rdfs:subPropertyOF  :biosampleSpecimenAnnotation ;
+        rdfs:range          :Tissue .
+
+:tumorType  rdfs:comment    "The type of tumor that the biospecimen used to generate the data were collected from." ;
+        rdfs:range          :Tumor ;
+        rdfs:subPropertyOF  :biosampleSpecimenAnnotation ;
+        rdf:type            owl:ObjectProperty .
+
+:resourceId  rdf:type       owl:ObjectProperty ;
+        rdfs:comment        "A UUID for a Resource from the NF Research Tools Database" ;
+        rdfs:subPropertyOF  :crossRefAnnotation .
+
+:curatedDataType  rdfs:subPropertyOF  :dataAnnotation ;
+        rdfs:comment        "The type of information being curated." ;
+        rdf:type            owl:ObjectProperty .
+
+:dataSubtype  rdf:type      owl:ObjectProperty ;
+        rdfs:subPropertyOF  :dataAnnotation ;
+        rdfs:comment        "Further qualification of dataType, which may be used to indicate the state of processing of the data, aggregation of the data, or presence of metadata." ;
+        rdfs:range          :Data .
+
+:dataType  rdfs:range       :Data ;
+        rdfs:subPropertyOF  :dataAnnotation ;
+        rdf:type            owl:ObjectProperty ;
+        rdfs:comment        "A type of experimental, clinical, or other data. This typically refers to a high-level data type, that is paired with a specific assay. For example, a file of dataType of \"\"genomicVariants\"\" might have an assay value of \"\"whole genome sequencing\"\"." .
+
+:metadataType  rdfs:comment  "For files of dataSubtype: metadata, a description of the type of metadata in the file." ;
+        rdfs:subPropertyOF  :dataAnnotation ;
+        rdf:type            owl:ObjectProperty .
+
+:fileFormat  rdf:type       owl:ObjectProperty ;
+        rdfs:subPropertyOF  :dataAnnotation .
+
+:fundingAgency  rdfs:subPropertyOF  :dccAnnotation ;
+        rdfs:comment        "Refers to the funding organization for the generated resource. This annotation is handled by the DCC." ;
+        rdf:type            owl:ObjectProperty .
+
+:initiative  rdfs:comment   "Refers to a funding initiative. This annotation is usually handled by the DCC or funder, not the researcher." ;
+        rdf:type            owl:ObjectProperty ;
+        rdfs:subPropertyOF  :dccAnnotation .
+
+:experimentId  rdf:type     owl:ObjectProperty ;
+        rdfs:subPropertyOF  :experimentAnnotation ;
+        rdfs:comment        "When applicable, an optional identifier that can be used to distinguish or group the experiments that generated the data; also can be used to denote internal batch reference if needed." .
+
+:timePointUnit  rdfs:subPropertyOF  :experimentAnnotation ;
+        rdfs:comment        "For timed experiments this represents the unit of time measured" ;
+        rdf:type            owl:ObjectProperty ;
+        rdfs:range          :Time_Unit .
+
+:genePerturbationTechnology
+        rdfs:comment        "Technology used to perform gene perturbation" ;
+        rdfs:range          :Gene_Perturbation_Technology ;
+        rdfs:subPropertyOF  :experimentAnnotation ;
+        rdf:type            owl:ObjectProperty .
+
+:genePerturbationType
+        rdfs:comment        "Specific way in which a single gene was perturbed in a sample" ;
+        rdf:type            owl:ObjectProperty ;
+        rdfs:subPropertyOF  :experimentAnnotation ;
+        rdfs:range          :Gene_Perturbation .
+
+:nf1Genotype  rdfs:range    :Genotype ;
+        rdf:type            owl:ObjectProperty ;
+        rdfs:subPropertyOF  :genotypeAnnotation .
+
+:nf2Genotype  rdfs:subPropertyOF  :genotypeAnnotation ;
+        rdfs:range          :Genotype ;
+        rdf:type            owl:ObjectProperty .
+
+:organ  rdf:type            owl:ObjectProperty ;
+        rdfs:range          :Organ ;
+        rdfs:subPropertyOF  :sampleSite ;
+        rdfs:comment        "A unique macroscopic (gross) anatomic structure that performs specific functions. It is composed of various tissues. An organ is part of an anatomic system or a body region." .
+
+:bodyPart  rdf:type         owl:ObjectProperty ;
+        rdfs:subPropertyOF  :sampleSite ;
+        rdfs:range          :Body_Part .
+
+:benefactorId  rdfs:comment  "The id of the resource from which access control is inherited." ;
+        rdfs:subPropertyOF  :synapseProperty ;
+        rdf:type            owl:ObjectProperty .
+
+:concreteType  rdf:type     owl:ObjectProperty ;
+        rdfs:comment        "Refers to the class model the data platform uses for representing the resource. This is a low-level field set by the platform and is not a user annotation." ;
+        rdfs:subPropertyOF  :synapseProperty .
+
+:contentSize  rdfs:subPropertyOF  :synapseProperty ;
+        rdf:type            owl:ObjectProperty ;
+        rdfs:comment        "(Files only) File size calculated by the platform." .
+
+:createdBy  rdf:type        owl:ObjectProperty ;
+        rdfs:subPropertyOF  :synapseProperty ;
+        rdfs:comment        "Refers to the user who created the resource on the platform." .
+
+:createdOn  rdfs:subPropertyOF  :synapseProperty ;
+        rdfs:comment        "Refers to when the resource was created on the platform." ;
+        rdf:type            owl:ObjectProperty .
+
+:currentVersion  rdfs:subPropertyOF  :synapseProperty ;
+        rdfs:comment        "(Versionable entities only) The current version number of the resource." ;
+        rdf:type            owl:ObjectProperty .
+
+:dataFileHandleId  rdf:type  owl:ObjectProperty ;
+        rdfs:subPropertyOF  :synapseProperty ;
+        rdfs:comment        "(Files only) Refers to the id of the file." .
+
+:etag   rdf:type            owl:ObjectProperty ;
+        rdfs:subPropertyOF  :synapseProperty ;
+        rdfs:comment        "Synapse employs an Optimistic Concurrency Control (OCC) scheme to handle concurrent updates. The E-Tag changes every time an entity is updated it is used to detect when a client's current representation of an entity is out-of-date." .
+
+:id     rdfs:comment        "The entity id for the resource automatically assigned by the platform." ;
+        rdf:type            owl:ObjectProperty ;
+        rdfs:subPropertyOF  :synapseProperty .
+
+:modifiedBy  rdfs:comment   "Refers to a user who last modified the resource on the platform." ;
+        rdfs:subPropertyOF  :synapseProperty ;
+        rdf:type            owl:ObjectProperty .
+
+:parentId  rdf:type         owl:ObjectProperty ;
+        rdfs:comment        "The id of the parent resource, i.e. the parent folder on the platform." ;
+        rdfs:subPropertyOF  :synapseProperty .
+
+:type   rdf:type            owl:ObjectProperty ;
+        rdfs:subPropertyOF  :synapseProperty ;
+        rdfs:comment        "Refers to the type of the resource on the platform, e.g. “file”." .
+
+:transplantationRecipientSpecies
+        rdf:type            owl:ObjectProperty ;
+        rdfs:range          :Species ;
+        rdfs:subPropertyOF  :transplantationCharacteristic ;
+        rdfs:comment        "Species into which donor tissue was grown" .
+
+:transplantationRecipientTissue
+        rdfs:subPropertyOF  :transplantationCharacteristic ;
+        rdf:type            owl:ObjectProperty ;
+        rdfs:range          :Tissue ;
+        rdfs:comment        "Tissue into which a xenograph sample is transplanted" .
+
+:transplantationType  rdf:type  owl:ObjectProperty ;
+        rdfs:subPropertyOF  :transplantationCharacteristic ;
+        rdfs:range          :Transplantation ;
+        rdfs:comment        "Type of transplantation involved in the experiment, derived from MESH" .
+
+:libraryID  rdf:type  owl:ObjectProperty .
+
+:modelSystemName  rdfs:comment  "A group of presumed common ancestry with clear-cut physiological but usually not morphological distinctions such as an animal model or cell line. EXAMPLE(S):  HEK293T (cell line), Minnesota5 (swine strain), DXL (poultry strain), RB51 (vaccine strain of Brucella abortus)" ;
+        rdfs:range          :Model_System ;
+        rdfs:subPropertyOF  :crossRef ;
+        rdf:type            owl:ObjectProperty .
+
+:experimentalCondition
+        rdfs:comment  "A free-text description of the experimental condition (e.g. 5 mM doxorubicin)." ;
+        rdf:type      owl:ObjectProperty .
+
+:experimentalTimepoint
+        rdfs:comment  "The numeric value indicating the time elapsed from the beginning of the experiment at which the specimen was collected. Use in tandem with timePointUnit" ;
+        rdf:type      owl:ObjectProperty .
+
+:genePerturbed  rdfs:range  :Gene ;
+        rdf:type      owl:ObjectProperty ;
+        rdfs:comment  "The HUGO gene symbol for the gene that is perturbed." .
+
+:resourceType  rdf:type  owl:ObjectProperty ;
+        rdfs:range    :Resource ;
+        rdfs:comment  "The type of resource being stored and annotated" .
+
+:specimenPreparationMethod
+        rdf:type      owl:ObjectProperty ;
+        rdfs:comment  "Term that represents preservation of the sample before usage in, e.g. sequencing" .
+
+:nf2Genotype  rdf:type  owl:ObjectProperty ;
+        rdfs:comment  "Genotype of NF2 gene in the biospecimen from which the data were derived, if known" .
+
+:nf1Genotype  rdfs:comment  "Genotype of NF1 gene in the biospecimen from which the data were derived, if known" ;
+        rdf:type      owl:ObjectProperty .
+
+:metadataTemplate  rdf:type  owl:ObjectProperty .

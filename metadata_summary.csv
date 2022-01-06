@@ -1,0 +1,148 @@
+prop,nvals,vals
+assay,86,""
+cellType,59,""
+dataSubtype,13,"metadata||processed|raw|dataMatrix|raw,processed|report|normalized|representative|NA|preprocessed|bundle|md5"
+dataType,46,""
+diagnosis,21,"Neurofibromatosis type 1||Neurofibromatosis type 2|nan|Unknown|NA|Not Applicable|Neurofibromatosis 1|JMML|Cancer|Schwannomatosis|NF1+/+|high grade metastatic MPNST|high grade MPNST|high grade MPNST with divergent differentiation|high grade MPNST, metastatic|Atypical Neurofibroma|High grade MPNST|NA|Sporadic Schwannoma|Neurofibromatosis 2"
+individualID,1627,""
+individualIdSource,8,NA||Sage Bionetworks|NTAP Biobank|Turku NF Clinic|UMN|U Iowa|Largespada Lab
+isCellLine,9,NA|FALSE|TRUE||no|yes|true|nan|false
+isMultiIndividual,6,TRUE|NA|FALSE||NA|false
+isMultiSpecimen,6,TRUE|NA|FALSE||NA|false
+isPrimaryCell,6,NA|TRUE|FALSE||embryonic Schwann Cell|no
+organ,14,"|skin|brain|spinal cord|NA|nerve|nerves|skin,nerve|foreskin|thyroid|blood|colon|bone marrow|NA"
+platform,29,"NA||NextSeq500|HiSeq2500|HiSeq2000|NA|nan|Illumina_NovaSeq_6000|Olympus DP80|Pannoramic 250 Slide scanner|Zeiss AxioImager|Immunoseq|Easy-nLC 1200 HPLC, Q Exactive HF mass spectrometer|nanoESI-LTQ-Orbitrap XL|HiSeqX|Illumina_Omni2pt5M|blood|Illumina HiSeq 4000|IlluminaHumanMethylation850k|HiSeq4000|Illumina_TruSeq_Exome|Illumina_NovaSeq|IlluminaHumanMethylationEPIC|384-well|Illumina|Orbitrap Fusion Lumos|MiSeq|LI-COR Odyssey CLx|Spectramax"
+sex,11,"|female|male|NA|Female|Male|nan|Unknown|unknown|male,female|NA"
+species,18,"Homo sapiens||Homo sapiens,Mus musculus|Mus musculus|nan|NA|Human|Sus scrofa|Pig|Mus musculus (humanized)|Rattus norvegicus,Homo sapiens|human|Mouse|Zebrafish|mus musculus|sus scrofa|NA|Oryctolagus cuniculus"
+specimenID,3348,""
+specimenIdSource,23,NA||Sage Bionetworks|MGH|Wallace lab|Turku NF Clinic|U Iowa|IU|UNC TGL|MPNST PDX 4 (SHIM18)|S16-13806|S16-13807|S16-13808|S16-13809|MPNST PDX 2 (SHIM8)|S14-11190|MPNST PDX 1 (SHIM10)|S16-12325|MPNST PDX 3 (SHIM14)|S16-15081|S16-32519|MPNST PDX5 (SHIM17)|unc/sage
+tissue,35,""
+cellSubType,1,NA
+experimentalCondition,890,""
+experimentalTimePoint,16,NA|4872|24|20|72|224||NA|2|2d|7d|1|4|8|6|48
+genePerturbationTechnology,10,"NA|RNAi,CRISPR|CRISPR, CRE Recombinase, shRNA|RNAi|CRE Recombinase||CRISPR|shRNA|CRISPR, shRNA|nan"
+genePerturbationType,13,"NA|control,knockdown,knockout|knockout, knockdown, control|knockdown|control|knockout||knockout, control|knockdown, control|control, knockdown|control, knockout|control,knockout|overexpression"
+genePerturbed,8,"NA|NF2||nan|NA|NF1|Nf1|NF1,MET"
+modelSystem,4,NA||Peri+|H9
+timePointUnit,8,NA|hours||days|nan|nn|NA|weeks
+transplantationDonorSpecies,4,NA||nan|Mouse
+transplantationDonorTissue,6,NA||nan|Primary Tumor|NA|primary tumor
+transplantationRecipientTissue,7,NA||nan|Primary Tumor|NA|skin|tumor
+transplantationType,5,NA||nan|xenograft|allograft
+tumorType,46,""
+consortium,5,NA||cNF Initiative|NFRI|NA
+fileFormat,84,""
+fundingAgency,12,"NTAP|CTF|NA||NIH-NCI|NTAP,NFRI|GFF|nan|CTF,NTAP|NFRI,NIH-NCI|NFRI|NIH-NCI, Children’s Cancer Foundation, Cancer Research Foundation, The V Foundation for Cancer Research, Center for Cancer Research,NTAP"
+resourceType,13,experimentalData|report||analysis|bundle|dataset|curatedData|tool|protocol|NA|metadata|result|ExperimentalData
+nf1Genotype,25,"|-/-|unknown|+/-|+/+|-/+|nan|NA|-/-, +/-|+/-,-/-|+/-,+/+|+/+,-/-|multiple|NF-/-|NF-/_|NF1-/-; P53-/-|NF1-/-|R816X (Nf1 gene)|NF1-/-; P53 -/-|Nf1-/-|NF1 R1947X/+|WT|NA|+/+, -/-|Unknown"
+nf2Genotype,11,"|+/+|-/-|+/+,-/-|nan|Unknown|unknown|NA|`+/+|+/-|NA"
+study,67,""
+id,36843,""
+name,28866,""
+studyId,107,""
+studyName,71,""
+reportMilestone,14,6|12|NA|4|18|1|2|3|5|24|36|9|7|0
+readPair,5,NA|1|2|NaN|151
+compoundDose,9,NA|100||-7.33 to -4|10|14|20|50|15
+compoundDoseUnit,6,NA||nM|log10(M)|log(M)|mg/kg
+compoundDoseRange,1,NA
+compoundName,684,""
+drugScreenType,7,NA|singleMolecule||smallMoleculeLibraryScreen|combinationLibraryScreen|TRAP1 inhibitors screening|hypoxia
+secondCompoundName,5,NA||AZD-6244|IMATINIB|XL-184
+analysisType,18,"NA||differentialExpression|differential expression|principal component analysis, visualization|somatic mutation calling|Copy number estimation|purity|visualization|transcript quantification|correlation|Clustering|data normalization|principal component analysis|Gene expression comparison|Supervised Machine Learning|Sequence alignment|Enrichment Analysis"
+isStranded,3,NA|TRUE|FALSE
+libraryPrep,11,NA||polyAselection|Agilent SureSelect XT Human All Exon v6|Illumina TruSeq Stranded mRNA|Nugen Ovation Solo Total RNA|Agilent SureSelect XT Mouse All Exon|TruSeq stranded prep with depletion|Kapa Hyper|Automated Kapa Hyper PCR free|NA
+readLength,62,""
+readPairOrientation,6,NA||nan|fr-firststrand|inward|matching
+readStrandOrigin,1,NA
+multipleTestingAdjustmentMethod,4,"NA||Benjamini Hotchberg|Bonferroni, Benjamini Hochberg"
+differentialExpressionMethod,3,NA||edgeR
+alignmentMethod,6,NA||GSNAP|Burrows Wheeler Alignment algorithm|STAR|Salmon
+runType,5,NA||singleEnd|pairedEnd|NA
+transcriptQuantificationMethod,4,NA||bedtools multicov|Salmon
+dataFileHandleId,21477,""
+chemicalStructure,4,"NA||CN(Cc1cc2c(s1)c(nc(n2)c3ccc(nc3)OC)N4CCOCC4)c5ncc(cn5)C(=O)NO,Cc1c(c2ccccc2[nH]1)CCNCc3ccc(cc3)/C=C/C(=O)NO|COc1c(cc(cn1)c2ccc3c(c2)c(ccn3)c4ccnnc4)NS(=O)(=O)c5ccc(cc5F)F"
+structureType,3,NA||SMILES
+createdOn,24289,""
+isModelSystem,2,NA|TRUE
+modelSystemName,72,""
+createdBy,90,""
+etag,27325,""
+type,3,NA|file|table
+currentVersion,25,NA|1|2|5|4|3|12|34|6|7|9|8|11|18|14|10|22|15|16|19|20|13|40|39|17
+parentId,2164,""
+benefactorId,116,""
+projectId,54,""
+modifiedOn,24333,""
+modifiedBy,15,NA|3342573|3437353|3370706|3419403|3428107|3409504|3409135|3335866|3409405|3409186|3409222|3389310|1418096|3437426
+age,52,""
+sciDataRelease,3,NA|FALSE|TRUE
+accessTeam,3,NA|3391263|273948
+modelOf,9,NA||nan|Neurofibroma|Malignant Peripheral Nerve Sheath Tumor|Plexiform Neurofibroma|Neurofibromatosis 1|Low Grade Glioma|NA
+accessType,7,NA|PRIVATE|REQUEST ACCESS|PUBLIC||nan|NA
+libraryPreparationMethod,9,NA||TruSeq|nan|IDT xGen Exome Research Panel|True_seq standard total RNA library kit|Agilent SureSelect Human All Exon V5+UTR|TruSeq stranded prep with depletion|NA
+fileType,6,NA||exel|word|csv|jpg
+age_months,5,NA|1|7||6 weeks mice
+disease,9,"NA|Control|Neurofibromatosis 1|Not Applicable|Control,Neurofibromatosis 1||Orphanet:638|tumor|NF1 - MPNST"
+sampleIdentifier,1,NA
+tissueType,3,NA|Not Applicable|
+dataFileSizeBytes,3137,""
+dataFileMD5Hex,6401,""
+Filename,809,""
+assayTarget,21,"NA|nuclei|Nanog|Oct3|p75|SOX2|Tra1-60|HOXB7|SOX10|AP2a||Nestin|GAP43|GFP|Ku80|S100beta|neurofibromin|tyrosine hydroxylase|H3K27ac,pAKT,GAPDH|H3K27ac,pAKT,AKT|NF1"
+eTag,655,""
+entityId,894,""
+experimentalTimepoint,9,"NA||48h|72h|0-14|0,3|0-16|14|varied"
+cellLineMetadataSynId,5,NA||syn7506024|syn11614204|syn7805075
+individualMetadataSynId,3,NA|syn7805075|
+specimenMetadataSynId,3,NA|syn7805075|
+isGenomewideNetwork,2,NA|FALSE
+bodyPart,1,NA
+dissociationMethod,4,NA||none|NA
+failedQC,1,NA
+filename,397,""
+isXenograft,5,NA|FALSE||TRUE|NA
+nucleicAcidSource,4,NA||bulk cell|NA
+compoundId,318,""
+organism,3,NA||Human
+caseNumber,50,""
+dob,46,""
+dod,12,NA|1433116800000|1435276800000|NaN|1433462400000|1.435536e+12|1433203200000|1433289600000|1.454976e+12|1455062400000|1458777600000|1455148800000
+experimentalTimePointUnit,3,NA||hours
+sampleID,40,""
+secondCompoundDose,3,NA|50|15
+secondCompoundDoseUnit,3,NA||mg/kg
+studySite,12,"NA|UCSF: Horvai|IU: Clapp|Matt Steensma, VAI||Indiana University|UTSW: Maya DePlaza|UCSF: Kevin Shannon|UCSF: Elliot Stieglitz|UCSF: Ben Braun|UCSF|UCSF: Jean Nakamura"
+initiative,8,NA|Developmental and HyperActive Ras Tumor Specialized Programs of Research Excellence|Synodos|Gene Therapy Initiative||MPNST Patient-Derived Model Centers|Open Proposal Program|Opening the Data Drawers
+channel,4,NA||Cy3|Cy5
+histology,15,NA||Glioblastoma multiforme|Anaplastic astrocytoma|Anaplastic ganglioglioma|Pilocytic astrocytoma|Ganglioglioma|Xanthoastrocytoma|Anaplastic xanthoastrocytoma|High-grade glioma|Low-grade calcifying astrocytoma|Optic pathway glioma|Diffuse glioma|Anaplastic diffuse glioma|Gliosarcoma
+grade,6,NA||IV|III|I|II
+isMultiSample,3,NA|FALSE|TRUE
+cellLine,9,NA|ipn02.8|ipNF95.6|ipn97.4|ipNF95.11bC|ipNF95.11bC_T||ipn02.8_Clone 5|multiple
+cellLineSource,1,NA
+isPairedEnd,2,NA|TRUE
+detailed_diagnosis,3,NA|Sporadic Schwannomatosis|Familial Schwannomatosis
+file,1,NA
+tissueID,1,NA
+chemicalDataType,9,"NA|chemical structure|target|chemical structure, chemical hashed fingerprint|chemical identifier|complex database|chemical hashed fingerprint||tool"
+chemicalDatabase,6,NA|ChEMBL|DGIdb|Drug-Target Explorer|ChemicalProbes|
+fingerprintType,6,NA||circular|extended|klekota and roth|maccs
+inputDataType,3,"NA||gene list, SMILES"
+outputDataType,3,"NA||gene list, small molecule, pathway or network"
+softwareAuthor,3,"NA||Robert Allaway, Sage Bionetworks"
+softwareLanguage,3,NA||R
+softwareLanguageVersion,3,NA||3.4.3
+softwareName,3,NA||Drug-Target Explorer
+softwareRepository,3,NA||Github
+softwareRepositoryType,3,NA||source code
+softwareType,3,NA||web user interface
+softwareVersion,3,NA||beta
+structureFormat,3,NA|SMILES|
+experimentNumber,30,""
+experimenter,14,NA|Fiona||Jiale|Grace|Patrick|Fiona Mike|Yao|Hong|Mike|Gabriela & Danny|Gabriela|Kanupriya Gabriela Fiona Danny|Danny
+specimenId,52,""
+individualId,52,""
+modelSystemStrainNomenclature,4,NA||nan|NA
+transplantationRecipientSpecies,4,NA||Human|mouse
+experimentId,42,""
+proteinExtractSource,1,NA

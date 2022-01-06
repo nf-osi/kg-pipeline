@@ -1,0 +1,89 @@
+@prefix : <http://nf-osi.github.com/terms#> .
+@prefix nfgraph: <http://nf-osi.github.com/templates/0.1/> .
+@prefix obo: <http://purl.obolibrary.org/obo/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix pav: <http://purl.org/pav/> .
+
+@prefix ottr: <http://ns.ottr.xyz/0.4/> .
+@prefix o-rdfs:    <http://tpl.ottr.xyz/rdfs/0.2/> .
+@prefix o-rdf:     <http://tpl.ottr.xyz/rdf/0.1/> .
+@prefix o-docttr:  <http://tpl.ottr.xyz/p/docttr/0.1/> .
+
+nfgraph:Study_Resource [
+   ottr:IRI ?iri ,
+   ! xsd:string ?name ,
+   ? xsd:string ?description ,
+   ? xsd:string ?initiative ,
+   ? List<xsd:string> ?leads ,
+   ? List<xsd:string> ?institution ,
+   ? List<ottr:IRI> ?manifestation ,
+   ! ottr:IRI ?disease ,
+   ? ottr:string ?studyStatus ,
+   ? ottr:string ?dataStatus ,
+   ? xsd:string ?funder ,
+   ? xsd:string ?req ,
+   ? xsd:string ?statements ,
+   ? List<ottr:IRI> ?type ,
+   ? List<ottr:IRI> ?related ,
+   ? ottr:IRI ?fileview ,
+   ? List<ottr:IRI> ?doi
+   ]
+:: {
+
+    o-rdf:Type(?iri, :Study),
+    ottr:Triple(?iri, :studyName, ?name),
+    ottr:Triple(?iri, :description, ?description),
+    ottr:Triple(?iri, :initiative, ?initiative),
+    cross | ottr:Triple(?iri, :studyLeads, ++?leads),
+    cross | ottr:Triple(?iri, :institutions, ++?institution),
+    cross | ottr:Triple(?iri, :manifestation, ++?manifestation),
+    ottr:Triple(?iri, :diseaseFocus, ?disease),
+    ottr:Triple(?iri, :studyStatus, ?studyStatus),
+    ottr:Triple(?iri, :dataStatus, ?dataStatus),
+    ottr:Triple(?iri, :fundingAgency, ?funder),
+    ottr:Triple(?iri, :accessRequirements, ?req),
+    ottr:Triple(?iri, :acknowledgementStatements, ?statements),
+    cross | ottr:Triple(?iri, :dataType, ++?type),
+    cross | ottr:Triple(?iri, :relatedStudies, ++?related),
+    ottr:Triple(?iri, :studyFileviewId, ?fileview),
+    cross | ottr:Triple(?iri, :grantDOI, ++?doi)
+} .
+
+
+nfgraph:Hackie_Resource [
+   ottr:IRI ?iri ,
+   ! xsd:string ?name ,
+   ? xsd:string ?studyStatus ,
+   ? List<ottr:IRI> ?doi ,
+   ? xsd:string ?description ,
+   ? xsd:string ?initiative ,
+   ? xsd:string ?statements ,
+   ? List<xsd:string> ?leads ,
+   ? List<xsd:string> ?institution ,
+   ? ottr:IRI ?disease ,
+   ? List<ottr:IRI> ?manifestation ,
+   ? List<ottr:IRI> ?related ,
+   ? xsd:string ?funder
+   ]
+:: {
+
+    o-rdf:Type(?iri, :Hackie),
+    ottr:Triple(?iri, :studyName, ?name),
+    ottr:Triple(?iri, :description, ?description),
+    ottr:Triple(?iri, :initiative, ?initiative),
+    cross | ottr:Triple(?iri, :studyLeads, ++?leads),
+    cross | ottr:Triple(?iri, :institutions, ++?institution),
+    ottr:Triple(?iri, :diseaseFocus, ?disease),
+    cross | ottr:Triple(?iri, :manifestation, ++?manifestation),
+    ottr:Triple(?iri, :studyStatus, ?studyStatus),
+    ottr:Triple(?iri, :fundingAgency, ?funder),
+    ottr:Triple(?iri, :acknowledgementStatements, ?statements),
+    cross | ottr:Triple(?iri, :relatedStudies, ++?related),
+    cross | ottr:Triple(?iri, :grantDOI, ++?doi)
+} .

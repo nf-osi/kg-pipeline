@@ -1,0 +1,60 @@
+@prefix : <http://nf-osi.github.com/terms#> .
+@prefix nfgraph: <http://nf-osi.github.com/templates/0.1/> .
+@prefix obo: <http://purl.obolibrary.org/obo/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix pav: <http://purl.org/pav/> .
+
+@prefix ottr: <http://ns.ottr.xyz/0.4/> .
+@prefix o-rdfs:    <http://tpl.ottr.xyz/rdfs/0.2/> .
+@prefix o-rdf:     <http://tpl.ottr.xyz/rdf/0.1/> .
+@prefix o-docttr:  <http://tpl.ottr.xyz/p/docttr/0.1/> .
+
+o-rdf:Type [
+    ottr:IRI ?resource,
+    ottr:IRI ?class ]
+  @@o-docttr:Version(o-rdf:Type, ottr:draft, "0.1.1", none, none)
+:: {
+    ottr:Triple(?resource, rdf:type, ?class)
+} .
+
+nfgraph:Class [
+    ottr:IRI ?iri ,
+    ? List<ottr:IRI> ?parentClass ,
+    ? xsd:string ?description ,
+    ? List<ottr:IRI> ?seeAlso ]
+:: {
+    o-rdf:Type(?iri, owl:Class),
+    cross | ottr:Triple(?iri, rdfs:subClassOf, ++?parentClass),
+    ottr:Triple(?iri, rdfs:comment, ?description),
+    cross | ottr:Triple(?iri, rdfs:seeAlso, ++?seeAlso)
+} .
+
+nfgraph:ObjectProperty [
+    ottr:IRI ?iri ,
+    ? ottr:IRI ?subPropertyOf ,
+    ? ottr:IRI ?range ,
+    ? xsd:string ?description ]
+:: {
+    o-rdf:Type(?iri, owl:ObjectProperty),
+    ottr:Triple(?iri, rdfs:subPropertyOF, ?subPropertyOf),
+    ottr:Triple(?iri, rdfs:range, ?range),
+    ottr:Triple(?iri, rdfs:comment, ?description)
+} .
+
+nfgraph:DataProperty [
+    ottr:IRI ?iri ,
+    ? List<ottr:IRI> ?subPropertyOf ,
+    ? ottr:IRI ?range ,
+    ? xsd:string ?description ]
+:: {
+    o-rdf:Type(?iri, owl:DataProperty),
+    cross | ottr:Triple(?iri, rdfs:subPropertyOF, ++?subPropertyOf),
+    ottr:Triple(?iri, rdfs:range, ?range),
+    ottr:Triple(?iri, rdfs:comment, ?description)
+} .
