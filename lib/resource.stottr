@@ -7,6 +7,7 @@
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix dct: <http://purl.org/dc/terms/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
 @prefix prov: <http://www.w3.org/ns/prov#> .
 @prefix pav: <http://purl.org/pav/> .
 
@@ -16,12 +17,12 @@
 @prefix o-docttr:  <http://tpl.ottr.xyz/p/docttr/0.1/> .
 
 nfgraph:Resource [
-   ottr:IRI ?resourceUUID ,
+   ottr:IRI ?iri , #resourceId
    ! ottr:IRI ?uuid ,
    ? ottr:IRI ?rrid ,
    ! ottr:IRI ?resourceType ,
    ! xsd:string ?name ,
-   ? xsd:string ?synonyms ,
+   ? List<xsd:string> ?synonyms ,
    ? xsd:string ?description ,
    ? xsd:string ?usageRequirements ,
    ? xsd:string ?howToAcquire ,
@@ -30,10 +31,10 @@ nfgraph:Resource [
    ]
 :: {
 
-    o-rdf:Type(?iri, ++(:Resource, ?resourceType)),
-    ottr:Triple(?iri, owl:sameAs, ++(?uuid, ?rrid)),
+    cross | o-rdf:Type(?iri, ++(rdfs:Resource, ?resourceType)),
+    cross | ottr:Triple(?iri, owl:sameAs, ++(?uuid, ?rrid)),
     ottr:Triple(?iri, rdf:label, ?name),
-    cross | ottr:Triple(?iri, skos:synonym, ++?synonyms),
+    cross | ottr:Triple(?iri, skos:altLabel, ++?synonyms),
     ottr:Triple(?iri, :description, ?description),
     ottr:Triple(?iri, :usageRestriction, ?usageRequirements),
     ottr:Triple(?iri, :howToAcquire, ?howToAcquire),
@@ -42,22 +43,22 @@ nfgraph:Resource [
 } .
 
 
-# Resource donor; may be the source of an animal model or cell line
 nfgraph:Donor [
    ottr:IRI ?iri ,
    ? ottr:IRI ?parentDonorId ,
    ? ottr:IRI ?species ,
    ? ottr:IRI ?race ,
    ? ottr:IRI ?sex ,
-   ? xsd:string ?age
+   ? xsd:double ?age
    ]
 :: {
 
     o-rdf:Type(?iri, ?species),
+    ottr:Triple(?iri, :donor, ?parentDonorId),
     ottr:Triple(?iri, :race, ?race),
     ottr:Triple(?iri, :sex, ?sex),
     ottr:Triple(?iri, :age, ?age)
-}
+} .
 
 
 nfgraph:AnimalModel [
@@ -75,22 +76,24 @@ nfgraph:AnimalModel [
     o-rdf:Type(?iri, ?category),
     ottr:Triple(?iri, :donor, ?donorId),
     ottr:Triple(?iri, :backgroundSubstrain, ?backgroundSubstrain),
+    ottr:Triple(?iri, :strainNomenclature, ?strainNomenclature),
     ottr:Triple(?iri, :tissue, ?tissue),
     ottr:Triple(?iri, :manifestation, ?manifestation),
     ottr:Triple(?iri, :geneticDisorder, ?geneticDisorder),
-    ottr:Triple(?iri, :populationDoublingTime, ?populationDoublingTime)
-}
+    ottr:Triple(?iri, :state, ?state),
+    ottr:Triple(?iri, :generation, ?generation)
+} .
 
 
 nfgraph:CellLine [
    ottr:IRI ?iri ,
-   ottr:IRI ?category ,
+   ! ottr:IRI ?category ,
    ? ottr:IRI ?donorId ,
    ? ottr:IRI ?organ ,
    ? ottr:IRI ?tissue ,
    ? ottr:IRI ?manifestation ,
    ? ottr:IRI ?geneticDisorder ,
-   ? ottr:IRI ?populationDoublingTime ,
+   ? xsd:string ?populationDoublingTime 
    ]
 :: {
 
@@ -101,22 +104,22 @@ nfgraph:CellLine [
     ottr:Triple(?iri, :manifestation, ?manifestation),
     ottr:Triple(?iri, :geneticDisorder, ?geneticDisorder),
     ottr:Triple(?iri, :populationDoublingTime, ?populationDoublingTime)
-}
+} .
 
 nfgraph:Mutation [
    ottr:IRI ?iri ,
-   ? xsd:string ?mutationType ,
+   ? ottr:IRI ?mutationType ,
    ? ottr:IRI ?mutationMethod ,
    ? xsd:string ?clinVar ,
    ? ottr:IRI ?alleleType ,
    ? ottr:IRI ?affectedGene ,
    ? xsd:string ?sequenceVariation ,
    ? xsd:string ?proteinVariation ,
-   ? xsd:string ?chromosome 
+   ? xsd:positiveInteger ?chromosome 
    ]
 :: {
 
-    o-rdf:Type(?iri, +(:Mutation, ?mutationType)),
+    cross | o-rdf:Type(?iri, ++(:Mutation, ?mutationType)),
     ottr:Triple(?iri, :mutationMethod, ?mutationMethod),
     ottr:Triple(?iri, :clinVar, ?clinVar),
     ottr:Triple(?iri, :alleleType, ?alleleType),
@@ -125,7 +128,65 @@ nfgraph:Mutation [
     ottr:Triple(?iri, :proteinVariation, ?proteinVariation),
     ottr:Triple(?iri, :onChromosome, ?chromosome),
 
-}
+} .
+
+nfgraph:Vector [
+   ottr:IRI ?iri ,
+   ! ottr:IRI ?vectorType ,
+   ? xsd:string ?insertEntrezId ,
+   ? xsd:string ?insertName ,
+   ? xsd:string ?fiveprimer ,
+   ? ottr:IRI ?cloningMethod ,
+   ? ottr:IRI ?copyNumber ,
+   ? ottr:IRI ?insertSpecies,
+   ? xsd:string ?nTerminalTag ,
+   ? xsd:string ?cTerminalTag ,
+   ? xsd:string ?totalSize ,
+   ? xsd:string ?fiveprimeCloningSite ,
+   ? xsd:string ?growthTemp ,
+   ? xsd:string ?threeprimer,
+   ? xsd:boolean ?fiveprimeSiteDestroyed ,
+   ? xsd:boolean ?threePrimeSiteDestroyed ,
+   ? xsd:string ?threeprimeCloningSite ,
+   ? xsd:string ?promoter ,
+   ? xsd:string ?backboneSize ,
+   ? xsd:string ?insertSize ,
+   ? xsd:string ?vectorBackbone ,
+   ? xsd:growthStrain ?vectorName ,
+   ? xsd:string ?gRNAshRNASequence ,
+   ? xsd:string ?growthStrain ,
+   ? xsd:string ?selectableMarker ,
+   ? xsd:string ?bacterialResistance
+   ]
+:: {
+
+    o-rdf:Type(?iri, ?vectorType),
+    ottr:Triple(?iri, :insertEntrezId, ?insertEntrezId),
+    ottr:Triple(?iri, :insertName, ?insertName),
+    ottr:Triple(?iri, :5primer, ?fiveprimer),
+    ottr:Triple(?iri, :cloningMethod, ?cloningMethod),
+    ottr:Triple(?iri, :copyNumber, ?copyNumber),
+    ottr:Triple(?iri, :insertSpecies, ?insertSpecies),
+    ottr:Triple(?iri, :nTerminalTag, ?nTerminalTag),
+    ottr:Triple(?iri, :cTerminalTag, ?cTerminalTag),
+    ottr:Triple(?iri, :totalSize, ?totalSize),
+    ottr:Triple(?iri, :5primeCloningSite, ?fiveprimeCloningSite),
+    ottr:Triple(?iri, :growthTemp, ?growthTemp),
+    ottr:Triple(?iri, :threeprimer, ?threeprimer),
+    ottr:Triple(?iri, :fiveprimeSiteDestroyed, ?fiveprimeSiteDestroyed),
+    ottr:Triple(?iri, :threePrimeSiteDestroyed, ?threePrimeSiteDestroyed),
+    ottr:Triple(?iri, :threeprimeCloningSite, ?threeprimeCloningSite),
+    ottr:Triple(?iri, :promoter, ?promoter),
+    ottr:Triple(?iri, :backboneSize, ?backboneSize),
+    ottr:Triple(?iri, :insertSize, ?insertSize),
+    ottr:Triple(?iri, :vectorBackbone, ?vectorBackbone),
+    ottr:Triple(?iri, :vectorName, ?vectorName),
+    ottr:Triple(?iri, :gRNAshRNASequence, ?gRNAshRNASequence),
+    ottr:Triple(?iri, :growthStrain, ?growthStrain),
+    ottr:Triple(?iri, :selectableMarker, ?selectableMarker),
+    ottr:Triple(?iri, :bacterialResistance, ?bacterialResistance)
+
+} .
 
 nfgraph:Mutation_Resource [
    ottr:IRI ?mutation ,
@@ -136,7 +197,7 @@ nfgraph:Mutation_Resource [
 
     ottr:Triple(?animalModel, :hasMutation, ?mutation),
     ottr:Triple(?cellLine, :hasMutation, ?mutation)
-}
+} .
 
 nfgraph:Publication_Resource [
    ottr:IRI ?publication ,
@@ -145,5 +206,19 @@ nfgraph:Publication_Resource [
 :: {
 
     ottr:Triple(?publication, :used, ?resource)
-}
+} .
+
+nfgraph:Development [
+    ottr:IRI ?resourceUUID ,
+    ? ottr:IRI ?investigator ,
+    ? ottr:IRI ?publication ,
+    ? ottr:IRI ?funder 
+]
+:: {
+    ottr:Triple(?resourceUUID, :createdBy, ?investigator),
+    ottr:Triple(?resourceUUID, :reference, ?publication),
+    ottr:Triple(?resourceUUID, :fundedBy, ?funder)
+} .
+
+
 
