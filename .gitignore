@@ -1,0 +1,4 @@
+# Ignore generated data artifacts
+# Keep data directory contents out of the repository
+# (files will remain locally but will not be tracked)
+data/
