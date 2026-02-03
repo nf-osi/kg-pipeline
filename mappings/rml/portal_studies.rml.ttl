@@ -29,7 +29,33 @@ map:StudyCore a rr:TriplesMap ;
     rr:predicateObjectMap [ rr:predicate rdf:type ; rr:objectMap [ rr:constant nf:Study ; rr:termType rr:IRI ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:studyName ; rr:objectMap [ rml:reference "studyName" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:description ; rr:objectMap [ rml:reference "summary" ; rr:datatype xsd:string ] ] ;
-    rr:predicateObjectMap [ rr:predicate nf:initiative ; rr:objectMap [ rml:reference "initiative" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:initiative ;
+        rr:objectMap [
+            a fnml:FunctionTermMap ;
+            rr:termType rr:IRI ;
+            fnml:functionValue [
+                a fno:Execution ;
+                rml:logicalSource map:PortalStudiesSource ;
+                rr:predicateObjectMap [
+                    rr:predicate fno:executes ;
+                    rr:objectMap [ rr:constant grel:string_replace ; rr:termType rr:IRI ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:valueParameter ;
+                    rr:objectMap [ rr:template "http://nf-osi.github.com/terms#{initiative}" ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:p_string_find ;
+                    rr:objectMap [ rr:constant "%20" ; rr:termType rr:Literal ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:p_string_replace ;
+                    rr:objectMap [ rr:constant "_" ; rr:termType rr:Literal ]
+                ]
+            ]
+        ]
+    ] ;
     rr:predicateObjectMap [ rr:predicate nf:studyStatus ; rr:objectMap [ rml:reference "studyStatus" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:dataStatus ; rr:objectMap [ rml:reference "dataStatus" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:accessRequirements ; rr:objectMap [ rml:reference "accessRequirements" ; rr:datatype xsd:string ] ] ;
@@ -163,7 +189,7 @@ map:StudyFundingAgency a rr:TriplesMap ;
         rr:predicate nf:fundingAgency ;
         rr:objectMap [
             a fnml:FunctionTermMap ;
-            rr:datatype xsd:string ;
+            rr:termType rr:IRI ;
             fnml:functionValue [
                 a fno:Execution ;
                 rml:logicalSource map:PortalStudiesSource ;
@@ -173,11 +199,55 @@ map:StudyFundingAgency a rr:TriplesMap ;
                 ] ;
                 rr:predicateObjectMap [
                     rr:predicate grel:valueParameter ;
-                    rr:objectMap [ rml:reference "fundingAgency" ; rr:termType rr:Literal ]
+                    rr:objectMap [
+                        a fnml:FunctionTermMap ;
+                        fnml:functionValue [
+                            a fno:Execution ;
+                            rml:logicalSource map:PortalStudiesSource ;
+                            rr:predicateObjectMap [
+                                rr:predicate fno:executes ;
+                                rr:objectMap [ rr:constant grel:string_replace ; rr:termType rr:IRI ]
+                            ] ;
+                            rr:predicateObjectMap [
+                                rr:predicate grel:valueParameter ;
+                                rr:objectMap [
+                                    a fnml:FunctionTermMap ;
+                                    fnml:functionValue [
+                                        a fno:Execution ;
+                                        rml:logicalSource map:PortalStudiesSource ;
+                                        rr:predicateObjectMap [
+                                            rr:predicate fno:executes ;
+                                            rr:objectMap [ rr:constant grel:string_replace ; rr:termType rr:IRI ]
+                                        ] ;
+                                        rr:predicateObjectMap [
+                                            rr:predicate grel:valueParameter ;
+                                            rr:objectMap [ rr:template "http://nf-osi.github.com/terms#{fundingAgency}" ]
+                                        ] ;
+                                        rr:predicateObjectMap [
+                                            rr:predicate grel:p_string_find ;
+                                            rr:objectMap [ rr:constant "%20" ; rr:termType rr:Literal ]
+                                        ] ;
+                                        rr:predicateObjectMap [
+                                            rr:predicate grel:p_string_replace ;
+                                            rr:objectMap [ rr:constant "_" ; rr:termType rr:Literal ]
+                                        ]
+                                    ]
+                                ]
+                            ] ;
+                            rr:predicateObjectMap [
+                                rr:predicate grel:p_string_find ;
+                                rr:objectMap [ rr:constant "%7C" ; rr:termType rr:Literal ]
+                            ] ;
+                            rr:predicateObjectMap [
+                                rr:predicate grel:p_string_replace ;
+                                rr:objectMap [ rr:constant "%7Chttp://nf-osi.github.com/terms#" ; rr:termType rr:Literal ]
+                            ]
+                        ]
+                    ]
                 ] ;
                 rr:predicateObjectMap [
                     rr:predicate grel:p_string_sep ;
-                    rr:objectMap [ rr:constant "\\|" ; rr:termType rr:Literal ]
+                    rr:objectMap [ rr:constant "%7C" ; rr:termType rr:Literal ]
                 ]
             ]
         ]
