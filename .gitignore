@@ -5,3 +5,6 @@ data/
 
 # Ignore RMLMapper logs
 logs/
+
+# Ignore local RMLMapper binary
+tools/rmlmapper-8.1.0.jar
