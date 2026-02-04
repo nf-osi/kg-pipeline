@@ -1,0 +1,122 @@
+@prefix rr:   <http://www.w3.org/ns/r2rml#> .
+@prefix rml:  <http://semweb.mmlab.be/ns/rml#> .
+@prefix fnml: <http://semweb.mmlab.be/ns/fnml#> .
+@prefix fno:  <https://w3id.org/function/ontology#> .
+@prefix ql:   <http://semweb.mmlab.be/ns/ql#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix grel: <http://users.ugent.be/~bjdmeest/function/grel.ttl#> .
+@prefix nf:   <http://nf-osi.github.com/terms#> .
+@prefix map:  <http://nf-osi.github.com/mappings/portal-genetic-reagents#> .
+
+################################################################################
+# Logical source
+################################################################################
+
+map:PortalGeneticReagentsSource a rml:LogicalSource ;
+    rml:source "data/csv/portal_genetic_reagents.csv" ;
+    rml:referenceFormulation ql:CSV .
+
+################################################################################
+# Genetic Reagent core facts
+################################################################################
+
+map:GeneticReagentCore a rr:TriplesMap ;
+    rdfs:label "Genetic Reagent Core" ;
+    rml:logicalSource map:PortalGeneticReagentsSource ;
+    rr:subjectMap [
+        rr:template "http://nf-osi.github.com/terms#geneticReagent/{geneticReagentId}" ;
+        rr:termType rr:IRI
+    ] ;
+    rr:predicateObjectMap [ rr:predicate rdf:type ; rr:objectMap [ rr:constant nf:GeneticReagent ; rr:termType rr:IRI ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:geneticReagentId ; rr:objectMap [ rml:reference "geneticReagentId" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:insertEntrezId ; rr:objectMap [ rml:reference "insertEntrezId" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:insertName ; rr:objectMap [ rml:reference "insertName" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:insertSize ; rr:objectMap [ rml:reference "insertSize" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:cloningMethod ; rr:objectMap [ rml:reference "cloningMethod" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:copyNumber ; rr:objectMap [ rml:reference "copyNumber" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:nTerminalTag ; rr:objectMap [ rml:reference "nTerminalTag" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:cTerminalTag ; rr:objectMap [ rml:reference "cTerminalTag" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:totalSize ; rr:objectMap [ rml:reference "totalSize" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:vectorBackbone ; rr:objectMap [ rml:reference "vectorBackbone" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:backboneSize ; rr:objectMap [ rml:reference "backboneSize" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:promoter ; rr:objectMap [ rml:reference "promoter" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:bacterialResistance ; rr:objectMap [ rml:reference "bacterialResistance" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:growthTemp ; rr:objectMap [ rml:reference "growthTemp" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:growthStrain ; rr:objectMap [ rml:reference "growthStrain" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:selectableMarker ; rr:objectMap [ rml:reference "selectableMarker" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:fivePrimer ; rr:objectMap [ rml:reference "fivePrimer" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:threePrimer ; rr:objectMap [ rml:reference "threePrimer" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:fivePrimeCloningSite ; rr:objectMap [ rml:reference "fivePrimeCloningSite" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:threePrimeCloningSite ; rr:objectMap [ rml:reference "threePrimeCloningSite" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:fivePrimeSiteDestroyed ; rr:objectMap [ rml:reference "fivePrimeSiteDestroyed" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:threePrimeSiteDestroyed ; rr:objectMap [ rml:reference "threePrimeSiteDestroyed" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:gRNAshRNASequence ; rr:objectMap [ rml:reference "gRNAshRNASequence" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:hazardous ; rr:objectMap [ rml:reference "hazardous" ; rr:datatype xsd:string ] ] .
+
+################################################################################
+# Multi-valued fields (StringList)
+################################################################################
+
+map:GeneticReagentVectorType a rr:TriplesMap ;
+    rdfs:label "Genetic Reagent Vector Type" ;
+    rml:logicalSource map:PortalGeneticReagentsSource ;
+    rr:subjectMap [
+        rr:template "http://nf-osi.github.com/terms#geneticReagent/{geneticReagentId}" ;
+        rr:termType rr:IRI
+    ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:vectorType ;
+        rr:objectMap [
+            a fnml:FunctionTermMap ;
+            rr:datatype xsd:string ;
+            fnml:functionValue [
+                a fno:Execution ;
+                rml:logicalSource map:PortalGeneticReagentsSource ;
+                rr:predicateObjectMap [
+                    rr:predicate fno:executes ;
+                    rr:objectMap [ rr:constant grel:string_split ; rr:termType rr:IRI ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:valueParameter ;
+                    rr:objectMap [ rml:reference "vectorType" ; rr:termType rr:Literal ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:p_string_sep ;
+                    rr:objectMap [ rr:constant "\\|" ; rr:termType rr:Literal ]
+                ]
+            ]
+        ]
+    ] .
+
+map:GeneticReagentInsertSpecies a rr:TriplesMap ;
+    rdfs:label "Genetic Reagent Insert Species" ;
+    rml:logicalSource map:PortalGeneticReagentsSource ;
+    rr:subjectMap [
+        rr:template "http://nf-osi.github.com/terms#geneticReagent/{geneticReagentId}" ;
+        rr:termType rr:IRI
+    ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:insertSpecies ;
+        rr:objectMap [
+            a fnml:FunctionTermMap ;
+            rr:datatype xsd:string ;
+            fnml:functionValue [
+                a fno:Execution ;
+                rml:logicalSource map:PortalGeneticReagentsSource ;
+                rr:predicateObjectMap [
+                    rr:predicate fno:executes ;
+                    rr:objectMap [ rr:constant grel:string_split ; rr:termType rr:IRI ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:valueParameter ;
+                    rr:objectMap [ rml:reference "insertSpecies" ; rr:termType rr:Literal ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:p_string_sep ;
+                    rr:objectMap [ rr:constant "\\|" ; rr:termType rr:Literal ]
+                ]
+            ]
+        ]
+    ] .
