@@ -1,0 +1,338 @@
+@prefix rr:   <http://www.w3.org/ns/r2rml#> .
+@prefix rml:  <http://semweb.mmlab.be/ns/rml#> .
+@prefix fnml: <http://semweb.mmlab.be/ns/fnml#> .
+@prefix fno:  <https://w3id.org/function/ontology#> .
+@prefix ql:   <http://semweb.mmlab.be/ns/ql#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix grel: <http://users.ugent.be/~bjdmeest/function/grel.ttl#> .
+@prefix nf:   <http://nf-osi.github.com/terms#> .
+@prefix map:  <http://nf-osi.github.com/mappings/portal-studies#> .
+
+################################################################################
+# Logical source shared by all triples maps
+################################################################################
+
+map:PortalStudiesSource a rml:LogicalSource ;
+    rml:source "data/csv/portal_studies.csv" ;
+    rml:referenceFormulation ql:CSV .
+
+################################################################################
+# Study core facts
+################################################################################
+
+map:StudyCore a rr:TriplesMap ;
+    rdfs:label "Study Core" ;
+    rml:logicalSource map:PortalStudiesSource ;
+    rr:subjectMap [ rml:reference "studyId" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [ rr:predicate rdf:type ; rr:objectMap [ rr:constant nf:Study ; rr:termType rr:IRI ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:studyName ; rr:objectMap [ rml:reference "studyName" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:description ; rr:objectMap [ rml:reference "summary" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:initiative ;
+        rr:objectMap [
+            a fnml:FunctionTermMap ;
+            rr:termType rr:IRI ;
+            fnml:functionValue [
+                a fno:Execution ;
+                rml:logicalSource map:PortalStudiesSource ;
+                rr:predicateObjectMap [
+                    rr:predicate fno:executes ;
+                    rr:objectMap [ rr:constant grel:string_replace ; rr:termType rr:IRI ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:valueParameter ;
+                    rr:objectMap [ rr:template "http://nf-osi.github.com/terms#{initiative}" ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:p_string_find ;
+                    rr:objectMap [ rr:constant "%20" ; rr:termType rr:Literal ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:p_string_replace ;
+                    rr:objectMap [ rr:constant "_" ; rr:termType rr:Literal ]
+                ]
+            ]
+        ]
+    ] ;
+    rr:predicateObjectMap [ rr:predicate nf:studyStatus ; rr:objectMap [ rml:reference "studyStatus" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:dataStatus ; rr:objectMap [ rml:reference "dataStatus" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:accessRequirements ; rr:objectMap [ rml:reference "accessRequirements" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:acknowledgementStatements ; rr:objectMap [ rml:reference "acknowledgementStatements" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:studyFileviewId ;
+        rr:objectMap [ rml:reference "studyFileviewId" ; rr:termType rr:IRI ]
+    ] .
+
+################################################################################
+# Helper macro for literal splits (expanded inline per property)
+################################################################################
+
+map:StudyLeads a rr:TriplesMap ;
+    rdfs:label "Study Leads" ;
+    rml:logicalSource map:PortalStudiesSource ;
+    rr:subjectMap [ rml:reference "studyId" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:studyLeads ;
+        rr:objectMap [
+            a fnml:FunctionTermMap ;
+            rr:datatype xsd:string ;
+            fnml:functionValue [
+                a fno:Execution ;
+                rml:logicalSource map:PortalStudiesSource ;
+                rr:predicateObjectMap [
+                    rr:predicate fno:executes ;
+                    rr:objectMap [ rr:constant grel:string_split ; rr:termType rr:IRI ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:valueParameter ;
+                    rr:objectMap [ rml:reference "studyLeads" ; rr:termType rr:Literal ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:p_string_sep ;
+                    rr:objectMap [ rr:constant "\\|" ; rr:termType rr:Literal ]
+                ]
+            ]
+        ]
+    ] .
+
+map:StudyInstitutions a rr:TriplesMap ;
+    rdfs:label "Study Institutions" ;
+    rml:logicalSource map:PortalStudiesSource ;
+    rr:subjectMap [ rml:reference "studyId" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:institutions ;
+        rr:objectMap [
+            a fnml:FunctionTermMap ;
+            rr:datatype xsd:string ;
+            fnml:functionValue [
+                a fno:Execution ;
+                rml:logicalSource map:PortalStudiesSource ;
+                rr:predicateObjectMap [
+                    rr:predicate fno:executes ;
+                    rr:objectMap [ rr:constant grel:string_split ; rr:termType rr:IRI ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:valueParameter ;
+                    rr:objectMap [ rml:reference "institutions" ; rr:termType rr:Literal ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:p_string_sep ;
+                    rr:objectMap [ rr:constant "\\|" ; rr:termType rr:Literal ]
+                ]
+            ]
+        ]
+    ] .
+
+map:StudyManifestation a rr:TriplesMap ;
+    rdfs:label "Study Manifestation" ;
+    rml:logicalSource map:PortalStudiesSource ;
+    rr:subjectMap [ rml:reference "studyId" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:manifestation ;
+        rr:objectMap [
+            a fnml:FunctionTermMap ;
+            rr:datatype xsd:string ;
+            fnml:functionValue [
+                a fno:Execution ;
+                rml:logicalSource map:PortalStudiesSource ;
+                rr:predicateObjectMap [
+                    rr:predicate fno:executes ;
+                    rr:objectMap [ rr:constant grel:string_split ; rr:termType rr:IRI ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:valueParameter ;
+                    rr:objectMap [ rml:reference "manifestation" ; rr:termType rr:Literal ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:p_string_sep ;
+                    rr:objectMap [ rr:constant "\\|" ; rr:termType rr:Literal ]
+                ]
+            ]
+        ]
+    ] .
+
+map:StudyDiseaseFocus a rr:TriplesMap ;
+    rdfs:label "Study Disease Focus" ;
+    rml:logicalSource map:PortalStudiesSource ;
+    rr:subjectMap [ rml:reference "studyId" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:diseaseFocus ;
+        rr:objectMap [
+            a fnml:FunctionTermMap ;
+            rr:datatype xsd:string ;
+            fnml:functionValue [
+                a fno:Execution ;
+                rml:logicalSource map:PortalStudiesSource ;
+                rr:predicateObjectMap [
+                    rr:predicate fno:executes ;
+                    rr:objectMap [ rr:constant grel:string_split ; rr:termType rr:IRI ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:valueParameter ;
+                    rr:objectMap [ rml:reference "diseaseFocus" ; rr:termType rr:Literal ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:p_string_sep ;
+                    rr:objectMap [ rr:constant "\\|" ; rr:termType rr:Literal ]
+                ]
+            ]
+        ]
+    ] .
+
+map:StudyFundingAgency a rr:TriplesMap ;
+    rdfs:label "Study Funding Agency" ;
+    rml:logicalSource map:PortalStudiesSource ;
+    rr:subjectMap [ rml:reference "studyId" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:fundingAgency ;
+        rr:objectMap [
+            a fnml:FunctionTermMap ;
+            rr:termType rr:IRI ;
+            fnml:functionValue [
+                a fno:Execution ;
+                rml:logicalSource map:PortalStudiesSource ;
+                rr:predicateObjectMap [
+                    rr:predicate fno:executes ;
+                    rr:objectMap [ rr:constant grel:string_split ; rr:termType rr:IRI ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:valueParameter ;
+                    rr:objectMap [
+                        a fnml:FunctionTermMap ;
+                        fnml:functionValue [
+                            a fno:Execution ;
+                            rml:logicalSource map:PortalStudiesSource ;
+                            rr:predicateObjectMap [
+                                rr:predicate fno:executes ;
+                                rr:objectMap [ rr:constant grel:string_replace ; rr:termType rr:IRI ]
+                            ] ;
+                            rr:predicateObjectMap [
+                                rr:predicate grel:valueParameter ;
+                                rr:objectMap [
+                                    a fnml:FunctionTermMap ;
+                                    fnml:functionValue [
+                                        a fno:Execution ;
+                                        rml:logicalSource map:PortalStudiesSource ;
+                                        rr:predicateObjectMap [
+                                            rr:predicate fno:executes ;
+                                            rr:objectMap [ rr:constant grel:string_replace ; rr:termType rr:IRI ]
+                                        ] ;
+                                        rr:predicateObjectMap [
+                                            rr:predicate grel:valueParameter ;
+                                            rr:objectMap [ rr:template "http://nf-osi.github.com/terms#{fundingAgency}" ]
+                                        ] ;
+                                        rr:predicateObjectMap [
+                                            rr:predicate grel:p_string_find ;
+                                            rr:objectMap [ rr:constant "%20" ; rr:termType rr:Literal ]
+                                        ] ;
+                                        rr:predicateObjectMap [
+                                            rr:predicate grel:p_string_replace ;
+                                            rr:objectMap [ rr:constant "_" ; rr:termType rr:Literal ]
+                                        ]
+                                    ]
+                                ]
+                            ] ;
+                            rr:predicateObjectMap [
+                                rr:predicate grel:p_string_find ;
+                                rr:objectMap [ rr:constant "%7C" ; rr:termType rr:Literal ]
+                            ] ;
+                            rr:predicateObjectMap [
+                                rr:predicate grel:p_string_replace ;
+                                rr:objectMap [ rr:constant "%7Chttp://nf-osi.github.com/terms#" ; rr:termType rr:Literal ]
+                            ]
+                        ]
+                    ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:p_string_sep ;
+                    rr:objectMap [ rr:constant "%7C" ; rr:termType rr:Literal ]
+                ]
+            ]
+        ]
+    ] .
+
+map:StudyDataType a rr:TriplesMap ;
+    rdfs:label "Study Data Type" ;
+    rml:logicalSource map:PortalStudiesSource ;
+    rr:subjectMap [ rml:reference "studyId" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:dataType ;
+        rr:objectMap [
+            a fnml:FunctionTermMap ;
+            rr:datatype xsd:string ;
+            fnml:functionValue [
+                a fno:Execution ;
+                rml:logicalSource map:PortalStudiesSource ;
+                rr:predicateObjectMap [
+                    rr:predicate fno:executes ;
+                    rr:objectMap [ rr:constant grel:string_split ; rr:termType rr:IRI ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:valueParameter ;
+                    rr:objectMap [ rml:reference "dataType" ; rr:termType rr:Literal ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:p_string_sep ;
+                    rr:objectMap [ rr:constant "\\|" ; rr:termType rr:Literal ]
+                ]
+            ]
+        ]
+    ] .
+
+map:StudyRelatedStudies a rr:TriplesMap ;
+    rdfs:label "Study Related Studies" ;
+    rml:logicalSource map:PortalStudiesSource ;
+    rr:subjectMap [ rml:reference "studyId" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:relatedStudies ;
+        rr:objectMap [
+            a fnml:FunctionTermMap ;
+            rr:termType rr:IRI ;
+            fnml:functionValue [
+                a fno:Execution ;
+                rml:logicalSource map:PortalStudiesSource ;
+                rr:predicateObjectMap [
+                    rr:predicate fno:executes ;
+                    rr:objectMap [ rr:constant grel:string_split ; rr:termType rr:IRI ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:valueParameter ;
+                    rr:objectMap [ rml:reference "relatedStudies" ; rr:termType rr:Literal ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:p_string_sep ;
+                    rr:objectMap [ rr:constant "\\|" ; rr:termType rr:Literal ]
+                ]
+            ]
+        ]
+    ] .
+
+map:StudyGrantDOI a rr:TriplesMap ;
+    rdfs:label "Study Grant DOI" ;
+    rml:logicalSource map:PortalStudiesSource ;
+    rr:subjectMap [ rml:reference "studyId" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:grantDOI ;
+        rr:objectMap [
+            a fnml:FunctionTermMap ;
+            rr:termType rr:IRI ;
+            fnml:functionValue [
+                a fno:Execution ;
+                rml:logicalSource map:PortalStudiesSource ;
+                rr:predicateObjectMap [
+                    rr:predicate fno:executes ;
+                    rr:objectMap [ rr:constant grel:string_split ; rr:termType rr:IRI ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:valueParameter ;
+                    rr:objectMap [ rml:reference "grantDOI" ; rr:termType rr:Literal ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:p_string_sep ;
+                    rr:objectMap [ rr:constant "\\|" ; rr:termType rr:Literal ]
+                ]
+            ]
+        ]
+    ] .

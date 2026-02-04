@@ -1,0 +1,10 @@
+# Ignore generated data artifacts
+# Keep data directory contents out of the repository
+# (files will remain locally but will not be tracked)
+data/
+
+# Ignore RMLMapper logs
+logs/
+
+# Ignore local RMLMapper binary
+tools/rmlmapper-8.1.0.jar

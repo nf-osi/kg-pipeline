@@ -1,0 +1,292 @@
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix nf: <http://nf-osi.github.com/terms#> .
+@prefix EDAM: <http://edamontology.org/> .
+@prefix map: <https://w3id.org/synapse/nfosi/mapping/data/> .
+
+map:DataEnumLookup a skos:ConceptScheme ;
+    skos:prefLabel "NF-OSI Data literal lookup" .
+
+map:aligned_reads skos:prefLabel "aligned reads" ;
+    skos:altLabel "AlignedReads" ;
+    skos:inScheme map:DataEnumLookup ;
+    skos:exactMatch nf:aligned_reads .
+
+map:annotated_germline_variants skos:prefLabel "annotated germline variants" ;
+    skos:inScheme map:DataEnumLookup ;
+    skos:exactMatch nf:annotated_germline_variants .
+
+map:annotated_somatic_mutation skos:prefLabel "annotated somatic mutation" ;
+    skos:inScheme map:DataEnumLookup ;
+    skos:exactMatch nf:annotated_somatic_mutation .
+
+map:audio_transcript skos:prefLabel "audio transcript" ;
+    skos:inScheme map:DataEnumLookup ;
+    skos:exactMatch nf:audio_transcript .
+
+map:behavioral_data skos:prefLabel "behavioral data" ;
+    skos:altLabel "behavior process" ;
+    skos:inScheme map:DataEnumLookup ;
+    skos:exactMatch nf:behavioral_data .
+
+map:capsid_sequence skos:prefLabel "capsid sequence" ;
+    skos:inScheme map:DataEnumLookup ;
+    skos:exactMatch EDAM:data_3494 .
+
+map:cellular_physiology skos:prefLabel "cellular physiology" ;
+    skos:altLabel "cellularPhysiology" ;
+    skos:inScheme map:DataEnumLookup ;
+    skos:exactMatch nf:cellular_physiology .
+
+map:characteristic skos:prefLabel "characteristic" ;
+    skos:altLabel "Feature" ;
+    skos:altLabel "Nature" ;
+    skos:inScheme map:DataEnumLookup ;
+    skos:exactMatch nf:characteristic .
+
+map:chromatin_activity skos:prefLabel "chromatin activity" ;
+    skos:altLabel "chromatinActivity" ;
+    skos:inScheme map:DataEnumLookup ;
+    skos:exactMatch nf:chromatin_activity .
+
+map:clinical skos:prefLabel "clinical" ;
+    skos:inScheme map:DataEnumLookup ;
+    skos:exactMatch nf:clinical .
+
+map:copy_number_variants skos:prefLabel "copy number variants" ;
+    skos:inScheme map:DataEnumLookup ;
+    skos:exactMatch nf:copy_number_variants .
+
+map:count_matrix skos:prefLabel "count matrix" ;
+    skos:altLabel "Read count matrix" ;
+    skos:inScheme map:DataEnumLookup ;
+    skos:exactMatch EDAM:data_3917 .
+
+map:data_index skos:prefLabel "data index" ;
+    skos:inScheme map:DataEnumLookup ;
+    skos:exactMatch EDAM:data_0955 .
+
+map:data_sharing_plan skos:prefLabel "data sharing plan" ;
+    skos:altLabel "DMP" ;
+    skos:altLabel "Data Management Plan" ;
+    skos:altLabel "Data Landscape Survey" ;
+    skos:inScheme map:DataEnumLookup ;
+    skos:exactMatch EDAM:data_4040 .
+
+map:demographics skos:prefLabel "demographics" ;
+    skos:altLabel "Demographic Factor" ;
+    skos:altLabel "Demography" ;
+    skos:altLabel "Population Studies / Demography" ;
+    skos:inScheme map:DataEnumLookup ;
+    skos:exactMatch nf:demographics .
+
+map:drug_combination_screen skos:prefLabel "drug combination screen" ;
+    skos:inScheme map:DataEnumLookup ;
+    skos:exactMatch nf:drug_combination_screen .
+
+map:drug_screen skos:prefLabel "drug screen" ;
+    skos:altLabel "drugScreen" ;
+    skos:inScheme map:DataEnumLookup ;
+    skos:exactMatch nf:drug_screen .
+
+map:electrophysiology skos:prefLabel "electrophysiology" ;
+    skos:inScheme map:DataEnumLookup ;
+    skos:exactMatch nf:electrophysiology .
+
+map:epidemiological_data skos:prefLabel "epidemiological data" ;
+    skos:inScheme map:DataEnumLookup ;
+    skos:exactMatch nf:epidemiological_data .
+
+map:gene_expression skos:prefLabel "gene expression" ;
+    skos:altLabel "geneExpression" ;
+    skos:inScheme map:DataEnumLookup ;
+    skos:exactMatch EDAM:data_2603 .
+
+map:gene_expression_matrix skos:prefLabel "gene expression matrix" ;
+    skos:altLabel "Gene expression data matrix" ;
+    skos:altLabel "Normalised microarray data" ;
+    skos:inScheme map:DataEnumLookup ;
+    skos:exactMatch EDAM:data_3112 .
+
+map:quantified_gene_expression skos:prefLabel "quantified gene expression" ;
+    skos:inScheme map:DataEnumLookup ;
+    skos:exactMatch nf:quantified_gene_expression .
+
+map:genomic_features skos:prefLabel "genomic features" ;
+    skos:inScheme map:DataEnumLookup ;
+    skos:exactMatch nf:genomic_features .
+
+map:genomic_variants skos:prefLabel "genomic variants" ;
+    skos:altLabel "Gene sequence variations" ;
+    skos:altLabel "genomicVariants" ;
+    skos:inScheme map:DataEnumLookup ;
+    skos:exactMatch EDAM:data_3498 .
+
+map:germline_variants skos:prefLabel "germline variants" ;
+    skos:inScheme map:DataEnumLookup ;
+    skos:exactMatch nf:germline_variants .
+
+map:guide_rna_sequence skos:prefLabel "guide RNA sequence" ;
+    skos:altLabel "sgRNA sequence" ;
+    skos:altLabel "gRNA sequence" ;
+    skos:inScheme map:DataEnumLookup ;
+    skos:exactMatch EDAM:data_3494 .
+
+map:image skos:prefLabel "image" ;
+    skos:altLabel "Image data" ;
+    skos:inScheme map:DataEnumLookup ;
+    skos:exactMatch EDAM:data_2968 .
+
+map:immunoassay skos:prefLabel "immunoassay" ;
+    skos:altLabel "Immunological Laboratory Method" ;
+    skos:altLabel "Immunology Test" ;
+    skos:inScheme map:DataEnumLookup ;
+    skos:exactMatch nf:immunoassay .
+
+map:isoform_expression skos:prefLabel "isoform expression" ;
+    skos:altLabel "Isoform Measurement" ;
+    skos:altLabel "Isoform Quantitation" ;
+    skos:altLabel "Protein Isoform Measurement" ;
+    skos:altLabel "Protein Isoform Quantitation" ;
+    skos:inScheme map:DataEnumLookup ;
+    skos:exactMatch nf:isoform_expression .
+
+map:kinomics skos:prefLabel "kinomics" ;
+    skos:inScheme map:DataEnumLookup ;
+    skos:exactMatch nf:kinomics .
+
+map:mask_image skos:prefLabel "mask image" ;
+    skos:inScheme map:DataEnumLookup ;
+    skos:exactMatch nf:mask_image .
+
+map:mass_spectrometry_data skos:prefLabel "mass spectrometry data" ;
+    skos:inScheme map:DataEnumLookup ;
+    skos:exactMatch EDAM:data_2536 .
+
+map:metabolomics skos:prefLabel "metabolomics" ;
+    skos:inScheme map:DataEnumLookup ;
+    skos:exactMatch nf:metabolomics .
+
+map:molecular_property skos:prefLabel "molecular property" ;
+    skos:altLabel "Physicochemical property" ;
+    skos:inScheme map:DataEnumLookup ;
+    skos:exactMatch EDAM:data_2087 .
+
+map:morphology_parameter skos:prefLabel "morphology parameter" ;
+    skos:inScheme map:DataEnumLookup ;
+    skos:exactMatch EDAM:data_3723 .
+
+map:network skos:prefLabel "network" ;
+    skos:altLabel "Pathway" ;
+    skos:inScheme map:DataEnumLookup ;
+    skos:exactMatch EDAM:data_2600 .
+
+map:nucleic_acid_sequence_record skos:prefLabel "nucleic acid sequence record" ;
+    skos:altLabel "Nucleotide sequence record" ;
+    skos:altLabel "Sequence record (nucleic acid)" ;
+    skos:inScheme map:DataEnumLookup ;
+    skos:exactMatch EDAM:data_2887 .
+
+map:over-representation_data skos:prefLabel "over-representation data" ;
+    skos:altLabel "Enrichment report" ;
+    skos:altLabel "Over-representation report" ;
+    skos:inScheme map:DataEnumLookup ;
+    skos:exactMatch EDAM:data_3753 .
+
+map:particle_characterization skos:prefLabel "particle characterization" ;
+    skos:inScheme map:DataEnumLookup ;
+    skos:exactMatch nf:particle_characterization .
+
+map:pharmacokinetics skos:prefLabel "pharmacokinetics" ;
+    skos:altLabel "PK Study" ;
+    skos:altLabel "Pharmacokinetic Study" ;
+    skos:inScheme map:DataEnumLookup ;
+    skos:exactMatch nf:pharmacokinetics .
+
+map:physiology_parameter skos:prefLabel "physiology parameter" ;
+    skos:inScheme map:DataEnumLookup ;
+    skos:exactMatch EDAM:data_3722 .
+
+map:plasmid_sequence skos:prefLabel "plasmid sequence" ;
+    skos:inScheme map:DataEnumLookup ;
+    skos:exactMatch EDAM:data_3494 .
+
+map:plot skos:prefLabel "plot" ;
+    skos:altLabel "Graph data" ;
+    skos:inScheme map:DataEnumLookup ;
+    skos:exactMatch EDAM:data_2884 .
+
+map:primer_sequence skos:prefLabel "primer sequence" ;
+    skos:inScheme map:DataEnumLookup ;
+    skos:exactMatch EDAM:data_3494 .
+
+map:probe_sequence skos:prefLabel "probe sequence" ;
+    skos:inScheme map:DataEnumLookup ;
+    skos:exactMatch EDAM:data_3494 .
+
+map:promoter_sequence skos:prefLabel "promoter sequence" ;
+    skos:inScheme map:DataEnumLookup ;
+    skos:exactMatch EDAM:data_3494 .
+
+map:protein_interaction_data skos:prefLabel "protein interaction data" ;
+    skos:altLabel "Protein interaction record" ;
+    skos:altLabel "Protein report (interaction)" ;
+    skos:altLabel "Protein-protein interaction data" ;
+    skos:inScheme map:DataEnumLookup ;
+    skos:exactMatch EDAM:data_0906 .
+
+map:protein_interaction_raw_data skos:prefLabel "protein interaction raw data" ;
+    skos:inScheme map:DataEnumLookup ;
+    skos:exactMatch EDAM:data_0905 .
+
+map:proteomics skos:prefLabel "proteomics" ;
+    skos:inScheme map:DataEnumLookup ;
+    skos:exactMatch nf:proteomics .
+
+map:raw_counts skos:prefLabel "raw counts" ;
+    skos:altLabel "Count" ;
+    skos:altLabel "NUMBER" ;
+    skos:altLabel "Num" ;
+    skos:altLabel "Number Count" ;
+    skos:inScheme map:DataEnumLookup ;
+    skos:exactMatch nf:raw_counts .
+
+map:reference_sequence skos:prefLabel "reference sequence" ;
+    skos:inScheme map:DataEnumLookup ;
+    skos:exactMatch EDAM:data_3494 .
+
+map:report skos:prefLabel "report" ;
+    skos:altLabel "Document" ;
+    skos:altLabel "Record" ;
+    skos:altLabel "analysis" ;
+    skos:inScheme map:DataEnumLookup ;
+    skos:exactMatch EDAM:data_2048 .
+
+map:somatic_variants skos:prefLabel "somatic variants" ;
+    skos:inScheme map:DataEnumLookup ;
+    skos:exactMatch nf:somatic_variants .
+
+map:structural_variants skos:prefLabel "structural variants" ;
+    skos:inScheme map:DataEnumLookup ;
+    skos:exactMatch nf:structural_variants .
+
+map:survey_data skos:prefLabel "survey data" ;
+    skos:altLabel "surveyData" ;
+    skos:inScheme map:DataEnumLookup ;
+    skos:exactMatch nf:survey_data .
+
+map:text_data skos:prefLabel "text data" ;
+    skos:inScheme map:DataEnumLookup ;
+    skos:exactMatch EDAM:data_2526 .
+
+map:volume skos:prefLabel "volume" ;
+    skos:altLabel "Total Volume" ;
+    skos:altLabel "Vol" ;
+    skos:altLabel "Volume" ;
+    skos:inScheme map:DataEnumLookup ;
+    skos:exactMatch nf:volume .
+
+map:weight skos:prefLabel "weight" ;
+    skos:altLabel "Weight" ;
+    skos:inScheme map:DataEnumLookup ;
+    skos:exactMatch nf:weight .
+
