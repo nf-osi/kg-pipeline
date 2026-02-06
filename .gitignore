@@ -8,3 +8,8 @@ logs/
 
 # Ignore local RMLMapper binary
 tools/rmlmapper-8.1.0.jar
+
+# Ignore test output artifacts
+test/output.ttl
+test/*.log
+test/temp_*.ttl
