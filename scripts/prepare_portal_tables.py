@@ -139,26 +139,37 @@ cellLineGeneticDisorder as cellLineGeneticDisorder,
 populationDoublingTime as populationDoublingTime
 """
 
+PORTAL_DONORS_SELECT = """
+donorId as donorId,
+parentDonorId as parentDonorId,
+species as species,
+race as race,
+sex as sex,
+age as age,
+transplantationDonorId as transplantationDonorId
+"""
+
+PORTAL_ANTIBODIES_SELECT = """
+antibodyId as antibodyId,
+uniprotId as uniprotId,
+cloneId as cloneId,
+reactiveSpecies as reactiveSpecies,
+hostOrganism as hostOrganism,
+conjugate as conjugate,
+clonality as clonality,
+targetAntigen as targetAntigen
+"""
+
 # Short name aliases for convenience
 TABLE_ALIASES = {
-    "studies": "portal_studies",
     "study": "portal_studies",
-    "files": "portal_files",
     "file": "portal_files",
-    "mutations": "portal_mutations",
     "mutation": "portal_mutations",
-    "genetic_reagents": "portal_genetic_reagents",
-    "genetic_reagent": "portal_genetic_reagents",
-    "reagents": "portal_genetic_reagents",
     "reagent": "portal_genetic_reagents",
-    "animal_models": "portal_animal_models",
-    "animal_model": "portal_animal_models",
-    "animals": "portal_animal_models",
     "animal": "portal_animal_models",
-    "cell_lines": "portal_cell_lines",
-    "cell_line": "portal_cell_lines",
-    "cells": "portal_cell_lines",
     "cell": "portal_cell_lines",
+    "donor": "portal_donors",
+    "antibody": "portal_antibodies",
 }
 
 TABLES: Dict[str, Dict[str, Any]] = {
@@ -323,6 +334,37 @@ TABLES: Dict[str, Dict[str, Any]] = {
             {"target": "contaminatedMisidentified", "source": "contaminatedMisidentified", "type": "text"},
             {"target": "cellLineGeneticDisorder", "source": "cellLineGeneticDisorder", "type": "text+", "transform": "string_list"},
             {"target": "populationDoublingTime", "source": "populationDoublingTime", "type": "text"},
+        ],
+    },
+    "portal_donors": {
+        "synapse_id": "syn26486829",
+        "csv_path": Path("data/csv/portal_donors.csv"),
+        "raw_filename": "portal_donors_raw.csv",
+        "select_clause": PORTAL_DONORS_SELECT,
+        "columns": [
+            {"target": "donorId", "source": "donorId", "type": "iri"},
+            {"target": "parentDonorId", "source": "parentDonorId", "type": "iri"},
+            {"target": "species", "source": "species", "type": "text+", "transform": "string_list"},
+            {"target": "race", "source": "race", "type": "text"},
+            {"target": "sex", "source": "sex", "type": "text"},
+            {"target": "age", "source": "age", "type": "text"},
+            {"target": "transplantationDonorId", "source": "transplantationDonorId", "type": "iri"},
+        ],
+    },
+    "portal_antibodies": {
+        "synapse_id": "syn26486811",
+        "csv_path": Path("data/csv/portal_antibodies.csv"),
+        "raw_filename": "portal_antibodies_raw.csv",
+        "select_clause": PORTAL_ANTIBODIES_SELECT,
+        "columns": [
+            {"target": "antibodyId", "source": "antibodyId", "type": "iri"},
+            {"target": "uniprotId", "source": "uniprotId", "type": "iri"},
+            {"target": "cloneId", "source": "cloneId", "type": "text"},
+            {"target": "reactiveSpecies", "source": "reactiveSpecies", "type": "text+", "transform": "string_list"},
+            {"target": "hostOrganism", "source": "hostOrganism", "type": "text"},
+            {"target": "conjugate", "source": "conjugate", "type": "text"},
+            {"target": "clonality", "source": "clonality", "type": "text"},
+            {"target": "targetAntigen", "source": "targetAntigen", "type": "text"},
         ],
     },
 }
@@ -527,14 +569,13 @@ def resolve_table_name(name: str) -> str:
 def main(argv: List[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         description=__doc__,
-        epilog="Table names can be specified using short forms (e.g., 'files', 'studies') "
-               "or full forms (e.g., 'portal_files', 'portal_studies')."
+        epilog="Table names: study, file, mutation, reagent, animal, cell, donor, antibody"
     )
     parser.add_argument(
         "tables",
         nargs="*",
         help="Subset of tables to download (defaults to all configured tables). "
-             "Examples: 'files studies', 'animal_models', 'portal_mutations'",
+             "Examples: 'file study', 'animal', 'mutation'",
     )
     parser.add_argument(
         "--raw-dir",

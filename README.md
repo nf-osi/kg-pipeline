@@ -1,6 +1,10 @@
 ## NF POC
 
-Knowledge graph materialization pipeline where portal data are processed and transformed from CSV. 
+Knowledge graph materialization pipeline for NF portal assets.
+
+Data integration sources:
+- "Main" data portal assets are from project syn26451327
+- Tools portal assets are from project syn26338068 
 
 ### Overview
 

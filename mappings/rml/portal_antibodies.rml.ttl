@@ -1,0 +1,74 @@
+@prefix rr:   <http://www.w3.org/ns/r2rml#> .
+@prefix rml:  <http://semweb.mmlab.be/ns/rml#> .
+@prefix fnml: <http://semweb.mmlab.be/ns/fnml#> .
+@prefix fno:  <https://w3id.org/function/ontology#> .
+@prefix ql:   <http://semweb.mmlab.be/ns/ql#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix grel: <http://users.ugent.be/~bjdmeest/function/grel.ttl#> .
+@prefix nf:   <http://nf-osi.github.com/terms#> .
+@prefix map:  <http://nf-osi.github.com/mappings/portal-antibodies#> .
+
+################################################################################
+# Logical source
+################################################################################
+
+map:PortalAntibodiesSource a rml:LogicalSource ;
+    rml:source "data/csv/portal_antibodies.csv" ;
+    rml:referenceFormulation ql:CSV .
+
+################################################################################
+# Antibody core facts
+################################################################################
+
+map:AntibodyCore a rr:TriplesMap ;
+    rdfs:label "Antibody Core" ;
+    rml:logicalSource map:PortalAntibodiesSource ;
+    rr:subjectMap [
+        rr:template "http://nf-osi.github.com/terms#antibody/{antibodyId}" ;
+        rr:termType rr:IRI
+    ] ;
+    rr:predicateObjectMap [ rr:predicate rdf:type ; rr:objectMap [ rr:constant nf:Antibody ; rr:termType rr:IRI ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:antibodyId ; rr:objectMap [ rml:reference "antibodyId" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:uniprotId ; rr:objectMap [ rml:reference "uniprotId" ; rr:termType rr:IRI ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:cloneId ; rr:objectMap [ rml:reference "cloneId" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:hostOrganism ; rr:objectMap [ rml:reference "hostOrganism" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:conjugate ; rr:objectMap [ rml:reference "conjugate" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:clonality ; rr:objectMap [ rml:reference "clonality" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:targetAntigen ; rr:objectMap [ rml:reference "targetAntigen" ; rr:datatype xsd:string ] ] .
+
+################################################################################
+# Multi-valued fields (StringList)
+################################################################################
+
+map:AntibodyReactiveSpecies a rr:TriplesMap ;
+    rdfs:label "Antibody Reactive Species" ;
+    rml:logicalSource map:PortalAntibodiesSource ;
+    rr:subjectMap [
+        rr:template "http://nf-osi.github.com/terms#antibody/{antibodyId}" ;
+        rr:termType rr:IRI
+    ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:reactiveSpecies ;
+        rr:objectMap [
+            a fnml:FunctionTermMap ;
+            rr:datatype xsd:string ;
+            fnml:functionValue [
+                a fno:Execution ;
+                rml:logicalSource map:PortalAntibodiesSource ;
+                rr:predicateObjectMap [
+                    rr:predicate fno:executes ;
+                    rr:objectMap [ rr:constant grel:string_split ; rr:termType rr:IRI ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:valueParameter ;
+                    rr:objectMap [ rml:reference "reactiveSpecies" ; rr:termType rr:Literal ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:p_string_sep ;
+                    rr:objectMap [ rr:constant "\\|" ; rr:termType rr:Literal ]
+                ]
+            ]
+        ]
+    ] .

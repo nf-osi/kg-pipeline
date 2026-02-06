@@ -1,0 +1,108 @@
+@prefix rr:   <http://www.w3.org/ns/r2rml#> .
+@prefix rml:  <http://semweb.mmlab.be/ns/rml#> .
+@prefix fnml: <http://semweb.mmlab.be/ns/fnml#> .
+@prefix fno:  <https://w3id.org/function/ontology#> .
+@prefix ql:   <http://semweb.mmlab.be/ns/ql#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix grel: <http://users.ugent.be/~bjdmeest/function/grel.ttl#> .
+@prefix nf:   <http://nf-osi.github.com/terms#> .
+@prefix map:  <http://nf-osi.github.com/mappings/portal-cell-lines#> .
+
+################################################################################
+# Logical source
+################################################################################
+
+map:PortalCellLinesSource a rml:LogicalSource ;
+    rml:source "data/csv/portal_cell_lines.csv" ;
+    rml:referenceFormulation ql:CSV .
+
+################################################################################
+# Cell Line core facts
+################################################################################
+
+map:CellLineCore a rr:TriplesMap ;
+    rdfs:label "Cell Line Core" ;
+    rml:logicalSource map:PortalCellLinesSource ;
+    rr:subjectMap [
+        rr:template "http://nf-osi.github.com/terms#cellLine/{cellLineId}" ;
+        rr:termType rr:IRI
+    ] ;
+    rr:predicateObjectMap [ rr:predicate rdf:type ; rr:objectMap [ rr:constant nf:CellLine ; rr:termType rr:IRI ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:cellLineId ; rr:objectMap [ rml:reference "cellLineId" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:donorId ; rr:objectMap [ rml:reference "donorId" ; rr:termType rr:IRI ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:originYear ; rr:objectMap [ rml:reference "originYear" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:organ ; rr:objectMap [ rml:reference "organ" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:strProfile ; rr:objectMap [ rml:reference "strProfile" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:tissue ; rr:objectMap [ rml:reference "tissue" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:resistance ; rr:objectMap [ rml:reference "resistance" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:cellLineCategory ; rr:objectMap [ rml:reference "cellLineCategory" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:contaminatedMisidentified ; rr:objectMap [ rml:reference "contaminatedMisidentified" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:populationDoublingTime ; rr:objectMap [ rml:reference "populationDoublingTime" ; rr:datatype xsd:string ] ] .
+
+################################################################################
+# Multi-valued fields (StringList)
+################################################################################
+
+map:CellLineManifestation a rr:TriplesMap ;
+    rdfs:label "Cell Line Manifestation" ;
+    rml:logicalSource map:PortalCellLinesSource ;
+    rr:subjectMap [
+        rr:template "http://nf-osi.github.com/terms#cellLine/{cellLineId}" ;
+        rr:termType rr:IRI
+    ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:cellLineManifestation ;
+        rr:objectMap [
+            a fnml:FunctionTermMap ;
+            rr:datatype xsd:string ;
+            fnml:functionValue [
+                a fno:Execution ;
+                rml:logicalSource map:PortalCellLinesSource ;
+                rr:predicateObjectMap [
+                    rr:predicate fno:executes ;
+                    rr:objectMap [ rr:constant grel:string_split ; rr:termType rr:IRI ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:valueParameter ;
+                    rr:objectMap [ rml:reference "cellLineManifestation" ; rr:termType rr:Literal ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:p_string_sep ;
+                    rr:objectMap [ rr:constant "\\|" ; rr:termType rr:Literal ]
+                ]
+            ]
+        ]
+    ] .
+
+map:CellLineGeneticDisorder a rr:TriplesMap ;
+    rdfs:label "Cell Line Genetic Disorder" ;
+    rml:logicalSource map:PortalCellLinesSource ;
+    rr:subjectMap [
+        rr:template "http://nf-osi.github.com/terms#cellLine/{cellLineId}" ;
+        rr:termType rr:IRI
+    ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:cellLineGeneticDisorder ;
+        rr:objectMap [
+            a fnml:FunctionTermMap ;
+            rr:datatype xsd:string ;
+            fnml:functionValue [
+                a fno:Execution ;
+                rml:logicalSource map:PortalCellLinesSource ;
+                rr:predicateObjectMap [
+                    rr:predicate fno:executes ;
+                    rr:objectMap [ rr:constant grel:string_split ; rr:termType rr:IRI ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:valueParameter ;
+                    rr:objectMap [ rml:reference "cellLineGeneticDisorder" ; rr:termType rr:Literal ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:p_string_sep ;
+                    rr:objectMap [ rr:constant "\\|" ; rr:termType rr:Literal ]
+                ]
+            ]
+        ]
+    ] .

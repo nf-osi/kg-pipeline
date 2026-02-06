@@ -1,0 +1,107 @@
+@prefix rr:   <http://www.w3.org/ns/r2rml#> .
+@prefix rml:  <http://semweb.mmlab.be/ns/rml#> .
+@prefix fnml: <http://semweb.mmlab.be/ns/fnml#> .
+@prefix fno:  <https://w3id.org/function/ontology#> .
+@prefix ql:   <http://semweb.mmlab.be/ns/ql#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix grel: <http://users.ugent.be/~bjdmeest/function/grel.ttl#> .
+@prefix nf:   <http://nf-osi.github.com/terms#> .
+@prefix map:  <http://nf-osi.github.com/mappings/portal-animal-models#> .
+
+################################################################################
+# Logical source
+################################################################################
+
+map:PortalAnimalModelsSource a rml:LogicalSource ;
+    rml:source "data/csv/portal_animal_models.csv" ;
+    rml:referenceFormulation ql:CSV .
+
+################################################################################
+# Animal Model core facts
+################################################################################
+
+map:AnimalModelCore a rr:TriplesMap ;
+    rdfs:label "Animal Model Core" ;
+    rml:logicalSource map:PortalAnimalModelsSource ;
+    rr:subjectMap [
+        rr:template "http://nf-osi.github.com/terms#animalModel/{animalModelId}" ;
+        rr:termType rr:IRI
+    ] ;
+    rr:predicateObjectMap [ rr:predicate rdf:type ; rr:objectMap [ rr:constant nf:AnimalModel ; rr:termType rr:IRI ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:animalModelId ; rr:objectMap [ rml:reference "animalModelId" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:donorId ; rr:objectMap [ rml:reference "donorId" ; rr:termType rr:IRI ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:transplantationDonorId ; rr:objectMap [ rml:reference "transplantationDonorId" ; rr:termType rr:IRI ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:backgroundStrain ; rr:objectMap [ rml:reference "backgroundStrain" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:backgroundSubstrain ; rr:objectMap [ rml:reference "backgroundSubstrain" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:strainNomenclature ; rr:objectMap [ rml:reference "strainNomenclature" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:transplantationType ; rr:objectMap [ rml:reference "transplantationType" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:animalState ; rr:objectMap [ rml:reference "animalState" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:generation ; rr:objectMap [ rml:reference "generation" ; rr:datatype xsd:string ] ] .
+
+################################################################################
+# Multi-valued fields (StringList)
+################################################################################
+
+map:AnimalModelManifestation a rr:TriplesMap ;
+    rdfs:label "Animal Model Manifestation" ;
+    rml:logicalSource map:PortalAnimalModelsSource ;
+    rr:subjectMap [
+        rr:template "http://nf-osi.github.com/terms#animalModel/{animalModelId}" ;
+        rr:termType rr:IRI
+    ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:animalModelOfManifestation ;
+        rr:objectMap [
+            a fnml:FunctionTermMap ;
+            rr:datatype xsd:string ;
+            fnml:functionValue [
+                a fno:Execution ;
+                rml:logicalSource map:PortalAnimalModelsSource ;
+                rr:predicateObjectMap [
+                    rr:predicate fno:executes ;
+                    rr:objectMap [ rr:constant grel:string_split ; rr:termType rr:IRI ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:valueParameter ;
+                    rr:objectMap [ rml:reference "animalModelOfManifestation" ; rr:termType rr:Literal ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:p_string_sep ;
+                    rr:objectMap [ rr:constant "\\|" ; rr:termType rr:Literal ]
+                ]
+            ]
+        ]
+    ] .
+
+map:AnimalModelGeneticDisorder a rr:TriplesMap ;
+    rdfs:label "Animal Model Genetic Disorder" ;
+    rml:logicalSource map:PortalAnimalModelsSource ;
+    rr:subjectMap [
+        rr:template "http://nf-osi.github.com/terms#animalModel/{animalModelId}" ;
+        rr:termType rr:IRI
+    ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:animalModelGeneticDisorder ;
+        rr:objectMap [
+            a fnml:FunctionTermMap ;
+            rr:datatype xsd:string ;
+            fnml:functionValue [
+                a fno:Execution ;
+                rml:logicalSource map:PortalAnimalModelsSource ;
+                rr:predicateObjectMap [
+                    rr:predicate fno:executes ;
+                    rr:objectMap [ rr:constant grel:string_split ; rr:termType rr:IRI ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:valueParameter ;
+                    rr:objectMap [ rml:reference "animalModelGeneticDisorder" ; rr:termType rr:Literal ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:p_string_sep ;
+                    rr:objectMap [ rr:constant "\\|" ; rr:termType rr:Literal ]
+                ]
+            ]
+        ]
+    ] .
