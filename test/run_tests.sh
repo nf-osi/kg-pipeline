@@ -235,6 +235,226 @@ else
     echo "  Expected nf:fundingAgency nf:CTF_Foundation"
 fi
 
+echo
+echo "=== Testing Portal Donors Mapping ==="
+
+# Create temporary mapping for donors
+echo "Creating temporary mapping for donors..."
+sed 's|data/csv/portal_donors.csv|test/portal_donors.csv|g' \
+    mappings/rml/portal_donors.rml.ttl > "$TEMP_MAPPING"
+
+# Run RMLMapper
+echo "Running RMLMapper for donors..."
+java -jar "$RMLMAPPER_JAR" $RML_FUNCTION_FILES -m "$TEMP_MAPPING" -s turtle -o "$OUTPUT_FILE"
+
+echo
+echo "=== Generated RDF Output (Donors) ==="
+cat "$OUTPUT_FILE"
+echo
+
+# Validation tests for donors
+echo "=== Running Validation Tests (Donors) ==="
+
+# Test D1: Donor exists with correct type
+echo -n "Test D1: donor 'test-donor-001' has type nf:Donor ... "
+if grep -q '<http://nf-osi.github.com/terms#donor/test-donor-001>' "$OUTPUT_FILE" && grep -q 'a nf:Donor' "$OUTPUT_FILE"; then
+    echo "PASS"
+    PASS=$((PASS + 1))
+else
+    echo "FAIL"
+    FAIL=$((FAIL + 1))
+    echo "  Expected donor IRI and type nf:Donor"
+fi
+
+# Test D2: Single species value
+echo -n "Test D2: species 'Homo sapiens' -> nf:species 'Homo sapiens' ... "
+if grep -q 'nf:species "Homo sapiens"' "$OUTPUT_FILE"; then
+    echo "PASS"
+    PASS=$((PASS + 1))
+else
+    echo "FAIL"
+    FAIL=$((FAIL + 1))
+    echo "  Expected nf:species \"Homo sapiens\""
+fi
+
+# Test D3: Multi-valued species split
+echo -n "Test D3: species 'Homo sapiens|Mus musculus' -> two values ... "
+if grep -A10 'test-donor-002' "$OUTPUT_FILE" | grep -q '"Homo sapiens"' && grep -A10 'test-donor-002' "$OUTPUT_FILE" | grep -q '"Mus musculus"'; then
+    echo "PASS"
+    PASS=$((PASS + 1))
+else
+    echo "FAIL"
+    FAIL=$((FAIL + 1))
+    echo "  Expected both \"Homo sapiens\" and \"Mus musculus\" for test-donor-002"
+fi
+
+# Test D4: Parent donor as IRI
+echo -n "Test D4: parentDonorId 'test-donor-001' is an IRI reference ... "
+if grep -q 'nf:parentDonorId.*test-donor-001' "$OUTPUT_FILE"; then
+    echo "PASS"
+    PASS=$((PASS + 1))
+else
+    echo "FAIL"
+    FAIL=$((FAIL + 1))
+    echo "  Expected nf:parentDonorId as IRI"
+fi
+
+# Test D5: Transplantation donor as IRI
+echo -n "Test D5: transplantationDonorId 'test-donor-003' is an IRI reference ... "
+if grep -q 'nf:transplantationDonorId.*test-donor-003' "$OUTPUT_FILE"; then
+    echo "PASS"
+    PASS=$((PASS + 1))
+else
+    echo "FAIL"
+    FAIL=$((FAIL + 1))
+    echo "  Expected nf:transplantationDonorId as IRI"
+fi
+
+# Test D6: Empty fields should not produce triples
+echo -n "Test D6: Empty parentDonorId for test-donor-001 produces no parentDonorId triple ... "
+# Check that test-donor-001's subject IRI doesn't have parentDonorId predicate in its block
+# Look for the line with test-donor-001 as subject and check following lines until next subject
+donor_has_parent=$(awk '
+    /<http[^>]*test-donor-001>/ { in_donor=1; next }
+    in_donor && /^<http/ { in_donor=0 }
+    in_donor && /nf:parentDonorId/ { found=1; exit }
+    END { if (found) print "yes"; else print "no" }
+' "$OUTPUT_FILE")
+
+if [ "$donor_has_parent" = "yes" ]; then
+    echo "FAIL"
+    FAIL=$((FAIL + 1))
+    echo "  Expected no parentDonorId triple for test-donor-001"
+else
+    echo "PASS"
+    PASS=$((PASS + 1))
+fi
+
+# Test D7: All basic string fields present
+echo -n "Test D7: Basic fields (race, sex, age) present for test-donor-001 ... "
+if grep -A10 'test-donor-001' "$OUTPUT_FILE" | grep -q 'nf:race "White"' && \
+   grep -A10 'test-donor-001' "$OUTPUT_FILE" | grep -q 'nf:sex "Male"' && \
+   grep -A10 'test-donor-001' "$OUTPUT_FILE" | grep -q 'nf:age "25"'; then
+    echo "PASS"
+    PASS=$((PASS + 1))
+else
+    echo "FAIL"
+    FAIL=$((FAIL + 1))
+    echo "  Expected race, sex, and age fields"
+fi
+
+echo
+echo "=== Testing Portal Antibodies Mapping ==="
+
+# Create temporary mapping for antibodies
+echo "Creating temporary mapping for antibodies..."
+sed 's|data/csv/portal_antibodies.csv|test/portal_antibodies.csv|g' \
+    mappings/rml/portal_antibodies.rml.ttl > "$TEMP_MAPPING"
+
+# Run RMLMapper
+echo "Running RMLMapper for antibodies..."
+java -jar "$RMLMAPPER_JAR" $RML_FUNCTION_FILES -m "$TEMP_MAPPING" -s turtle -o "$OUTPUT_FILE"
+
+echo
+echo "=== Generated RDF Output (Antibodies) ==="
+cat "$OUTPUT_FILE"
+echo
+
+# Validation tests for antibodies
+echo "=== Running Validation Tests (Antibodies) ==="
+
+# Test A1: Antibody exists with correct type
+echo -n "Test A1: antibody 'test-ab-001' has type nf:Antibody ... "
+if grep -q '<http://nf-osi.github.com/terms#antibody/test-ab-001>' "$OUTPUT_FILE" && grep -q 'a nf:Antibody' "$OUTPUT_FILE"; then
+    echo "PASS"
+    PASS=$((PASS + 1))
+else
+    echo "FAIL"
+    FAIL=$((FAIL + 1))
+    echo "  Expected antibody IRI and type nf:Antibody"
+fi
+
+# Test A2: UniProt ID as IRI
+echo -n "Test A2: uniprotId 'P12345' is an IRI ... "
+if grep -q 'nf:uniprotId.*P12345' "$OUTPUT_FILE"; then
+    echo "PASS"
+    PASS=$((PASS + 1))
+else
+    echo "FAIL"
+    FAIL=$((FAIL + 1))
+    echo "  Expected nf:uniprotId as IRI"
+fi
+
+# Test A3: Multi-valued reactiveSpecies split
+echo -n "Test A3: reactiveSpecies 'Human|Mouse|Rat' -> three values ... "
+if grep -A15 'test-ab-001' "$OUTPUT_FILE" | grep -q '"Human"' && \
+   grep -A15 'test-ab-001' "$OUTPUT_FILE" | grep -q '"Mouse"' && \
+   grep -A15 'test-ab-001' "$OUTPUT_FILE" | grep -q '"Rat"'; then
+    echo "PASS"
+    PASS=$((PASS + 1))
+else
+    echo "FAIL"
+    FAIL=$((FAIL + 1))
+    echo "  Expected \"Human\", \"Mouse\", and \"Rat\" for test-ab-001"
+fi
+
+# Test A4: Single reactiveSpecies value
+echo -n "Test A4: Single reactiveSpecies 'Human' for test-ab-002 ... "
+if grep -A10 'test-ab-002' "$OUTPUT_FILE" | grep -q 'nf:reactiveSpecies "Human"'; then
+    echo "PASS"
+    PASS=$((PASS + 1))
+else
+    echo "FAIL"
+    FAIL=$((FAIL + 1))
+    echo "  Expected nf:reactiveSpecies \"Human\""
+fi
+
+# Test A5: Basic string fields
+echo -n "Test A5: Basic fields (hostOrganism, conjugate, clonality) for test-ab-001 ... "
+if grep -A15 'test-ab-001' "$OUTPUT_FILE" | grep -q 'nf:hostOrganism "Rabbit"' && \
+   grep -A15 'test-ab-001' "$OUTPUT_FILE" | grep -q 'nf:conjugate "Nonconjugated"' && \
+   grep -A15 'test-ab-001' "$OUTPUT_FILE" | grep -q 'nf:clonality "Polyclonal"'; then
+    echo "PASS"
+    PASS=$((PASS + 1))
+else
+    echo "FAIL"
+    FAIL=$((FAIL + 1))
+    echo "  Expected hostOrganism, conjugate, and clonality fields"
+fi
+
+# Test A6: Target antigen field
+echo -n "Test A6: targetAntigen 'NF1' present for test-ab-001 ... "
+if grep -A15 'test-ab-001' "$OUTPUT_FILE" | grep -q 'nf:targetAntigen "NF1"'; then
+    echo "PASS"
+    PASS=$((PASS + 1))
+else
+    echo "FAIL"
+    FAIL=$((FAIL + 1))
+    echo "  Expected nf:targetAntigen \"NF1\""
+fi
+
+# Test A7: Empty cloneId should not produce triple
+echo -n "Test A7: Empty cloneId for test-ab-002 produces no cloneId triple ... "
+if grep -A10 'test-ab-002' "$OUTPUT_FILE" | grep -q 'nf:cloneId'; then
+    echo "FAIL"
+    FAIL=$((FAIL + 1))
+    echo "  Expected no cloneId triple for test-ab-002"
+else
+    echo "PASS"
+    PASS=$((PASS + 1))
+fi
+
+# Test A8: Empty uniprotId should not produce triple
+echo -n "Test A8: Empty uniprotId for test-ab-003 produces no uniprotId triple ... "
+if grep -A10 'test-ab-003' "$OUTPUT_FILE" | grep -q 'nf:uniprotId'; then
+    echo "FAIL"
+    FAIL=$((FAIL + 1))
+    echo "  Expected no uniprotId triple for test-ab-003"
+else
+    echo "PASS"
+    PASS=$((PASS + 1))
+fi
+
 # Summary
 echo
 echo "=== Test Summary ==="
