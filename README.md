@@ -3,8 +3,13 @@
 Knowledge graph materialization pipeline for NF portal assets.
 
 Data integration sources:
-- "Main" data portal assets are from project syn26451327
-- Tools portal assets are from project syn26338068 
+- "Main" data portal assets from project syn26451327
+- Tools portal assets from project syn26338068 
+
+> [!IMPORTANT]
+> Synapse tables ETL runs using anonymous user (no auth) to use open-access data only.
+
+For reproducibility and easy distribution, archives are created with `scripts/create_archive.py`
 
 ### Overview
 
@@ -17,33 +22,16 @@ data/csv/*.csv
       ▼ (RML mapping)
 data/rdf/*_raw.ttl     ←── literal values
       │
-      ▼ (IRI transform script)
+      ▼ (IRI transforms, harmonization)
 data/rdf/*.ttl         ←── normalized IRIs
-```
-
-### Quick start
-
-```bash
-# Generate final RDF (runs full pipeline)
-make
-
-# Or step by step:
-make rml_portal_studies   # Step 1: RML mapping only
-make portal_studies       # Step 2: + IRI transform script
-
-# Data quality check
-make check_datatypes      # Find unmatched dataType literals
 ```
 
 ### Portal table data retrieval
 
-`scripts/prepare_portal_tables.py` downloads the current `portal_files` (syn16858331) and `portal_studies`
-(syn52694652) tables via `synapseclient`, writes the raw exports to `data/raw/`, and creates
-pre-processed CSVs in `data/csv/`.
-
-Run before the RML pipeline whenever Synapse tables change. The script keeps column order and
-naming explicit; if upstream tables add/remove fields, it will fail early instead of producing
-misaligned template calls.
+`scripts/prepare_portal_tables.py` downloads all relevant tables via `synapseclient`, 
+writes the raw exports to `data/raw/`, and creates pre-processed CSVs in `data/csv/`. 
+The script keeps column order and naming explicit; 
+if upstream tables add/remove fields, it will fail early instead of leading to misaligned templates.
 
 ### RDF generation pipeline
 
@@ -55,20 +43,12 @@ RML mappings [1] in `mappings/rml/` materializes pre-processed CSVs to RDF. The 
 - **Multi-valued fields** split by `|` delimiter
 - **Controlled vocabulary IRIs** for `nf:initiative` and `nf:fundingAgency` (spaces → underscores)
 
-```bash
-make rml_portal_studies  # Produces data/rdf/portal_studies_raw.ttl
-```
-
 #### Step 2: IRI transform
 
 `scripts/transform_iris.py` transforms `nf:dataType` literals to ontology IRIs using a SKOS
 lookup vocabulary (`mappings/data_lookup.ttl`).
 
 The lookup maps source literals (with synonyms via `skos:altLabel`) to target IRIs,
-
-```bash
-make portal_studies      # Produces data/rdf/portal_studies.ttl
-```
 
 ### Project structure
 
@@ -92,13 +72,7 @@ make portal_studies      # Produces data/rdf/portal_studies.ttl
 
 ### Testing
 
-```bash
-./test/run_tests.sh
-```
-
-Validates that RML mappings correctly transform:
-- `nf:initiative` values to IRIs (e.g., "Cutaneous Neurofibroma Initiative" → `nf:Cutaneous_Neurofibroma_Initiative`)
-- `nf:fundingAgency` values to IRIs with proper splitting
+See test/README.md
 
 ### Dependencies
 
