@@ -25,15 +25,10 @@ Ground truth data is split into two files:
 Ground truth IDs for evaluation questions are partially generated using the `main/generate_ground_truth.py` script. 
 This script processes the raw CSV data located in `../data/csv` to extract relevant entity IDs for specific queries and outputs them to `eval_tools_ground_auto.yaml`.
 
-#### Identifier Standardization:
-All ground truth IDs in the generated files are standardized to use `resourceId`. 
-The script utilizes `donor_tool.csv` to map internal tool identifiers (like `animalModelId` or `cellLineId`) to their corresponding public `resourceId`. This ensures consistency across the evaluation suite and alignment with the Research Tools Portal.
+#### Identifier Standardization
 
-#### Current Limitations:
-- **Phenotypic Observations**: Detailed phenotypic data requiring nuanced interpretation (e.g., distinguishing genetic manipulation timing from actual tumor detection in `AM-004`) require manual curation due to the complexity of observation text interpretation. However, straightforward phenotypic queries (e.g., `AM-006` for café-au-lait spots) are now automated using the Observations table.
-- **Complex Multi-hop Reasoning**: Queries requiring deep graph traversals or complex semantic reasoning (e.g., identifying gaps in the tool landscape or suitability for specific advanced research applications) are primarily handled through manual curation in `eval_tools_ground_manual.yaml`.
-- **Omics Data Linkage**: Automated linkage to omics data (e.g., `CR-002`) depends on string matching of model names in the file manifests, which may not capture all available datasets.
-
+All ground truth IDs in the generated files should be standardized to use `resourceId` (instead of `cellLineID` or `geneticReagentId`, etc.). 
+There is only one question that returns a number (count) instead of uuid(s).
 
 ---
 
