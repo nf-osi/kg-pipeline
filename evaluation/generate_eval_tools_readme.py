@@ -220,6 +220,21 @@ def generate_readme(data, stats, legend):
     """Generate README content in markdown format (auto-generated section only)."""
     lines = []
 
+    # Data Versioning section
+    metadata = data.get('metadata', {})
+    if metadata:
+        lines.append("### Data Versioning\n")
+
+        version = metadata.get('version')
+        if version:
+            lines.append(f"**Dataset Version**: {version}\n")
+
+        data_archive = metadata.get('data_archive')
+        if data_archive:
+            lines.append(f"Data archived at **{data_archive}**\n")
+
+        lines.append("---\n")
+
     # Legend (moved to top for easy reference)
     lines.append("### Legend\n")
     lines.append("- **Complexity**: Number of graph hops required (0-hop, 1-hop, 2-hop, 3-hop)")

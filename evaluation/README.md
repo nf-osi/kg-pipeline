@@ -1,6 +1,9 @@
 # Evaluation Suite
 
-Personas referenced in the evaluation datasets have descriptions [here](https://docs.google.com/spreadsheets/d/15KSQJn4F7nk8d3v2N9StILFhdyD5AiamTtnfr-QwusQ/edit?gid=0#gid=0).
+**Personas** referenced in the evaluation datasets have descriptions [here](https://docs.google.com/spreadsheets/d/15KSQJn4F7nk8d3v2N9StILFhdyD5AiamTtnfr-QwusQ/edit?gid=0#gid=0).
+
+For **reproducibility**, evaluation datasets are versioned and accompanied by data archive. 
+Download the appropriate archive from linked Synapse ID and extract to `evaluation/data` as needed.
 
 ## Research Tools Discovery Evaluation
 
@@ -19,10 +22,12 @@ Ground truth data is split into two files:
 
 ### Ground Truth Generation
 
-Ground truth IDs for evaluation questions are partially generated using the `main/generate_ground_truth.py` script. This script processes the raw CSV data located in `../data/csv` to extract relevant entity IDs for specific queries and outputs them to `eval_tools_ground_auto.yaml`.
+Ground truth IDs for evaluation questions are partially generated using the `main/generate_ground_truth.py` script. 
+This script processes the raw CSV data located in `../data/csv` to extract relevant entity IDs for specific queries and outputs them to `eval_tools_ground_auto.yaml`.
 
 #### Identifier Standardization:
-All ground truth IDs in the generated files are standardized to use `resourceId`. The script utilizes `donor_tool.csv` to map internal tool identifiers (like `animalModelId` or `cellLineId`) to their corresponding public `resourceId`. This ensures consistency across the evaluation suite and alignment with the Research Tools Portal.
+All ground truth IDs in the generated files are standardized to use `resourceId`. 
+The script utilizes `donor_tool.csv` to map internal tool identifiers (like `animalModelId` or `cellLineId`) to their corresponding public `resourceId`. This ensures consistency across the evaluation suite and alignment with the Research Tools Portal.
 
 #### Current Limitations:
 - **Phenotypic Observations**: Detailed phenotypic data requiring nuanced interpretation (e.g., distinguishing genetic manipulation timing from actual tumor detection in `AM-004`) require manual curation due to the complexity of observation text interpretation. However, straightforward phenotypic queries (e.g., `AM-006` for café-au-lait spots) are now automated using the Observations table.
@@ -33,6 +38,14 @@ All ground truth IDs in the generated files are standardized to use `resourceId`
 ---
 
 <!-- BEGIN AUTO-GENERATED SECTION - DO NOT EDIT MANUALLY -->
+
+### Data Versioning
+
+**Dataset Version**: v1
+
+Data archived at **syn73695746**
+
+---
 
 ### Legend
 
@@ -102,10 +115,10 @@ All ground truth IDs in the generated files are standardized to use `resourceId`
 
 | ID | Question | Level | Complexity | Facet | Text Search |
 |----|----------|-------|------------|-------|-------------|
-| MUT-001 | Find relevant animal or cell line models with mutation NM_000267.3(NF1):c.204... | baseline | 1-hop | No | Yes |
+| MUT-001 | What animal or cell line models are available with mutation NM_000267.3(NF1):... | baseline | 1-hop | No | Yes |
 | MUT-002 | Find NF1 floxed mice | baseline | 0-hop | No | Yes |
-| MUT-003 | Find cell line with 'c.104del' sequence variation | advanced | 1-hop | No | No |
-| MUT-004 | Find animal or cell line models with splice-site variants | advanced | 1-hop | No | Partial |
+| MUT-003 | Which cell lines have the 'c.104del' sequence variation? | advanced | 1-hop | No | No |
+| MUT-004 | Show me animal or cell line models with splice-site variants | advanced | 1-hop | No | Partial |
 | MUT-005 | Which cell lines have mutations in multiple genes? | advanced | 1-hop | No | No |
 | MUT-006 | Which mutations are available in both animal models and cell lines? | advanced | 2-hop | No | Partial |
 
@@ -117,12 +130,12 @@ All ground truth IDs in the generated files are standardized to use `resourceId`
 
 | ID | Question | Level | Complexity | Facet | Text Search |
 |----|----------|-------|------------|-------|-------------|
-| AM-001 | Find animal models for optic glioma | baseline | 0-hop | Yes | Yes |
-| AM-002 | Find animal models for energy expenditure study | baseline | 0-hop | Partial | Partial |
-| AM-003 | Find non-mouse mammalian models | baseline | 0-hop | Yes | Partial |
-| AM-004 | Find mouse model with the earliest observed tumor development | advanced | 1-hop | No | No |
+| AM-001 | What animal models are available for optic glioma? | baseline | 0-hop | Yes | Yes |
+| AM-002 | Help me find animal models suitable for energy expenditure studies | baseline | 0-hop | Partial | Partial |
+| AM-003 | Are there any non-mouse mammalian models available? | baseline | 0-hop | Yes | Partial |
+| AM-004 | Which mouse model has the earliest observed tumor development? | advanced | 1-hop | No | No |
 | AM-005 | Find transplantation mouse models (xenografts) and related donor cell lines | advanced | 2-hop | No | No |
-| AM-006 | Find animal models that develop café-au-lait spots | advanced | 1-hop | No | No |
+| AM-006 | Which animal models develop café-au-lait spots? | advanced | 1-hop | No | No |
 
 
 #### Cell Line Discovery
@@ -132,8 +145,8 @@ All ground truth IDs in the generated files are standardized to use `resourceId`
 
 | ID | Question | Level | Complexity | Facet | Text Search |
 |----|----------|-------|------------|-------|-------------|
-| CL-001 | Find plexiform neurofibroma cell lines | baseline | 0-hop | Yes | Yes |
-| CL-002 | Find hybridoma cell lines | baseline | 0-hop | Yes | Yes |
+| CL-001 | Show me plexiform neurofibroma cell lines | baseline | 0-hop | Yes | Yes |
+| CL-002 | What hybridoma cell lines are available? | baseline | 0-hop | Yes | Yes |
 | CL-003 | Find normal schwann cell lines | baseline | 1-hop | Partial | Yes |
 | CL-004 | Find NF1 cell lines from black patients | baseline | 0-hop | Yes | Partial |
 | CL-005 | Find human cell lines from pediatric donors | baseline | 1-hop | Partial | No |

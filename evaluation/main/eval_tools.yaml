@@ -53,12 +53,16 @@
 #   ✓ Showcases significantly improved UX and capabilities through technical innovation
 #   ✓ Can be explained clearly in <30 seconds
 
+metadata:
+  version: v1
+  data_archive: syn73695746
+
 components:
   - name: "Discovery via Mutation of Interest"
     description: "Finding animal and/or cell line models by mutation"
     questions:
       - id: MUT-001
-        question: "Find relevant animal or cell line models with mutation NM_000267.3(NF1):c.2041C>T (p.Arg681Ter) (ClinVar)"
+        question: "What animal or cell line models are available with mutation NM_000267.3(NF1):c.2041C>T (p.Arg681Ter) (ClinVar)?"
         user_story: "As a researcher, I want to find relevant animal or cell line models to study specific ClinVar mutations"
         level: baseline
         complexity: 1-hop
@@ -81,7 +85,7 @@ components:
         demo_rationale: "Common experimental need but straightforward search"
 
       - id: MUT-003
-        question: "Find cell line with 'c.104del' sequence variation"
+        question: "Which cell lines have the 'c.104del' sequence variation?"
         user_story: "As a researcher, I want to find cell lines with specific sequence variations to study their effects"
         level: advanced
         complexity: 1-hop
@@ -93,7 +97,7 @@ components:
         demo_rationale: "Realistic sequence variant search"
 
       - id: MUT-004
-        question: "Find animal or cell line models with splice-site variants"
+        question: "Show me animal or cell line models with splice-site variants"
         user_story: "As a Gene Therapy Developer, I want to find animal or cell line models with splice-site variants to develop and test splice-switching antisense oligos"
         level: advanced
         complexity: 1-hop
@@ -143,7 +147,7 @@ components:
     description: "Finding animal models by manifestation, phenotype observations, strain"
     questions:
       - id: AM-001
-        question: "Find animal models for optic glioma"
+        question: "What animal models are available for optic glioma?"
         user_story: "As a researcher, I want to find animal models for optic glioma to study tumor development"
         level: baseline
         complexity: 0-hop
@@ -156,7 +160,7 @@ components:
         demo_rationale: "Straightforward manifestation search, baseline capability"
 
       - id: AM-002
-        question: "Find animal models for energy expenditure study"
+        question: "Help me find animal models suitable for energy expenditure studies"
         user_story: "As a researcher (metabolism expert), I want to find animal models suitable for energy expenditure studies"
         level: baseline
         complexity: 0-hop
@@ -170,7 +174,7 @@ components:
         demo_rationale: "Showcases semantic reasoning and ontology bridging for metabolism concepts"
 
       - id: AM-003
-        question: "Find non-mouse mammalian models"
+        question: "Are there any non-mouse mammalian models available?"
         user_story: "As a researcher, I want to see if larger NF1 mammalian animal systems are available, as these might more closely resemble humans than mice"
         level: baseline
         complexity: 0-hop
@@ -182,7 +186,7 @@ components:
         demo_rationale: "Simple species filter, not innovative"
 
       - id: AM-004
-        question: "Find mouse model with the earliest observed tumor development"
+        question: "Which mouse model has the earliest observed tumor development?"
         user_story: "As a researcher, I want to find mouse models with the earliest observed tumor development to study early tumorigenesis"
         level: advanced
         complexity: 1-hop
@@ -205,7 +209,7 @@ components:
         demo_rationale: "Cross-resource transplantation tracking, xenograft-to-cell-line donor linkage"
 
       - id: AM-006
-        question: "Find animal models that develop café-au-lait spots"
+        question: "Which animal models develop café-au-lait spots?"
         user_story: "As a researcher (dermatology expert), I want to find animal models that develop café-au-lait spots to investigate the mechanisms of this visible NF1 manifestation"
         level: advanced
         complexity: 1-hop
@@ -221,7 +225,7 @@ components:
     description: "Finding cell lines by type, tissue, manifestation, growth characteristics, donor characteristics"
     questions:
       - id: CL-001
-        question: "Find plexiform neurofibroma cell lines"
+        question: "Show me plexiform neurofibroma cell lines"
         user_story: "As a researcher, I want to find plexiform neurofibroma cell lines to study this tumor type in vitro"
         level: baseline
         complexity: 0-hop
@@ -232,7 +236,7 @@ components:
         demo_rationale: "Simple baseline search, well-established"
 
       - id: CL-002
-        question: "Find hybridoma cell lines"
+        question: "What hybridoma cell lines are available?"
         user_story: "As a researcher, I want to find hybridoma cell lines for antibody production"
         level: baseline
         complexity: 0-hop
