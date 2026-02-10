@@ -1,0 +1,15 @@
+# Testing dependencies for NF-OSI KG pipeline
+
+# Core testing framework
+pytest>=7.4.0
+pytest-cov>=4.1.0          # Coverage reporting
+pytest-xdist>=3.3.0        # Parallel test execution
+
+# RDF handling
+rdflib>=7.0.0              # RDF graph manipulation and SPARQL
+
+# Test reporting
+pytest-html>=3.2.0         # HTML test reports
+
+# Optional but recommended
+pytest-sugar>=0.9.7        # Better test output formatting

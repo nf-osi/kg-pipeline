@@ -1,0 +1,5 @@
+antibodyId,uniprotId,cloneId,reactiveSpecies,hostOrganism,conjugate,clonality,targetAntigen
+test-ab-001,P12345,Clone123,Human|Mouse|Rat,Rabbit,Nonconjugated,Polyclonal,NF1
+test-ab-002,Q67890,,Human,Goat,HRP,Monoclonal,NF2
+test-ab-003,,,Mouse,,Nonconjugated,Polyclonal,EGFR
+test-ab-004,P11111,Clone456,Human|Mouse,Rabbit,,Polyclonal,

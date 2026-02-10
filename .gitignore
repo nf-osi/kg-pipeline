@@ -13,3 +13,17 @@ tools/rmlmapper-8.1.0.jar
 test/output.ttl
 test/*.log
 test/temp_*.ttl
+
+# Ignore Python cache artifacts
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Ignore Python virtual environments
+.venv/
+venv/
+env/
+
+# Ignore Dagster temporary directories
+.tmp_dagster_home_*/
+.dagster_home/

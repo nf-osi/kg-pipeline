@@ -15,7 +15,7 @@
 ################################################################################
 
 map:PortalMutationsSource a rml:LogicalSource ;
-    rml:source "data/csv/portal_mutations.csv" ;
+    rml:source "data/csv/mutations.csv" ;
     rml:referenceFormulation ql:CSV .
 
 ################################################################################
@@ -26,11 +26,11 @@ map:MutationCore a rr:TriplesMap ;
     rdfs:label "Mutation Core" ;
     rml:logicalSource map:PortalMutationsSource ;
     rr:subjectMap [
-        rr:template "http://nf-osi.github.com/terms#mutation/{mutationDetailsId}" ;
+        rr:template "http://nf-osi.github.com/terms#mutation/{mutationId}" ;
         rr:termType rr:IRI
     ] ;
     rr:predicateObjectMap [ rr:predicate rdf:type ; rr:objectMap [ rr:constant nf:Mutation ; rr:termType rr:IRI ] ] ;
-    rr:predicateObjectMap [ rr:predicate nf:mutationDetailsId ; rr:objectMap [ rml:reference "mutationDetailsId" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:mutationId ; rr:objectMap [ rml:reference "mutationId" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:humanClinVarMutation ; rr:objectMap [ rml:reference "humanClinVarMutation" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:affectedGeneSymbol ; rr:objectMap [ rml:reference "affectedGeneSymbol" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:externalMutationID ; rr:objectMap [ rml:reference "externalMutationID" ; rr:termType rr:IRI ] ] ;
@@ -48,7 +48,7 @@ map:MutationAlleleType a rr:TriplesMap ;
     rdfs:label "Mutation Allele Type" ;
     rml:logicalSource map:PortalMutationsSource ;
     rr:subjectMap [
-        rr:template "http://nf-osi.github.com/terms#mutation/{mutationDetailsId}" ;
+        rr:template "http://nf-osi.github.com/terms#mutation/{mutationId}" ;
         rr:termType rr:IRI
     ] ;
     rr:predicateObjectMap [
@@ -79,7 +79,7 @@ map:MutationMethod a rr:TriplesMap ;
     rdfs:label "Mutation Method" ;
     rml:logicalSource map:PortalMutationsSource ;
     rr:subjectMap [
-        rr:template "http://nf-osi.github.com/terms#mutation/{mutationDetailsId}" ;
+        rr:template "http://nf-osi.github.com/terms#mutation/{mutationId}" ;
         rr:termType rr:IRI
     ] ;
     rr:predicateObjectMap [
@@ -110,7 +110,7 @@ map:MutationType a rr:TriplesMap ;
     rdfs:label "Mutation Type" ;
     rml:logicalSource map:PortalMutationsSource ;
     rr:subjectMap [
-        rr:template "http://nf-osi.github.com/terms#mutation/{mutationDetailsId}" ;
+        rr:template "http://nf-osi.github.com/terms#mutation/{mutationId}" ;
         rr:termType rr:IRI
     ] ;
     rr:predicateObjectMap [

@@ -1,0 +1,4 @@
+developmentId,resourceId,publicationId,funderId,funderName
+dev-001,test-res-001,pub-001,funder-ntap,NTAP
+dev-001,test-res-001,pub-001,funder-ctf,Children's Tumor Foundation
+dev-002,test-res-002,pub-002,funder-nih,National Institutes of Health

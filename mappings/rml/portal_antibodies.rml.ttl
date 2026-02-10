@@ -15,7 +15,7 @@
 ################################################################################
 
 map:PortalAntibodiesSource a rml:LogicalSource ;
-    rml:source "data/csv/portal_antibodies.csv" ;
+    rml:source "data/csv/antibodies.csv" ;
     rml:referenceFormulation ql:CSV .
 
 ################################################################################

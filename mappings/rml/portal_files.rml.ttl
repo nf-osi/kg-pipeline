@@ -15,7 +15,7 @@
 ################################################################################
 
 map:PortalFilesSource a rml:LogicalSource ;
-    rml:source "data/csv/portal_files.csv" ;
+    rml:source "data/csv/files.csv" ;
     rml:referenceFormulation ql:CSV .
 
 ################################################################################
@@ -56,7 +56,7 @@ map:FileFundingAgency a rr:TriplesMap ;
     rml:logicalSource map:PortalFilesSource ;
     rr:subjectMap [ rml:reference "id" ; rr:termType rr:IRI ] ;
     rr:predicateObjectMap [
-        rr:predicate nf:fundingAgency ;
+        rr:predicate nf:hasFunder ;
         rr:objectMap [
             a fnml:FunctionTermMap ;
             rr:termType rr:IRI ;

@@ -1,0 +1,95 @@
+@prefix rr:   <http://www.w3.org/ns/r2rml#> .
+@prefix rml:  <http://semweb.mmlab.be/ns/rml#> .
+@prefix fnml: <http://semweb.mmlab.be/ns/fnml#> .
+@prefix fno:  <https://w3id.org/function/ontology#> .
+@prefix ql:   <http://semweb.mmlab.be/ns/ql#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix grel: <http://users.ugent.be/~bjdmeest/function/grel.ttl#> .
+@prefix nf:   <http://nf-osi.github.com/terms#> .
+@prefix map:  <http://nf-osi.github.com/mappings/development-publication#> .
+
+################################################################################
+# Logical source
+################################################################################
+
+map:DevelopmentPublicationSource a rml:LogicalSource ;
+    rml:source "data/csv/development_publication.csv" ;
+    rml:referenceFormulation ql:CSV .
+
+################################################################################
+# Development -> Publication relationship
+################################################################################
+
+map:DevelopmentHasPublication a rr:TriplesMap ;
+    rdfs:label "Development Has Publication" ;
+    rml:logicalSource map:DevelopmentPublicationSource ;
+    rr:subjectMap [ rml:reference "developmentId" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:hasPublication ;
+        rr:objectMap [ rml:reference "publicationId" ; rr:termType rr:IRI ]
+    ] .
+
+################################################################################
+# Publication core properties
+################################################################################
+
+map:PublicationCore a rr:TriplesMap ;
+    rdfs:label "Publication Core" ;
+    rml:logicalSource map:DevelopmentPublicationSource ;
+    rr:subjectMap [ rml:reference "publicationId" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [ rr:predicate rdf:type ; rr:objectMap [ rr:constant nf:Publication ; rr:termType rr:IRI ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:publicationTitle ; rr:objectMap [ rml:reference "publicationTitle" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:abstract ; rr:objectMap [ rml:reference "abstract" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:citation ; rr:objectMap [ rml:reference "citation" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:publicationDate ; rr:objectMap [ rml:reference "publicationDate" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:publicationDateUnix ; rr:objectMap [ rml:reference "publicationDateUnix" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:journal ; rr:objectMap [ rml:reference "journal" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:doi ; rr:objectMap [ rml:reference "doi" ; rr:termType rr:IRI ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:pmid ; rr:objectMap [ rml:reference "pmid" ; rr:termType rr:IRI ] ] .
+
+################################################################################
+# Publication authors (pipe-delimited)
+################################################################################
+
+map:PublicationAuthors a rr:TriplesMap ;
+    rdfs:label "Publication Authors" ;
+    rml:logicalSource map:DevelopmentPublicationSource ;
+    rr:subjectMap [ rml:reference "publicationId" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:authors ;
+        rr:objectMap [
+            a fnml:FunctionTermMap ;
+            rr:datatype xsd:string ;
+            fnml:functionValue [
+                a fno:Execution ;
+                rml:logicalSource map:DevelopmentPublicationSource ;
+                rr:predicateObjectMap [
+                    rr:predicate fno:executes ;
+                    rr:objectMap [ rr:constant grel:string_split ; rr:termType rr:IRI ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:valueParameter ;
+                    rr:objectMap [ rml:reference "authors" ; rr:termType rr:Literal ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:p_string_sep ;
+                    rr:objectMap [ rr:constant "\\|" ; rr:termType rr:Literal ]
+                ]
+            ]
+        ]
+    ] .
+
+################################################################################
+# Resource -> Publication relationship (via development)
+################################################################################
+
+map:ResourceHasPublication a rr:TriplesMap ;
+    rdfs:label "Resource Has Publication" ;
+    rml:logicalSource map:DevelopmentPublicationSource ;
+    rr:subjectMap [ rml:reference "resourceId" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:hasPublication ;
+        rr:objectMap [ rml:reference "publicationId" ; rr:termType rr:IRI ]
+    ] .

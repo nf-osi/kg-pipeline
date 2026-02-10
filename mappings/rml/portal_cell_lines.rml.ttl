@@ -15,7 +15,7 @@
 ################################################################################
 
 map:PortalCellLinesSource a rml:LogicalSource ;
-    rml:source "data/csv/portal_cell_lines.csv" ;
+    rml:source "data/csv/cell_lines.csv" ;
     rml:referenceFormulation ql:CSV .
 
 ################################################################################

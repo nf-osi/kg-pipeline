@@ -1,0 +1,5 @@
+cellLineId,donorId,originYear,organ,strProfile,tissue,cellLineManifestation,resistance,cellLineCategory,contaminatedMisidentified,cellLineGeneticDisorder,populationDoublingTime
+test-cell-001,test-donor-001,2015,Brain,STR-12345,Nerve,Plexiform Neurofibroma|Malignant Peripheral Nerve Sheath Tumor,Cisplatin,Primary,No,Neurofibromatosis type 1,24
+test-cell-002,test-donor-002,2018,Skin,,Schwann cell,Schwannoma,None,Immortalized,No,Neurofibromatosis type 2,48
+test-cell-003,,2020,Peripheral nerve,STR-67890,Neurofibroma,,Doxorubicin|Paclitaxel,Primary,Yes,,36
+test-cell-004,test-donor-003,2022,,,Fibroblast,,,,No,Legius syndrome,

@@ -1,0 +1,91 @@
+profiles:
+  release:
+    version: KG v0.1
+    date: '2025-02-10'
+    comment: Initial knowledge graph release
+    csv_archive:
+      archive_id: null
+      archive_version: null
+      last_snapshot_comment: null
+      last_snapshot_date: null
+    rdf_archive:
+      archive_id: null
+      archive_version: null
+      last_snapshot_comment: null
+      last_snapshot_date: null
+    tables:
+      studies:
+        synapse_id: syn52694652
+      files:
+        synapse_id: syn16858331
+      mutations:
+        synapse_id: syn26486835
+      genetic_reagents:
+        synapse_id: syn26486832
+      animal_models:
+        synapse_id: syn26486808
+      cell_lines:
+        synapse_id: syn26486823
+      donors:
+        synapse_id: syn26486829
+      antibodies:
+        synapse_id: syn26486811
+      resources:
+        synapse_id: syn26450069
+      observations:
+        synapse_id: syn26486836
+      development_funder:
+        synapse_id: syn51734076
+      development_investigator:
+        synapse_id: syn51734029
+      donor_tool:
+        synapse_id: syn51735419
+      mutation_animal_model:
+        synapse_id: syn51750819
+      mutation_cell_line:
+        synapse_id: syn51735479
+  evaluation:
+    version: KG v0.1-eval
+    date: '2025-02-10'
+    comment: Evaluation snapshot (currently same as release)
+    csv_archive:
+      archive_id: syn73695746
+      archive_version: 1
+      last_snapshot_comment: For eval dataset v1
+      last_snapshot_date: '2026-02-10 11:15:28'
+    rdf_archive:
+      archive_id: null
+      archive_version: null
+      last_snapshot_comment: null
+      last_snapshot_date: null
+    tables:
+      studies:
+        synapse_id: syn52694652
+      files:
+        synapse_id: syn16858331
+      mutations:
+        synapse_id: syn26486835
+      genetic_reagents:
+        synapse_id: syn26486832
+      animal_models:
+        synapse_id: syn26486808
+      cell_lines:
+        synapse_id: syn26486823
+      donors:
+        synapse_id: syn26486829
+      antibodies:
+        synapse_id: syn26486811
+      resources:
+        synapse_id: syn26450069
+      observations:
+        synapse_id: syn26486836
+      development_funder:
+        synapse_id: syn51734076
+      development_investigator:
+        synapse_id: syn51734029
+      donor_tool:
+        synapse_id: syn51735419
+      mutation_animal_model:
+        synapse_id: syn51750819
+      mutation_cell_line:
+        synapse_id: syn51735479
