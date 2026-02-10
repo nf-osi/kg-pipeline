@@ -13,3 +13,7 @@ tools/rmlmapper-8.1.0.jar
 test/output.ttl
 test/*.log
 test/temp_*.ttl
+
+# Ignore Python cache artifacts
+__pycache__/
+*.py[cod]
