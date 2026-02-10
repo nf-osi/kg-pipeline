@@ -5,7 +5,7 @@ import re
 from datetime import datetime
 
 # Path adjusted for script location in evaluation/main/
-DATA_DIR = '../../data/csv'
+DATA_DIR = '../data/csv'
 EVAL_TOOLS_FILE = 'eval_tools.yaml'
 OUTPUT_FILE = 'eval_tools_ground_auto.yaml'
 
