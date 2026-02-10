@@ -1,0 +1,393 @@
+metadata:
+  generated_at: '2026-02-10T00:56:06.723692'
+  skipped_questions:
+  - AM-004
+  - CR-001
+  total_questions: 34
+  generated_questions: 32
+ground_truth:
+  AB-001:
+    question: Find drosophila neurofibromin antibodies
+    results:
+    - cdde78f3-a1c3-43b4-a2d9-4f1a7cc88564
+  AB-002:
+    question: Find antibodies targeting the C-terminal region of neurofibromin
+    results:
+    - 01a755e0-90b9-44d4-ae81-3605fc5a7539
+    - 1910c1dc-3557-44f9-aedf-f3344cfd0097
+    - 6c02b2fe-94c2-4668-8730-afcd4807c1db
+    - 76e5f3c5-195b-448e-a7fe-48fb3ecf1a91
+    - 93f06d41-d7db-4fea-b0b4-173b2be80d17
+    - c70c0de8-16c2-4aec-8af8-b50c47797345
+    - db7bf81f-e9f8-4fad-9e6e-3cba8d6ca84a
+  AB-003:
+    question: Find antibodies for studying NF1 phosphorylation and post-translational
+      regulation
+    results:
+    - 077df72b-88a2-41b9-aad0-8bb5ff52c046
+    - 240c58e6-bf94-4a57-9af2-e5e2eb11e7d8
+    - 3f5ceb79-864a-4f03-aa7f-8804f10b3a32
+    - cd1c2c1d-d738-45c2-b240-c082c839e4e9
+    - e860b011-a781-42b7-af23-c8b08bc25ebc
+    - eb5d7230-1787-4f68-b3d8-ccf87041976d
+  AM-001:
+    question: Find animal models for optic glioma
+    results:
+    - 118aa95e-27f4-48fa-94c7-5f786b8b4f2f
+    - 893695cf-daa7-42eb-998c-9b04af941964
+  AM-002:
+    question: Find animal models for energy expenditure study
+    results:
+    - 033b7173-4c58-410e-b441-579ba05c388a
+    - 8e5c372e-dec8-4693-98a8-b07f3014257d
+  AM-003:
+    question: Find non-mouse mammalian models
+    results:
+    - 209c16d7-c1fa-414f-8f08-458eaefc2259
+    - 57625a6e-c039-418e-8e22-db464f8aa827
+  AM-005:
+    question: Find transplantation mouse models (xenografts) and related donor cell
+      lines
+    results:
+    - 1b604846-d41c-4969-a79a-9660c04e585c
+    - c8a807e4-502b-461c-a60f-fd10b3cde70e
+  AM-006:
+    question: "Find animal models that develop caf\xE9-au-lait spots"
+    results:
+    - 02aba952-5860-4bd9-bfb2-ff796b22bf48
+    - 209c16d7-c1fa-414f-8f08-458eaefc2259
+    - 57625a6e-c039-418e-8e22-db464f8aa827
+    - 89b2f63c-1538-468e-9ca1-7ff948cb354e
+    - d27fd7b0-ed8f-4ee2-a8d9-26748c12518c
+  CL-001:
+    question: Find plexiform neurofibroma cell lines
+    results:
+    - 00f8dcc6-a2b2-4fc2-a327-e87367bffa21
+    - 3dedf9d2-614c-4cf9-8d18-aff8aa2dc0eb
+    - 5502caf5-4cf1-418f-bf50-164cfa316b0f
+    - 844b598c-0171-4972-91c3-27aa21b45d52
+    - 8fdc5f7a-ef8c-4193-a5c0-04577c3b134d
+    - a8f48ce7-438c-4564-a70b-020abc96d5fe
+    - ab60aae5-7860-4d1d-bb02-208e6631c78b
+    - b44361f2-9021-4920-901a-b1a1f9143f97
+    - be2333d6-6716-4d13-947d-41f4198497a4
+    - f21cb7db-ee85-48a7-8f41-e4603238bede
+  CL-002:
+    question: Find hybridoma cell lines
+    results:
+    - 42257ac4-1950-4541-9bee-b9a965e2fa86
+    - 65d07476-2469-4679-85b2-e2ca67f3b01b
+    - f410431d-7571-4302-8870-eb115b71d0ce
+  CL-003:
+    question: Find normal schwann cell lines
+    results:
+    - 617cb183-3377-4473-8ad8-2f6472bce1fa
+  CL-004:
+    question: Find NF1 cell lines from black patients
+    results:
+    - 2549e536-b033-43e4-acf6-501499b6e498
+    - 7ef2fd6f-9ba6-4e30-94fc-d4ffd61de6e6
+    - 93469888-1234-4f52-b3a7-175423b817cc
+    - 95e9ea19-3d84-43a5-b003-347ecec6b1fa
+    - 9db66052-f458-4400-ae1b-3f5c075dbd25
+    - a14754e6-1c26-4224-9ef9-a1abfd1538eb
+    - ad2e271b-55ac-44ae-b39d-f1a6d76e1dc3
+    - b26e0c8b-689f-4018-bf27-e2d3a522e039
+    - f2677690-2137-408e-b250-784a0cd235f4
+  CL-005:
+    question: Find human cell lines from pediatric donors
+    results:
+    - 026b1ceb-5f1c-4497-825c-ee3cc5d9d2ed
+    - 1785a08d-ce83-45f6-bba8-68f4b0d3514c
+    - 1c53f612-f254-487d-a545-186fd4e2b856
+    - 1cc872fc-6a95-4722-a598-bf60bb124b82
+    - 1d2aa58f-2aaa-44ca-96e0-e37231052451
+    - 1edebf4d-8ea4-4071-90bf-7e934c7ab029
+    - 25fa8030-970e-48ec-8e22-55e23a747164
+    - 2e792f78-55b0-4091-9f86-6b78abd920bb
+    - 327fcda4-f2ef-4cb5-9245-d3256960f17f
+    - 3e6aae84-e57c-4c1d-9ce7-24a03026b435
+    - 49286dfd-632c-4f62-834f-d1441e05fde5
+    - 53c871d3-6f75-49a6-aa73-42d0ead2298b
+    - 5bdf2270-d002-41bf-b75d-2a1d890f9967
+    - 5e1d0a02-22cc-489a-851c-c7b9955a6270
+    - 5ebbfa6b-049f-4e85-af96-be49c3b5b31a
+    - 617cb183-3377-4473-8ad8-2f6472bce1fa
+    - 6a894263-7e2b-46f5-81b1-9aa351590843
+    - 6b2e6bfa-e869-4970-a71c-10abd3224ea9
+    - 6fd4f461-6137-4922-81b1-e9f30d993df1
+    - 73b8caeb-cc91-4d81-b076-25d611949807
+    - 7deb7765-38aa-4d8a-a3cb-bd4aefeb3a86
+    - 7ef2fd6f-9ba6-4e30-94fc-d4ffd61de6e6
+    - 827f08a1-3d0f-4fd8-98e4-fb5c40a9c742
+    - 8ebe9be8-88df-4598-bd25-510de550ca5e
+    - 8f77c8f5-a9a2-4d1a-a34a-79e912718c91
+    - 8fd09582-99a8-40d5-a16b-b250a6975e44
+    - 91cec0db-b483-4674-9636-e2fc4a91bf61
+    - 965771a4-c863-4e89-a9db-d160d1e4c5e5
+    - a03250ca-0914-4318-b5c6-5b5a86ca1965
+    - a2e3f513-8780-4f7e-985a-4dd4eab7de95
+    - a6bcc8ec-3169-4e4f-afbb-fbca2658007c
+    - a9634dff-4e4e-4cd9-bfe9-3d23e7d40583
+    - abfc2e7c-0d28-422f-9973-74b5fb66b402
+    - ad2e271b-55ac-44ae-b39d-f1a6d76e1dc3
+    - ae35c72c-7fd9-463b-9b0d-fb4670ccf05e
+    - b44361f2-9021-4920-901a-b1a1f9143f97
+    - bd026e3f-c345-4e67-8d79-31c1cd295a25
+    - bd3db98f-0ec9-40df-bc06-5e314c0fc671
+    - c87d24ac-439e-404a-9a43-6110c497599e
+    - cb814003-cd22-430d-a3b7-e387ef8eac76
+    - cba1c774-499d-4d01-b3d2-a62f670b03ce
+    - ce47dba5-1303-4253-af99-3e16cc14a341
+    - cebfdef3-2323-48d9-bfbb-aa704338eabe
+    - cf150ecf-4971-4500-ae94-5d25e4895d63
+    - d7bcdcae-52d3-4bc5-af24-243483588ee5
+    - db6b3d0d-ee80-49ab-bb51-5672448e580b
+    - dc42f6e8-494c-49ff-880f-be2352f3a87e
+    - e4cf20b8-9e30-4798-8281-25b83346458d
+    - e8ec4106-295f-4fa3-b744-40b6f9b68d38
+    - eb1b960d-bfd7-48d2-b467-c7faf52b4b3a
+    - f21cb7db-ee85-48a7-8f41-e4603238bede
+    - f354ec1a-0305-4e6c-897a-10e4fba10a28
+    - f6d3fc47-cd5d-4b7e-a5b7-7c10cecb2490
+    - fa12d6e9-6547-43ad-a666-c17c7c1a9cb3
+    - fe5b49ff-6d77-4de3-adc3-0fc97fd076e4
+  CL-006:
+    question: Find human lung cell lines for pulmonary toxicity assessment
+    results:
+    - 055e78dc-b3d2-416b-a7f1-ac4de9d9ec2b
+    - 0d519727-94e9-4f9e-95d3-9227443c03fe
+    - 12d08160-d127-463a-9e6e-c62347f9e756
+    - 177c35b5-d859-4bf2-870b-9311ef059159
+    - 2a57bc0e-51ee-4a44-a872-2ed8ab56f4c6
+    - 31448c47-8e6d-412c-917a-9f92c53ad687
+    - 42a7d7eb-f6df-45b8-80fc-242650606a84
+    - 6365e6d0-eefd-4778-9e0f-d8c549838ff2
+    - 665f978b-9fec-4f0b-8921-058a94b84bcd
+    - 903d9857-0c45-4817-a8d6-b43490a3fbcb
+    - 93469888-1234-4f52-b3a7-175423b817cc
+    - 95e9ea19-3d84-43a5-b003-347ecec6b1fa
+    - 9c2fbf5a-1c45-43f0-87bb-bb97ea9062f0
+    - a14754e6-1c26-4224-9ef9-a1abfd1538eb
+    - a7fe3fbf-d242-40b6-9d33-c19e8e0057e0
+    - a8cc9b6b-d1fc-4e77-8f10-3ca5737bcd5c
+    - b177ff32-b33c-4327-8862-e5b23994b502
+    - bd026e3f-c345-4e67-8d79-31c1cd295a25
+    - cca5b217-ce0b-4c2b-814f-54fefb967475
+    - d124e590-59ba-44c6-9c9f-0b0a3c96862c
+    - d28192f0-d180-40e1-b184-de3fed398e72
+    - d605ae2e-969a-4956-bac5-5e36654d7b41
+    - d6928d53-c913-4078-8354-4a5de3d5c824
+    - da179d37-bc2d-4725-8621-f8ec49b917d0
+    - df53b267-e448-4051-a0d8-1db4da3c5c41
+    - e3ae7e3f-d6ae-48d9-8e08-e2625c048642
+    - e6cb07c1-218d-4762-90d9-4de228447635
+  CL-007:
+    question: Find MPNST cell lines with population doubling times under 48 hours
+    results:
+    - 202c110b-a5f1-49ab-acdc-e6e33a1c29bb
+    - 504647eb-6b60-492a-bb51-3ab025830f51
+    - 9f4e4596-0c7d-4d41-b9ff-73ecebd30263
+    - b72d99fd-ee1e-42ec-92b6-9f89e375cce1
+    - c9a87975-378b-4930-8fda-e5896c42c86c
+    - fc3ae45e-9a5b-4fa5-8430-f53479f07f5a
+  CL-008:
+    question: Find isogenic cell line pairs that differ only in NF1 status
+    results:
+    - 02dacc42-ea46-48fb-a4df-7a875d801086
+    - 130fd347-28e1-46c2-a72d-d243e99322b7
+    - 14353c91-2be9-4617-b337-c29080961826
+    - 1b604846-d41c-4969-a79a-9660c04e585c
+    - 234515dd-7c28-4172-83c7-59dddfa22acb
+    - 25fa8030-970e-48ec-8e22-55e23a747164
+    - 3239573e-4ae1-4e01-8098-00dce6ac0a84
+    - 32f73d96-fd2a-4966-a150-ba5fa47d150c
+    - 3a3e5460-3d5b-45f9-995d-25bd49c06f34
+    - 3beebac1-95b0-4834-9008-19f7d268fc5b
+    - 3f29aa26-1d05-453a-a6ac-d4e37d609dba
+    - 44f9c496-ddd8-4e4b-bddb-6b93f7e04fc2
+    - 46da7a41-c654-426e-bfb7-361caf4d3c4c
+    - 4cf14492-2735-4e31-ab6a-75554b9ad298
+    - 590ebb66-5944-4cf7-accc-23e18d6c3818
+    - 5a466cdc-5eaa-45a5-87b1-ba9cac6d7d21
+    - 64615ea4-6879-49ff-8f10-18c6710cb33c
+    - 7126593e-4b96-40a5-9ff4-d41b81fbba4c
+    - 73b8caeb-cc91-4d81-b076-25d611949807
+    - 75d4b88a-a906-4f08-a9f8-66490328b9f1
+    - 779714c8-f522-4355-a502-d5d2e6e09afa
+    - 7d565aea-0917-428b-9101-d2a19f3fbcf1
+    - 7ef2fd6f-9ba6-4e30-94fc-d4ffd61de6e6
+    - 882101e0-1207-4323-a354-6d5a642e6ca3
+    - 8e9ec3f3-5622-4f8f-a02c-34d8777c82b6
+    - 96d339f9-9d19-40c3-8f81-3590f7c00205
+    - 96f2ab08-2c90-4ef9-9d56-1705ee49cecc
+    - 9b4b8eca-f981-440d-b478-0a5483353368
+    - a03250ca-0914-4318-b5c6-5b5a86ca1965
+    - a0c91627-fad6-4d60-bf74-67623374eff8
+    - a731535e-f7a6-4c6e-b0db-7f0d0979e69f
+    - aa32fc67-9cc3-4d31-bcbd-f7044f9fd484
+    - ad2e271b-55ac-44ae-b39d-f1a6d76e1dc3
+    - ad73cdb2-8add-48ff-b9f2-35a38132db84
+    - ae765b00-9189-4a72-8ae7-cddc41e24055
+    - b4987f0a-67ec-4f13-96f1-9443aac6e5ac
+    - bd74fd9f-6357-40d5-8569-96883628fb1a
+    - c5b9e065-6855-4a11-bceb-681d8e82ae5e
+    - c88fcbc9-24c1-4f2b-8d13-02f5037dcf1c
+    - d390b3f3-fea7-46d2-9bb7-dc72d59b2ccc
+    - d6a101aa-9ca8-4191-9b43-eddf327ea48b
+    - d86c2e88-3de9-4c0f-9cb5-de2921b8207f
+    - df513bb8-697a-4cac-ae6c-5aca6113ac24
+    - eb920757-ad44-4705-815e-31b5bd6105f5
+    - f047cff6-98c8-4562-b589-94b864ae35a1
+    - f103987e-5196-440e-a6ba-53d39305c714
+    - f2d00598-9db3-4549-a473-16b1db349614
+    - f59f3308-a440-497d-8eee-8d7756a9ae2b
+    - f5ec9375-0564-414a-94ad-86d5083b440f
+    - faf29a50-3168-4ccd-a484-f2a78a026af3
+    - fb67363f-d309-4c7c-ba1e-f295ba411018
+  CL-009:
+    question: Find cell lines from different tissues of the same donor
+    results:
+    - 3899a07c-6fb8-4fc2-997f-c2301d6082f7
+    - 46cc2e4e-d9bf-4474-b4de-448e25fb0c66
+    - c4e97f99-a857-4f2d-80f1-62de8a12d037
+  CR-002:
+    question: Find human cell lines with the most diverse data types available on
+      the portal.
+    results:
+    - 5502caf5-4cf1-418f-bf50-164cfa316b0f
+    - b44361f2-9021-4920-901a-b1a1f9143f97
+    - be2333d6-6716-4d13-947d-41f4198497a4
+  CR-003:
+    question: Find animal models and cell lines that are derived from the same donor
+    results:
+    - 1b604846-d41c-4969-a79a-9660c04e585c
+    - c8a807e4-502b-461c-a60f-fd10b3cde70e
+  GR-001:
+    question: Find CRISPR vectors
+    results:
+    - 0af1bf36-fa11-4e30-ac58-7a3dbce6c227
+    - 0ffb7ddf-418f-4e35-b134-e9ab3df13f85
+    - eb0b9d5c-ff06-4e86-8191-dc5336c0a372
+  GR-002:
+    question: Find lentiviral vectors for RNAi
+    results:
+    - 58a67e29-1551-4828-97da-85d37b88f4f1
+  GR-003:
+    question: Find vectors with a CMV promoter
+    results:
+    - 1215c62b-3d47-4a41-8c02-68392015304d
+    - 1fe49f07-3c8e-4081-b2c5-02aa94a48198
+    - 3aa2fe55-5c61-4614-87ab-63f3e5b947ea
+    - 43c71f77-131c-495b-8299-47bac726bad9
+    - 601ed27e-1a62-4e94-a36f-cc0fa3265b24
+    - 639f1f9b-fb34-4261-923c-f94fbe521494
+    - 6b0cfb7c-26a1-4269-97a9-264c1cbe81da
+    - 7522635f-797f-4410-b5b1-89b73e435eee
+    - 8c69eb2e-b455-4ac7-a73c-a748bf9bbba6
+    - 97c0540d-5f5b-4c72-84bf-8ea896193ba3
+    - 9bef3a38-7350-4596-a60c-8e8b281b42ff
+    - abc360d4-6700-4b3e-97e9-1b9a4b56831b
+    - bdbc4c09-fb61-41cb-87f2-82e2d0d65298
+    - be700072-5240-407a-be68-b0605664a055
+    - c428d110-60c4-41f9-bf15-54a1c1c2a858
+    - ccba42df-9123-4536-9af2-951150eeb548
+    - d4bfc2e5-70db-44ed-a735-b3f65b5dd3f2
+    - d9e0d028-18dd-4e08-b191-d1161ba96fbd
+    - fc763fda-e198-4351-912d-82fb223bf916
+  GR-004:
+    question: Find NF1 expression vectors compatible with high-copy E. coli systems
+    results:
+    - 542442e1-979c-4bad-96da-dfb2a401b8a8
+    - 58a67e29-1551-4828-97da-85d37b88f4f1
+    - 728283a2-36cd-4b5a-9fd8-5a6c3661b43d
+    - 8be8edb3-e0d9-4f91-975f-2a521e474082
+  GR-005:
+    question: Find vectors with resistance markers suitable for mammalian selection
+    results:
+    - 1fe49f07-3c8e-4081-b2c5-02aa94a48198
+    - 3aa2fe55-5c61-4614-87ab-63f3e5b947ea
+    - 43c71f77-131c-495b-8299-47bac726bad9
+    - 58a67e29-1551-4828-97da-85d37b88f4f1
+    - 601ed27e-1a62-4e94-a36f-cc0fa3265b24
+    - 6b0cfb7c-26a1-4269-97a9-264c1cbe81da
+    - 7522635f-797f-4410-b5b1-89b73e435eee
+    - 8c69eb2e-b455-4ac7-a73c-a748bf9bbba6
+    - 9bef3a38-7350-4596-a60c-8e8b281b42ff
+    - be700072-5240-407a-be68-b0605664a055
+    - c25da5cc-8694-4170-b58a-dbb56e451d60
+    - c428d110-60c4-41f9-bf15-54a1c1c2a858
+    - ccba42df-9123-4536-9af2-951150eeb548
+    - d4bfc2e5-70db-44ed-a735-b3f65b5dd3f2
+    - d9e0d028-18dd-4e08-b191-d1161ba96fbd
+    - fc763fda-e198-4351-912d-82fb223bf916
+  MUT-001:
+    question: Find relevant animal or cell line models with mutation NM_000267.3(NF1):c.2041C>T
+      (p.Arg681Ter) (ClinVar)
+    results:
+    - 033b7173-4c58-410e-b441-579ba05c388a
+    - 1ae5651a-818f-4732-8045-17bea2555056
+    - 32f73d96-fd2a-4966-a150-ba5fa47d150c
+    - 47f50ef0-8d59-430d-9d05-7df1a4f41c3b
+    - 504d7dfe-acf9-476c-974d-e8665095afbb
+    - 6ff97eee-5c1a-4439-9df6-d1715cbdd189
+    - 70c1e3f6-751f-49e4-aa47-e3bea4aeac43
+    - 8b964052-b74b-4ca3-ad82-31bd2f3457aa
+    - 91e9130d-00bc-4dfe-9a5d-356e5ae3f4db
+    - a2a0345f-f0ba-4d72-99d7-f9ad2ea77751
+    - a9933922-29fb-4a4c-bc5f-604691a8bab7
+    - e70947db-35d1-448b-90d8-ec6f14e70303
+    - f8984594-d5ff-4827-8e83-13ccbf0055e8
+    - faf29a50-3168-4ccd-a484-f2a78a026af3
+  MUT-002:
+    question: Find NF1 floxed mice
+    results:
+    - 27c1a639-9e98-4289-872d-f275d4e49be7
+    - ddf3618d-dda5-4c03-a4b4-b9263dba0a31
+  MUT-003:
+    question: Find cell line with 'c.104del' sequence variation
+    results:
+    - 02dacc42-ea46-48fb-a4df-7a875d801086
+    - 130fd347-28e1-46c2-a72d-d243e99322b7
+    - 14353c91-2be9-4617-b337-c29080961826
+    - 32f73d96-fd2a-4966-a150-ba5fa47d150c
+    - 3f29aa26-1d05-453a-a6ac-d4e37d609dba
+    - 7d565aea-0917-428b-9101-d2a19f3fbcf1
+    - 96d339f9-9d19-40c3-8f81-3590f7c00205
+    - 9b4b8eca-f981-440d-b478-0a5483353368
+    - aa32fc67-9cc3-4d31-bcbd-f7044f9fd484
+    - ae765b00-9189-4a72-8ae7-cddc41e24055
+    - f047cff6-98c8-4562-b589-94b864ae35a1
+    - f2d00598-9db3-4549-a473-16b1db349614
+    - f59f3308-a440-497d-8eee-8d7756a9ae2b
+    - fb67363f-d309-4c7c-ba1e-f295ba411018
+  MUT-004:
+    question: Find animal or cell line models with splice-site variants
+    results:
+    - 0f404e70-2acf-4877-bcd5-6da81d9fa41e
+    - 46da7a41-c654-426e-bfb7-361caf4d3c4c
+    - 882101e0-1207-4323-a354-6d5a642e6ca3
+    - bd74fd9f-6357-40d5-8569-96883628fb1a
+    - df513bb8-697a-4cac-ae6c-5aca6113ac24
+  MUT-005:
+    question: Which cell lines have mutations in multiple genes?
+    results:
+    - 0f404e70-2acf-4877-bcd5-6da81d9fa41e
+    - 1ae5651a-818f-4732-8045-17bea2555056
+    - 1b604846-d41c-4969-a79a-9660c04e585c
+    - 7fe31236-bc93-449b-b559-9394999be926
+    - 827f08a1-3d0f-4fd8-98e4-fb5c40a9c742
+    - f17b839e-acd9-4dbc-a5bb-7d72ed0d0bd8
+    - fc3ae45e-9a5b-4fa5-8430-f53479f07f5a
+  MUT-006:
+    question: Which mutations are available in both animal models and cell lines?
+    results:
+    - 41883c45-fa85-4101-aba4-1076708d9f18
+    - c4456e3a-5007-455b-bf85-f04b440284d6
+  PI-001:
+    question: Find tools developed by Piotr Topilko
+    results:
+    - 15c3bd82-9791-4a53-b6f7-4d23b882a285
+  PI-002:
+    question: How many tools have been funded by GFF?
+    results: 4

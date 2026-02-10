@@ -1,0 +1,496 @@
+# Research Tools Discovery Evaluation Dataset
+#
+# Dedicated benchmark suite for evaluating queries across the
+# Research Tools Portal entities: Mutations, Animal Models, Cell Lines,
+# Genetic Reagents, Donor, Antibodies.
+#
+# These resources are critical for researchers planning experiments,
+# and graph-based, semantic queries enable discovery that spans resource types.
+#
+# Entity Types:
+#   - nf:Mutation (portal_mutations)
+#   - nf:AnimalModel (portal_animal_models)
+#   - nf:CellLine (portal_cell_lines)
+#   - nf:GeneticReagent (portal_genetic_reagents)
+#
+# Key Relationships:
+#   - AnimalModel --nf:donorId--> Donor
+#   - CellLine --nf:donorId--> Donor
+#   - Mutation --nf:affectedGeneSymbol--> Gene
+#   - AnimalModel --nf:animalModelOfManifestation--> Manifestation
+#   - CellLine --nf:cellLineManifestation--> Manifestation
+#   - Both models link to genetic disorders
+#
+# Dataset Item Attributes:
+#   - user_story: User story behind query with format "As a {persona}, I want..." 
+#   - complexity: Number of hops required (1-hop, 2-hop, 3-hop)
+#   - level: Difficulty/capability level of the question
+#       * "baseline" - baseline functionality established by current portal technologies and configuration
+#       * "advanced" - harder questions not handled by portal infra currently (e.g. missing materialization and aggregation, missing integration of additional semantics) 
+#   - facet_answerable: For feature comparison, whether this can be answered via portal UI facets alone
+#       * "yes" - fully answerable using available facets
+#       * "partial" - answerable but requires workarounds, manual filtering, or multiple steps
+#       * "no" - cannot be answered via facets alone
+#   - facet_note: (optional) Explanation for facet flow
+#   - text_search_answerable: For feature comparison, whether this can already be answered via the MySQL text search today
+#       * "yes" - fully answerable using text search
+#       * "partial" - answerable but with limitations, missing results, or requires knowing exact terms
+#       * "no" - cannot be answered via text search
+#   - text_search_note: (optional) Explanation for text search flow
+#   - target_milestone: (optional) Roadmap milestone where we expect this to be working/fully supported
+#   - demo_priority: (optional) Priority for demonstration/showcase purposes
+#       * "high" - Essential demo candidate: realistic use case, interesting results, showcases innovation
+#       * "medium" - Good demo candidate if time/context allows
+#       * "low" - Less suitable for demos but valuable for comprehensive testing
+#       * "tbd" - To be determined; needs discussion/review
+#   - demo_rationale: (optional) Why this priority level was assigned (use case realism, technical innovation, visual appeal, ease of explanation, etc.)
+#   - note: (optional) Additional notes
+#   - see_also: (optional) Supplementary links of interest
+#
+# Demo Priority Criteria (for "high" priority):
+#   ✓ Represents realistic researcher workflow
+#   ✓ Showcases "discovery" with meaningful/interesting results returned (avoid great questions with empty result sets bc desired tools don't exist in collection)
+#   ✓ Showcases significantly improved UX and capabilities through technical innovation
+#   ✓ Can be explained clearly in <30 seconds
+
+components:
+  - name: "Discovery via Mutation of Interest"
+    description: "Finding animal and/or cell line models by mutation"
+    questions:
+      - id: MUT-001
+        question: "Find relevant animal or cell line models with mutation NM_000267.3(NF1):c.2041C>T (p.Arg681Ter) (ClinVar)"
+        user_story: "As a researcher, I want to find relevant animal or cell line models to study specific ClinVar mutations"
+        level: baseline
+        complexity: 1-hop
+        facet_answerable: no
+        facet_note: "Select both Animal Model and Cell Line for Resource Type -> look for 'Human Clin Var Mutation' filter to show list and enable selection -> blocked bc filter not available)"
+        text_search_answerable: yes
+        text_search_note: "Use mutation as search term, e.g. 'NM_000267.3(NF1):c.2041C>T (p.Arg681Ter)', get exact relevant results"
+        demo_priority: medium
+        demo_rationale: "Cross-resource query, realistic clinical mutation workflow; however, current text search handles this well"
+
+      - id: MUT-002
+        question: "Find NF1 floxed mice"
+        user_story: "As a researcher, I want to find floxed mice for conditional knockout experiments"
+        level: baseline
+        complexity: 0-hop
+        facet_answerable: no
+        text_search_answerable: yes
+        text_search_note: "Using 'floxed' returns some relevant results"
+        demo_priority: medium
+        demo_rationale: "Common experimental need but straightforward search"
+
+      - id: MUT-003
+        question: "Find cell line with 'c.104del' sequence variation"
+        user_story: "As a researcher, I want to find cell lines with specific sequence variations to study their effects"
+        level: advanced
+        complexity: 1-hop
+        facet_answerable: no
+        facet_note: "Relevant filter Sequence Variation not available"
+        text_search_answerable: no
+        text_search_note: "No results for 'c.104del' without any filters; Sequence Variation not indexed"
+        demo_priority: medium
+        demo_rationale: "Realistic sequence variant search"
+
+      - id: MUT-004
+        question: "Find animal or cell line models with splice-site variants"
+        user_story: "As a Gene Therapy Developer, I want to find animal or cell line models with splice-site variants to develop and test splice-switching antisense oligos"
+        level: advanced
+        complexity: 1-hop
+        facet_answerable: no
+        facet_note: "Same blocked flow as MUT-001"
+        text_search_answerable: partial
+        text_search_note: > 
+          Type in "splice" to see some relevant cell lines that mention it in the description,
+          but MISSING relevant animal models. 
+
+          The field `humanClinVarMutation` field contains HGVS c. notation, 
+          so canonical splice-site variants are usually written with + or - offsets from an exon boundary.
+          For example, NM_000546.6(TP53):c.96+1G>A and NM_001042492.3(NF1):c.6704+1G>T are currently ones in the db. 
+          Can attempt to use this as alternative search term, e.g. type in `+1`, `+2`, `-1`, or `-2`,
+          since we know `humanClinVarMutation` is indexed, but won't work because get the message that these terms are too short.
+        see_also: https://pmc.ncbi.nlm.nih.gov/articles/PMC8705852/
+        demo_priority: high
+        demo_rationale: "Overcomes technical limitations of current search (short terms); critical for gene therapy workflows"
+
+      - id: MUT-005
+        question: "Which cell lines have mutations in multiple genes?"
+        user_story: "As a researcher, I want to find cell lines with compound mutations affecting multiple genes to study genetic interactions and synthetic lethality"
+        level: advanced
+        complexity: 1-hop
+        facet_answerable: no
+        facet_note: "No filter for grouping mutations by affected genes or identifying compound mutations"
+        text_search_answerable: no
+        text_search_note: "Cannot systematically identify cell lines with multiple gene mutations through text search alone"
+        demo_priority: high
+        demo_rationale: "Enables discovery of models for studying genetic interactions, synthetic lethality, and compound mutation effects - critical for understanding complex disease mechanisms"
+        note: "Query mutation_cell_line joined with mutations table, group by resourceId and count distinct affectedGeneSymbol. Return cell lines with >1 gene. Reveals models valuable for epistasis studies and combination therapy development"
+
+      - id: MUT-006
+        question: "Which mutations are available in both animal models and cell lines?"
+        user_story: "As a researcher, I want to identify which mutations have both in vitro and in vivo model representations available, so I can plan cross-validation experiments"
+        level: advanced
+        complexity: 2-hop
+        facet_answerable: no
+        facet_note: "Requires grouping resources by shared mutationId across animal models and cell lines"
+        text_search_answerable: partial
+        text_search_note: "Can search for specific mutation text, but cannot identify which models share the same mutation without manual comparison"
+        demo_priority: high
+        demo_rationale: "Enables cross-validation between cell and animal models; showcases mutation as integration point; critical for experimental design requiring matched in vitro/in vivo systems"
+        note: "Query mutation_animal_model and mutation_cell_line tables for mutationIds present in both. Returns the mutation IDs (not individual resources), enabling researchers to identify which mutations have both model types available. Also reveals model gaps: most mutations exist in only one model type, highlighting opportunities for tool development"
+
+  - name: "Animal Model Discovery"
+    description: "Finding animal models by manifestation, phenotype observations, strain"
+    questions:
+      - id: AM-001
+        question: "Find animal models for optic glioma"
+        user_story: "As a researcher, I want to find animal models for optic glioma to study tumor development"
+        level: baseline
+        complexity: 0-hop
+        facet_answerable: yes
+        facet_note: "Resource Type = 'Animal Model' + Animal Model of Manifestation = 'Optic Nerve Glioma'"
+        text_search_answerable: yes
+        text_search_note: 
+        note: Part of the current canned "Suggested Searches"
+        demo_priority: medium
+        demo_rationale: "Straightforward manifestation search, baseline capability"
+
+      - id: AM-002
+        question: "Find animal models for energy expenditure study"
+        user_story: "As a researcher (metabolism expert), I want to find animal models suitable for energy expenditure studies"
+        level: baseline
+        complexity: 0-hop
+        facet_answerable: partial
+        facet_note: "Filter 'Animal Model of Manifestation' -> select closest term 'Metabolic Function'"
+        text_search_answerable: partial
+        text_search_note: "Type in 'energy expenditure', no results; type in 'metabolic', some possibly relevant results returned"
+        note: Need translation from 'energy expenditure' -> 'metabolic function' via ontology; 
+        see_also: https://www.humangeneticsjournal.com/articles/resting-energy-expenditure-in-neurofibromatosis-type-1-indirect-calorimetry-versus-predictive-equations.html
+        demo_priority: medium
+        demo_rationale: "Showcases semantic reasoning and ontology bridging for metabolism concepts"
+
+      - id: AM-003
+        question: "Find non-mouse mammalian models"
+        user_story: "As a researcher, I want to see if larger NF1 mammalian animal systems are available, as these might more closely resemble humans than mice"
+        level: baseline
+        complexity: 0-hop
+        facet_answerable: yes
+        facet_note: "Resource Type = 'Animal Model' + background Strain = 'Ossabaw'/'Yucatan'"
+        text_search_answerable: partial
+        text_search_note: Hard to use text search for negated terms; users would have to manually try a variety of species in search
+        demo_priority: low
+        demo_rationale: "Simple species filter, not innovative"
+
+      - id: AM-004
+        question: "Find mouse model with the earliest observed tumor development"
+        user_story: "As a researcher, I want to find mouse models with the earliest observed tumor development to study early tumorigenesis"
+        level: advanced
+        complexity: 1-hop
+        facet_answerable: no
+        text_search_answerable: no
+        note: Without correct mouse selection, this returns a zebrafish model
+        demo_priority: high
+        demo_rationale: "Showcases temporal/observation data, interesting ranking query"
+      
+      - id: AM-005
+        question: "Find transplantation mouse models (xenografts) and related donor cell lines"
+        user_story: "As a researcher, I want to find xenograft models and their related donor cell lines to understand the tumor source and plan xenograft experiments"
+        level: advanced
+        complexity: 2-hop
+        facet_answerable: no
+        facet_note: "No direct facet linking xenografts to donor cell lines"
+        text_search_answerable: no
+        text_search_note: "Requires traversing transplantation relationships and donor linkages"
+        demo_priority: high
+        demo_rationale: "Cross-resource transplantation tracking, xenograft-to-cell-line donor linkage"
+
+      - id: AM-006
+        question: "Find animal models that develop café-au-lait spots"
+        user_story: "As a researcher (dermatology expert), I want to find animal models that develop café-au-lait spots to investigate the mechanisms of this visible NF1 manifestation"
+        level: advanced
+        complexity: 1-hop
+        facet_answerable: no
+        facet_note: "Specific phenotypic features like café-au-lait spots not available as filterable observations"
+        text_search_answerable: no
+        text_search_note: "Current infra does not allow Observations to be indexed/linked"
+        demo_priority: high
+        demo_rationale: "Phenotype-based discovery for iconic NF1 symptoms; visually evocative"
+
+
+  - name: "Cell Line Discovery"
+    description: "Finding cell lines by type, tissue, manifestation, growth characteristics, donor characteristics"
+    questions:
+      - id: CL-001
+        question: "Find plexiform neurofibroma cell lines"
+        user_story: "As a researcher, I want to find plexiform neurofibroma cell lines to study this tumor type in vitro"
+        level: baseline
+        complexity: 0-hop
+        facet_answerable: yes
+        text_search_answerable: yes
+        note: Part of the current canned "Suggested Searches"
+        demo_priority: low
+        demo_rationale: "Simple baseline search, well-established"
+
+      - id: CL-002
+        question: "Find hybridoma cell lines"
+        user_story: "As a researcher, I want to find hybridoma cell lines for antibody production"
+        level: baseline
+        complexity: 0-hop
+        facet_answerable: yes
+        facet_note: "Filter Cell Line Category = 'Hybridoma'"
+        text_search_answerable: yes
+        demo_priority: low
+        demo_rationale: "Simple category filter"
+      
+      - id: CL-003
+        question: "Find normal schwann cell lines"
+        user_story: "As a researcher, I want to find normal schwann cell lines to use as controls in my experiments"
+        level: baseline
+        complexity: 1-hop
+        facet_answerable: partial
+        facet_note: "Missing cell type as filterable, so text search required"
+        text_search_answerable: yes
+        text_search_note: "Resource Type = 'Cell Line' + 'Cell Line Genetic Disorder' = 'No known genetic disorder' + 'schwann' in text search; relevant hits at bottom"
+        note: Text search returns healthy cell lines at very bottom bc affected cell lines are incorrectly categorized w/ 'No known genetic disorder'; issues with data rather than search capability 
+        demo_priority: medium
+        demo_rationale: "Control lines for experiments, common need"
+
+      - id: CL-004
+        question: "Find NF1 cell lines from black patients"
+        user_story: "As a researcher, I want to find human cell lines from black patients to ensure diversity in my studies"
+        level: baseline
+        complexity: 0-hop
+        facet_answerable: yes
+        facet_note: "Use Species + Cell Line Genetic Disorder + Race filters"
+        text_search_answerable: partial
+        text_search_note: "Terms like 'black' return relevant results, but in this case using facets alone is better UX"
+        demo_priority: medium
+        demo_rationale: "Diversity/equity angle, donor demographics"
+      
+      - id: CL-005
+        question: "Find human cell lines from pediatric donors"
+        user_story: "As a researcher, I want to find human cell lines from pediatric donors to study age-specific disease characteristics"
+        level: baseline
+        complexity: 1-hop
+        facet_answerable: partial
+        facet_note: "Can manually select all ages < 18 using Age filter, but very poor UX"
+        text_search_answerable: no
+        demo_priority: medium
+        demo_rationale: "Age-specific research, pediatric focus"
+
+      - id: CL-006
+        question: "Find human lung cell lines for pulmonary toxicity assessment"
+        user_story: "As a researcher (toxicology expert), I want to find human lung cell lines to assess drug-induced pulmonary toxicity and respiratory safety profiles"
+        level: baseline
+        complexity: 0-hop
+        facet_answerable: no
+        facet_note: "Would require Organ='Lung' filter"
+        text_search_answerable: yes
+        text_search_note: "Searching 'lung' returns lung cell lines, use filter to ensure human species only"
+        demo_priority: medium
+        demo_rationale: "Species + organ filtering for toxicology; valuable but less innovative than quantitative or graph queries"
+        
+      - id: CL-007
+        question: "Find MPNST cell lines with population doubling times under 48 hours"
+        user_story: "As a researcher (drug screening expert), I want to find MPNST cell lines with doubling times under 48 hours to be optimized for my particular screening assay"
+        level: advanced
+        complexity: 0-hop
+        facet_answerable: no
+        facet_note: "No facet for population doubling time filtering"
+        text_search_answerable: no
+        text_search_note: "Requires parsing and numerical comparison of doubling time values"
+        note: >
+          MPNST cell lines have median doubling time of 28h (range 24-64h).
+          48h threshold captures fast-growing lines suitable for standard 48h screening assays.
+          Excludes NCC-MPNST3-X2-C1 (64h doubling time).
+          PMID:29856369 provides an example for how drug screen assay design takes into account cell line growth characteristics.
+        demo_priority: high
+        demo_rationale: "Quantitative filtering for experimental design-specific constraint"
+
+      - id: CL-008
+        question: "Find isogenic cell line pairs that differ only in NF1 status"
+        user_story: "As a researcher, I want to find isogenic cell line pairs (same genetic background, different NF1 status) to isolate the effects of NF1 loss from other genetic variation"
+        level: advanced
+        complexity: 2-hop
+        facet_answerable: no
+        facet_note: "Requires traversing parentDonorId relationship to find derivative lines from common parent"
+        text_search_answerable: no
+        text_search_note: "Isogenic relationships not searchable via text; requires graph traversal through donor lineage"
+        note: "Uses parentDonorId property added to schema; enables powerful experimental designs comparing NF1+/+ vs NF1+/- vs NF1-/- from same genetic background"
+        demo_priority: high
+        demo_rationale: "Isogenic pair discovery, uses parentDonorId, powerful experimental design"
+
+      - id: CL-009
+        question: "Find cell lines from different tissues of the same donor"
+        user_story: "As a researcher, I want to compare NF1 expression in different tissue contexts with the same genetic background"
+        level: advanced
+        complexity: 1-hop
+        facet_answerable: no
+        facet_note: "No 'group by donor' or 'related cell lines' functionality in current facets"
+        text_search_answerable: no
+        text_search_note: "Donor IDs not exposed in searchable interface; requires querying by donorId relationship"
+        note: "Enables within-subject comparisons across tissues (e.g., dermal vs plexiform neurofibroma from same patient); requires grouping Cell Lines by Donor ID and finding those with multiple distinct tissues"
+        demo_priority: high
+        demo_rationale: "Enables high-value intra-donor comparison impossible via current facets"
+
+  - name: "Antibody Discovery"
+    description: "Finding antibodies by target, species reactivity, and epitope specificity"
+    questions:
+      - id: AB-001
+        question: "Find drosophila neurofibromin antibodies"
+        user_story: "As a researcher, I want to find drosophila neurofibromin antibodies since my lab uses drosophila as a model organism for a current study"
+        level: baseline
+        complexity: 0-hop
+        facet_answerable: yes
+        facet_note: "Filter Reactive Species = 'Drosophila'"
+        text_search_answerable: yes
+        text_search_note: "Search for 'drosophila' in text"
+        demo_priority: low
+        demo_rationale: "Simple species filter, niche model system"
+
+      - id: AB-002
+        question: "Find antibodies targeting the C-terminal region of neurofibromin"
+        user_story: "As a researcher, I want to find C-terminal antibodies to detect full-length neurofibromin and distinguish it from truncated protein products"
+        level: baseline
+        complexity: 0-hop
+        facet_answerable: no
+        facet_note: "No facet for epitope region selection"
+        text_search_answerable: yes
+        text_search_note: "Search for 'C-term' or 'C-terminal' in antibody descriptions"
+        demo_priority: medium
+        demo_rationale: "Epitope-region selection, truncation detection capability"
+
+      - id: AB-003
+        question: "Find antibodies for studying NF1 phosphorylation and post-translational regulation"
+        user_story: "As a researcher, I want to find phospho-specific NF1 antibodies to study dynamic signaling events and post-translational modifications in RAS pathway regulation"
+        level: advanced
+        complexity: 1-hop
+        facet_answerable: no
+        facet_note: "No facet for phospho-specific antibodies or PTM detection"
+        text_search_answerable: partial
+        text_search_note: "Can search 'phospho' but may miss variants and requires understanding target antigen field"
+        demo_priority: high
+        demo_rationale: "Phospho-proteomics capability, signaling pathway analysis, PTM research"
+  
+  - name: "Genetic Reagent Discovery"
+    description: "Finding vectors, plasmids, and other genetic tools"
+    questions:
+      - id: GR-001
+        question: "Find CRISPR vectors"
+        user_story: "As a gene therapy developer, I want to find CRISPR vectors for genome editing experiments"
+        level: baseline
+        complexity: 0-hop
+        facet_answerable: yes
+        text_search_answerable: yes
+        demo_priority: low
+        demo_rationale: "Simple category filter"
+
+      - id: GR-002
+        question: "Find lentiviral vectors for RNAi"
+        user_story: "As a gene therapy developer, I want to find lentiviral vectors for RNAi to perform gene knockdown studies"
+        level: baseline
+        complexity: 0-hop
+        facet_answerable: yes
+        facet_note: "Filter Vector Type contains 'Lentiviral' and 'RNAi'"
+        text_search_answerable: yes
+        text_search_note: "Search for 'lentiviral RNAi' returns relevant results"
+        demo_priority: low
+        demo_rationale: "Simple vector type combination"
+
+      - id: GR-003
+        question: "Find vectors with a CMV promoter"
+        user_story: "As a researcher, I need a vector with a strong constitutive promoter like CMV"
+        level: baseline
+        complexity: 0-hop
+        facet_answerable: no
+        facet_note: "Promoter field is not available as a facet"
+        text_search_answerable: yes
+        text_search_note: "Search 'CMV' returns relevant results"
+        demo_priority: medium
+        demo_rationale: "Promoter-based search, regulatory element filtering"
+
+      - id: GR-004
+        question: "Find NF1 expression vectors compatible with high-copy E. coli systems"
+        user_story: "As a researcher (structural biology expert), I want to find NF1 expression vectors compatible with high-copy E. coli systems to produce large amounts of protein"
+        level: advanced
+        complexity: 1-hop
+        facet_answerable: no
+        facet_note: "Copy Number property not available as a filter"
+        text_search_answerable: partial
+        text_search_note: "Search 'NF1' + filter for vectors, but copy number requires reading descriptions"
+        demo_priority: medium
+        demo_rationale: "Copy number requirement, realistic cloning workflow"
+
+      - id: GR-005
+        question: "Find vectors with resistance markers suitable for mammalian selection"
+        user_story: "As a gene therapy developer, I want to find vectors with resistance markers suitable for mammalian selection to create stable cell lines"
+        level: advanced
+        complexity: 1-hop
+        facet_answerable: no
+        facet_note: "Selectable Marker property not available as a filter"
+        text_search_answerable: no
+        text_search_note: "Mammalian selection markers (Puromycin, G418, etc.) not indexed"
+        demo_priority: medium
+        demo_rationale: "Selection marker search, practical genetic engineering"
+
+  - name: "By Investigator"
+    description: "Find tool by investigator"
+    questions:
+      - id: PI-001
+        question: "Find tools developed by Piotr Topilko"
+        user_story: "As a researcher, I want to find tools developed by specific investigators to leverage their expertise"
+        level: baseline
+        complexity: 1-hop
+        facet_answerable: yes
+        text_search_answerable: yes
+        demo_priority: low
+        demo_rationale: "Simple investigator attribution"
+
+      - id: PI-002
+        question: "How many tools have been funded by GFF?"
+        user_story: "As a program officer, I want to see the total number of research tools produced by GFF-funded investigators to assess program impact."
+        level: advanced
+        complexity: 2-hop
+        facet_answerable: no
+        facet_note: "No direct facet for funder, only investigator name"
+        text_search_answerable: no
+        text_search_note: "Shows some tools if GFF mentioned explictly in description, but not reliable to get correct number"
+        demo_priority: high
+        demo_rationale: "Aggregation query, funding provenance tracking, strategic planning"
+
+  - name: "Integrated Resource Queries"
+    description: "Questions that integrate data across multiple resource types or with additional semantics"
+    questions:
+      - id: CR-001
+        question: "Which cell lines have shown sensitivity to HDAC inhibitors?"
+        user_story: "As a drug screening researcher, I want to identify cell lines with documented HDAC inhibitor sensitivity to select appropriate models for epigenetic therapy studies"
+        level: advanced
+        complexity: 1-hop
+        facet_answerable: no
+        facet_note: "HDAC inhibitor responses not available as filterable observations"
+        text_search_answerable: partial
+        text_search_note: "Can search for 'HDAC' or specific drug names, but cannot systematically identify all cell lines with documented sensitivity"
+        demo_priority: high
+        demo_rationale: "Showcases Observations integration for practical drug discovery; addresses critical need for pre-validated screening models; HDAC inhibitors are promising epigenetic therapeutics for NF tumors"
+        note: "Query observations.observationText for HDAC inhibitor terms (HDAC, histone deacetylase, valproic acid, vorinostat, PCI-24781, etc.) with evidence of sensitivity/response. Requires manual curation to distinguish sensitivity from resistance or neutral observations"
+
+      - id: CR-002
+        question: "Find human cell lines with the most diverse data types available on the portal."
+        user_story: "As a bioinformatician, I want to identify the best-characterized cell lines across different assays to perform integrated multi-omics analysis."
+        level: advanced
+        complexity: 2-hop
+        facet_answerable: no
+        text_search_answerable: no
+        demo_priority: high
+        demo_rationale: "Requires cross-resource aggregation and ranking; high value for multi-omics integration"
+        note: "Requires using the modelSystemName attribute in Files to link to cell line, rank by dataType"
+
+      - id: CR-003
+        question: "Find animal models and cell lines that are derived from the same donor"
+        user_story: "As a researcher, I want to find matched model systems (isogenic or same-donor) to compare in vitro and in vivo results"
+        level: advanced
+        complexity: 2-hop
+        facet_answerable: no
+        text_search_answerable: no
+        demo_priority: high
+        demo_rationale: "Cross-resource matching, donor-based integration"

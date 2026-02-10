@@ -1,0 +1,103 @@
+# Manual Ground Truth for Research Tools Discovery Evaluation
+#
+# This file contains ground truth results for questions that require manual
+# curation or careful interpretation for text that cannot be reliably automated.
+
+metadata:
+  description: "Manually curated ground truth for complex evaluation questions"
+  manually_maintained_questions:
+    - AM-004
+    - CR-001
+
+ground_truth:
+  AM-004:
+    question: "Find mouse model with the earliest observed tumor development"
+    results:
+      # Two mouse models tied for earliest tumor detection at 120 days (4 months)
+      - 215b4e43-8a99-4702-ab4b-eeeadeeb13a5  # Nf1flox/flox;PostnCre(+)
+      - eb4aff73-9da2-42b5-8f94-0a6084db75b0  # Nf14F/4F; DhhCre
+
+    methodology: |
+      Review observations table for:
+      1. Mouse models only (filtered by backgroundStrain: C57BL/6, etc.)
+      2. observationType = "Tumor Incidence"
+      3. Actual tumor detection (not genetic manipulation timing or negative results)
+      4. Earliest observationTime
+
+      Interpret observation text carefully, as most "Tumor Incidence" observations don't pertain.
+      For example, exclude:
+      - "at embryonic day" / "at E12.5" (genetic manipulation timing)
+      - "prior to" / "before" (pre-tumor observations)
+      - "no evidence" / "no reduction" (negative results)
+      - "loss of Nf1 in" / "inactivation of" (describes genetic event *in* tissue, not tumor)
+
+    observations:
+      - resourceId: 215b4e43-8a99-4702-ab4b-eeeadeeb13a5
+        resourceName: "Nf1flox/flox;PostnCre(+)"
+        observationTime: 120.0
+        observationTimeUnits: "days"
+        observationType: "Tumor incidence"
+        observationText: "The Nf1flox/flox;PostnCre(+) mice develop plexiform neurofibromas in multiple peripheral nerves with 100% penetrance by 4 months of age."
+
+      - resourceId: eb4aff73-9da2-42b5-8f94-0a6084db75b0
+        resourceName: "Nf14F/4F; DhhCre"
+        observationTime: 120.0
+        observationTimeUnits: "days"
+        observationType: "Tumor incidence"
+        observationText: "Neurofibromas were observed in 79.2% of Nf14F/4F; DhhCre mice, arising from the dorsal root ganglia and compressing the spinal cord, with 90.9% detected in the cervical or thoracic spine."
+
+    notes: >
+      Advanced question bc the Observations text needs to be interpeted for actually relevant results. 
+      Models found after Observations data review have actual tumor detection at 120 days (4 months).
+
+  CR-001:
+    question: "Which cell lines have shown sensitivity to HDAC inhibitors?"
+    results:
+      # Two cell lines with documented HDAC inhibitor sensitivity
+      - 818f4c93-dbd3-41f7-b557-f264f7949c6e  # MPNST-642
+      - d124e590-59ba-44c6-9c9f-0b0a3c96862c  # NCI-H727
+
+    methodology: |
+      Review observations table for:
+      1. Cell lines only (resourceType = 'Cell Line')
+      2. observationText contains HDAC inhibitor terms:
+         - Generic: "HDAC", "histone deacetylase inhibitor", "HDACi"
+         - Specific drugs: "valproic acid", "vorinostat", "SAHA", "PCI-24781",
+           "romidepsin", "belinostat", "panobinostat", "entinostat"
+      4. Manual review of text to confirm sensitivity to (not resistance or other types of response)
+
+      Sensitivity indicators:
+      - Quantitative IC50/GI50 values
+      - "sensitive", "inhibited growth", "reduced growth"
+      - Dose-dependent response
+
+      Exclude observations indicating:
+      - Resistance or lack of response
+      - Testing without outcome data
+
+    observations:
+      - resourceId: 818f4c93-dbd3-41f7-b557-f264f7949c6e
+        resourceName: "MPNST-642"
+        resourceType: "Cell Line"
+        observationType: "Drug response"
+        hdacInhibitor: "PCI-24781"
+        evidence: "GI50 between 0.1 and 0.35 μM (48 hours)"
+        observationText: "The MPNST-642 cell line was one of six MPNST cell lines used to evaluate the effects of histone deacetylase inhibitors (HDACis) on growth and clonogenicity. MPNST-642 was found to be sensitive to the HDACi PCI-24781, with a GI50 between 0.1 and 0.35 μM after 48 hours of treatment."
+
+      - resourceId: d124e590-59ba-44c6-9c9f-0b0a3c96862c
+        resourceName: "NCI-H727"
+        resourceType: "Cell Line"
+        observationType: "Drug response"
+        hdacInhibitor: "Valproic acid"
+        evidence: "Dose-dependent growth inhibition"
+        observationText: "The NCI-H727 cell line showed inhibited growth in a dose-dependent manner when treated with the antiepileptic drug valproic acid."
+
+    notes: >
+      This obviously requires additional semantics of what is an HDACi and 
+      what types of endpoints/results mean "sensitivity to", such as relevant IC50/GI50 value cutoffs. 
+      MPNST-642 has strongest evidence with quantitative IC50 data for HDACi PCI-24781.
+      NCI-H727 shows sensitivity to valproic acid (HDAC inhibitor with antiepileptic use).
+
+      The MPNST-642 observation mentions it was part of a 6-cell line MPNST screen,
+      suggesting 5 additional MPNST cell lines may have been tested but aren't yet
+      documented in observations (potential data gap).
