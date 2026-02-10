@@ -26,7 +26,7 @@
 #   - complexity: Number of hops required (1-hop, 2-hop, 3-hop)
 #   - level: Difficulty/capability level of the question
 #       * "baseline" - baseline functionality established by current portal technologies and configuration
-#       * "advanced" - harder questions not handled by portal infra currently (e.g. missing materialization and aggregation, missing integration of additional semantics) 
+#       * "advanced" - questions not handled by current portal infra (highly linked, with ranking/aggregation, need semantics) 
 #   - facet_answerable: For feature comparison, whether this can be answered via portal UI facets alone
 #       * "yes" - fully answerable using available facets
 #       * "partial" - answerable but requires workarounds, manual filtering, or multiple steps
