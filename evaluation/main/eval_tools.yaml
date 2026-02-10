@@ -147,7 +147,7 @@ components:
     description: "Finding animal models by manifestation, phenotype observations, strain"
     questions:
       - id: AM-001
-        question: "What animal models are available for optic glioma?"
+        question: "I want animal models to study optic glioma"
         user_story: "As a researcher, I want to find animal models for optic glioma to study tumor development"
         level: baseline
         complexity: 0-hop
@@ -247,7 +247,7 @@ components:
         demo_rationale: "Simple category filter"
       
       - id: CL-003
-        question: "Find normal schwann cell lines"
+        question: "I need normal schwann cell lines"
         user_story: "As a researcher, I want to find normal schwann cell lines to use as controls in my experiments"
         level: baseline
         complexity: 1-hop
@@ -365,7 +365,7 @@ components:
         demo_rationale: "Epitope-region selection, truncation detection capability"
 
       - id: AB-003
-        question: "Find antibodies for studying NF1 phosphorylation and post-translational regulation"
+        question: "Give me antibodies for studying NF1 phosphorylation and post-translational regulation"
         user_story: "As a researcher, I want to find phospho-specific NF1 antibodies to study dynamic signaling events and post-translational modifications in RAS pathway regulation"
         level: advanced
         complexity: 1-hop
@@ -380,7 +380,7 @@ components:
     description: "Finding vectors, plasmids, and other genetic tools"
     questions:
       - id: GR-001
-        question: "Find CRISPR vectors"
+        question: "Need CRISPR vectors"
         user_story: "As a gene therapy developer, I want to find CRISPR vectors for genome editing experiments"
         level: baseline
         complexity: 0-hop
@@ -390,7 +390,7 @@ components:
         demo_rationale: "Simple category filter"
 
       - id: GR-002
-        question: "Find lentiviral vectors for RNAi"
+        question: "Need lentiviral vectors for RNAi"
         user_story: "As a gene therapy developer, I want to find lentiviral vectors for RNAi to perform gene knockdown studies"
         level: baseline
         complexity: 0-hop
@@ -441,7 +441,7 @@ components:
     description: "Find tool by investigator"
     questions:
       - id: PI-001
-        question: "Find tools developed by Piotr Topilko"
+        question: "What tools have been developed by Piotr Topilko"
         user_story: "As a researcher, I want to find tools developed by specific investigators to leverage their expertise"
         level: baseline
         complexity: 1-hop
