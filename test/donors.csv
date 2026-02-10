@@ -1,0 +1,5 @@
+donorId,parentDonorId,species,race,sex,age,transplantationDonorId
+test-donor-001,,Homo sapiens,White,Male,25,
+test-donor-002,test-donor-001,Homo sapiens|Mus musculus,Asian,Female,30,test-donor-003
+test-donor-003,,,Unknown,Unknown,,
+test-donor-004,,Rattus norvegicus,,Male,2,

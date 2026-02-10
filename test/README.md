@@ -1,153 +1,159 @@
 # RML Mapping Tests
 
-This directory contains tests for validating RML mappings that transform CSV data into RDF triples.
+Pytest-based test suite for validating RML mappings that transform CSV data into RDF triples.
 
-## Test Structure
-
-Tests are organized into two suites:
-
-1. **IRI Transformation Tests** (`test_iri_transform.sh`) - Studies & Files with SPARQL IRI transformation
-2. **Intermediate RML Tests** (`test_rml_intermediate.sh`) - All other entities (Mutations, Reagents, Animals, Cells, Donors, Antibodies)
-
-### Test Scripts
-
-- **`run_tests.sh`** - Master runner (executes both suites)
-- **`test_iri_transform.sh`** - IRI transformation tests
-- **`test_rml_intermediate.sh`** - Intermediate RML tests
-
-## Running Tests
+## Quick Start
 
 ```bash
-# Run all tests
-bash test/run_tests.sh
+# Install and run
+pip install -r test/requirements-test.txt
+pytest  # Runs 165 tests in ~23 seconds (parallel by default)
 
-# Run specific suite
-bash test/test_iri_transform.sh
-bash test/test_rml_intermediate.sh
+# Common usage
+pytest test/test_rml_mutations.py                    # Specific module
+pytest test/test_rml_mutations.py::TestMutationsCore # Specific class
+pytest -k "multi_value"                               # Pattern matching
+pytest --cov=scripts --cov-report=html                # With coverage
+pytest -n 0                                           # Sequential (debugging)
 ```
 
 ## Test Coverage
 
-### Portal Studies (7 tests)
-- ✅ Initiative field with spaces → IRI with underscores
-- ✅ Initiative without spaces → direct IRI
-- ✅ FundingAgency with spaces → IRI with underscores
-- ✅ FundingAgency without spaces → direct IRI
-- ✅ No URL-encoded spaces (%20) in IRIs
-- ✅ Empty studyLeads field produces no triple
+**165 tests** covering all RML mappings:
 
-### Portal Files (9 tests)
-- ✅ File name as literal string
-- ✅ Diagnosis list split correctly (pipe-delimited)
-- ✅ SpecimenID list split correctly
-- ✅ FundingAgency as IRI
-- ✅ ReportMilestone as number
-- ✅ Empty diagnosis produces no triple
-- ✅ Multiple specimenID values split
-- ✅ Single diagnosis value handled
-- ✅ FundingAgency with spaces → IRI with underscores
+- ✅ **Entity types**: Mutations, Genetic Reagents, Animal Models, Cell Lines, Donors, Antibodies, Resources, Studies, Files, Observations
+- ✅ **Development entities**: Funders, Investigators, Publications
+- ✅ **Relationships**: Mutation→Resource, Donor→Resource, Resource→Tool-specific IDs (owl:sameAs), Development→Funder/Investigator/Publication
+- ✅ **Multi-value fields**: Pipe-delimited list splitting
+- ✅ **IRI vs literals**: Proper type assignment
+- ✅ **Empty fields**: No triples for missing/empty values
+- ✅ **IRI transformation**: Spaces→underscores, no URL encoding
+- ✅ **SPARQL validation**: Native RDF queries
 
-### Portal Donors (7 tests)
-- ✅ Donor has correct type (nf:Donor)
-- ✅ Single species value as literal
-- ✅ Multi-valued species split correctly (pipe-delimited)
-- ✅ ParentDonorId as IRI reference
-- ✅ TransplantationDonorId as IRI reference
-- ✅ Empty parentDonorId produces no triple
-- ✅ Basic fields (race, sex, age) present
+### Performance
 
-### Portal Antibodies (8 tests)
-- ✅ Antibody has correct type (nf:Antibody)
-- ✅ UniprotId as IRI
-- ✅ Multi-valued reactiveSpecies split correctly (pipe-delimited)
-- ✅ Single reactiveSpecies value
-- ✅ Basic fields (hostOrganism, conjugate, clonality)
-- ✅ TargetAntigen field present
-- ✅ Empty cloneId produces no triple
-- ✅ Empty uniprotId produces no triple
+Tests run in parallel by default (via pytest.ini). Each test is isolated and independent.
 
-## Test Data Format
+| Mode | Time | Speedup |
+|------|------|---------|
+| Sequential (`-n 0`) | ~140s (2:20) | 1x |
+| **Parallel** (default) | **~21s** | **6.5x faster** |
 
-Each test CSV includes edge cases:
-- Empty/missing values
-- Single values
-- Multi-valued pipe-delimited fields (`value1|value2|value3`)
-- IRI fields
-- String fields with spaces
+**Bottleneck**: RMLMapper (Java) execution takes ~1s per test (94% of time). RDFLib parsing and SPARQL are very fast (<7% combined).
 
-## What Tests Validate
+## Test Structure
 
-1. **Type declarations**: Each entity has correct `rdf:type`
-2. **Field datatypes**: Strings as literals, IDs as IRIs
-3. **Multi-valued fields**: Pipe-delimited values split into multiple triples
-4. **Empty values**: No triples generated for missing/empty fields
-5. **IRI formatting**: Spaces converted to underscores, no URL encoding
-6. **Required fields**: Core identifiers always present
+### Organization
 
-## Adding New Table Tests
-
-1. **Create test CSV**: `test/portal_{table}.csv`
-   - Include 3-4 test records
-   - Cover edge cases (empty, single, multiple values)
-
-2. **Add test section** to `run_tests.sh`:
-   ```bash
-   echo
-   echo "=== Testing Portal {Table} Mapping ==="
-
-   # Create temporary mapping
-   sed 's|data/csv/portal_{table}.csv|test/portal_{table}.csv|g' \
-       mappings/rml/portal_{table}.rml.ttl > "$TEMP_MAPPING"
-
-   # Run RMLMapper
-   java -jar "$RMLMAPPER_JAR" $RML_FUNCTION_FILES \
-       -m "$TEMP_MAPPING" -s turtle -o "$OUTPUT_FILE"
-
-   # Show output
-   echo "=== Generated RDF Output ({Table}) ==="
-   cat "$OUTPUT_FILE"
-
-   # Add validation tests...
-   ```
-
-3. **Add validation tests**:
-   - Check entity type
-   - Validate multi-valued field splitting
-   - Verify IRI vs literal handling
-   - Confirm empty fields don't generate triples
-
-## Test Output
-
-Success:
 ```
-=== Test Summary ===
-Passed: 31
-Failed: 0
-All tests passed!
+test/
+├── conftest.py                 # Shared fixtures (rml_runner, transform_iris)
+├── test_rml_mutations.py       # Mutations mapping (10 tests)
+├── test_rml_genetic_reagents.py # Genetic reagents (10 tests)
+├── test_rml_animal_models.py   # Animal models (11 tests)
+├── test_rml_cell_lines.py      # Cell lines (11 tests)
+├── test_rml_donors.py          # Donors (13 tests)
+├── test_rml_antibodies.py      # Antibodies (14 tests)
+├── test_rml_relationships.py   # Mutation/donor relationships (13 tests)
+├── test_rml_resources.py       # Resources + owl:sameAs (15 tests)
+├── test_rml_studies.py         # Studies + IRI transform (14 tests)
+├── test_rml_files.py           # Files + IRI transform (15 tests)
+├── test_rml_development.py     # Development tables (22 tests)
+├── test_rml_observations.py    # Observations (17 tests)
+└── *.csv                       # Test data (3-5 rows each)
 ```
 
-Failure:
+### Test Categories
+
+Each test module includes:
+- **Core tests**: Entity types, IDs, basic properties
+- **Multi-value tests**: Pipe-delimited field splitting
+- **IRI tests**: URI vs literal validation
+- **Empty field tests**: No triples for empty values
+- **Data quality tests**: Consistency checks
+
+## Writing New Tests
+
+### Example Test
+
+```python
+def test_entity_has_correct_type(self, entity_graph, namespaces):
+    """All entities should have correct type"""
+    NF = namespaces["nf"]
+
+    query = """
+    SELECT ?entity
+    WHERE {
+        ?entity a nf:Entity .
+    }
+    """
+    results = list(entity_graph.query(query, initNs={"nf": NF}))
+    assert len(results) > 0, "No entities found"
 ```
-=== Test Summary ===
-Passed: 30
-Failed: 1
 
-Some tests failed. Output preserved at: test/output.ttl
+### Using Fixtures
+
+```python
+@pytest.fixture
+def my_graph(rml_runner, namespaces):
+    """Load specific graph for tests"""
+    return rml_runner(
+        mapping_file="portal_entity.rml.ttl",
+        csv_replacements={"data/csv/entity.csv": "test/entity.csv"}
+    )
+
+def test_something(my_graph, namespaces):
+    """Test uses the fixture"""
+    # Query the graph with SPARQL
+    query = "SELECT ?s ?p ?o WHERE { ?s ?p ?o } LIMIT 10"
+    results = my_graph.query(query)
+    # Make assertions
 ```
 
-Inspect `test/output.ttl` to debug failures.
+### Available Fixtures (conftest.py)
 
-## CI/CD Integration
+- `rml_runner(mapping_file, csv_replacements)` - Run RMLMapper and return RDF graph
+- `transform_iris(graph)` - Apply IRI transformation to graph
+- `namespaces` - Dict of RDF namespaces (nf, syn, owl, etc.)
+- `project_paths` - Dict of important paths
 
-Add to your CI pipeline:
-```yaml
-- name: Run RML tests
-  run: bash test/run_tests.sh
+### Development Workflow
+
+```bash
+# Run just what you're working on
+pytest test/test_rml_mutations.py          # One module
+pytest test/test_rml_mutations.py::TestMutationsCore  # One class
+pytest -k "multi_value"                    # Tests matching pattern
+
+# Rerun only failures
+pytest --lf
+
+# Stop on first failure
+pytest -x
+
+# Debug mode (sequential, no capture)
+pytest test/test_rml_mutations.py -s --pdb -n 0
 ```
 
-## Notes
+### Disabling Parallel Execution
 
-- Tests run **before** IRI transformation (testing `.rml.ttl` output)
-- Tests use temporary modified mappings pointing to test CSVs
-- RMLMapper JAR must be present at `tools/rmlmapper-8.1.0.jar`
-- Function files must be at `tools/functions_grel.ttl` and `tools/grel_java_mapping.ttl`
+Parallel is enabled by default in `pytest.ini`. Disable with `-n 0` when:
+- Debugging with `--pdb`
+- Need reproducible timing per test
+- Troubleshooting test isolation issues
+
+## Troubleshooting
+
+### Common Issues
+
+**Import errors**
+```bash
+# Install test dependencies
+pip install -r test/requirements-test.txt
+```
+
+**RMLMapper not found**
+```bash
+# Check RMLMapper JAR exists
+ls tools/rmlmapper-8.1.0.jar
+```

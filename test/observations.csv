@@ -1,0 +1,4 @@
+observationId,resourceId,publicationId,observationSubmitterName,synapseId,observationText,observationType,observationPhase,observationTime,observationTimeUnits,reliabilityRating,easeOfUseRating,observationLink
+obs-001,test-res-001,pub-001,Dr. Jane Smith,syn12345678,This cell line shows robust growth in standard culture conditions.,Phenotype|Growth Rate,In vitro,48,hours,High,Easy,https://example.com/obs-001
+obs-002,test-res-002,pub-002,Dr. John Doe,syn23456789,The model exhibited tumor formation after 3 months with high penetrance.,Tumor Formation|Timeline,In vivo,90,days,High,Moderate,https://example.com/obs-002
+obs-003,test-res-003,,Dr. Alice Brown,syn34567890,Antibody showed strong specificity with minimal off-target binding.,Specificity,In vitro,2,hours,Medium,,https://example.com/obs-003
