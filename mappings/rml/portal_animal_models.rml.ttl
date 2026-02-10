@@ -15,7 +15,7 @@
 ################################################################################
 
 map:PortalAnimalModelsSource a rml:LogicalSource ;
-    rml:source "data/csv/portal_animal_models.csv" ;
+    rml:source "data/csv/animal_models.csv" ;
     rml:referenceFormulation ql:CSV .
 
 ################################################################################

@@ -1,0 +1,146 @@
+@prefix rr:   <http://www.w3.org/ns/r2rml#> .
+@prefix rml:  <http://semweb.mmlab.be/ns/rml#> .
+@prefix fnml: <http://semweb.mmlab.be/ns/fnml#> .
+@prefix fno:  <https://w3id.org/function/ontology#> .
+@prefix ql:   <http://semweb.mmlab.be/ns/ql#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix grel: <http://users.ugent.be/~bjdmeest/function/grel.ttl#> .
+@prefix nf:   <http://nf-osi.github.com/terms#> .
+@prefix map:  <http://nf-osi.github.com/mappings/resources#> .
+
+################################################################################
+# Logical source
+################################################################################
+
+map:ResourcesSource a rml:LogicalSource ;
+    rml:source "data/csv/resources.csv" ;
+    rml:referenceFormulation ql:CSV .
+
+################################################################################
+# Resource core properties
+################################################################################
+
+map:ResourceCore a rr:TriplesMap ;
+    rdfs:label "Resource Core" ;
+    rml:logicalSource map:ResourcesSource ;
+    rr:subjectMap [ rml:reference "resourceId" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [ rr:predicate rdf:type ; rr:objectMap [ rr:constant nf:Tool ; rr:termType rr:IRI ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:name ; rr:objectMap [ rml:reference "resourceName" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:resourceType ; rr:objectMap [ rml:reference "resourceType" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:description ; rr:objectMap [ rml:reference "description" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:rrid ; rr:objectMap [ rml:reference "rrid" ; rr:termType rr:IRI ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:howToAcquire ; rr:objectMap [ rml:reference "howToAcquire" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:dateAdded ; rr:objectMap [ rml:reference "dateAdded" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:dateModified ; rr:objectMap [ rml:reference "dateModified" ; rr:datatype xsd:string ] ] .
+
+################################################################################
+# Resource list properties (pipe-delimited)
+################################################################################
+
+map:ResourceUsageRequirements a rr:TriplesMap ;
+    rdfs:label "Resource Usage Requirements" ;
+    rml:logicalSource map:ResourcesSource ;
+    rr:subjectMap [ rml:reference "resourceId" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:usageRequirements ;
+        rr:objectMap [
+            a fnml:FunctionTermMap ;
+            rr:datatype xsd:string ;
+            fnml:functionValue [
+                a fno:Execution ;
+                rml:logicalSource map:ResourcesSource ;
+                rr:predicateObjectMap [
+                    rr:predicate fno:executes ;
+                    rr:objectMap [ rr:constant grel:string_split ; rr:termType rr:IRI ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:valueParameter ;
+                    rr:objectMap [ rml:reference "usageRequirements" ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:p_string_sep ;
+                    rr:objectMap [ rr:constant "|" ; rr:termType rr:Literal ]
+                ]
+            ]
+        ]
+    ] .
+
+map:ResourceSynonyms a rr:TriplesMap ;
+    rdfs:label "Resource Synonyms" ;
+    rml:logicalSource map:ResourcesSource ;
+    rr:subjectMap [ rml:reference "resourceId" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:synonyms ;
+        rr:objectMap [
+            a fnml:FunctionTermMap ;
+            rr:datatype xsd:string ;
+            fnml:functionValue [
+                a fno:Execution ;
+                rml:logicalSource map:ResourcesSource ;
+                rr:predicateObjectMap [
+                    rr:predicate fno:executes ;
+                    rr:objectMap [ rr:constant grel:string_split ; rr:termType rr:IRI ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:valueParameter ;
+                    rr:objectMap [ rml:reference "synonyms" ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:p_string_sep ;
+                    rr:objectMap [ rr:constant "|" ; rr:termType rr:Literal ]
+                ]
+            ]
+        ]
+    ] .
+
+################################################################################
+# owl:sameAs relationships to tool-specific IDs
+################################################################################
+
+map:ResourceToGeneticReagent a rr:TriplesMap ;
+    rdfs:label "Resource to Genetic Reagent ID" ;
+    rml:logicalSource map:ResourcesSource ;
+    rr:subjectMap [ rml:reference "resourceId" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [
+        rr:predicate owl:sameAs ;
+        rr:objectMap [ rml:reference "geneticReagentId" ; rr:termType rr:IRI ]
+    ] .
+
+map:ResourceToAntibody a rr:TriplesMap ;
+    rdfs:label "Resource to Antibody ID" ;
+    rml:logicalSource map:ResourcesSource ;
+    rr:subjectMap [ rml:reference "resourceId" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [
+        rr:predicate owl:sameAs ;
+        rr:objectMap [ rml:reference "antibodyId" ; rr:termType rr:IRI ]
+    ] .
+
+map:ResourceToCellLine a rr:TriplesMap ;
+    rdfs:label "Resource to Cell Line ID" ;
+    rml:logicalSource map:ResourcesSource ;
+    rr:subjectMap [ rml:reference "resourceId" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [
+        rr:predicate owl:sameAs ;
+        rr:objectMap [ rml:reference "cellLineId" ; rr:termType rr:IRI ]
+    ] .
+
+map:ResourceToAnimalModel a rr:TriplesMap ;
+    rdfs:label "Resource to Animal Model ID" ;
+    rml:logicalSource map:ResourcesSource ;
+    rr:subjectMap [ rml:reference "resourceId" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [
+        rr:predicate owl:sameAs ;
+        rr:objectMap [ rml:reference "animalModelId" ; rr:termType rr:IRI ]
+    ] .
+
+map:ResourceToBiobank a rr:TriplesMap ;
+    rdfs:label "Resource to Biobank ID" ;
+    rml:logicalSource map:ResourcesSource ;
+    rr:subjectMap [ rml:reference "resourceId" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [
+        rr:predicate owl:sameAs ;
+        rr:objectMap [ rml:reference "biobankId" ; rr:termType rr:IRI ]
+    ] .

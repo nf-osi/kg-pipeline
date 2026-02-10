@@ -1,0 +1,28 @@
+@prefix rr:   <http://www.w3.org/ns/r2rml#> .
+@prefix rml:  <http://semweb.mmlab.be/ns/rml#> .
+@prefix ql:   <http://semweb.mmlab.be/ns/ql#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix nf:   <http://nf-osi.github.com/terms#> .
+@prefix map:  <http://nf-osi.github.com/mappings/donor-tool#> .
+
+################################################################################
+# Logical source
+################################################################################
+
+map:DonorToolSource a rml:LogicalSource ;
+    rml:source "data/csv/donor_tool.csv" ;
+    rml:referenceFormulation ql:CSV .
+
+################################################################################
+# Resource -> Donor relationship
+################################################################################
+
+map:ToolFromDonor a rr:TriplesMap ;
+    rdfs:label "Tool From Donor" ;
+    rml:logicalSource map:DonorToolSource ;
+    rr:subjectMap [ rml:reference "resourceId" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:fromDonor ;
+        rr:objectMap [ rml:reference "donorId" ; rr:termType rr:IRI ]
+    ] .

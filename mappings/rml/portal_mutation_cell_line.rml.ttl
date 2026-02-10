@@ -1,0 +1,31 @@
+@prefix rr:   <http://www.w3.org/ns/r2rml#> .
+@prefix rml:  <http://semweb.mmlab.be/ns/rml#> .
+@prefix ql:   <http://semweb.mmlab.be/ns/ql#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix nf:   <http://nf-osi.github.com/terms#> .
+@prefix map:  <http://nf-osi.github.com/mappings/portal-mutation-cell-line#> .
+
+################################################################################
+# Logical source
+################################################################################
+
+map:PortalMutationCellLineSource a rml:LogicalSource ;
+    rml:source "data/csv/mutation_cell_line.csv" ;
+    rml:referenceFormulation ql:CSV .
+
+################################################################################
+# Cell Line -> Mutation relationship
+################################################################################
+
+map:CellLineHasMutation a rr:TriplesMap ;
+    rdfs:label "Cell Line Has Mutation" ;
+    rml:logicalSource map:PortalMutationCellLineSource ;
+    rr:subjectMap [ rml:reference "resourceId" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:hasMutation ;
+        rr:objectMap [
+            rr:template "http://nf-osi.github.com/terms#mutation/{mutationId}" ;
+            rr:termType rr:IRI
+        ]
+    ] .

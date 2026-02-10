@@ -1,0 +1,121 @@
+@prefix rr:   <http://www.w3.org/ns/r2rml#> .
+@prefix rml:  <http://semweb.mmlab.be/ns/rml#> .
+@prefix fnml: <http://semweb.mmlab.be/ns/fnml#> .
+@prefix fno:  <https://w3id.org/function/ontology#> .
+@prefix ql:   <http://semweb.mmlab.be/ns/ql#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix grel: <http://users.ugent.be/~bjdmeest/function/grel.ttl#> .
+@prefix nf:   <http://nf-osi.github.com/terms#> .
+@prefix map:  <http://nf-osi.github.com/mappings/observations#> .
+
+################################################################################
+# Logical source
+################################################################################
+
+map:ObservationsSource a rml:LogicalSource ;
+    rml:source "data/csv/observations.csv" ;
+    rml:referenceFormulation ql:CSV .
+
+################################################################################
+# Observation core properties
+################################################################################
+
+map:ObservationCore a rr:TriplesMap ;
+    rdfs:label "Observation Core" ;
+    rml:logicalSource map:ObservationsSource ;
+    rr:subjectMap [
+        rr:template "http://nf-osi.github.com/terms#observation/{observationId}" ;
+        rr:termType rr:IRI
+    ] ;
+    rr:predicateObjectMap [ rr:predicate rdf:type ; rr:objectMap [ rr:constant nf:Observation ; rr:termType rr:IRI ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:observationId ; rr:objectMap [ rml:reference "observationId" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:observationSubmitterName ; rr:objectMap [ rml:reference "observationSubmitterName" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:observationText ; rr:objectMap [ rml:reference "observationText" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:observationPhase ; rr:objectMap [ rml:reference "observationPhase" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:observationTime ; rr:objectMap [ rml:reference "observationTime" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:observationTimeUnits ; rr:objectMap [ rml:reference "observationTimeUnits" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:reliabilityRating ; rr:objectMap [ rml:reference "reliabilityRating" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:easeOfUseRating ; rr:objectMap [ rml:reference "easeOfUseRating" ; rr:datatype xsd:string ] ] .
+
+################################################################################
+# Observation IRI properties
+################################################################################
+
+map:ObservationIRIs a rr:TriplesMap ;
+    rdfs:label "Observation IRIs" ;
+    rml:logicalSource map:ObservationsSource ;
+    rr:subjectMap [
+        rr:template "http://nf-osi.github.com/terms#observation/{observationId}" ;
+        rr:termType rr:IRI
+    ] ;
+    rr:predicateObjectMap [ rr:predicate nf:synapseId ; rr:objectMap [ rml:reference "synapseId" ; rr:termType rr:IRI ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:observationLink ; rr:objectMap [ rml:reference "observationLink" ; rr:termType rr:IRI ] ] .
+
+################################################################################
+# Observation -> Resource relationship
+################################################################################
+
+map:ObservationAboutResource a rr:TriplesMap ;
+    rdfs:label "Observation About Resource" ;
+    rml:logicalSource map:ObservationsSource ;
+    rr:subjectMap [
+        rr:template "http://nf-osi.github.com/terms#observation/{observationId}" ;
+        rr:termType rr:IRI
+    ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:aboutResource ;
+        rr:objectMap [ rml:reference "resourceId" ; rr:termType rr:IRI ]
+    ] .
+
+################################################################################
+# Observation -> Publication relationship
+################################################################################
+
+map:ObservationReferencesPublication a rr:TriplesMap ;
+    rdfs:label "Observation References Publication" ;
+    rml:logicalSource map:ObservationsSource ;
+    rr:subjectMap [
+        rr:template "http://nf-osi.github.com/terms#observation/{observationId}" ;
+        rr:termType rr:IRI
+    ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:referencesPublication ;
+        rr:objectMap [ rml:reference "publicationId" ; rr:termType rr:IRI ]
+    ] .
+
+################################################################################
+# Multi-valued fields (StringList)
+################################################################################
+
+map:ObservationType a rr:TriplesMap ;
+    rdfs:label "Observation Type" ;
+    rml:logicalSource map:ObservationsSource ;
+    rr:subjectMap [
+        rr:template "http://nf-osi.github.com/terms#observation/{observationId}" ;
+        rr:termType rr:IRI
+    ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:observationType ;
+        rr:objectMap [
+            a fnml:FunctionTermMap ;
+            rr:datatype xsd:string ;
+            fnml:functionValue [
+                a fno:Execution ;
+                rml:logicalSource map:ObservationsSource ;
+                rr:predicateObjectMap [
+                    rr:predicate fno:executes ;
+                    rr:objectMap [ rr:constant grel:string_split ; rr:termType rr:IRI ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:valueParameter ;
+                    rr:objectMap [ rml:reference "observationType" ; rr:termType rr:Literal ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:p_string_sep ;
+                    rr:objectMap [ rr:constant "\\|" ; rr:termType rr:Literal ]
+                ]
+            ]
+        ]
+    ] .

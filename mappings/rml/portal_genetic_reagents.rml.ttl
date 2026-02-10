@@ -15,7 +15,7 @@
 ################################################################################
 
 map:PortalGeneticReagentsSource a rml:LogicalSource ;
-    rml:source "data/csv/portal_genetic_reagents.csv" ;
+    rml:source "data/csv/genetic_reagents.csv" ;
     rml:referenceFormulation ql:CSV .
 
 ################################################################################
