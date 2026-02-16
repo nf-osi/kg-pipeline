@@ -14,11 +14,12 @@ class TableConfig:
     csv_path: Path
     rml_path: Path
     rdf_path: Path
-    rdf_raw_path: Path
     log_path: Path
     select_clause: str
     columns: List[Dict[str, Any]]
-    needs_transform: bool = False
+    harmonize_script: Optional[str] = None
+    harmonize_output: Optional[Path] = None
+    harmonize_args: Optional[List[str]] = None
 
 
 # Import from prepare_portal_tables.py
@@ -37,35 +38,73 @@ from scripts.prepare_portal_tables import (
     PORTAL_ANTIBODIES_SELECT,
 )
 
-# Tables that need IRI transform
-TRANSFORM_TABLES = {"portal_studies", "portal_files"}
-
-# Custom RML filenames (for tables where RML filename differs from table name)
-CUSTOM_RML_NAMES = {
-    "donor_tool": "donor_tool",
-    "resources": "resources",
-    "development_funder": "development_funder",
-    "development_investigator": "development_investigator",
-    "development_publication": "development_publication",
-}
-
 # Build TableConfig objects
 TABLE_CONFIGS: Dict[str, TableConfig] = {}
 
 for table_name, table_data in TABLES.items():
-    # Use custom RML name if available, otherwise use table_name
-    rml_name = CUSTOM_RML_NAMES.get(table_name, table_name)
-
     config = TableConfig(
         name=table_name,
         synapse_id=table_data["synapse_id"],
         csv_path=table_data["csv_path"],
-        rml_path=Path(f"mappings/rml/{rml_name}.rml.ttl"),
+        rml_path=Path(f"mappings/rml/{table_name}.rml.ttl"),
         rdf_path=Path(f"data/rdf/{table_name}.ttl"),
-        rdf_raw_path=Path(f"data/rdf/{table_name}.rml.ttl"),
         log_path=Path(f"logs/{table_name}_rml.log"),
         select_clause=table_data["select_clause"],
         columns=table_data["columns"],
-        needs_transform=table_name in TRANSFORM_TABLES,
     )
     TABLE_CONFIGS[table_name] = config
+
+# Configure harmonization for studies (dataType labels to IRIs)
+TABLE_CONFIGS["studies"].harmonize_script = "scripts/classify_datatypes.py"
+TABLE_CONFIGS["studies"].harmonize_output = Path("data/csv/studies_harmonized.csv")
+TABLE_CONFIGS["studies"].harmonize_args = [
+    "--input", "data/csv/studies.csv",
+    "--output", "data/csv/studies_harmonized.csv",
+    "--lookup", "mappings/sssom/data_lookup.sssom.tsv",
+]
+
+# Configure harmonization for observations
+TABLE_CONFIGS["observations"].harmonize_script = "scripts/classify_observations.py"
+TABLE_CONFIGS["observations"].harmonize_output = Path("data/csv/observation_harmonized.csv")
+TABLE_CONFIGS["observations"].harmonize_args = [
+    "--observations", "data/csv/observations.csv",
+    "--mapping", "mappings/sssom/observation_type_mapping.sssom.tsv",
+    "--output", "data/csv/observation_harmonized.csv",
+]
+
+# Configure harmonization for files (link modelSystemName to entity IRIs + dataType to IRIs)
+TABLE_CONFIGS["files"].harmonize_script = "scripts/link_model_systems.py"
+TABLE_CONFIGS["files"].harmonize_output = Path("data/csv/files_harmonized.csv")
+TABLE_CONFIGS["files"].harmonize_args = [
+    "--files", "data/csv/files.csv",
+    "--resources", "data/csv/resources.csv",
+    "--output", "data/csv/files_harmonized.csv",
+    "--lookup", "mappings/sssom/data_lookup.sssom.tsv",
+    "--nf1-lookup", "mappings/sssom/nf1_genotype_lookup.sssom.tsv",
+    "--nf2-lookup", "mappings/sssom/nf2_genotype_lookup.sssom.tsv",
+]
+
+# Configure harmonization for cell lines (cellLineCategory to subclass IRIs)
+TABLE_CONFIGS["cell_lines"].harmonize_script = "scripts/classify_cell_lines.py"
+TABLE_CONFIGS["cell_lines"].harmonize_output = Path("data/csv/cell_lines_harmonized.csv")
+TABLE_CONFIGS["cell_lines"].harmonize_args = [
+    "--input", "data/csv/cell_lines.csv",
+    "--output", "data/csv/cell_lines_harmonized.csv",
+    "--lookup", "mappings/sssom/cell_line_category_lookup.sssom.tsv",
+]
+
+# Configure harmonization for genetic reagents (vectorType to subclass IRIs)
+TABLE_CONFIGS["genetic_reagents"].harmonize_script = "scripts/classify_genetic_reagents.py"
+TABLE_CONFIGS["genetic_reagents"].harmonize_output = Path("data/csv/genetic_reagents_harmonized.csv")
+TABLE_CONFIGS["genetic_reagents"].harmonize_args = [
+    "--input", "data/csv/genetic_reagents.csv",
+    "--output", "data/csv/genetic_reagents_harmonized.csv",
+]
+
+# Configure harmonization for mutations (mutationType to subclass IRIs)
+TABLE_CONFIGS["mutations"].harmonize_script = "scripts/classify_mutations.py"
+TABLE_CONFIGS["mutations"].harmonize_output = Path("data/csv/mutations_harmonized.csv")
+TABLE_CONFIGS["mutations"].harmonize_args = [
+    "--input", "data/csv/mutations.csv",
+    "--output", "data/csv/mutations_harmonized.csv",
+]

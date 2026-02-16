@@ -1,7 +1,7 @@
 """
 Tests for Cell Lines RML mapping
 
-Tests the portal_cell_lines.rml.ttl mapping against test/cell_lines.csv
+Tests the cell_lines.rml.ttl mapping against test/cell_lines.csv
 """
 
 import pytest
@@ -13,8 +13,8 @@ from rdflib.namespace import RDF
 def cell_lines_graph(rml_runner, namespaces):
     """Load cell lines RDF graph from test data"""
     graph = rml_runner(
-        mapping_file="portal_cell_lines.rml.ttl",
-        csv_replacements={"data/csv/cell_lines.csv": "test/cell_lines.csv"}
+        mapping_file="cell_lines.rml.ttl",
+        csv_replacements={"data/csv/cell_lines_harmonized.csv": "test/cell_lines.csv"}
     )
     return graph
 
@@ -34,6 +34,70 @@ class TestCellLinesCore:
         for cell_line in cell_lines:
             assert isinstance(cell_line, URIRef), \
                 f"Cell line ID should be IRI, got {type(cell_line)}"
+
+
+class TestCellLineCategoryType:
+    """Test rdf:type subclass from cellLineCategoryIRI"""
+
+    def test_cancer_cell_line_type(self, cell_lines_graph, namespaces):
+        """Cancer cell line should have rdf:type nf:CancerCellLine"""
+        NF = namespaces["nf"]
+        query = """
+        SELECT ?type WHERE {
+            ?cl a nf:CellLine .
+            FILTER(CONTAINS(STR(?cl), "test-cell-001"))
+            ?cl a ?type .
+        }
+        """
+        types = [str(r.type) for r in cell_lines_graph.query(query, initNs={"nf": NF})]
+        assert "http://nf-osi.github.com/terms#CancerCellLine" in types
+
+    def test_ipsc_type(self, cell_lines_graph, namespaces):
+        """iPSC cell line should have rdf:type nf:InducedPluripotentStemCellLine"""
+        NF = namespaces["nf"]
+        query = """
+        SELECT ?type WHERE {
+            ?cl a nf:CellLine .
+            FILTER(CONTAINS(STR(?cl), "test-cell-002"))
+            ?cl a ?type .
+        }
+        """
+        types = [str(r.type) for r in cell_lines_graph.query(query, initNs={"nf": NF})]
+        assert "http://nf-osi.github.com/terms#InducedPluripotentStemCellLine" in types
+
+    def test_finite_cell_line_type(self, cell_lines_graph, namespaces):
+        """Finite cell line should have rdf:type nf:FiniteCellLine"""
+        NF = namespaces["nf"]
+        query = """
+        SELECT ?type WHERE {
+            ?cl a nf:CellLine .
+            FILTER(CONTAINS(STR(?cl), "test-cell-003"))
+            ?cl a ?type .
+        }
+        """
+        types = [str(r.type) for r in cell_lines_graph.query(query, initNs={"nf": NF})]
+        assert "http://nf-osi.github.com/terms#FiniteCellLine" in types
+
+    def test_empty_category_no_extra_type(self, cell_lines_graph, namespaces):
+        """Cell line with empty category should only have nf:CellLine type"""
+        NF = namespaces["nf"]
+        query = """
+        SELECT ?type WHERE {
+            ?cl a nf:CellLine .
+            FILTER(CONTAINS(STR(?cl), "test-cell-004"))
+            ?cl a ?type .
+        }
+        """
+        types = [str(r.type) for r in cell_lines_graph.query(query, initNs={"nf": NF})]
+        assert "http://nf-osi.github.com/terms#CellLine" in types
+        # Should only have CellLine, no subclass type
+        nf_types = [t for t in types if t.startswith("http://nf-osi.github.com/terms#")]
+        assert len(nf_types) == 1, f"Expected only nf:CellLine type, got {nf_types}"
+
+    def test_all_cell_lines_have_base_type(self, cell_lines_graph, namespaces):
+        """All cell lines should still have nf:CellLine as rdf:type"""
+        cell_lines = list(cell_lines_graph.subjects(RDF.type, namespaces["nf"].CellLine))
+        assert len(cell_lines) >= 4
 
 
 class TestCellLinesIRIFields:

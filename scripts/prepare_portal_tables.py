@@ -293,30 +293,31 @@ TABLES: Dict[str, Dict[str, Any]] = {
             {"target": "dataType", "source": "dataType", "type": "text"},
             {"target": "dataSubtype", "source": "dataSubtype", "type": "text"},
             {"target": "fileFormat", "source": "fileFormat", "type": "text"},
-            {"target": "individualID", "source": "individualID", "type": "text"},
+            {"target": "individualID", "source": "individualID", "type": "text+", "transform": "string_list"},
             {"target": "diagnosis", "source": "diagnosis", "type": "text+", "transform": "string_list"},
-            {"target": "nf1Genotype", "source": "nf1Genotype", "type": "text"},
-            {"target": "nf2Genotype", "source": "nf2Genotype", "type": "text"},
+            {"target": "nf1Genotype", "source": "nf1Genotype", "type": "text+", "transform": "string_list"},
+            {"target": "nf2Genotype", "source": "nf2Genotype", "type": "text+", "transform": "string_list"},
             {"target": "sex", "source": "sex", "type": "text"},
             {"target": "species", "source": "species", "type": "text"},
             {"target": "specimenID", "source": "specimenID", "type": "text+", "transform": "string_list"},
-            {"target": "cellType", "source": "cellType", "type": "text"},
-            {"target": "tissue", "source": "tissue", "type": "text"},
+            {"target": "cellType", "source": "cellType", "type": "text+", "transform": "string_list"},
+            {"target": "tissue", "source": "tissue", "type": "text+", "transform": "string_list"},
             {"target": "tumorType", "source": "tumorType", "type": "text+", "transform": "string_list"},
-            {"target": "fundingAgency", "source": "fundingAgency", "type": "text"},
+            {"target": "fundingAgency", "source": "fundingAgency", "type": "text+", "transform": "string_list"},
             {
                 "target": "reportMilestone",
                 "source": "progressReportNumber",
                 "type": "text",
                 "transform": "number",
             },
-            {"target": "compoundName", "source": "compoundName", "type": "text"},
+            {"target": "compoundName", "source": "compoundName", "type": "text+", "transform": "string_list"},
             {
                 "target": "experimentalCondition",
                 "source": "experimentalCondition",
-                "type": "text",
+                "type": "text+",
+                "transform": "string_list",
             },
-            {"target": "modelSystemName", "source": "modelSystemName", "type": "text"},
+            {"target": "modelSystemName", "source": "modelSystemName", "type": "text+", "transform": "string_list"},
         ],
     },
     "mutations": {
@@ -326,7 +327,7 @@ TABLES: Dict[str, Dict[str, Any]] = {
         "select_clause": PORTAL_MUTATIONS_SELECT,
         "columns": [
             {"target": "mutationDetailsId", "source": "mutationDetailsId", "type": "iri"},
-            {"target": "humanClinVarMutation", "source": "humanClinVarMutation", "type": "text"},
+            {"target": "humanClinVarMutation", "source": "humanClinVarMutation", "type": "text+", "transform": "string_list"},
             {"target": "alleleType", "source": "alleleType", "type": "text+", "transform": "string_list"},
             {"target": "affectedGeneSymbol", "source": "affectedGeneSymbol", "type": "text"},
             {"target": "mutationMethod", "source": "mutationMethod", "type": "text+", "transform": "string_list"},
@@ -592,7 +593,9 @@ def ensure_list(value: Any) -> List[Any]:
     if isinstance(value, str):
         if not value.strip():
             return []
-        return [part.strip() for part in value.split("|") if part.strip()]
+        # Normalize commas to pipes so both separators are handled uniformly
+        normalized = value.replace(",", "|")
+        return [part.strip() for part in normalized.split("|") if part.strip()]
     return [value]
 
 
@@ -610,10 +613,6 @@ def format_synapse_id(value: Any) -> str:
     raw = format_string(value).strip()
     if not raw:
         return ""
-    if raw.startswith("syn:") or raw.startswith("http"):
-        return raw
-    if raw.startswith("syn"):
-        return f"syn:{raw}"
     return raw
 
 
@@ -746,6 +745,14 @@ def resolve_table_name(name: str) -> str:
     )
 
 
+def _find_raw_csv(raw_dir: Path, raw_filename: str) -> Optional[Path]:
+    """Find a raw CSV in the cache directory."""
+    candidate = raw_dir / raw_filename
+    if candidate.exists():
+        return candidate
+    return None
+
+
 def main(argv: List[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         description=__doc__,
@@ -765,10 +772,12 @@ def main(argv: List[str] | None = None) -> int:
         type=Path,
         help="Directory to store the raw Synapse CSV exports.",
     )
+    parser.add_argument(
+        "--from-cache",
+        action="store_true",
+        help="Re-process from cached raw CSVs in --raw-dir instead of fetching from Synapse.",
+    )
     args = parser.parse_args(argv)
-
-    syn = synapseclient.Synapse()
-    syn.login(silent=True)
 
     # Resolve table names (handle aliases)
     if args.tables:
@@ -780,13 +789,29 @@ def main(argv: List[str] | None = None) -> int:
     else:
         table_names = sorted(TABLES.keys())
 
+    syn = None
+    if not args.from_cache:
+        syn = synapseclient.Synapse()
+        syn.login(silent=True)
+
     for table_name in table_names:
         config = TABLES[table_name]
-        print(f"Fetching {table_name} ({config['synapse_id']}) ...", flush=True)
-        select_clause_text = config.get("select_clause")
-        df = fetch_table(syn, config["synapse_id"], config["columns"], select_clause_text)
-        print(f"  Retrieved {len(df)} rows", flush=True)
-        write_raw(args.raw_dir, config["raw_filename"], df)
+
+        if args.from_cache:
+            raw_path = _find_raw_csv(args.raw_dir, config["raw_filename"])
+            if raw_path is None:
+                print(f"Skipping {table_name}: no cached raw CSV found in {args.raw_dir}", flush=True)
+                continue
+            print(f"Processing {table_name} from cache ({raw_path}) ...", flush=True)
+            df = pd.read_csv(raw_path, keep_default_na=False, dtype=str)
+            print(f"  Read {len(df)} rows", flush=True)
+        else:
+            print(f"Fetching {table_name} ({config['synapse_id']}) ...", flush=True)
+            select_clause_text = config.get("select_clause")
+            df = fetch_table(syn, config["synapse_id"], config["columns"], select_clause_text)
+            print(f"  Retrieved {len(df)} rows", flush=True)
+            write_raw(args.raw_dir, config["raw_filename"], df)
+
         data_rows = build_rows(df, config["columns"])
         write_processed_csv(config["csv_path"], config["columns"], data_rows)
         print(f"  Wrote CSV -> {config['csv_path']}")

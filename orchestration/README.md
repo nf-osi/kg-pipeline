@@ -7,13 +7,10 @@ This directory contains the Dagster orchestration for the NF Knowledge Graph pip
 The pipeline is organized as a DAG of **assets**:
 
 ```
-Synapse Tables → CSV Files → RML RDF (.rml.ttl) → Final RDF (.ttl)
-                                                  (transform for studies/files only)
+Synapse Tables → CSV → [Harmonize] → RML → RDF (.ttl)
 ```
 
-**File Naming:**
-- `.rml.ttl` - RMLMapper output (intermediate)
-- `.ttl` - Final output (IRI-transformed for studies/files, copied for others)
+- **Harmonize** (studies, observations, files, genetic_reagents, mutations): classify/link CSV data before RML mapping
 
 ### Asset Groups
 
@@ -24,15 +21,13 @@ Each portal table (study, file, mutation, reagent, animal, cell, donor, antibody
    - Applies transformations (string_list, synapse_id, etc.)
    - Writes to `data/csv/`
 
-2. **RDF Asset** (`portal/rdf/{table}_rdf_raw` or `portal/rdf/{table}_rdf`)
-   - Runs RMLMapper
-   - Generates RDF from CSV
-   - Writes to `data/rdf/`
+2. **Harmonize Asset** (`portal/csv/{table}_harmonized`) - *studies, observations, files, genetic_reagents, mutations*
+   - Runs classification/linking scripts on CSV data
+   - Writes to `data/csv/{table}_harmonized.csv`
 
-3. **Transform Asset** (`portal/rdf/{table}_rdf`) - *studies/files only*
-   - Runs IRI transformation via SPARQL
-   - Converts literals to IRIs
-   - Writes final RDF to `data/rdf/`
+3. **RDF Asset** (`portal/rdf/{table}_rdf`)
+   - Runs RMLMapper (CSV → RDF)
+   - Writes to `data/rdf/`
 
 ## Setup
 
@@ -47,26 +42,10 @@ source .venv/bin/activate
 
 # Install dependencies
 pip install -e ".[dev]"
-
-# Or with uv (faster)
-uv pip install -e ".[dev]"
+pip install "pyoxigraph>=0.4.0"  # required for dataType harmonization
 ```
 
 ## Usage
-
-### With Dagster UI
-
-```bash
-cd orchestration
-dagster dev -m dagster_pipeline
-```
-
-Then open http://localhost:3000
-
-**From the UI:**
-- Navigate to "Assets" tab
-- Select the assets you want to build
-- Click "Materialize selected"
 
 **With CLI:**
 
@@ -86,6 +65,20 @@ dagster asset materialize --module-name dagster_pipeline --select "tag:compute_k
 # Materialize all RML assets
 dagster asset materialize --module-name dagster_pipeline --select "tag:compute_kind=rml"
 ```
+
+### With Dagster UI
+
+```bash
+cd orchestration
+dagster dev -m dagster_pipeline
+```
+
+Then open http://localhost:3000
+
+**From the UI:**
+- Navigate to "Assets" tab
+- Select the assets you want to build
+- Click "Materialize selected"
 
 ## Asset Selection Patterns
 
@@ -130,4 +123,3 @@ dagster asset list --module-name dagster_pipeline
 # Test a single asset
 dagster asset materialize --module-name dagster_pipeline --select portal_donors_csv
 ```
-

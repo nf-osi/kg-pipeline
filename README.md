@@ -43,12 +43,10 @@ RML mappings [1] in `mappings/rml/` materializes pre-processed CSVs to RDF. The 
 - **Multi-valued fields** split by `|` delimiter
 - **Controlled vocabulary IRIs** for `nf:initiative` and `nf:fundingAgency` (spaces → underscores)
 
-#### Step 2: IRI transform
+#### Step 2: Harmonization
 
-`scripts/transform_iris.py` transforms `nf:dataType` literals to ontology IRIs using a SKOS
-lookup vocabulary (`mappings/data_lookup.ttl`).
-
-The lookup maps source literals (with synonyms via `skos:altLabel`) to target IRIs,
+Harmonization scripts (`classify_datatypes.py`, `link_model_systems.py`, etc.) map
+dataType labels to ontology IRIs using the SSSOM mapping (`mappings/data_lookup.sssom.tsv`).
 
 ### Project structure
 
@@ -60,10 +58,10 @@ The lookup maps source literals (with synonyms via `skos:altLabel`) to target IR
 ├── mappings/
 │   ├── rml/                 # RML mapping files
 │   │   └── portal_studies.rml.ttl
-│   └── data_lookup.ttl      # SKOS vocabulary for dataType normalization
+│   └── data_lookup.sssom.tsv # SSSOM mapping for dataType normalization
 ├── scripts/
 │   ├── prepare_portal_tables.py
-│   └── transform_iris.py
+│   └── classify_datatypes.py
 ├── test/                    # Test inputs and validation
 │   ├── portal_studies.csv
 │   └── run_tests.sh
