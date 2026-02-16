@@ -1,0 +1,20 @@
+name: Validate ontology
+
+on:
+  pull_request:
+    paths:
+      - "schema/ontology.ttl"
+  push:
+    paths:
+      - "schema/ontology.ttl"
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate Turtle syntax
+        run: |
+          sudo apt-get install -y -qq raptor2-utils > /dev/null
+          rapper -i turtle -c schema/ontology.ttl
