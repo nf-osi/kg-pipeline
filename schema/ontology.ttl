@@ -5,6 +5,7 @@
 @prefix nf:   <http://nf-osi.github.com/terms#> .
 @prefix efo:   <http://www.ebi.ac.uk/efo/> .
 @prefix obo:   <http://purl.obolibrary.org/obo/> .
+@prefix prov:  <http://www.w3.org/ns/prov#> .
 
 
 nf:ReferenceOntology a owl:Ontology ;
@@ -354,9 +355,14 @@ nf:IssueObservation a owl:Class ;
     rdfs:label "Issue observation" ;
     rdfs:comment "An observation regarding an issue for a resource, e.g. a QC issue" .
 
-nf:AI_Agent a owl:Class ;
+nf:AIAgent a owl:Class ;
+    rdfs:subClassOf prov:Agent ;
     rdfs:label "AI Agent" ;
-    rdfs:comment "An artificial intelligence agent" .
+    rdfs:comment "An artificial intelligence agent." .
+
+nf:ObservationExtraction a prov:Activity ;
+    rdfs:label "Observation Extraction" ;
+    rdfs:comment "An activity in which structured observations are extracted from unstructured text." .
 
 ################################################################################
 # Properties - File related
