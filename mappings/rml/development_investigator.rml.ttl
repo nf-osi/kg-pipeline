@@ -40,7 +40,7 @@ map:InvestigatorCore a rr:TriplesMap ;
     rr:predicateObjectMap [ rr:predicate nf:investigatorName ; rr:objectMap [ rml:reference "investigatorName" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:institution ; rr:objectMap [ rml:reference "institution" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:orcid ; rr:objectMap [ rml:reference "orcid" ; rr:termType rr:IRI ] ] ;
-    rr:predicateObjectMap [ rr:predicate nf:investigatorSynapseId ; rr:objectMap [ rml:reference "investigatorSynapseId" ; rr:termType rr:IRI ] ] .
+    rr:predicateObjectMap [ rr:predicate nf:investigatorSynapseId ; rr:objectMap [ rr:template "https://www.synapse.org/Profile:{investigatorSynapseId}" ; rr:termType rr:IRI ] ] .
 
 ################################################################################
 # Resource -> Investigator relationship (via development)

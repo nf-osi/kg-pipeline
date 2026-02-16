@@ -1,0 +1,17 @@
+#curie_map:
+#  nf: http://nf-osi.github.com/terms#
+#  skos: http://www.w3.org/2004/02/skos/core#
+#  semapv: https://w3id.org/semapv/vocab/
+#mapping_set_id: https://w3id.org/synapse/nfosi/mapping/celllinecategory
+#license: https://creativecommons.org/licenses/by/4.0/
+subject_id	subject_label	predicate_id	object_id	mapping_justification
+	Cancer cell line	skos:exactMatch	nf:CancerCellLine	semapv:ManualMappingCuration
+	Transformed cell line	skos:exactMatch	nf:TransformedCellLine	semapv:ManualMappingCuration
+	Induced pluripotent stem cell	skos:exactMatch	nf:InducedPluripotentStemCellLine	semapv:ManualMappingCuration
+	Telomerase immortalized cell line	skos:exactMatch	nf:TelomeraseImmortalizedCellLine	semapv:ManualMappingCuration
+	Embryonic stem cell	skos:exactMatch	nf:EmbryonicStemCellLine	semapv:ManualMappingCuration
+	Finite cell line	skos:exactMatch	nf:FiniteCellLine	semapv:ManualMappingCuration
+	Spontaneously immortalized cell line	skos:exactMatch	nf:SpontaneouslyImmortalizedCellLine	semapv:ManualMappingCuration
+	Hybrid cell line	skos:exactMatch	nf:HybridCellLine	semapv:ManualMappingCuration
+	Undefined cell line type	skos:exactMatch	nf:UndefinedCellLineType	semapv:ManualMappingCuration
+	Hybridoma	skos:exactMatch	nf:Hybridoma	semapv:ManualMappingCuration

@@ -1,0 +1,118 @@
+#curie_map:
+#  nf: http://nf-osi.github.com/terms#
+#  EDAM: http://edamontology.org/
+#  skos: http://www.w3.org/2004/02/skos/core#
+#  semapv: https://w3id.org/semapv/vocab/
+#mapping_set_id: https://w3id.org/synapse/nfosi/mapping/data/DataEnumLookup
+#license: https://creativecommons.org/licenses/by/4.0/
+subject_id	subject_label	predicate_id	object_id	mapping_justification
+	aligned reads	skos:exactMatch	nf:aligned_reads	semapv:ManualMappingCuration
+	AlignedReads	skos:exactMatch	nf:aligned_reads	semapv:ManualMappingCuration
+	annotated germline variants	skos:exactMatch	nf:annotated_germline_variants	semapv:ManualMappingCuration
+	annotated somatic mutation	skos:exactMatch	nf:annotated_somatic_mutation	semapv:ManualMappingCuration
+	audio transcript	skos:exactMatch	nf:audio_transcript	semapv:ManualMappingCuration
+	behavioral data	skos:exactMatch	nf:behavioral_data	semapv:ManualMappingCuration
+	behavior process	skos:exactMatch	nf:behavioral_data	semapv:ManualMappingCuration
+	capsid sequence	skos:exactMatch	EDAM:data_3494	semapv:ManualMappingCuration
+	cellular physiology	skos:exactMatch	nf:cellular_physiology	semapv:ManualMappingCuration
+	cellularPhysiology	skos:exactMatch	nf:cellular_physiology	semapv:ManualMappingCuration
+	characteristic	skos:exactMatch	nf:characteristic	semapv:ManualMappingCuration
+	Feature	skos:exactMatch	nf:characteristic	semapv:ManualMappingCuration
+	Nature	skos:exactMatch	nf:characteristic	semapv:ManualMappingCuration
+	chromatin activity	skos:exactMatch	nf:chromatin_activity	semapv:ManualMappingCuration
+	chromatinActivity	skos:exactMatch	nf:chromatin_activity	semapv:ManualMappingCuration
+	clinical	skos:exactMatch	nf:clinical	semapv:ManualMappingCuration
+	copy number variants	skos:exactMatch	nf:copy_number_variants	semapv:ManualMappingCuration
+	count matrix	skos:exactMatch	EDAM:data_3917	semapv:ManualMappingCuration
+	Read count matrix	skos:exactMatch	EDAM:data_3917	semapv:ManualMappingCuration
+	data index	skos:exactMatch	EDAM:data_0955	semapv:ManualMappingCuration
+	data sharing plan	skos:exactMatch	EDAM:data_4040	semapv:ManualMappingCuration
+	DMP	skos:exactMatch	EDAM:data_4040	semapv:ManualMappingCuration
+	Data Management Plan	skos:exactMatch	EDAM:data_4040	semapv:ManualMappingCuration
+	Data Landscape Survey	skos:exactMatch	EDAM:data_4040	semapv:ManualMappingCuration
+	demographics	skos:exactMatch	nf:demographics	semapv:ManualMappingCuration
+	Demographic Factor	skos:exactMatch	nf:demographics	semapv:ManualMappingCuration
+	Demography	skos:exactMatch	nf:demographics	semapv:ManualMappingCuration
+	Population Studies / Demography	skos:exactMatch	nf:demographics	semapv:ManualMappingCuration
+	drug combination screen	skos:exactMatch	nf:drug_combination_screen	semapv:ManualMappingCuration
+	drug screen	skos:exactMatch	nf:drug_screen	semapv:ManualMappingCuration
+	drugScreen	skos:exactMatch	nf:drug_screen	semapv:ManualMappingCuration
+	electrophysiology	skos:exactMatch	nf:electrophysiology	semapv:ManualMappingCuration
+	epidemiological data	skos:exactMatch	nf:epidemiological_data	semapv:ManualMappingCuration
+	gene expression	skos:exactMatch	EDAM:data_2603	semapv:ManualMappingCuration
+	geneExpression	skos:exactMatch	EDAM:data_2603	semapv:ManualMappingCuration
+	gene expression matrix	skos:exactMatch	EDAM:data_3112	semapv:ManualMappingCuration
+	Gene expression data matrix	skos:exactMatch	EDAM:data_3112	semapv:ManualMappingCuration
+	Normalised microarray data	skos:exactMatch	EDAM:data_3112	semapv:ManualMappingCuration
+	quantified gene expression	skos:exactMatch	nf:quantified_gene_expression	semapv:ManualMappingCuration
+	genomic features	skos:exactMatch	nf:genomic_features	semapv:ManualMappingCuration
+	genomic variants	skos:exactMatch	EDAM:data_3498	semapv:ManualMappingCuration
+	Gene sequence variations	skos:exactMatch	EDAM:data_3498	semapv:ManualMappingCuration
+	genomicVariants	skos:exactMatch	EDAM:data_3498	semapv:ManualMappingCuration
+	germline variants	skos:exactMatch	nf:germline_variants	semapv:ManualMappingCuration
+	guide RNA sequence	skos:exactMatch	EDAM:data_3494	semapv:ManualMappingCuration
+	sgRNA sequence	skos:exactMatch	EDAM:data_3494	semapv:ManualMappingCuration
+	gRNA sequence	skos:exactMatch	EDAM:data_3494	semapv:ManualMappingCuration
+	image	skos:exactMatch	EDAM:data_2968	semapv:ManualMappingCuration
+	Image data	skos:exactMatch	EDAM:data_2968	semapv:ManualMappingCuration
+	immunoassay	skos:exactMatch	nf:immunoassay	semapv:ManualMappingCuration
+	Immunological Laboratory Method	skos:exactMatch	nf:immunoassay	semapv:ManualMappingCuration
+	Immunology Test	skos:exactMatch	nf:immunoassay	semapv:ManualMappingCuration
+	isoform expression	skos:exactMatch	nf:isoform_expression	semapv:ManualMappingCuration
+	Isoform Measurement	skos:exactMatch	nf:isoform_expression	semapv:ManualMappingCuration
+	Isoform Quantitation	skos:exactMatch	nf:isoform_expression	semapv:ManualMappingCuration
+	Protein Isoform Measurement	skos:exactMatch	nf:isoform_expression	semapv:ManualMappingCuration
+	Protein Isoform Quantitation	skos:exactMatch	nf:isoform_expression	semapv:ManualMappingCuration
+	kinomics	skos:exactMatch	nf:kinomics	semapv:ManualMappingCuration
+	mask image	skos:exactMatch	nf:mask_image	semapv:ManualMappingCuration
+	mass spectrometry data	skos:exactMatch	EDAM:data_2536	semapv:ManualMappingCuration
+	metabolomics	skos:exactMatch	nf:metabolomics	semapv:ManualMappingCuration
+	molecular property	skos:exactMatch	EDAM:data_2087	semapv:ManualMappingCuration
+	Physicochemical property	skos:exactMatch	EDAM:data_2087	semapv:ManualMappingCuration
+	morphology parameter	skos:exactMatch	EDAM:data_3723	semapv:ManualMappingCuration
+	network	skos:exactMatch	EDAM:data_2600	semapv:ManualMappingCuration
+	Pathway	skos:exactMatch	EDAM:data_2600	semapv:ManualMappingCuration
+	nucleic acid sequence record	skos:exactMatch	EDAM:data_2887	semapv:ManualMappingCuration
+	Nucleotide sequence record	skos:exactMatch	EDAM:data_2887	semapv:ManualMappingCuration
+	Sequence record (nucleic acid)	skos:exactMatch	EDAM:data_2887	semapv:ManualMappingCuration
+	over-representation data	skos:exactMatch	EDAM:data_3753	semapv:ManualMappingCuration
+	Enrichment report	skos:exactMatch	EDAM:data_3753	semapv:ManualMappingCuration
+	Over-representation report	skos:exactMatch	EDAM:data_3753	semapv:ManualMappingCuration
+	particle characterization	skos:exactMatch	nf:particle_characterization	semapv:ManualMappingCuration
+	pharmacokinetics	skos:exactMatch	nf:pharmacokinetics	semapv:ManualMappingCuration
+	PK Study	skos:exactMatch	nf:pharmacokinetics	semapv:ManualMappingCuration
+	Pharmacokinetic Study	skos:exactMatch	nf:pharmacokinetics	semapv:ManualMappingCuration
+	physiology parameter	skos:exactMatch	EDAM:data_3722	semapv:ManualMappingCuration
+	plasmid sequence	skos:exactMatch	EDAM:data_3494	semapv:ManualMappingCuration
+	plot	skos:exactMatch	EDAM:data_2884	semapv:ManualMappingCuration
+	Graph data	skos:exactMatch	EDAM:data_2884	semapv:ManualMappingCuration
+	primer sequence	skos:exactMatch	EDAM:data_3494	semapv:ManualMappingCuration
+	probe sequence	skos:exactMatch	EDAM:data_3494	semapv:ManualMappingCuration
+	promoter sequence	skos:exactMatch	EDAM:data_3494	semapv:ManualMappingCuration
+	protein interaction data	skos:exactMatch	EDAM:data_0906	semapv:ManualMappingCuration
+	Protein interaction record	skos:exactMatch	EDAM:data_0906	semapv:ManualMappingCuration
+	Protein report (interaction)	skos:exactMatch	EDAM:data_0906	semapv:ManualMappingCuration
+	Protein-protein interaction data	skos:exactMatch	EDAM:data_0906	semapv:ManualMappingCuration
+	protein interaction raw data	skos:exactMatch	EDAM:data_0905	semapv:ManualMappingCuration
+	proteomics	skos:exactMatch	nf:proteomics	semapv:ManualMappingCuration
+	raw counts	skos:exactMatch	nf:raw_counts	semapv:ManualMappingCuration
+	Count	skos:exactMatch	nf:raw_counts	semapv:ManualMappingCuration
+	NUMBER	skos:exactMatch	nf:raw_counts	semapv:ManualMappingCuration
+	Num	skos:exactMatch	nf:raw_counts	semapv:ManualMappingCuration
+	Number Count	skos:exactMatch	nf:raw_counts	semapv:ManualMappingCuration
+	reference sequence	skos:exactMatch	EDAM:data_3494	semapv:ManualMappingCuration
+	report	skos:exactMatch	EDAM:data_2048	semapv:ManualMappingCuration
+	Document	skos:exactMatch	EDAM:data_2048	semapv:ManualMappingCuration
+	Record	skos:exactMatch	EDAM:data_2048	semapv:ManualMappingCuration
+	analysis	skos:exactMatch	EDAM:data_2048	semapv:ManualMappingCuration
+	somatic variants	skos:exactMatch	nf:somatic_variants	semapv:ManualMappingCuration
+	structural variants	skos:exactMatch	nf:structural_variants	semapv:ManualMappingCuration
+	survey data	skos:exactMatch	nf:survey_data	semapv:ManualMappingCuration
+	surveyData	skos:exactMatch	nf:survey_data	semapv:ManualMappingCuration
+	text data	skos:exactMatch	EDAM:data_2526	semapv:ManualMappingCuration
+	volume	skos:exactMatch	nf:volume	semapv:ManualMappingCuration
+	Total Volume	skos:exactMatch	nf:volume	semapv:ManualMappingCuration
+	Vol	skos:exactMatch	nf:volume	semapv:ManualMappingCuration
+	Volume	skos:exactMatch	nf:volume	semapv:ManualMappingCuration
+	weight	skos:exactMatch	nf:weight	semapv:ManualMappingCuration
+	Weight	skos:exactMatch	nf:weight	semapv:ManualMappingCuration

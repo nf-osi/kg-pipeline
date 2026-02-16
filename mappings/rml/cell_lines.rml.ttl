@@ -15,7 +15,7 @@
 ################################################################################
 
 map:PortalCellLinesSource a rml:LogicalSource ;
-    rml:source "data/csv/cell_lines.csv" ;
+    rml:source "data/csv/cell_lines_harmonized.csv" ;
     rml:referenceFormulation ql:CSV .
 
 ################################################################################
@@ -30,6 +30,7 @@ map:CellLineCore a rr:TriplesMap ;
         rr:termType rr:IRI
     ] ;
     rr:predicateObjectMap [ rr:predicate rdf:type ; rr:objectMap [ rr:constant nf:CellLine ; rr:termType rr:IRI ] ] ;
+    rr:predicateObjectMap [ rr:predicate rdf:type ; rr:objectMap [ rml:reference "cellLineCategoryIRI" ; rr:termType rr:IRI ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:cellLineId ; rr:objectMap [ rml:reference "cellLineId" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:donorId ; rr:objectMap [ rml:reference "donorId" ; rr:termType rr:IRI ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:originYear ; rr:objectMap [ rml:reference "originYear" ; rr:datatype xsd:string ] ] ;

@@ -1,0 +1,345 @@
+#curie_map:
+#  nf: http://nf-osi.github.com/terms#
+#  skos: http://www.w3.org/2004/02/skos/core#
+#  semapv: https://w3id.org/semapv/vocab/
+#mapping_set_id: https://w3id.org/synapse/nfosi/mapping/observationtype
+#license: https://creativecommons.org/licenses/by/4.0/
+subject_id	subject_label	predicate_id	object_id	mapping_justification	mpRelevant	notes	needsContentReclassification
+	3D culture	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	3D cell culture methods	false
+	3D model	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	3D modeling approach	false
+	Aneuploidy	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Chromosomal abnormality characterization	false
+	Angiogenesis	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Maps to MP:0001614 (abnormal blood vessel morphology)	false
+	Animal Husbandry	skos:exactMatch	nf:MethodObservation	semapv:ManualMappingCuration	false	Animal care methods	false
+	Animal husbandry	skos:exactMatch	nf:MethodObservation	semapv:ManualMappingCuration	false	Animal care methods	false
+	Animal model	skos:exactMatch	nf:UsageObservation	semapv:ManualMappingCuration	false	Animal model description	false
+	Animal model generation	skos:exactMatch	nf:DerivationObservation	semapv:ManualMappingCuration	false	Model generation details	false
+	Antigen expression	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Antigen expression characterization	false
+	Anxiety	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Maps to MP:0001363 (increased anxiety-related response)	false
+	Anxiety-like Behavior	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Anxiety behavior phenotype	false
+	Apoptosis	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Apoptosis assay results	false
+	Behavior	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Maps to MP:0004924 (abnormal behavior)	false
+	Behavioral deficits	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Behavioral phenotype deficits	false
+	Behavioral phenotype	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Behavioral phenotype	false
+	Biochemical markers	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Biochemical marker data	false
+	Biochemical properties	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Biochemical properties	false
+	Biochemistry	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Biochemical characterization	false
+	Biomarker expression	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Biomarker expression data	false
+	Biomarkers	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Biomarker characterization	false
+	Body Weight	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Maps to MP:0001259 (body weight)	false
+	Body composition	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Maps to MP metabolism terms	false
+	Body size	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Maps to MP:0001265 (body size)	false
+	Body temperature	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Maps to MP:0001182 (abnormal body temperature)	false
+	Body weight	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Maps to MP:0001259 (body weight)	false
+	Breeding	skos:exactMatch	nf:MethodObservation	semapv:ManualMappingCuration	false	Breeding methodology	false
+	Breeding strategy	skos:exactMatch	nf:MethodObservation	semapv:ManualMappingCuration	false	Breeding strategy	false
+	Cardiac Function	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Maps to MP:0001544 (abnormal cardiovascular system physiology)	false
+	Cardiac abnormalities	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Cardiac phenotype	false
+	Cardiac function	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Cardiac physiology phenotype	false
+	Cardiovascular defects	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Maps to MP:0005385 (cardiovascular system phenotype)	false
+	Cardiovascular phenotype	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Cardiovascular phenotype	false
+	Cell Proliferation	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Cell proliferation assay	false
+	Cell behavior	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Cell behavior experiments	false
+	Cell biology	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Cell biology experiments	false
+	Cell culture	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Cell culture methodology	false
+	Cell culture conditions	skos:exactMatch	nf:MethodObservation	semapv:ManualMappingCuration	false	Cell culture conditions	false
+	Cell culture methods	skos:exactMatch	nf:MethodObservation	semapv:ManualMappingCuration	false	Cell culture methodology	false
+	Cell culture properties	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Cell culture properties	false
+	Cell cycle	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Cell cycle characterization	false
+	Cell death	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Cell death assay	false
+	Cell density	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Cell density measurements	false
+	Cell differentiation	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Differentiation experiments	false
+	Cell division	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Cell division observation	false
+	Cell growth	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Cell growth assay	false
+	Cell line authentication	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Cell line authentication	false
+	Cell line characterization	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Cell line characterization	false
+	Cell line characteristics	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Cell line characteristics	false
+	Cell line derivation	skos:exactMatch	nf:DerivationObservation	semapv:ManualMappingCuration	false	Cell line derivation info	false
+	Cell line derivation method	skos:exactMatch	nf:DerivationObservation	semapv:ManualMappingCuration	false	Derivation methodology	false
+	Cell line details	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Cell line details	false
+	Cell line establishment	skos:exactMatch	nf:DerivationObservation	semapv:ManualMappingCuration	false	Cell line establishment	false
+	Cell line generation	skos:exactMatch	nf:DerivationObservation	semapv:ManualMappingCuration	false	Cell line generation	false
+	Cell line growth characteristics	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Growth characteristics	false
+	Cell line identity	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Cell line identity verification	false
+	Cell line immortalization	skos:exactMatch	nf:DerivationObservation	semapv:ManualMappingCuration	false	Immortalization details	false
+	Cell line origin	skos:exactMatch	nf:DerivationObservation	semapv:ManualMappingCuration	false	Cell line origin information	false
+	Cell line panel	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Cell line panel for screening	false
+	Cell line properties	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Cell line properties	false
+	Cell line quality control	skos:exactMatch	nf:MethodObservation	semapv:ManualMappingCuration	false	QC data	false
+	Cell line source	skos:exactMatch	nf:DerivationObservation	semapv:ManualMappingCuration	false	Source information	false
+	Cell line usage	skos:exactMatch	nf:UsageObservation	semapv:ManualMappingCuration	false	Cell line usage information	false
+	Cell line validation	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Validation data	false
+	Cell markers	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Cell marker expression	false
+	Cell migration	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Migration assay results	false
+	Cell morphology	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Cell morphology characterization	false
+	Cell of origin	skos:exactMatch	nf:DerivationObservation	semapv:ManualMappingCuration	false	Cell of origin	false
+	Cell proliferation	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Proliferation assay results	false
+	Cell properties	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Cell properties	false
+	Cell size	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Cell size measurements	false
+	Cell subpopulation	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Subpopulation characterization	false
+	Cell surface markers	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Surface marker characterization	false
+	Cell ultrastructure	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Ultrastructure characterization	false
+	Cell viability	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Viability assay results	false
+	Cellular development	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Maps to MP:0002152 (abnormal cell development)	false
+	Cellular invasion	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Invasion assay	false
+	Cellular markers	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Cellular marker expression	false
+	Cellular pathology	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Cellular pathology phenotype	false
+	Cellular phenotype	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Cellular phenotype	false
+	Cellular proliferation	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Proliferation assay	false
+	Cellular signaling	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Cellular signaling characterization	false
+	Characterization	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	General characterization	false
+	Clinical Chemistry	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Clinical chemistry phenotype	false
+	Clinical chemistry	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Clinical chemistry measurements	false
+	Cloning	skos:exactMatch	nf:DerivationObservation	semapv:ManualMappingCuration	false	Cloning methodology	false
+	Clonogenicity	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Clonogenic assay	false
+	Colony formation	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Colony formation assay	false
+	Cre expression pattern	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Cre recombinase expression	false
+	Cytogenetics	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Cytogenetic characterization	false
+	Depositor Comment	skos:exactMatch	nf:ContributedObservation	semapv:ManualMappingCuration	false	Comment from depositor	true
+	Depositor comment	skos:exactMatch	nf:ContributedObservation	semapv:ManualMappingCuration	false	Comment from depositor	true
+	Development	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Developmental phenotype	false
+	Developmental Biology	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Developmental biology phenotype	false
+	Developmental Timing	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Developmental timing phenotype	false
+	Developmental defect	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Developmental defect phenotype	false
+	Developmental defects	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Developmental defects	false
+	Developmental milestone	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Developmental milestone phenotype	false
+	Developmental phenotype	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Developmental phenotype	false
+	Differentiation	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Differentiation experiments	false
+	Differentiation potential	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Differentiation potential	false
+	Disease Model	skos:exactMatch	nf:UsageObservation	semapv:ManualMappingCuration	false	Disease model description	false
+	Disease Phenotype	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Disease phenotype	false
+	Disease Progression	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Disease progression phenotype	false
+	Disease Susceptibility	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Maps to MP:0002020 (increased tumor incidence) or related	false
+	Disease association	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Disease association information	false
+	Disease modeling	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Disease modeling experiments	false
+	Disease phenotype	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Disease phenotype	false
+	Disease progression	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Disease progression	false
+	Disease relevance	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Disease relevance information	false
+	Disease severity	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Disease severity phenotype	false
+	Disease symptoms	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Disease symptoms	false
+	Drug resistance	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Drug resistance data	false
+	Drug response	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Drug response experiments	false
+	Drug screening	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Drug screening results	false
+	Electrophysiology	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Maps to MP:0002272 (abnormal synaptic transmission)	false
+	Embryonic development	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Maps to MP:0002084 (embryo phenotype)	false
+	Embryonic lethality	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Maps to MP:0011087 (embryonic lethality)	false
+	Embryonic phenotype	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Embryonic phenotype	false
+	Energy expenditure	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Maps to MP:0001964 (abnormal energy expenditure)	false
+	Environmental conditions	skos:exactMatch	nf:MethodObservation	semapv:ManualMappingCuration	false	Environmental conditions	false
+	Experimental Design	skos:exactMatch	nf:MethodObservation	semapv:ManualMappingCuration	false	Experimental design details	false
+	Experimental Methods	skos:exactMatch	nf:MethodObservation	semapv:ManualMappingCuration	false	Experimental methodology	false
+	Experimental context	skos:exactMatch	nf:MethodObservation	semapv:ManualMappingCuration	false	Experimental context	false
+	Experimental methods	skos:exactMatch	nf:MethodObservation	semapv:ManualMappingCuration	false	Experimental methods	false
+	Experimental usage	skos:exactMatch	nf:UsageObservation	semapv:ManualMappingCuration	false	Experimental usage information	false
+	Exploratory Behavior	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Maps to MP:0001443 (abnormal exploration in new environment)	false
+	Feed Intake	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Maps to MP:0001985 (abnormal food consumption)	false
+	Feeding Behavior	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Maps to MP:0001969 (abnormal eating behavior)	false
+	Fertility	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Maps to MP:0001921 (abnormal fertility)	false
+	Flow cytometry	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Flow cytometry data	false
+	Fluorescent Reporter Expression	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Reporter expression	false
+	Functional assay	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Functional assay	false
+	Functional assays	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Functional assays	false
+	Gene Expression	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Gene expression data	false
+	Gene expression	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Gene expression data	false
+	Gene knockdown	skos:exactMatch	nf:MethodObservation	semapv:ManualMappingCuration	false	Knockdown experiment	false
+	General Comment or Review	skos:exactMatch	nf:ContributedObservation	semapv:ManualMappingCuration	false	General commentary	true
+	Genetic background	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Genetic background information	false
+	Genetic marker	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Genetic marker	false
+	Genetic modification	skos:exactMatch	nf:DerivationObservation	semapv:ManualMappingCuration	false	Genetic modification details	false
+	Genetics	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Genetic characterization	false
+	Genotype	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Genotype information	false
+	Genotype characterization	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Genotype characterization	false
+	Genotype-phenotype correlation	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Genotype-phenotype correlation	false
+	Glial cells	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Glial cell characterization	false
+	Glycomics	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Glycomics characterization	false
+	Glycosylation	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Glycosylation characterization	false
+	Genomics	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Genomic characterization	false
+	Growth Characteristics	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Growth characteristics	false
+	Growth Rate	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Maps to MP:0001265 (decreased body size) or related	false
+	Growth development	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Growth and development	false
+	Growth factor response	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Growth factor response assay	false
+	Growth kinetics	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Growth kinetics measurements	false
+	Growth rate	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Growth rate phenotype	false
+	HLA typing	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	HLA typing data	false
+	Hematology	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Maps to MP:0002429 (abnormal blood cell morphology)	false
+	Heterogeneity	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Heterogeneity characterization	false
+	Histology	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Histological phenotype	false
+	Histopathology	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Histopathological phenotype	false
+	Hormone response	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Hormone response assay	false
+	Immortalization	skos:exactMatch	nf:DerivationObservation	semapv:ManualMappingCuration	false	Immortalization details	false
+	Immunofluorescence	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Immunofluorescence data	false
+	Immunology	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Immunological characterization	false
+	In vivo growth	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	In vivo growth experiments	false
+	In vivo model	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	In vivo model experiments	false
+	In vivo studies	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	In vivo studies	false
+	Insulin Signaling	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Insulin signaling pathway	false
+	Invasion	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Invasion assay results	false
+	Invasiveness	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Invasiveness assay	false
+	Issue	skos:exactMatch	nf:IssueObservation	semapv:ManualMappingCuration	false	QC or resource issue	false
+	Karyotype	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Karyotype characterization	false
+	LTD	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Long-term depression (synaptic plasticity)	false
+	LTP	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Long-term potentiation (synaptic plasticity)	false
+	Learning	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Maps to MP:0001444 (abnormal learning/memory)	false
+	Learning and Memory	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Learning and memory phenotype	false
+	Learning/memory deficits	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Maps to MP:0001444 (abnormal learning/memory)	false
+	Lifespan	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Maps to MP:0010768 (mortality/aging)	false
+	Lipid metabolism	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Maps to MP:0001547 (abnormal lipid metabolism)	false
+	Lipidomics	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Lipidomics characterization	false
+	Malignant potential	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Malignant potential assessment	false
+	Marker expression	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Marker expression	false
+	Memory	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Maps to MP:0001444 (abnormal learning/memory)	false
+	Metabolism	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Maps to MP:0005266 (abnormal metabolism)	false
+	Metabolomics	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Metabolomics characterization	false
+	Metastasis	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Maps to MP:0002108 (abnormal metastasis)	false
+	Microglia content	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Microglia content quantification	false
+	Microglia marker	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Microglia marker expression	false
+	Microglia quantification	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Microglia quantification	false
+	Microglia visualization	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Microglia visualization	false
+	Migration	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Migration assay	false
+	Model Development	skos:exactMatch	nf:UsageObservation	semapv:ManualMappingCuration	false	Model development information	false
+	Model characterization	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Model characterization	false
+	Model description	skos:exactMatch	nf:UsageObservation	semapv:ManualMappingCuration	false	Model description	false
+	Model development	skos:exactMatch	nf:UsageObservation	semapv:ManualMappingCuration	false	Model development	false
+	Model generation	skos:exactMatch	nf:DerivationObservation	semapv:ManualMappingCuration	false	Model generation	false
+	Molecular Biology	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Molecular biology characterization	false
+	Molecular Pathways	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Molecular pathway characterization	false
+	Molecular biology	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Molecular biology characterization	false
+	Molecular biology techniques	skos:exactMatch	nf:MethodObservation	semapv:ManualMappingCuration	false	Molecular biology methods	false
+	Molecular characterization	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Molecular characterization	false
+	Molecular defect	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Molecular defect characterization	false
+	Molecular function	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Molecular function	false
+	Molecular genetics	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Molecular genetics	false
+	Molecular markers	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Molecular markers	false
+	Molecular pathology	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Molecular pathology	false
+	Molecular pathways	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Molecular pathways	false
+	Molecular profiling	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Molecular profiling	false
+	Molecular subtype	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Molecular subtype classification	false
+	Morphology	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Morphology characterization	false
+	Motor Activity	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Maps to MP:0001392 (abnormal motor capabilities)	false
+	Multinucleation	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Multinucleation observation	false
+	Muscle fiber size	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Maps to MP:0000750 (abnormal muscle fiber morphology)	false
+	Muscle function	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Maps to MP:0001406 (abnormal muscle physiology)	false
+	Muscle strength	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Maps to MP:0001405 (impaired muscle contractility)	false
+	Mutational signatures	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Mutational signature analysis	false
+	Mutation	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Mutation characterization	false
+	Mutation status	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Mutation status	false
+	Myelination	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Maps to MP:0000920 (abnormal myelination)	false
+	Myelination defect	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Myelination defect phenotype	false
+	Myelination defects	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Maps to MP:0000920 (abnormal myelination)	false
+	NF1 mutation status	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	NF1 mutation status	false
+	Neuroanatomy	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Neuroanatomical phenotype	false
+	Neurochemistry	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Neurochemistry characterization	false
+	Neurodevelopment	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Maps to MP:0003860 (abnormal neuron development)	false
+	Neurological abnormalities	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Neurological abnormalities	false
+	Neurological defects	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Neurological defects	false
+	Neurological function	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Neurological function phenotype	false
+	Neurological phenotype	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Maps to MP:0003631 (nervous system phenotype)	false
+	Neurological symptoms	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Neurological symptoms	false
+	Neuromotor function	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Neuromotor function phenotype	false
+	Neuronal excitability	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Maps to MP:0002272 (abnormal synaptic transmission)	false
+	Neurosphere formation	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Neurosphere formation assay	false
+	Oncogene activation	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Oncogene activation	false
+	Oncogene mutations	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Oncogene mutations	false
+	Oncogenes	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Oncogene characterization	false
+	Optic nerve volume	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Optic nerve volume phenotype	false
+	Organ Development	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Maps to MP organ development terms	false
+	Organ development	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Organ development phenotype	false
+	Origin	skos:exactMatch	nf:DerivationObservation	semapv:ManualMappingCuration	false	Resource origin	false
+	Pain behavior	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Maps to MP:0001976 (abnormal nociception)	false
+	Pain response	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Pain response phenotype	false
+	Parental Effects	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Parental effects on phenotype	false
+	Patient demographics	skos:exactMatch	nf:UsageObservation	semapv:ManualMappingCuration	false	Patient demographic information	false
+	Patient information	skos:exactMatch	nf:UsageObservation	semapv:ManualMappingCuration	false	Patient information	false
+	Penetrance	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Phenotype penetrance	false
+	Pharmacological response	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Pharmacological response	false
+	Pharmacology	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Pharmacology experiments	false
+	Phenotype	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	General phenotype	false
+	Phenotype severity	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Phenotype severity	false
+	Phenotypic variability	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Phenotypic variability	false
+	Phosphorylation	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Phosphorylation status	false
+	Physiology	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Physiological phenotype	false
+	Pigmentation	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Maps to MP:0001186 (pigmentation phenotype)	false
+	Pigmentation defect	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Pigmentation defect	false
+	Pigmentation defects	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Pigmentation defects	false
+	Pigmentation phenotype	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Pigmentation phenotype	false
+	Pluripotency	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Pluripotency characterization	false
+	Preclinical studies	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Preclinical study results	false
+	Proliferation	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Proliferation assay	false
+	Protein Expression	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Protein expression data	false
+	Protein expression	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Protein expression data	false
+	Protein structure	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Protein structure	false
+	Proteomics	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Proteomic characterization	false
+	Quality control	skos:exactMatch	nf:MethodObservation	semapv:ManualMappingCuration	false	Quality control data	false
+	Radiation sensitivity	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Radiation sensitivity assay	false
+	Receptor expression	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Receptor expression	false
+	Reflex Development	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Maps to MP:0001961 (abnormal reflex)	false
+	Reproductive Behavior	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Reproductive behavior phenotype	false
+	Reproductive ability	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Reproductive ability phenotype	false
+	Reproductive behavior	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Maps to MP:0002127 (abnormal reproductive system physiology)	false
+	Reproductive fitness	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Reproductive fitness phenotype	false
+	Reproductive phenotype	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Reproductive phenotype	false
+	Research application	skos:exactMatch	nf:UsageObservation	semapv:ManualMappingCuration	false	Research application information	false
+	Research applications	skos:exactMatch	nf:UsageObservation	semapv:ManualMappingCuration	false	Research applications	false
+	Rescue experiment	skos:exactMatch	nf:MethodObservation	semapv:ManualMappingCuration	false	Rescue experiment	false
+	Resource availability	skos:exactMatch	nf:UsageObservation	semapv:ManualMappingCuration	false	Resource availability information	false
+	Resource development	skos:exactMatch	nf:UsageObservation	semapv:ManualMappingCuration	false	Resource development	false
+	Resource utility	skos:exactMatch	nf:UsageObservation	semapv:ManualMappingCuration	false	Resource utility information	false
+	Retinal ganglion cells	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Maps to MP:0001325 (retina phenotype)	false
+	Secreted factors	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Secreted factor characterization	false
+	Secretion	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Secretion characterization	false
+	Sensory function	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Maps to MP:0005391 (vision/eye phenotype)	false
+	Signaling	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Signaling characterization	false
+	Signaling Pathways	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Signaling pathway characterization	false
+	Signaling pathway	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Signaling pathway characterization	false
+	Signaling pathways	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Signaling pathway characterization	false
+	Skin abnormalities	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Maps to MP:0010678 (abnormal skin morphology)	false
+	Skin phenotype	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Skin phenotype	false
+	Sleep	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Maps to MP:0001402 (abnormal locomotor behavior)	false
+	Spheroid formation	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Spheroid formation assay	false
+	Stem cell markers	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Stem cell marker expression	false
+	Stemness	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Stemness characterization	false
+	Study design	skos:exactMatch	nf:MethodObservation	semapv:ManualMappingCuration	false	Study design information	false
+	Subline derivation	skos:exactMatch	nf:DerivationObservation	semapv:ManualMappingCuration	false	Subline derivation	false
+	Survival	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Maps to MP:0010768 (mortality/aging)	false
+	Synaptic plasticity	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Maps to MP:0002207 (abnormal long term potentiation)	false
+	Synaptic transmission	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Maps to MP:0002272 (abnormal synaptic transmission)	false
+	Tactile sensitivity	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Maps to MP:0001976 (abnormal nociception)	false
+	Thermal sensitivity	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Maps to MP:0001985 (abnormal thermal nociception)	false
+	Therapeutic response	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Therapeutic response experiments	false
+	Tissue origin	skos:exactMatch	nf:DerivationObservation	semapv:ManualMappingCuration	false	Tissue of origin	false
+	Transcriptional regulation	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Transcriptional regulation	false
+	Transcriptomics	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Transcriptomic characterization	false
+	Treatment history	skos:exactMatch	nf:UsageObservation	semapv:ManualMappingCuration	false	Treatment history information	false
+	Tumor Biology	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Tumor biology phenotype	false
+	Tumor Growth	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Maps to MP:0002082 (abnormal tumor growth/development)	false
+	Tumor Incidence	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Maps to MP:0002020 (increased tumor incidence)	false
+	Tumor Multiplicity	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Multiple tumor phenotype	false
+	Tumor Progression	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Tumor progression phenotype	false
+	Tumor antigens	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Tumor antigen characterization	false
+	Tumor biology	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Tumor biology phenotype	false
+	Tumor burden	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Tumor burden phenotype	false
+	Tumor development	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Tumor development phenotype	false
+	Tumor formation	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Tumor formation phenotype	false
+	Tumor grade	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Tumor grading	false
+	Tumor growth	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Maps to MP:0002082 (abnormal tumor growth/development)	false
+	Tumor histology	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Tumor histology phenotype	false
+	Tumor incidence	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Maps to MP:0002020 (increased tumor incidence)	false
+	Tumor initiation	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Tumor initiation experiments	false
+	Tumor localization	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Tumor location phenotype	false
+	Tumor location	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Tumor location phenotype	false
+	Tumor multiplicity	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Multiple tumor phenotype	false
+	Tumor pathology	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Tumor pathology	false
+	Tumor phenotype	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Tumor phenotype	false
+	Tumor progression	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Tumor progression phenotype	false
+	Tumor suppressor	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Tumor suppressor characterization	false
+	Tumor susceptibility	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Maps to MP:0002020 or related	false
+	Tumor type	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Tumor type classification	false
+	Tumorigenesis	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Tumorigenesis phenotype	false
+	Tumorigenicity	skos:exactMatch	nf:PhenotypeObservation	semapv:ManualMappingCuration	true	Tumorigenicity phenotype	false
+	Ultrastructure	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Ultrastructure characterization	false
+	Usage	skos:exactMatch	nf:UsageObservation	semapv:ManualMappingCuration	false	Usage information	false
+	Usage Instructions	skos:exactMatch	nf:UsageObservation	semapv:ManualMappingCuration	false	Usage instructions	false
+	Variant	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Variant characterization	false
+	Viability	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Viability assay	false
+	Viral infection	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Viral infection experiment	false
+	Xenograft	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	Xenograft experiment	false
+	miRNA expression	skos:exactMatch	nf:AssayObservation	semapv:ManualMappingCuration	false	miRNA expression data	false

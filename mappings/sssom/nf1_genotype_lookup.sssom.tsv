@@ -1,0 +1,22 @@
+#curie_map:
+#  nf: http://nf-osi.github.com/terms#
+#  skos: http://www.w3.org/2004/02/skos/core#
+#  semapv: https://w3id.org/semapv/vocab/
+#mapping_set_id: https://w3id.org/synapse/nfosi/mapping/nf1genotype
+#license: https://creativecommons.org/licenses/by/4.0/
+subject_id	subject_label	predicate_id	object_id	mapping_justification
+	+/+	skos:exactMatch	nf:NF1WildType	semapv:ManualMappingCuration
+	WT	skos:exactMatch	nf:NF1WildType	semapv:ManualMappingCuration
+	+/-	skos:exactMatch	nf:NF1Heterozygous	semapv:ManualMappingCuration
+	-/-	skos:exactMatch	nf:NF1HomozygousNull	semapv:ManualMappingCuration
+	NF-/-	skos:exactMatch	nf:NF1HomozygousNull	semapv:ManualMappingCuration
+	NF1-/-	skos:exactMatch	nf:NF1HomozygousNull	semapv:ManualMappingCuration
+	Nf1-/-	skos:exactMatch	nf:NF1HomozygousNull	semapv:ManualMappingCuration
+	NF-/_	skos:exactMatch	nf:NF1HomozygousNull	semapv:ManualMappingCuration
+	+/?	skos:exactMatch	nf:NF1UnknownGenotype	semapv:ManualMappingCuration
+	unknown	skos:exactMatch	nf:NF1UnknownGenotype	semapv:ManualMappingCuration
+	Unknown	skos:exactMatch	nf:NF1UnknownGenotype	semapv:ManualMappingCuration
+	knockdown	skos:exactMatch	nf:NF1Knockdown	semapv:ManualMappingCuration
+	NF1-/-; P53-/-	skos:exactMatch	nf:NF1HomozygousNull	semapv:ManualMappingCuration
+	NF1-/-; P53 -/-	skos:exactMatch	nf:NF1HomozygousNull	semapv:ManualMappingCuration
+	multiple	skos:exactMatch	nf:NF1UnknownGenotype	semapv:ManualMappingCuration

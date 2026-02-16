@@ -1,0 +1,12 @@
+#curie_map:
+#  nf: http://nf-osi.github.com/terms#
+#  skos: http://www.w3.org/2004/02/skos/core#
+#  semapv: https://w3id.org/semapv/vocab/
+#mapping_set_id: https://w3id.org/synapse/nfosi/mapping/nf2genotype
+#license: https://creativecommons.org/licenses/by/4.0/
+subject_id	subject_label	predicate_id	object_id	mapping_justification
+	+/+	skos:exactMatch	nf:NF2WildType	semapv:ManualMappingCuration
+	+/-	skos:exactMatch	nf:NF2Heterozygous	semapv:ManualMappingCuration
+	-/-	skos:exactMatch	nf:NF2HomozygousNull	semapv:ManualMappingCuration
+	unknown	skos:exactMatch	nf:NF2UnknownGenotype	semapv:ManualMappingCuration
+	Unknown	skos:exactMatch	nf:NF2UnknownGenotype	semapv:ManualMappingCuration
