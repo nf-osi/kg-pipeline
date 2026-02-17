@@ -170,7 +170,7 @@ class TestFilesMultiValue:
         NF = namespaces["nf"]
         query = """
         SELECT ?fa WHERE {
-            <https://www.synapse.org/Synapse:syn9999991> nf:hasFunder ?fa .
+            <https://www.synapse.org/Synapse:syn9999991> nf:funder ?fa .
         }
         """
         funders = [str(r.fa) for r in files_graph.query(query, initNs={"nf": NF})]
@@ -339,7 +339,7 @@ class TestFilesEmptyFields:
         NF = namespaces["nf"]
         query = """
         SELECT ?fa WHERE {
-            <https://www.synapse.org/Synapse:syn9999992> nf:hasFunder ?fa .
+            <https://www.synapse.org/Synapse:syn9999992> nf:funder ?fa .
         }
         """
         results = list(files_graph.query(query, initNs={"nf": NF}))

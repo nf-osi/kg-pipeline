@@ -102,7 +102,7 @@ map:FileFundingAgency a rr:TriplesMap ;
     rml:logicalSource map:PortalFilesSource ;
     rr:subjectMap [ rr:template "https://www.synapse.org/Synapse:{id}" ; rr:termType rr:IRI ] ;
     rr:predicateObjectMap [
-        rr:predicate nf:hasFunder ;
+        rr:predicate nf:funder ;
         rr:objectMap [
             a fnml:FunctionTermMap ;
             rr:datatype xsd:string ;
