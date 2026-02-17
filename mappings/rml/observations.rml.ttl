@@ -29,6 +29,7 @@ map:ObservationCore a rr:TriplesMap ;
         rr:template "http://nf-osi.github.com/terms#observation/{observationId}" ;
         rr:termType rr:IRI
     ] ;
+    rr:predicateObjectMap [ rr:predicate rdf:type ; rr:objectMap [ rr:constant nf:Observation ; rr:termType rr:IRI ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:observationId ; rr:objectMap [ rml:reference "observationId" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:observationSubmitterName ; rr:objectMap [ rml:reference "observationSubmitterName" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:observationText ; rr:objectMap [ rml:reference "observationText" ; rr:datatype xsd:string ] ] ;

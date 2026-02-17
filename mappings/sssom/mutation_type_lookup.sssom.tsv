@@ -1,0 +1,23 @@
+#curie_map:
+#  nf: http://nf-osi.github.com/terms#
+#  skos: http://www.w3.org/2004/02/skos/core#
+#  semapv: https://w3id.org/semapv/vocab/
+#mapping_set_id: https://w3id.org/synapse/nfosi/mapping/mutationtype
+#license: https://creativecommons.org/licenses/by/4.0/
+subject_id	subject_label	predicate_id	object_id	mapping_justification
+	Single point mutation	skos:exactMatch	nf:SinglePointMutation	semapv:ManualMappingCuration
+	Intragenic deletion	skos:exactMatch	nf:IntragenicDeletion	semapv:ManualMappingCuration
+	Insertion	skos:exactMatch	nf:Insertion	semapv:ManualMappingCuration
+	Insertion of gene trap vector	skos:exactMatch	nf:Insertion	semapv:ManualMappingCuration
+	Exogenous DNA expression	skos:exactMatch	nf:ExogenousDNAExpression	semapv:ManualMappingCuration
+	Homozygous deletion	skos:exactMatch	nf:HomozygousDeletion	semapv:ManualMappingCuration
+	Intergenic deletion	skos:exactMatch	nf:IntergenicDeletion	semapv:ManualMappingCuration
+	Loss of heterozygosity (deletion)	skos:exactMatch	nf:LossOfHeterozygosityByDeletion	semapv:ManualMappingCuration
+	Loss of heterozygosity (mitotic recombination)	skos:exactMatch	nf:LossOfHeterozygosityByMitoticRecombination	semapv:ManualMappingCuration
+	Loss of heterozygosity (unspecified mechanism)	skos:exactMatch	nf:LossOfHeterozygosityUnspecified	semapv:ManualMappingCuration
+	Viral insertion	skos:exactMatch	nf:ViralInsertion	semapv:ManualMappingCuration
+	Stable knockdown	skos:exactMatch	nf:StableKnockdown	semapv:ManualMappingCuration
+	Nucleotide substitutions	skos:exactMatch	nf:NucleotideSubstitutions	semapv:ManualMappingCuration
+	Microdeletion	skos:exactMatch	nf:Microdeletion	semapv:ManualMappingCuration
+	Duplication	skos:exactMatch	nf:Duplication	semapv:ManualMappingCuration
+	Not Specified	skos:exactMatch	nf:UnspecifiedMutation	semapv:ManualMappingCuration

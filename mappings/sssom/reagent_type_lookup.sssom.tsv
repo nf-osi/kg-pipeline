@@ -1,0 +1,17 @@
+#curie_map:
+#  nf: http://nf-osi.github.com/terms#
+#  skos: http://www.w3.org/2004/02/skos/core#
+#  semapv: https://w3id.org/semapv/vocab/
+#mapping_set_id: https://w3id.org/synapse/nfosi/mapping/reagenttype
+#license: https://creativecommons.org/licenses/by/4.0/
+subject_id	subject_label	predicate_id	object_id	mapping_justification
+	Bacterial Expression	skos:exactMatch	nf:BacterialExpressionVector	semapv:ManualMappingCuration
+	CRISPR	skos:exactMatch	nf:CRISPRReagent	semapv:ManualMappingCuration
+	Gateway Entry Clone	skos:exactMatch	nf:GatewayEntryClone	semapv:ManualMappingCuration
+	Lentiviral	skos:exactMatch	nf:LentiviralVector	semapv:ManualMappingCuration
+	Mammalian Expression	skos:exactMatch	nf:MammalianExpressionVector	semapv:ManualMappingCuration
+	Mouse Targeting	skos:exactMatch	nf:MouseTargetingVector	semapv:ManualMappingCuration
+	RNAi	skos:exactMatch	nf:RNAiReagent	semapv:ManualMappingCuration
+	Transfer Vector	skos:exactMatch	nf:TransferVector	semapv:ManualMappingCuration
+	Transposon Vector	skos:exactMatch	nf:TransposonVector	semapv:ManualMappingCuration
+	Yeast Expression	skos:exactMatch	nf:YeastExpressionVector	semapv:ManualMappingCuration

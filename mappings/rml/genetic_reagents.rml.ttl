@@ -80,7 +80,7 @@ map:GeneticReagentVectorType a rr:TriplesMap ;
                 ] ;
                 rr:predicateObjectMap [
                     rr:predicate grel:valueParameter ;
-                    rr:objectMap [ rml:reference "vectorTypeClass" ; rr:termType rr:Literal ]
+                    rr:objectMap [ rml:reference "reagentClass" ; rr:termType rr:Literal ]
                 ] ;
                 rr:predicateObjectMap [
                     rr:predicate grel:p_string_sep ;
