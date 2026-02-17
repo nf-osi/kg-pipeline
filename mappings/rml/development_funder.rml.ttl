@@ -22,10 +22,10 @@ map:DevelopmentFunderSource a rml:LogicalSource ;
 map:DevelopmentHasFunder a rr:TriplesMap ;
     rdfs:label "Development Has Funder" ;
     rml:logicalSource map:DevelopmentFunderSource ;
-    rr:subjectMap [ rml:reference "developmentId" ; rr:termType rr:IRI ] ;
+    rr:subjectMap [ rr:template "http://nf-osi.github.com/terms#development/{developmentId}" ; rr:termType rr:IRI ] ;
     rr:predicateObjectMap [
         rr:predicate nf:hasFunder ;
-        rr:objectMap [ rml:reference "funderId" ; rr:termType rr:IRI ]
+        rr:objectMap [ rr:template "http://nf-osi.github.com/terms#funder/{funderId}" ; rr:termType rr:IRI ]
     ] .
 
 ################################################################################
@@ -35,7 +35,7 @@ map:DevelopmentHasFunder a rr:TriplesMap ;
 map:FunderCore a rr:TriplesMap ;
     rdfs:label "Funder Core" ;
     rml:logicalSource map:DevelopmentFunderSource ;
-    rr:subjectMap [ rml:reference "funderId" ; rr:termType rr:IRI ] ;
+    rr:subjectMap [ rr:template "http://nf-osi.github.com/terms#funder/{funderId}" ; rr:termType rr:IRI ] ;
     rr:predicateObjectMap [ rr:predicate rdf:type ; rr:objectMap [ rr:constant nf:Funder ; rr:termType rr:IRI ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:funderName ; rr:objectMap [ rml:reference "funderName" ; rr:datatype xsd:string ] ] .
 
@@ -46,10 +46,10 @@ map:FunderCore a rr:TriplesMap ;
 map:ResourceHasFunder a rr:TriplesMap ;
     rdfs:label "Resource Has Funder" ;
     rml:logicalSource map:DevelopmentFunderSource ;
-    rr:subjectMap [ rml:reference "resourceId" ; rr:termType rr:IRI ] ;
+    rr:subjectMap [ rr:template "http://nf-osi.github.com/terms#resource/{resourceId}" ; rr:termType rr:IRI ] ;
     rr:predicateObjectMap [
         rr:predicate nf:hasFunder ;
-        rr:objectMap [ rml:reference "funderId" ; rr:termType rr:IRI ]
+        rr:objectMap [ rr:template "http://nf-osi.github.com/terms#funder/{funderId}" ; rr:termType rr:IRI ]
     ] .
 
 ################################################################################
@@ -59,8 +59,8 @@ map:ResourceHasFunder a rr:TriplesMap ;
 map:PublicationHasFunder a rr:TriplesMap ;
     rdfs:label "Publication Has Funder" ;
     rml:logicalSource map:DevelopmentFunderSource ;
-    rr:subjectMap [ rml:reference "publicationId" ; rr:termType rr:IRI ] ;
+    rr:subjectMap [ rr:template "http://nf-osi.github.com/terms#publication/{publicationId}" ; rr:termType rr:IRI ] ;
     rr:predicateObjectMap [
         rr:predicate nf:hasFunder ;
-        rr:objectMap [ rml:reference "funderId" ; rr:termType rr:IRI ]
+        rr:objectMap [ rr:template "http://nf-osi.github.com/terms#funder/{funderId}" ; rr:termType rr:IRI ]
     ] .

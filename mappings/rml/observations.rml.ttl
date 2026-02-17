@@ -82,7 +82,7 @@ map:ObservationReferencesPublication a rr:TriplesMap ;
     ] ;
     rr:predicateObjectMap [
         rr:predicate nf:referencesPublication ;
-        rr:objectMap [ rml:reference "publicationId" ; rr:termType rr:IRI ]
+        rr:objectMap [ rr:template "http://nf-osi.github.com/terms#publication/{publicationId}" ; rr:termType rr:IRI ]
     ] .
 
 ################################################################################

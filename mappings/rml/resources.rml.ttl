@@ -26,7 +26,7 @@ map:ResourcesSource a rml:LogicalSource ;
 map:ResourceCore a rr:TriplesMap ;
     rdfs:label "Resource Core" ;
     rml:logicalSource map:ResourcesSource ;
-    rr:subjectMap [ rml:reference "resourceId" ; rr:termType rr:IRI ] ;
+    rr:subjectMap [ rr:template "http://nf-osi.github.com/terms#resource/{resourceId}" ; rr:termType rr:IRI ] ;
     rr:predicateObjectMap [ rr:predicate rdf:type ; rr:objectMap [ rr:constant nf:Tool ; rr:termType rr:IRI ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:name ; rr:objectMap [ rml:reference "resourceName" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:resourceType ; rr:objectMap [ rml:reference "resourceType" ; rr:datatype xsd:string ] ] ;
@@ -43,7 +43,7 @@ map:ResourceCore a rr:TriplesMap ;
 map:ResourceUsageRequirements a rr:TriplesMap ;
     rdfs:label "Resource Usage Requirements" ;
     rml:logicalSource map:ResourcesSource ;
-    rr:subjectMap [ rml:reference "resourceId" ; rr:termType rr:IRI ] ;
+    rr:subjectMap [ rr:template "http://nf-osi.github.com/terms#resource/{resourceId}" ; rr:termType rr:IRI ] ;
     rr:predicateObjectMap [
         rr:predicate nf:usageRequirements ;
         rr:objectMap [
@@ -71,7 +71,7 @@ map:ResourceUsageRequirements a rr:TriplesMap ;
 map:ResourceSynonyms a rr:TriplesMap ;
     rdfs:label "Resource Synonyms" ;
     rml:logicalSource map:ResourcesSource ;
-    rr:subjectMap [ rml:reference "resourceId" ; rr:termType rr:IRI ] ;
+    rr:subjectMap [ rr:template "http://nf-osi.github.com/terms#resource/{resourceId}" ; rr:termType rr:IRI ] ;
     rr:predicateObjectMap [
         rr:predicate nf:synonyms ;
         rr:objectMap [
@@ -103,44 +103,44 @@ map:ResourceSynonyms a rr:TriplesMap ;
 map:ResourceToGeneticReagent a rr:TriplesMap ;
     rdfs:label "Resource to Genetic Reagent ID" ;
     rml:logicalSource map:ResourcesSource ;
-    rr:subjectMap [ rml:reference "resourceId" ; rr:termType rr:IRI ] ;
+    rr:subjectMap [ rr:template "http://nf-osi.github.com/terms#resource/{resourceId}" ; rr:termType rr:IRI ] ;
     rr:predicateObjectMap [
         rr:predicate owl:sameAs ;
-        rr:objectMap [ rml:reference "geneticReagentId" ; rr:termType rr:IRI ]
+        rr:objectMap [ rr:template "http://nf-osi.github.com/terms#geneticReagent/{geneticReagentId}" ; rr:termType rr:IRI ]
     ] .
 
 map:ResourceToAntibody a rr:TriplesMap ;
     rdfs:label "Resource to Antibody ID" ;
     rml:logicalSource map:ResourcesSource ;
-    rr:subjectMap [ rml:reference "resourceId" ; rr:termType rr:IRI ] ;
+    rr:subjectMap [ rr:template "http://nf-osi.github.com/terms#resource/{resourceId}" ; rr:termType rr:IRI ] ;
     rr:predicateObjectMap [
         rr:predicate owl:sameAs ;
-        rr:objectMap [ rml:reference "antibodyId" ; rr:termType rr:IRI ]
+        rr:objectMap [ rr:template "http://nf-osi.github.com/terms#antibody/{antibodyId}" ; rr:termType rr:IRI ]
     ] .
 
 map:ResourceToCellLine a rr:TriplesMap ;
     rdfs:label "Resource to Cell Line ID" ;
     rml:logicalSource map:ResourcesSource ;
-    rr:subjectMap [ rml:reference "resourceId" ; rr:termType rr:IRI ] ;
+    rr:subjectMap [ rr:template "http://nf-osi.github.com/terms#resource/{resourceId}" ; rr:termType rr:IRI ] ;
     rr:predicateObjectMap [
         rr:predicate owl:sameAs ;
-        rr:objectMap [ rml:reference "cellLineId" ; rr:termType rr:IRI ]
+        rr:objectMap [ rr:template "http://nf-osi.github.com/terms#cellLine/{cellLineId}" ; rr:termType rr:IRI ]
     ] .
 
 map:ResourceToAnimalModel a rr:TriplesMap ;
     rdfs:label "Resource to Animal Model ID" ;
     rml:logicalSource map:ResourcesSource ;
-    rr:subjectMap [ rml:reference "resourceId" ; rr:termType rr:IRI ] ;
+    rr:subjectMap [ rr:template "http://nf-osi.github.com/terms#resource/{resourceId}" ; rr:termType rr:IRI ] ;
     rr:predicateObjectMap [
         rr:predicate owl:sameAs ;
-        rr:objectMap [ rml:reference "animalModelId" ; rr:termType rr:IRI ]
+        rr:objectMap [ rr:template "http://nf-osi.github.com/terms#animalModel/{animalModelId}" ; rr:termType rr:IRI ]
     ] .
 
 map:ResourceToBiobank a rr:TriplesMap ;
     rdfs:label "Resource to Biobank ID" ;
     rml:logicalSource map:ResourcesSource ;
-    rr:subjectMap [ rml:reference "resourceId" ; rr:termType rr:IRI ] ;
+    rr:subjectMap [ rr:template "http://nf-osi.github.com/terms#resource/{resourceId}" ; rr:termType rr:IRI ] ;
     rr:predicateObjectMap [
         rr:predicate owl:sameAs ;
-        rr:objectMap [ rml:reference "biobankId" ; rr:termType rr:IRI ]
+        rr:objectMap [ rr:template "http://nf-osi.github.com/terms#biobank/{biobankId}" ; rr:termType rr:IRI ]
     ] .

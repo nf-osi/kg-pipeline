@@ -21,7 +21,7 @@ map:PortalMutationCellLineSource a rml:LogicalSource ;
 map:CellLineHasMutation a rr:TriplesMap ;
     rdfs:label "Cell Line Has Mutation" ;
     rml:logicalSource map:PortalMutationCellLineSource ;
-    rr:subjectMap [ rml:reference "resourceId" ; rr:termType rr:IRI ] ;
+    rr:subjectMap [ rr:template "http://nf-osi.github.com/terms#resource/{resourceId}" ; rr:termType rr:IRI ] ;
     rr:predicateObjectMap [
         rr:predicate nf:hasMutation ;
         rr:objectMap [

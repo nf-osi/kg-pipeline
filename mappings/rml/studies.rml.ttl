@@ -62,7 +62,7 @@ map:StudyCore a rr:TriplesMap ;
     rr:predicateObjectMap [ rr:predicate nf:acknowledgementStatements ; rr:objectMap [ rml:reference "acknowledgementStatements" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [
         rr:predicate nf:studyFileviewId ;
-        rr:objectMap [ rml:reference "studyFileviewId" ; rr:termType rr:IRI ]
+        rr:objectMap [ rr:template "https://www.synapse.org/Synapse:{studyFileviewId}" ; rr:termType rr:IRI ]
     ] .
 
 ################################################################################

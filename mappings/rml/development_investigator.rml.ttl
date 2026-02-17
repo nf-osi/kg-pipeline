@@ -22,10 +22,10 @@ map:DevelopmentInvestigatorSource a rml:LogicalSource ;
 map:DevelopmentHasInvestigator a rr:TriplesMap ;
     rdfs:label "Development Has Investigator" ;
     rml:logicalSource map:DevelopmentInvestigatorSource ;
-    rr:subjectMap [ rml:reference "developmentId" ; rr:termType rr:IRI ] ;
+    rr:subjectMap [ rr:template "http://nf-osi.github.com/terms#development/{developmentId}" ; rr:termType rr:IRI ] ;
     rr:predicateObjectMap [
         rr:predicate nf:hasInvestigator ;
-        rr:objectMap [ rml:reference "investigatorId" ; rr:termType rr:IRI ]
+        rr:objectMap [ rr:template "http://nf-osi.github.com/terms#investigator/{investigatorId}" ; rr:termType rr:IRI ]
     ] .
 
 ################################################################################
@@ -35,11 +35,11 @@ map:DevelopmentHasInvestigator a rr:TriplesMap ;
 map:InvestigatorCore a rr:TriplesMap ;
     rdfs:label "Investigator Core" ;
     rml:logicalSource map:DevelopmentInvestigatorSource ;
-    rr:subjectMap [ rml:reference "investigatorId" ; rr:termType rr:IRI ] ;
+    rr:subjectMap [ rr:template "http://nf-osi.github.com/terms#investigator/{investigatorId}" ; rr:termType rr:IRI ] ;
     rr:predicateObjectMap [ rr:predicate rdf:type ; rr:objectMap [ rr:constant nf:Investigator ; rr:termType rr:IRI ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:investigatorName ; rr:objectMap [ rml:reference "investigatorName" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:institution ; rr:objectMap [ rml:reference "institution" ; rr:datatype xsd:string ] ] ;
-    rr:predicateObjectMap [ rr:predicate nf:orcid ; rr:objectMap [ rml:reference "orcid" ; rr:termType rr:IRI ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:orcid ; rr:objectMap [ rr:template "https://orcid.org/{orcid}" ; rr:termType rr:IRI ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:investigatorSynapseId ; rr:objectMap [ rr:template "https://www.synapse.org/Profile:{investigatorSynapseId}" ; rr:termType rr:IRI ] ] .
 
 ################################################################################
@@ -49,10 +49,10 @@ map:InvestigatorCore a rr:TriplesMap ;
 map:ResourceHasInvestigator a rr:TriplesMap ;
     rdfs:label "Resource Has Investigator" ;
     rml:logicalSource map:DevelopmentInvestigatorSource ;
-    rr:subjectMap [ rml:reference "resourceId" ; rr:termType rr:IRI ] ;
+    rr:subjectMap [ rr:template "http://nf-osi.github.com/terms#resource/{resourceId}" ; rr:termType rr:IRI ] ;
     rr:predicateObjectMap [
         rr:predicate nf:hasInvestigator ;
-        rr:objectMap [ rml:reference "investigatorId" ; rr:termType rr:IRI ]
+        rr:objectMap [ rr:template "http://nf-osi.github.com/terms#investigator/{investigatorId}" ; rr:termType rr:IRI ]
     ] .
 
 ################################################################################
@@ -62,10 +62,10 @@ map:ResourceHasInvestigator a rr:TriplesMap ;
 map:PublicationHasInvestigator a rr:TriplesMap ;
     rdfs:label "Publication Has Investigator" ;
     rml:logicalSource map:DevelopmentInvestigatorSource ;
-    rr:subjectMap [ rml:reference "publicationId" ; rr:termType rr:IRI ] ;
+    rr:subjectMap [ rr:template "http://nf-osi.github.com/terms#publication/{publicationId}" ; rr:termType rr:IRI ] ;
     rr:predicateObjectMap [
         rr:predicate nf:hasInvestigator ;
-        rr:objectMap [ rml:reference "investigatorId" ; rr:termType rr:IRI ]
+        rr:objectMap [ rr:template "http://nf-osi.github.com/terms#investigator/{investigatorId}" ; rr:termType rr:IRI ]
     ] .
 
 ################################################################################
@@ -75,8 +75,8 @@ map:PublicationHasInvestigator a rr:TriplesMap ;
 map:FunderHasInvestigator a rr:TriplesMap ;
     rdfs:label "Funder Has Investigator" ;
     rml:logicalSource map:DevelopmentInvestigatorSource ;
-    rr:subjectMap [ rml:reference "funderId" ; rr:termType rr:IRI ] ;
+    rr:subjectMap [ rr:template "http://nf-osi.github.com/terms#funder/{funderId}" ; rr:termType rr:IRI ] ;
     rr:predicateObjectMap [
         rr:predicate nf:hasInvestigator ;
-        rr:objectMap [ rml:reference "investigatorId" ; rr:termType rr:IRI ]
+        rr:objectMap [ rr:template "http://nf-osi.github.com/terms#investigator/{investigatorId}" ; rr:termType rr:IRI ]
     ] .

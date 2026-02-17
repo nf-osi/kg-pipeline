@@ -21,7 +21,7 @@ map:PortalMutationAnimalModelSource a rml:LogicalSource ;
 map:AnimalModelHasMutation a rr:TriplesMap ;
     rdfs:label "Animal Model Has Mutation" ;
     rml:logicalSource map:PortalMutationAnimalModelSource ;
-    rr:subjectMap [ rml:reference "resourceId" ; rr:termType rr:IRI ] ;
+    rr:subjectMap [ rr:template "http://nf-osi.github.com/terms#resource/{resourceId}" ; rr:termType rr:IRI ] ;
     rr:predicateObjectMap [
         rr:predicate nf:hasMutation ;
         rr:objectMap [
