@@ -54,7 +54,7 @@ def rml_runner(project_paths):
 
     Usage:
         graph = rml_runner(
-            mapping_file="portal_mutations.rml.ttl",
+            mapping_file="mutations.rml.ttl",
             csv_replacements={"data/csv/mutations.csv": "test/mutations.csv"}
         )
     """

@@ -37,7 +37,7 @@ class TestCellLinesCore:
 
 
 class TestCellLineCategoryType:
-    """Test rdf:type subclass from cellLineCategoryIRI"""
+    """Test rdf:type subclass from cellLineClass"""
 
     def test_cancer_cell_line_type(self, cell_lines_graph, namespaces):
         """Cancer cell line should have rdf:type nf:CancerCellLine"""

@@ -2,7 +2,7 @@
 """Classify cell lines by mapping cellLineCategory to subclass IRIs.
 
 Reads the cell_lines CSV and the SSSOM lookup, then adds a
-cellLineCategoryIRI column with resolved class IRIs.
+cellLineClass column with resolved class IRIs.
 Runs after prepare_portal_tables.py and before RML mapping.
 
 Usage:
@@ -94,7 +94,7 @@ def main(argv: list[str] | None = None) -> int:
             else:
                 class_counts["(unclassified)"] += 1
 
-            row["cellLineCategoryIRI"] = category_iri
+            row["cellLineClass"] = category_iri
             rows.append(row)
 
     print(f"\nClassification results ({len(rows)} cell lines):")
@@ -109,7 +109,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.check_only:
         return 0
 
-    out_fieldnames = list(fieldnames) + ["cellLineCategoryIRI"]
+    out_fieldnames = list(fieldnames) + ["cellLineClass"]
     args.output.parent.mkdir(parents=True, exist_ok=True)
     with open(args.output, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=out_fieldnames, quoting=csv.QUOTE_MINIMAL)

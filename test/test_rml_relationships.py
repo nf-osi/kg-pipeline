@@ -2,8 +2,8 @@
 Tests for relationship RML mappings
 
 Tests mappings that create relationships between entities:
-- portal_mutation_animal_model.rml.ttl
-- portal_mutation_cell_line.rml.ttl
+- mutation_animal_model.rml.ttl
+- mutation_cell_line.rml.ttl
 - donor_tool.rml.ttl
 """
 
@@ -19,7 +19,7 @@ class TestMutationAnimalModelRelationship:
     def mutation_animal_model_graph(self, rml_runner):
         """Load mutation-animal model relationship graph"""
         return rml_runner(
-            mapping_file="portal_mutation_animal_model.rml.ttl",
+            mapping_file="mutation_animal_model.rml.ttl",
             csv_replacements={
                 "data/csv/mutation_animal_model.csv": "test/mutation_animal_model.csv"
             }
@@ -101,7 +101,7 @@ class TestMutationCellLineRelationship:
     def mutation_cell_line_graph(self, rml_runner):
         """Load mutation-cell line relationship graph"""
         return rml_runner(
-            mapping_file="portal_mutation_cell_line.rml.ttl",
+            mapping_file="mutation_cell_line.rml.ttl",
             csv_replacements={
                 "data/csv/mutation_cell_line.csv": "test/mutation_cell_line.csv"
             }
@@ -247,14 +247,14 @@ class TestRelationshipConsistency:
 
         # Load both graphs
         animal_graph = rml_runner(
-            mapping_file="portal_mutation_animal_model.rml.ttl",
+            mapping_file="mutation_animal_model.rml.ttl",
             csv_replacements={
                 "data/csv/mutation_animal_model.csv": "test/mutation_animal_model.csv"
             }
         )
 
         cell_graph = rml_runner(
-            mapping_file="portal_mutation_cell_line.rml.ttl",
+            mapping_file="mutation_cell_line.rml.ttl",
             csv_replacements={
                 "data/csv/mutation_cell_line.csv": "test/mutation_cell_line.csv"
             }
@@ -277,8 +277,8 @@ class TestRelationshipConsistency:
     def test_no_literal_object_in_relationships(self, rml_runner):
         """All relationship objects should be IRIs, not literals"""
         mapping_files = [
-            ("portal_mutation_animal_model.rml.ttl", "mutation_animal_model.csv"),
-            ("portal_mutation_cell_line.rml.ttl", "mutation_cell_line.csv"),
+            ("mutation_animal_model.rml.ttl", "mutation_animal_model.csv"),
+            ("mutation_cell_line.rml.ttl", "mutation_cell_line.csv"),
             ("donor_tool.rml.ttl", "donor_tool.csv"),
         ]
 

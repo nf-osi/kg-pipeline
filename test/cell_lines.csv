@@ -1,4 +1,4 @@
-cellLineId,donorId,originYear,organ,strProfile,tissue,cellLineManifestation,resistance,cellLineCategory,contaminatedMisidentified,cellLineGeneticDisorder,populationDoublingTime,cellLineCategoryIRI
+cellLineId,donorId,originYear,organ,strProfile,tissue,cellLineManifestation,resistance,cellLineCategory,contaminatedMisidentified,cellLineGeneticDisorder,populationDoublingTime,cellLineClass
 test-cell-001,test-donor-001,2015,Brain,STR-12345,Nerve,Plexiform Neurofibroma|Malignant Peripheral Nerve Sheath Tumor,Cisplatin,Cancer cell line,No,Neurofibromatosis type 1,24,http://nf-osi.github.com/terms#CancerCellLine
 test-cell-002,test-donor-002,2018,Skin,,Schwann cell,Schwannoma,None,Induced pluripotent stem cell,No,Neurofibromatosis type 2,48,http://nf-osi.github.com/terms#InducedPluripotentStemCellLine
 test-cell-003,,2020,Peripheral nerve,STR-67890,Neurofibroma,,Doxorubicin|Paclitaxel,Finite cell line,Yes,,36,http://nf-osi.github.com/terms#FiniteCellLine

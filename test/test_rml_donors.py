@@ -1,7 +1,7 @@
 """
 Tests for Donors RML mapping
 
-Tests the portal_donors.rml.ttl mapping against test/donors.csv
+Tests the donors.rml.ttl mapping against test/donors.csv
 """
 
 import pytest
@@ -13,7 +13,7 @@ from rdflib.namespace import RDF
 def donors_graph(rml_runner, namespaces):
     """Load donors RDF graph from test data"""
     graph = rml_runner(
-        mapping_file="portal_donors.rml.ttl",
+        mapping_file="donors.rml.ttl",
         csv_replacements={"data/csv/donors.csv": "test/donors.csv"}
     )
     return graph

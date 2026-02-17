@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Classify genetic reagents by mapping vectorType to subclass IRIs.
 
-Reads the genetic reagents CSV and adds a vectorTypeClass column with resolved
-class IRIs. Runs after prepare_portal_tables.py and before RML mapping.
+Reads the genetic reagents CSV and the SSSOM lookup, then adds a
+reagentClass column with resolved class IRIs. Runs after
+prepare_portal_tables.py and before RML mapping.
 
 Usage:
     python scripts/classify_genetic_reagents.py
@@ -17,36 +18,25 @@ import sys
 from collections import Counter
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from scripts.classify_datatypes import build_label_to_iri
+
 DEFAULT_INPUT = Path("data/csv/genetic_reagents.csv")
 DEFAULT_OUTPUT = Path("data/csv/genetic_reagents_harmonized.csv")
-
-NF_NS = "http://nf-osi.github.com/terms#"
-
-VECTOR_TYPE_TO_CLASS: dict[str, str] = {
-    "Bacterial Expression": "BacterialExpressionVector",
-    "CRISPR": "CRISPRReagent",
-    "Gateway Entry Clone": "GatewayEntryClone",
-    "Lentiviral": "LentiviralVector",
-    "Mammalian Expression": "MammalianExpressionVector",
-    "Mouse Targeting": "MouseTargetingVector",
-    "RNAi": "RNAiReagent",
-    "Transfer Vector": "TransferVector",
-    "Transposon Vector": "TransposonVector",
-    "Yeast Expression": "YeastExpressionVector",
-}
+DEFAULT_LOOKUP = Path("mappings/sssom/reagent_type_lookup.sssom.tsv")
 
 
-def classify_vector_type(vector_type: str) -> str:
+def classify_vector_type(vector_type: str, lookup: dict[str, str]) -> str:
     """Resolve a pipe-delimited vectorType to pipe-delimited class IRIs."""
     if not vector_type:
         return ""
 
-    parts = [p.strip() for p in vector_type.split("|")]
     iris = []
-    for part in parts:
-        cls = VECTOR_TYPE_TO_CLASS.get(part)
-        if cls:
-            iris.append(f"{NF_NS}{cls}")
+    for part in vector_type.split("|"):
+        part = part.strip()
+        iri = lookup.get(part.lower())
+        if iri:
+            iris.append(iri)
     return "|".join(iris)
 
 
@@ -68,6 +58,12 @@ def main(argv: list[str] | None = None) -> int:
         help=f"Output harmonized CSV (default: {DEFAULT_OUTPUT})",
     )
     parser.add_argument(
+        "--lookup",
+        type=Path,
+        default=DEFAULT_LOOKUP,
+        help=f"SSSOM lookup TSV (default: {DEFAULT_LOOKUP})",
+    )
+    parser.add_argument(
         "--check-only",
         action="store_true",
         help="Report stats without writing output",
@@ -77,6 +73,12 @@ def main(argv: list[str] | None = None) -> int:
     if not args.input.exists():
         print(f"Error: input file not found: {args.input}", file=sys.stderr)
         return 1
+    if not args.lookup.exists():
+        print(f"Error: lookup file not found: {args.lookup}", file=sys.stderr)
+        return 1
+
+    lookup = build_label_to_iri(args.lookup)
+    print(f"Loaded {len(lookup)} reagent-type-to-IRI entries from {args.lookup}")
 
     rows = []
     class_counts: Counter[str] = Counter()
@@ -87,12 +89,12 @@ def main(argv: list[str] | None = None) -> int:
         fieldnames = reader.fieldnames
         for row in reader:
             vector_type = row.get("vectorType", "").strip()
-            vector_class = classify_vector_type(vector_type)
+            vector_class = classify_vector_type(vector_type, lookup)
 
             if vector_type and not vector_class:
                 for part in vector_type.split("|"):
                     part = part.strip()
-                    if part and part not in VECTOR_TYPE_TO_CLASS:
+                    if part and not lookup.get(part.lower()):
                         unmapped[part] += 1
 
             if vector_class:
@@ -101,12 +103,12 @@ def main(argv: list[str] | None = None) -> int:
             else:
                 class_counts["(unclassified)"] += 1
 
-            row["vectorTypeClass"] = vector_class
+            row["reagentClass"] = vector_class
             rows.append(row)
 
     print(f"Classification results ({len(rows)} genetic reagents):")
     for cls, count in class_counts.most_common():
-        print(f"  {cls:30s}: {count}")
+        print(f"  {cls:60s}: {count}")
 
     if unmapped:
         print(f"\nUnmapped vectorType values ({len(unmapped)} unique):")
@@ -116,7 +118,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.check_only:
         return 0
 
-    out_fieldnames = list(fieldnames) + ["vectorTypeClass"]
+    out_fieldnames = list(fieldnames) + ["reagentClass"]
     args.output.parent.mkdir(parents=True, exist_ok=True)
     with open(args.output, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=out_fieldnames, quoting=csv.QUOTE_MINIMAL)

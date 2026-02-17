@@ -1,7 +1,7 @@
 """
 Tests for Antibodies RML mapping
 
-Tests the portal_antibodies.rml.ttl mapping against test/antibodies.csv
+Tests the antibodies.rml.ttl mapping against test/antibodies.csv
 """
 
 import pytest
@@ -13,7 +13,7 @@ from rdflib.namespace import RDF
 def antibodies_graph(rml_runner, namespaces):
     """Load antibodies RDF graph from test data"""
     graph = rml_runner(
-        mapping_file="portal_antibodies.rml.ttl",
+        mapping_file="antibodies.rml.ttl",
         csv_replacements={"data/csv/antibodies.csv": "test/antibodies.csv"}
     )
     return graph

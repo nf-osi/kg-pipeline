@@ -1,7 +1,7 @@
 """
 Tests for Animal Models RML mapping
 
-Tests the portal_animal_models.rml.ttl mapping against test/animal_models.csv
+Tests the animal_models.rml.ttl mapping against test/animal_models.csv
 """
 
 import pytest
@@ -13,7 +13,7 @@ from rdflib.namespace import RDF
 def animal_models_graph(rml_runner, namespaces):
     """Load animal models RDF graph from test data"""
     graph = rml_runner(
-        mapping_file="portal_animal_models.rml.ttl",
+        mapping_file="animal_models.rml.ttl",
         csv_replacements={"data/csv/animal_models.csv": "test/animal_models.csv"}
     )
     return graph

@@ -98,7 +98,7 @@ def test_entity_has_correct_type(self, entity_graph, namespaces):
 def my_graph(rml_runner, namespaces):
     """Load specific graph for tests"""
     return rml_runner(
-        mapping_file="portal_entity.rml.ttl",
+        mapping_file="entity.rml.ttl",
         csv_replacements={"data/csv/entity.csv": "test/entity.csv"}
     )
 
