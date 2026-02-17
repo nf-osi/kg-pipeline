@@ -9,9 +9,9 @@ labels to class IRIs using nf1/nf2_genotype_lookup.sssom.tsv.
 Runs after prepare_portal_tables.py and before RML mapping.
 
 Usage:
-    python scripts/link_model_systems.py
-    python scripts/link_model_systems.py --files data/csv/files.csv --resources data/csv/resources.csv
-    python scripts/link_model_systems.py --check-only
+    python scripts/harmonize_files.py
+    python scripts/harmonize_files.py --files data/csv/files.csv --resources data/csv/resources.csv
+    python scripts/harmonize_files.py --check-only
 """
 
 from __future__ import annotations
