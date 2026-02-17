@@ -67,7 +67,7 @@ modelSystemName as modelSystemName
 """
 
 PORTAL_MUTATIONS_SELECT = """
-mutationDetailsId as mutationDetailsId,
+mutationId as mutationId,
 humanClinVarMutation as humanClinVarMutation,
 alleleType as alleleType,
 affectedGeneSymbol as affectedGeneSymbol,
@@ -326,7 +326,7 @@ TABLES: Dict[str, Dict[str, Any]] = {
         "raw_filename": "mutations_raw.csv",
         "select_clause": PORTAL_MUTATIONS_SELECT,
         "columns": [
-            {"target": "mutationDetailsId", "source": "mutationDetailsId", "type": "iri"},
+            {"target": "mutationId", "source": "mutationId", "type": "iri"},
             {"target": "humanClinVarMutation", "source": "humanClinVarMutation", "type": "text+", "transform": "string_list"},
             {"target": "alleleType", "source": "alleleType", "type": "text+", "transform": "string_list"},
             {"target": "affectedGeneSymbol", "source": "affectedGeneSymbol", "type": "text"},
@@ -593,6 +593,16 @@ def ensure_list(value: Any) -> List[Any]:
     if isinstance(value, str):
         if not value.strip():
             return []
+        # Handle Python list repr strings from Synapse (e.g. "['val1', 'val2']")
+        s = value.strip()
+        if s.startswith("[") and s.endswith("]"):
+            import ast
+            try:
+                parsed = ast.literal_eval(s)
+                if isinstance(parsed, list):
+                    return [str(v) for v in parsed]
+            except (ValueError, SyntaxError):
+                pass
         # Normalize commas to pipes so both separators are handled uniformly
         normalized = value.replace(",", "|")
         return [part.strip() for part in normalized.split("|") if part.strip()]

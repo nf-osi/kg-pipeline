@@ -73,7 +73,7 @@ TABLE_CONFIGS["observations"].harmonize_args = [
 ]
 
 # Configure harmonization for files (link modelSystemName to entity IRIs + dataType to IRIs)
-TABLE_CONFIGS["files"].harmonize_script = "scripts/link_model_systems.py"
+TABLE_CONFIGS["files"].harmonize_script = "scripts/harmonize_files.py"
 TABLE_CONFIGS["files"].harmonize_output = Path("data/csv/files_harmonized.csv")
 TABLE_CONFIGS["files"].harmonize_args = [
     "--files", "data/csv/files.csv",
@@ -99,6 +99,7 @@ TABLE_CONFIGS["genetic_reagents"].harmonize_output = Path("data/csv/genetic_reag
 TABLE_CONFIGS["genetic_reagents"].harmonize_args = [
     "--input", "data/csv/genetic_reagents.csv",
     "--output", "data/csv/genetic_reagents_harmonized.csv",
+    "--lookup", "mappings/sssom/reagent_type_lookup.sssom.tsv",
 ]
 
 # Configure harmonization for mutations (mutationType to subclass IRIs)
@@ -107,4 +108,5 @@ TABLE_CONFIGS["mutations"].harmonize_output = Path("data/csv/mutations_harmonize
 TABLE_CONFIGS["mutations"].harmonize_args = [
     "--input", "data/csv/mutations.csv",
     "--output", "data/csv/mutations_harmonized.csv",
+    "--lookup", "mappings/sssom/mutation_type_lookup.sssom.tsv",
 ]
