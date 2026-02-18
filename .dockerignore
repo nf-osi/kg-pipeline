@@ -1,0 +1,11 @@
+# Ignore everything except what we explicitly need
+*
+
+# Include all final RDF files
+!data/rdf/*.ttl
+
+# Exclude RML intermediate files
+data/rdf/*.rml.ttl
+
+# Include ontology
+!schema/ontology.ttl

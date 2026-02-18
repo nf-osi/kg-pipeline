@@ -1,0 +1,37 @@
+# QLever SPARQL endpoint for the NF knowledge graph.
+#
+# Usage:
+#   docker compose run --rm qlever-index   # build index (one-shot)
+#   docker compose up qlever-server        # start SPARQL endpoint on :7001
+#   ./scripts/test_sparql.sh               # verify with test queries
+#
+# To rebuild after data changes, remove the volume first:
+#   docker compose down -v
+#   docker compose run --rm qlever-index
+
+volumes:
+  qlever-index:
+
+services:
+  qlever-index:
+    image: adfreiburg/qlever
+    entrypoint: ["/bin/bash", "-c"]
+    command:
+      - |
+        sudo chown qlever:qlever /index &&
+        cat /input/schema/ontology.ttl \
+            $(ls /input/rdf/*.ttl | grep -v '\.rml\.ttl$$') \
+          | qlever-index -F ttl -f - -i /index/kg --parse-parallel false
+    volumes:
+      - ./data/rdf:/input/rdf:ro
+      - ./schema:/input/schema:ro
+      - qlever-index:/index
+
+  qlever-server:
+    image: adfreiburg/qlever
+    entrypoint: ["qlever-server"]
+    command: ["-i", "/index/kg", "-p", "7001"]
+    ports:
+      - "7001:7001"
+    volumes:
+      - qlever-index:/index:ro
