@@ -16,34 +16,52 @@ profiles:
     tables:
       studies:
         synapse_id: syn52694652
+        concrete_type: MaterializedView
       files:
         synapse_id: syn16858331
+        concrete_type: EntityView
       mutations:
         synapse_id: syn26486835
+        concrete_type: TableEntity
       genetic_reagents:
         synapse_id: syn26486832
+        concrete_type: TableEntity
       animal_models:
         synapse_id: syn26486808
+        concrete_type: TableEntity
       cell_lines:
         synapse_id: syn26486823
+        concrete_type: TableEntity
       donors:
         synapse_id: syn26486829
+        concrete_type: TableEntity
       antibodies:
         synapse_id: syn26486811
+        concrete_type: TableEntity
       resources:
         synapse_id: syn26450069
+        concrete_type: TableEntity
       observations:
         synapse_id: syn26486836
+        concrete_type: TableEntity
       development_funder:
         synapse_id: syn51734076
+        concrete_type: MaterializedView
       development_investigator:
         synapse_id: syn51734029
+        concrete_type: MaterializedView
+      development_publication:
+        synapse_id: syn51735467
+        concrete_type: MaterializedView
       donor_tool:
         synapse_id: syn51735419
-      mutation_animal_model:
-        synapse_id: syn51750819
-      mutation_cell_line:
-        synapse_id: syn51735479
+        concrete_type: MaterializedView
+      mutation_model:
+        synapse_id: syn26486834
+        concrete_type: TableEntity
+      biobanks:
+        synapse_id: syn26486821
+        concrete_type: TableEntity
   evaluation:
     version: KG v0.1-eval
     date: '2025-02-10'
@@ -61,31 +79,49 @@ profiles:
     tables:
       studies:
         synapse_id: syn52694652
+        concrete_type: MaterializedView
       files:
         synapse_id: syn16858331
+        concrete_type: EntityView
       mutations:
         synapse_id: syn26486835
+        concrete_type: TableEntity
       genetic_reagents:
         synapse_id: syn26486832
+        concrete_type: TableEntity
       animal_models:
         synapse_id: syn26486808
+        concrete_type: TableEntity
       cell_lines:
         synapse_id: syn26486823
+        concrete_type: TableEntity
       donors:
         synapse_id: syn26486829
+        concrete_type: TableEntity
       antibodies:
         synapse_id: syn26486811
+        concrete_type: TableEntity
       resources:
         synapse_id: syn26450069
+        concrete_type: TableEntity
       observations:
         synapse_id: syn26486836
+        concrete_type: TableEntity
       development_funder:
         synapse_id: syn51734076
+        concrete_type: MaterializedView
       development_investigator:
         synapse_id: syn51734029
+        concrete_type: MaterializedView
+      development_publication:
+        synapse_id: syn51735467
+        concrete_type: MaterializedView
       donor_tool:
         synapse_id: syn51735419
-      mutation_animal_model:
-        synapse_id: syn51750819
-      mutation_cell_line:
-        synapse_id: syn51735479
+        concrete_type: MaterializedView
+      mutation_model:
+        synapse_id: syn26486834
+        concrete_type: TableEntity
+      biobanks:
+        synapse_id: syn26486821
+        concrete_type: TableEntity

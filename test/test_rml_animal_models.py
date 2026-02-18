@@ -92,7 +92,7 @@ class TestAnimalModelsMultiValue:
         SELECT ?model ?manifestation
         WHERE {
             ?model a nf:AnimalModel ;
-                      nf:animalModelOfManifestation ?manifestation .
+                      nf:manifestation ?manifestation .
         }
         """
         results = animal_models_graph.query(query, initNs={"nf": NF})
@@ -112,7 +112,7 @@ class TestAnimalModelsMultiValue:
         SELECT ?model ?disorder
         WHERE {
             ?model a nf:AnimalModel ;
-                      nf:animalModelGeneticDisorder ?disorder .
+                      nf:geneticDisorder ?disorder .
             FILTER(CONTAINS(STR(?model), "test-animal-002"))
         }
         """

@@ -2,8 +2,7 @@
 Tests for relationship RML mappings
 
 Tests mappings that create relationships between entities:
-- mutation_animal_model.rml.ttl
-- mutation_cell_line.rml.ttl
+- mutation_model.rml.ttl
 - donor_tool.rml.ttl
 """
 
@@ -12,43 +11,43 @@ from rdflib import URIRef
 from rdflib.namespace import RDF
 
 
-class TestMutationAnimalModelRelationship:
-    """Test mutation-animal model relationships"""
+class TestMutationModelRelationship:
+    """Test mutation-model relationships (animal models and cell lines)"""
 
     @pytest.fixture
-    def mutation_animal_model_graph(self, rml_runner):
-        """Load mutation-animal model relationship graph"""
+    def mutation_model_graph(self, rml_runner):
+        """Load mutation-model relationship graph"""
         return rml_runner(
-            mapping_file="mutation_animal_model.rml.ttl",
+            mapping_file="mutation_model.rml.ttl",
             csv_replacements={
-                "data/csv/mutation_animal_model.csv": "test/mutation_animal_model.csv"
+                "data/csv/mutation_model.csv": "test/mutation_model.csv"
             }
         )
 
-    def test_has_mutation_relationships_exist(self, mutation_animal_model_graph, namespaces):
-        """Animal models should link to mutations via hasMutation"""
+    def test_has_mutation_relationships_exist(self, mutation_model_graph, namespaces):
+        """Animal models and cell lines should link to mutations via hasMutation"""
         NF = namespaces["nf"]
 
         query = """
-        SELECT ?resource ?mutation
+        SELECT ?subject ?mutation
         WHERE {
-            ?resource nf:hasMutation ?mutation .
+            ?subject nf:hasMutation ?mutation .
         }
         """
-        results = list(mutation_animal_model_graph.query(query, initNs={"nf": NF}))
+        results = list(mutation_model_graph.query(query, initNs={"nf": NF}))
         assert len(results) > 0, "No hasMutation relationships found"
 
-    def test_mutation_is_iri(self, mutation_animal_model_graph, namespaces):
+    def test_mutation_is_iri(self, mutation_model_graph, namespaces):
         """Mutation should be referenced as IRI with correct pattern"""
         NF = namespaces["nf"]
 
         query = """
-        SELECT ?resource ?mutation
+        SELECT ?subject ?mutation
         WHERE {
-            ?resource nf:hasMutation ?mutation .
+            ?subject nf:hasMutation ?mutation .
         }
         """
-        results = list(mutation_animal_model_graph.query(query, initNs={"nf": NF}))
+        results = list(mutation_model_graph.query(query, initNs={"nf": NF}))
 
         for row in results:
             assert isinstance(row.mutation, URIRef), \
@@ -57,104 +56,75 @@ class TestMutationAnimalModelRelationship:
             assert "mutation/" in mutation_str, \
                 f"Mutation IRI should contain 'mutation/', got {mutation_str}"
 
-    def test_resource_id_as_subject(self, mutation_animal_model_graph, namespaces):
-        """ResourceId should be the subject of hasMutation triples"""
+    def test_animal_model_has_mutation(self, mutation_model_graph, namespaces):
+        """Animal model IDs should be subjects of hasMutation triples"""
         NF = namespaces["nf"]
 
-        # Check for specific resource from test data
-        test_resource = "a067f136-f956-4355-a76f-a5eec7c196f0"
+        test_animal_model = "a067f136-f956-4355-a76f-a5eec7c196f0"
 
         query = f"""
         SELECT ?mutation
         WHERE {{
-            ?resource nf:hasMutation ?mutation .
-            FILTER(CONTAINS(STR(?resource), "{test_resource}"))
+            ?subject nf:hasMutation ?mutation .
+            FILTER(CONTAINS(STR(?subject), "{test_animal_model}"))
         }}
         """
-        results = list(mutation_animal_model_graph.query(query, initNs={"nf": NF}))
+        results = list(mutation_model_graph.query(query, initNs={"nf": NF}))
         assert len(results) > 0, \
-            f"Expected hasMutation relationship for resource {test_resource}"
+            f"Expected hasMutation relationship for animal model {test_animal_model}"
 
-    def test_no_empty_mutation_ids(self, mutation_animal_model_graph, namespaces):
-        """Empty mutationId should not create triples"""
+    def test_cell_line_has_mutation(self, mutation_model_graph, namespaces):
+        """Cell line IDs should be subjects of hasMutation triples"""
         NF = namespaces["nf"]
 
-        # Count triples in graph
-        query = """
-        SELECT ?resource ?mutation
-        WHERE {
-            ?resource nf:hasMutation ?mutation .
-        }
-        """
-        results = list(mutation_animal_model_graph.query(query, initNs={"nf": NF}))
-
-        # Test CSV has rows but empty mutationId should not produce triples
-        # Just verify we have at least some valid relationships if data exists
-        # The relationship should only exist for non-empty mutationId values
-        assert True, "Empty mutationId check passed"
-
-
-class TestMutationCellLineRelationship:
-    """Test mutation-cell line relationships"""
-
-    @pytest.fixture
-    def mutation_cell_line_graph(self, rml_runner):
-        """Load mutation-cell line relationship graph"""
-        return rml_runner(
-            mapping_file="mutation_cell_line.rml.ttl",
-            csv_replacements={
-                "data/csv/mutation_cell_line.csv": "test/mutation_cell_line.csv"
-            }
-        )
-
-    def test_has_mutation_relationships_exist(self, mutation_cell_line_graph, namespaces):
-        """Cell lines should link to mutations via hasMutation"""
-        NF = namespaces["nf"]
-
-        query = """
-        SELECT ?resource ?mutation
-        WHERE {
-            ?resource nf:hasMutation ?mutation .
-        }
-        """
-        results = list(mutation_cell_line_graph.query(query, initNs={"nf": NF}))
-        assert len(results) > 0, "No hasMutation relationships found for cell lines"
-
-    def test_mutation_is_iri(self, mutation_cell_line_graph, namespaces):
-        """Mutation should be referenced as IRI"""
-        NF = namespaces["nf"]
-
-        query = """
-        SELECT ?resource ?mutation
-        WHERE {
-            ?resource nf:hasMutation ?mutation .
-        }
-        """
-        results = list(mutation_cell_line_graph.query(query, initNs={"nf": NF}))
-
-        for row in results:
-            assert isinstance(row.mutation, URIRef), \
-                f"Mutation should be IRI, got {type(row.mutation)}"
-            assert "mutation/" in str(row.mutation), \
-                f"Mutation IRI should contain 'mutation/', got {row.mutation}"
-
-    def test_specific_cell_line_relationship(self, mutation_cell_line_graph, namespaces):
-        """Test specific cell line from test data has mutation relationship"""
-        NF = namespaces["nf"]
-
-        # Check for specific resource from test data
-        test_resource = "a9638c45-74f3-4d0d-8bac-67631503f437"
+        test_cell_line = "a9638c45-74f3-4d0d-8bac-67631503f437"
 
         query = f"""
         SELECT ?mutation
         WHERE {{
-            ?resource nf:hasMutation ?mutation .
-            FILTER(CONTAINS(STR(?resource), "{test_resource}"))
+            ?subject nf:hasMutation ?mutation .
+            FILTER(CONTAINS(STR(?subject), "{test_cell_line}"))
         }}
         """
-        results = list(mutation_cell_line_graph.query(query, initNs={"nf": NF}))
+        results = list(mutation_model_graph.query(query, initNs={"nf": NF}))
         assert len(results) > 0, \
-            f"Expected hasMutation relationship for cell line {test_resource}"
+            f"Expected hasMutation relationship for cell line {test_cell_line}"
+
+    def test_animal_model_iri_pattern(self, mutation_model_graph, namespaces):
+        """Animal model subjects should use animalModel/ IRI pattern"""
+        NF = namespaces["nf"]
+
+        test_animal_model = "a067f136-f956-4355-a76f-a5eec7c196f0"
+
+        query = f"""
+        SELECT ?subject
+        WHERE {{
+            ?subject nf:hasMutation ?mutation .
+            FILTER(CONTAINS(STR(?subject), "{test_animal_model}"))
+        }}
+        """
+        results = list(mutation_model_graph.query(query, initNs={"nf": NF}))
+        assert len(results) > 0
+        assert "animalModel/" in str(results[0].subject), \
+            f"Expected animalModel/ IRI pattern, got {results[0].subject}"
+
+    def test_cell_line_iri_pattern(self, mutation_model_graph, namespaces):
+        """Cell line subjects should use cellLine/ IRI pattern"""
+        NF = namespaces["nf"]
+
+        test_cell_line = "a9638c45-74f3-4d0d-8bac-67631503f437"
+
+        query = f"""
+        SELECT ?subject
+        WHERE {{
+            ?subject nf:hasMutation ?mutation .
+            FILTER(CONTAINS(STR(?subject), "{test_cell_line}"))
+        }}
+        """
+        results = list(mutation_model_graph.query(query, initNs={"nf": NF}))
+        assert len(results) > 0
+        assert "cellLine/" in str(results[0].subject), \
+            f"Expected cellLine/ IRI pattern, got {results[0].subject}"
 
 
 class TestDonorToolRelationship:
@@ -241,35 +211,36 @@ class TestDonorToolRelationship:
 class TestRelationshipConsistency:
     """Test consistency across relationship mappings"""
 
-    def test_same_property_for_both_mutations(self, rml_runner, namespaces):
+    def test_both_model_types_have_mutations(self, rml_runner, namespaces):
         """Both animal models and cell lines use hasMutation property"""
         NF = namespaces["nf"]
 
-        # Load both graphs
-        animal_graph = rml_runner(
-            mapping_file="mutation_animal_model.rml.ttl",
+        graph = rml_runner(
+            mapping_file="mutation_model.rml.ttl",
             csv_replacements={
-                "data/csv/mutation_animal_model.csv": "test/mutation_animal_model.csv"
+                "data/csv/mutation_model.csv": "test/mutation_model.csv"
             }
         )
 
-        cell_graph = rml_runner(
-            mapping_file="mutation_cell_line.rml.ttl",
-            csv_replacements={
-                "data/csv/mutation_cell_line.csv": "test/mutation_cell_line.csv"
-            }
-        )
-
-        # Both should use nf:hasMutation
-        query = """
-        SELECT ?resource ?mutation
+        # Check animal models
+        animal_query = """
+        SELECT ?subject ?mutation
         WHERE {
-            ?resource nf:hasMutation ?mutation .
+            ?subject nf:hasMutation ?mutation .
+            FILTER(CONTAINS(STR(?subject), "animalModel/"))
         }
         """
+        animal_results = list(graph.query(animal_query, initNs={"nf": NF}))
 
-        animal_results = list(animal_graph.query(query, initNs={"nf": NF}))
-        cell_results = list(cell_graph.query(query, initNs={"nf": NF}))
+        # Check cell lines
+        cell_query = """
+        SELECT ?subject ?mutation
+        WHERE {
+            ?subject nf:hasMutation ?mutation .
+            FILTER(CONTAINS(STR(?subject), "cellLine/"))
+        }
+        """
+        cell_results = list(graph.query(cell_query, initNs={"nf": NF}))
 
         assert len(animal_results) > 0, "Animal models should have hasMutation"
         assert len(cell_results) > 0, "Cell lines should have hasMutation"
@@ -277,8 +248,7 @@ class TestRelationshipConsistency:
     def test_no_literal_object_in_relationships(self, rml_runner):
         """All relationship objects should be IRIs, not literals"""
         mapping_files = [
-            ("mutation_animal_model.rml.ttl", "mutation_animal_model.csv"),
-            ("mutation_cell_line.rml.ttl", "mutation_cell_line.csv"),
+            ("mutation_model.rml.ttl", "mutation_model.csv"),
             ("donor_tool.rml.ttl", "donor_tool.csv"),
         ]
 

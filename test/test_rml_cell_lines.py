@@ -137,7 +137,7 @@ class TestCellLinesMultiValue:
         SELECT ?cellLine ?manifestation
         WHERE {
             ?cellLine a nf:CellLine ;
-                      nf:cellLineManifestation ?manifestation .
+                      nf:manifestation ?manifestation .
         }
         """
         results = cell_lines_graph.query(query, initNs={"nf": NF})
@@ -157,7 +157,7 @@ class TestCellLinesMultiValue:
         SELECT ?cellLine ?disorder
         WHERE {
             ?cellLine a nf:CellLine ;
-                      nf:cellLineGeneticDisorder ?disorder .
+                      nf:geneticDisorder ?disorder .
             FILTER(CONTAINS(STR(?cellLine), "test-cell-001"))
         }
         """

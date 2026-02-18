@@ -40,7 +40,7 @@ class TestDevelopmentFunder:
         SELECT ?funder ?name
         WHERE {
             ?funder a nf:Funder ;
-                    nf:funderName ?name .
+                    nf:name ?name .
         }
         """
         results = list(funder_graph.query(query, initNs={"nf": NF}))
@@ -122,7 +122,7 @@ class TestDevelopmentInvestigator:
         SELECT ?investigator ?name
         WHERE {
             ?investigator a nf:Investigator ;
-                         nf:investigatorName ?name .
+                         nf:name ?name .
         }
         """
         results = list(investigator_graph.query(query, initNs={"nf": NF}))

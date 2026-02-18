@@ -2,8 +2,8 @@
 """Download portal tables from Synapse and emit raw + processed CSV exports.
 
 The raw files are untouched Synapse exports for archival/debugging, while the
-processed CSVs normalize IDs, flatten to pipe-delimited lists, and coerce numeric
-columns so downstream mapping jobs see consistent values. The SELECT clauses are
+processed CSVs flatten to pipe-delimited lists, coerce numeric
+columns so downstream mapping jobs see consistent values, etc. The SELECT clauses are
 defined as constants so column order and naming stay stable even if the upstream
 Synapse schemas evolve."""
 
@@ -18,8 +18,9 @@ from typing import Any, Dict, List, Optional
 import numpy as np
 import pandas as pd
 import synapseclient
+import yaml
 
-PORTAL_STUDIES_SELECT = """
+STUDIES_SELECT = """
 studyId as studyId,
 studyName as studyName,
 summary as summary,
@@ -39,7 +40,7 @@ studyFileviewId as studyFileviewId,
 grantDOI as grantDOI
 """
 
-PORTAL_FILES_SELECT = """
+FILES_SELECT = """
 id as id,
 name as name,
 studyId as studyId,
@@ -66,8 +67,9 @@ experimentalCondition as experimentalCondition,
 modelSystemName as modelSystemName
 """
 
-PORTAL_MUTATIONS_SELECT = """
-mutationId as mutationId,
+# MUST USE mutationDetailsId as mutationId
+MUTATIONS_SELECT = """
+mutationDetailsId as mutationId,
 humanClinVarMutation as humanClinVarMutation,
 alleleType as alleleType,
 affectedGeneSymbol as affectedGeneSymbol,
@@ -81,7 +83,7 @@ animalModelMutation as animalModelMutation,
 mutationType as mutationType
 """
 
-PORTAL_GENETIC_REAGENTS_SELECT = """
+GENETIC_REAGENTS_SELECT = """
 geneticReagentId as geneticReagentId,
 vectorType as vectorType,
 insertEntrezId as insertEntrezId,
@@ -110,7 +112,7 @@ gRNAshRNASequence as gRNAshRNASequence,
 hazardous as hazardous
 """
 
-PORTAL_ANIMAL_MODELS_SELECT = """
+ANIMAL_MODELS_SELECT = """
 animalModelId as animalModelId,
 donorId as donorId,
 transplantationDonorId as transplantationDonorId,
@@ -124,7 +126,7 @@ animalState as animalState,
 generation as generation
 """
 
-PORTAL_CELL_LINES_SELECT = """
+CELL_LINES_SELECT = """
 cellLineId as cellLineId,
 donorId as donorId,
 originYear as originYear,
@@ -139,7 +141,7 @@ cellLineGeneticDisorder as cellLineGeneticDisorder,
 populationDoublingTime as populationDoublingTime
 """
 
-PORTAL_DONORS_SELECT = """
+DONORS_SELECT = """
 donorId as donorId,
 parentDonorId as parentDonorId,
 species as species,
@@ -149,7 +151,7 @@ age as age,
 transplantationDonorId as transplantationDonorId
 """
 
-PORTAL_ANTIBODIES_SELECT = """
+ANTIBODIES_SELECT = """
 antibodyId as antibodyId,
 uniprotId as uniprotId,
 cloneId as cloneId,
@@ -180,19 +182,45 @@ orcid as orcid,
 investigatorName as investigatorName
 """
 
+DEVELOPMENT_PUBLICATION_SELECT = """
+publicationId as publicationId,
+developmentId as developmentId,
+resourceId as resourceId,
+doi as doi,
+citation as citation,
+publicationTitle as publicationTitle,
+abstract as abstract,
+publicationDate as publicationDate,
+publicationDateUnix as publicationDateUnix,
+journal as journal,
+pmid as pmid,
+authors as authors
+"""
+
 DONOR_TOOL_SELECT = """
 donorId as donorId,
 resourceId as resourceId
 """
 
-MUTATION_ANIMAL_MODEL_SELECT = """
+MUTATION_MODEL_SELECT = """
 mutationId as mutationId,
-resourceId as resourceId
+mutationDetailsId as mutationDetailsId,
+animalModelId as animalModelId,
+cellLineId as cellLineId
 """
 
-MUTATION_CELL_LINE_SELECT = """
-mutationId as mutationId,
-resourceId as resourceId
+BIOBANKS_SELECT = """
+biobankId as biobankId,
+resourceId as resourceId,
+diseaseType as diseaseType,
+biobankURL as biobankURL,
+biobankName as biobankName,
+specimenPreparationMethod as specimenPreparationMethod,
+specimenType as specimenType,
+tumorType as tumorType,
+specimenFormat as specimenFormat,
+specimenTissueType as specimenTissueType,
+contact as contact
 """
 
 OBSERVATIONS_SELECT = """
@@ -243,9 +271,10 @@ TABLE_ALIASES = {
     "observation": "observations",
     "dev_funder": "development_funder",
     "dev_investigator": "development_investigator",
+    "dev_publication": "development_publication",
     "donor_tool": "donor_tool",
-    "mutation_animal": "mutation_animal_model",
-    "mutation_cell": "mutation_cell_line",
+    "mutation_model": "mutation_model",
+    "biobank": "biobanks",
 }
 
 TABLES: Dict[str, Dict[str, Any]] = {
@@ -253,7 +282,7 @@ TABLES: Dict[str, Dict[str, Any]] = {
         "synapse_id": "syn52694652",
         "csv_path": Path("data/csv/studies.csv"),
         "raw_filename": "studies_raw.csv",
-        "select_clause": PORTAL_STUDIES_SELECT,
+        "select_clause": STUDIES_SELECT,
         "columns": [
             {"target": "studyId", "source": "studyId", "type": "iri", "transform": "synapse_id"},
             {"target": "studyName", "source": "studyName", "type": "text"},
@@ -282,7 +311,7 @@ TABLES: Dict[str, Dict[str, Any]] = {
         "synapse_id": "syn16858331",
         "csv_path": Path("data/csv/files.csv"),
         "raw_filename": "files_raw.csv",
-        "select_clause": PORTAL_FILES_SELECT,
+        "select_clause": FILES_SELECT,
         "columns": [
             {"target": "id", "source": "id", "type": "iri", "transform": "synapse_id"},
             {"target": "name", "source": "name", "type": "text"},
@@ -324,7 +353,7 @@ TABLES: Dict[str, Dict[str, Any]] = {
         "synapse_id": "syn26486835",
         "csv_path": Path("data/csv/mutations.csv"),
         "raw_filename": "mutations_raw.csv",
-        "select_clause": PORTAL_MUTATIONS_SELECT,
+        "select_clause": MUTATIONS_SELECT,
         "columns": [
             {"target": "mutationId", "source": "mutationId", "type": "iri"},
             {"target": "humanClinVarMutation", "source": "humanClinVarMutation", "type": "text+", "transform": "string_list"},
@@ -344,7 +373,7 @@ TABLES: Dict[str, Dict[str, Any]] = {
         "synapse_id": "syn26486832",
         "csv_path": Path("data/csv/genetic_reagents.csv"),
         "raw_filename": "genetic_reagents_raw.csv",
-        "select_clause": PORTAL_GENETIC_REAGENTS_SELECT,
+        "select_clause": GENETIC_REAGENTS_SELECT,
         "columns": [
             {"target": "geneticReagentId", "source": "geneticReagentId", "type": "iri"},
             {"target": "vectorType", "source": "vectorType", "type": "text+", "transform": "string_list"},
@@ -378,7 +407,7 @@ TABLES: Dict[str, Dict[str, Any]] = {
         "synapse_id": "syn26486808",
         "csv_path": Path("data/csv/animal_models.csv"),
         "raw_filename": "animal_models_raw.csv",
-        "select_clause": PORTAL_ANIMAL_MODELS_SELECT,
+        "select_clause": ANIMAL_MODELS_SELECT,
         "columns": [
             {"target": "animalModelId", "source": "animalModelId", "type": "iri"},
             {"target": "donorId", "source": "donorId", "type": "iri"},
@@ -397,7 +426,7 @@ TABLES: Dict[str, Dict[str, Any]] = {
         "synapse_id": "syn26486823",
         "csv_path": Path("data/csv/cell_lines.csv"),
         "raw_filename": "cell_lines_raw.csv",
-        "select_clause": PORTAL_CELL_LINES_SELECT,
+        "select_clause": CELL_LINES_SELECT,
         "columns": [
             {"target": "cellLineId", "source": "cellLineId", "type": "iri"},
             {"target": "donorId", "source": "donorId", "type": "iri"},
@@ -417,7 +446,7 @@ TABLES: Dict[str, Dict[str, Any]] = {
         "synapse_id": "syn26486829",
         "csv_path": Path("data/csv/donors.csv"),
         "raw_filename": "donors_raw.csv",
-        "select_clause": PORTAL_DONORS_SELECT,
+        "select_clause": DONORS_SELECT,
         "columns": [
             {"target": "donorId", "source": "donorId", "type": "iri"},
             {"target": "parentDonorId", "source": "parentDonorId", "type": "iri"},
@@ -432,7 +461,7 @@ TABLES: Dict[str, Dict[str, Any]] = {
         "synapse_id": "syn26486811",
         "csv_path": Path("data/csv/antibodies.csv"),
         "raw_filename": "antibodies_raw.csv",
-        "select_clause": PORTAL_ANTIBODIES_SELECT,
+        "select_clause": ANTIBODIES_SELECT,
         "columns": [
             {"target": "antibodyId", "source": "antibodyId", "type": "iri"},
             {"target": "uniprotId", "source": "uniprotId", "type": "iri"},
@@ -518,6 +547,26 @@ TABLES: Dict[str, Dict[str, Any]] = {
             {"target": "investigatorName", "source": "investigatorName", "type": "text"},
         ],
     },
+    "development_publication": {
+        "synapse_id": "syn51735467",
+        "csv_path": Path("data/csv/development_publication.csv"),
+        "raw_filename": "development_publication_raw.csv",
+        "select_clause": DEVELOPMENT_PUBLICATION_SELECT,
+        "columns": [
+            {"target": "publicationId", "source": "publicationId", "type": "iri"},
+            {"target": "developmentId", "source": "developmentId", "type": "iri"},
+            {"target": "resourceId", "source": "resourceId", "type": "iri"},
+            {"target": "doi", "source": "doi", "type": "iri"},
+            {"target": "citation", "source": "citation", "type": "text"},
+            {"target": "publicationTitle", "source": "publicationTitle", "type": "text"},
+            {"target": "abstract", "source": "abstract", "type": "text"},
+            {"target": "publicationDate", "source": "publicationDate", "type": "text"},
+            {"target": "publicationDateUnix", "source": "publicationDateUnix", "type": "text"},
+            {"target": "journal", "source": "journal", "type": "text"},
+            {"target": "pmid", "source": "pmid", "type": "iri"},
+            {"target": "authors", "source": "authors", "type": "text+", "transform": "string_list"},
+        ],
+    },
     "donor_tool": {
         "synapse_id": "syn51735419",
         "csv_path": Path("data/csv/donor_tool.csv"),
@@ -528,24 +577,35 @@ TABLES: Dict[str, Dict[str, Any]] = {
             {"target": "resourceId", "source": "resourceId", "type": "iri"},
         ],
     },
-    "mutation_animal_model": {
-        "synapse_id": "syn51750819",
-        "csv_path": Path("data/csv/mutation_animal_model.csv"),
-        "raw_filename": "mutation_animal_model_raw.csv",
-        "select_clause": MUTATION_ANIMAL_MODEL_SELECT,
+    "mutation_model": {
+        "synapse_id": "syn26486834",
+        "csv_path": Path("data/csv/mutation_model.csv"),
+        "raw_filename": "mutation_model_raw.csv",
+        "select_clause": MUTATION_MODEL_SELECT,
         "columns": [
             {"target": "mutationId", "source": "mutationId", "type": "iri"},
-            {"target": "resourceId", "source": "resourceId", "type": "iri"},
+            {"target": "mutationDetailsId", "source": "mutationDetailsId", "type": "iri"},
+            {"target": "animalModelId", "source": "animalModelId", "type": "iri"},
+            {"target": "cellLineId", "source": "cellLineId", "type": "iri"},
         ],
     },
-    "mutation_cell_line": {
-        "synapse_id": "syn51735479",
-        "csv_path": Path("data/csv/mutation_cell_line.csv"),
-        "raw_filename": "mutation_cell_line_raw.csv",
-        "select_clause": MUTATION_CELL_LINE_SELECT,
+    "biobanks": {
+        "synapse_id": "syn26486821",
+        "csv_path": Path("data/csv/biobanks.csv"),
+        "raw_filename": "biobanks_raw.csv",
+        "select_clause": BIOBANKS_SELECT,
         "columns": [
-            {"target": "mutationId", "source": "mutationId", "type": "iri"},
+            {"target": "biobankId", "source": "biobankId", "type": "iri"},
             {"target": "resourceId", "source": "resourceId", "type": "iri"},
+            {"target": "diseaseType", "source": "diseaseType", "type": "text+", "transform": "string_list"},
+            {"target": "biobankURL", "source": "biobankURL", "type": "iri"},
+            {"target": "biobankName", "source": "biobankName", "type": "text"},
+            {"target": "specimenPreparationMethod", "source": "specimenPreparationMethod", "type": "text+", "transform": "string_list"},
+            {"target": "specimenType", "source": "specimenType", "type": "text+", "transform": "string_list"},
+            {"target": "tumorType", "source": "tumorType", "type": "text+", "transform": "string_list"},
+            {"target": "specimenFormat", "source": "specimenFormat", "type": "text+", "transform": "string_list"},
+            {"target": "specimenTissueType", "source": "specimenTissueType", "type": "text+", "transform": "string_list"},
+            {"target": "contact", "source": "contact", "type": "text"},
         ],
     },
 }
@@ -763,12 +823,55 @@ def _find_raw_csv(raw_dir: Path, raw_filename: str) -> Optional[Path]:
     return None
 
 
+def check_config(config_path: Path) -> int:
+    """Verify that TABLES and data_sources.yaml agree on names and Synapse IDs."""
+    with config_path.open() as f:
+        config = yaml.safe_load(f)
+
+    errors: List[str] = []
+    for profile_name, profile in config.get("profiles", {}).items():
+        ds_tables = profile.get("tables", {})
+        ds_names = set(ds_tables.keys())
+        local_names = set(TABLES.keys())
+
+        only_ds = sorted(ds_names - local_names)
+        only_local = sorted(local_names - ds_names)
+        if only_ds:
+            errors.append(
+                f"[{profile_name}] in data_sources.yaml but not in TABLES: "
+                + ", ".join(only_ds)
+            )
+        if only_local:
+            errors.append(
+                f"[{profile_name}] in TABLES but not in data_sources.yaml: "
+                + ", ".join(only_local)
+            )
+
+        for name in sorted(ds_names & local_names):
+            ds_id = ds_tables[name]["synapse_id"]
+            local_id = TABLES[name]["synapse_id"]
+            if ds_id != local_id:
+                errors.append(
+                    f"[{profile_name}] {name}: synapse_id mismatch "
+                    f"(data_sources={ds_id}, TABLES={local_id})"
+                )
+
+    if errors:
+        print("Config check FAILED:", file=sys.stderr)
+        for e in errors:
+            print(f"  {e}", file=sys.stderr)
+        return 1
+
+    print(f"Config check passed: {len(TABLES)} tables consistent with {config_path}")
+    return 0
+
+
 def main(argv: List[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         description=__doc__,
         epilog="Table names: study, file, mutation, reagent, animal, cell, donor, antibody, "
-               "resource, observation, dev_funder, dev_investigator, donor_tool, "
-               "mutation_animal, mutation_cell"
+               "resource, observation, dev_funder, dev_investigator, dev_publication, "
+               "donor_tool, mutation_model, biobank"
     )
     parser.add_argument(
         "tables",
@@ -787,7 +890,18 @@ def main(argv: List[str] | None = None) -> int:
         action="store_true",
         help="Re-process from cached raw CSVs in --raw-dir instead of fetching from Synapse.",
     )
+    parser.add_argument(
+        "--check-config",
+        type=Path,
+        nargs="?",
+        const=Path("data_sources.yaml"),
+        metavar="PATH",
+        help="Check that TABLES matches data_sources.yaml (default path) and exit.",
+    )
     args = parser.parse_args(argv)
+
+    if args.check_config is not None:
+        return check_config(args.check_config)
 
     # Resolve table names (handle aliases)
     if args.tables:
