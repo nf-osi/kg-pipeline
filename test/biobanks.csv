@@ -1,0 +1,4 @@
+biobankId,resourceId,diseaseType,biobankURL,biobankName,specimenPreparationMethod,specimenType,tumorType,specimenFormat,specimenTissueType,contact
+test-bb-001,test-res-001,Neurofibromatosis type 1,https://example.org/biobank1,Test Biobank One,Flash frozen|FFPE,cell lines|human tissue,malignant peripheral nerve sheath tumor|plexiform neurofibroma,whole tumor|DNA,Tumor|Blood,
+test-bb-002,test-res-002,Neurofibromatosis type 1|Schwannomatosis,https://example.org/biobank2,Test Biobank Two,Cryopreserved,human tissue,schwannoma,RNA|whole tumor|DNA,Tumor|Brain,
+test-bb-003,test-res-003,Neurofibromatosis type 1,https://example.org/biobank3,Test Biobank Three,Cryopreserved|FFPE|Flash frozen,cell lines|human tissue,neurofibroma NOS,DNA|RNA|cells,Blood|Skin|Tumor,test-contact@example.org
