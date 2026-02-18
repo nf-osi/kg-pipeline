@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
-"""Create versioned CSV archives from data/csv and update data_sources.yaml.
+"""Fetch raw Synapse tables, archive them, and update data_sources.yaml.
 
-This script creates tar.gz archives from existing CSV files in data/csv, uploads
-them to a Synapse folder, and updates data_sources.yaml with the archive metadata.
+This script queries each table in the chosen profile via ``SELECT * FROM
+<synapse_id>``, saves the raw CSVs to data/raw/, creates a tar.gz archive,
+uploads it to a Synapse folder, and updates data_sources.yaml with the
+archive metadata.
 
 Prerequisites:
-    1. Run prepare_portal_tables.py first to generate CSV files in data/csv
-    2. Set SYNAPSE_AUTH_TOKEN environment variable:
+    Set SYNAPSE_AUTH_TOKEN environment variable:
         export SYNAPSE_AUTH_TOKEN='your-synapse-token'
 
 Usage:
@@ -16,6 +17,7 @@ Usage:
     python scripts/create_archive.py --profile release --comment "Test" --dry-run
 
 Output:
+    Saves raw CSVs to data/raw/
     Creates a file like: csv-release-20250210.tar.gz
     Uploads to Synapse folder (default: syn73695288)
     Updates data_sources.yaml with archive metadata
@@ -67,54 +69,78 @@ def save_version_config(config_path: Path, config: Dict[str, Any]) -> None:
         )
 
 
+def fetch_raw_tables(
+    syn: synapseclient.Synapse,
+    tables: Dict[str, Dict[str, Any]],
+    raw_dir: Path,
+) -> Dict[str, int]:
+    """Query each Synapse table and save the raw CSV to *raw_dir*.
+
+    Args:
+        syn: Authenticated Synapse client
+        tables: ``{name: {synapse_id: ..., ...}}`` from the profile config
+        raw_dir: Directory to write raw CSVs into
+
+    Returns:
+        ``{table_name: row_count}``
+    """
+    raw_dir.mkdir(parents=True, exist_ok=True)
+    table_counts: Dict[str, int] = {}
+
+    for table_name, table_info in tables.items():
+        synapse_id = table_info["synapse_id"]
+        print(f"  Fetching {table_name} ({synapse_id})...", end=" ", flush=True)
+        result = syn.tableQuery(f"SELECT * FROM {synapse_id}")
+        df = result.asDataFrame()
+        row_count = len(df)
+        csv_path = raw_dir / f"{table_name}.csv"
+        df.to_csv(csv_path, index=False)
+        table_counts[table_name] = row_count
+        print(f"{row_count} rows", flush=True)
+
+    return table_counts
+
+
+def count_raw_tables(
+    tables: Dict[str, Dict[str, Any]],
+    raw_dir: Path,
+) -> Dict[str, int]:
+    """Count rows in existing raw CSVs without fetching from Synapse.
+
+    Raises:
+        FileNotFoundError: If any expected CSV is missing from *raw_dir*.
+    """
+    missing = [n for n in tables if not (raw_dir / f"{n}.csv").exists()]
+    if missing:
+        raise FileNotFoundError(
+            f"Missing CSVs in {raw_dir}: {', '.join(missing)}"
+        )
+
+    table_counts: Dict[str, int] = {}
+    for table_name in tables:
+        csv_path = raw_dir / f"{table_name}.csv"
+        with csv_path.open() as f:
+            row_count = sum(1 for _ in f) - 1  # exclude header
+        table_counts[table_name] = row_count
+        print(f"  {table_name}.csv: {row_count} rows", flush=True)
+    return table_counts
+
+
 def create_csv_archive(
     tables: Dict[str, Dict[str, Any]],
     profile: str,
-    comment: str,
-    csv_dir: Path = Path("data/csv"),
-) -> tuple[Path, Dict[str, int]]:
-    """Create compressed archive from existing CSV files in data/csv.
+    raw_dir: Path,
+) -> Path:
+    """Create a compressed archive from raw CSVs in *raw_dir*.
 
     Args:
         tables: Dictionary of table configurations
         profile: Profile name for naming the archive
-        comment: Version comment
-        csv_dir: Directory containing CSV files (default: data/csv)
+        raw_dir: Directory containing the raw CSV files
 
     Returns:
-        Tuple of (archive_path, table_row_counts)
-
-    Raises:
-        FileNotFoundError: If any expected CSV file is missing
+        Path to the created tar.gz archive
     """
-    # Check that all expected CSV files exist
-    missing_files = []
-    for table_name in tables.keys():
-        csv_path = csv_dir / f"{table_name}.csv"
-        if not csv_path.exists():
-            missing_files.append(f"{table_name}.csv")
-
-    if missing_files:
-        raise FileNotFoundError(
-            f"Missing CSV files in {csv_dir}: {', '.join(missing_files)}\n"
-            f"Run prepare_portal_tables.py first to generate CSV files."
-        )
-
-    print(f"Verifying CSV files in {csv_dir}...", flush=True)
-
-    table_counts = {}
-
-    # Count rows in each CSV
-    for table_name in tables.keys():
-        csv_path = csv_dir / f"{table_name}.csv"
-
-        # Count rows (excluding header)
-        with csv_path.open() as f:
-            row_count = sum(1 for _ in f) - 1
-        table_counts[table_name] = row_count
-        print(f"  ✓ {table_name}.csv: {row_count} rows", flush=True)
-
-    # Create archive filename with date
     date = datetime.now().strftime("%Y%m%d")
     archive_name = f"csv-{profile}-{date}.tar.gz"
     archive_path = Path(tempfile.gettempdir()) / archive_name
@@ -122,12 +148,11 @@ def create_csv_archive(
     print(f"\nCreating archive {archive_name}...", flush=True)
     with tarfile.open(archive_path, "w:gz") as tar:
         for table_name in tables.keys():
-            csv_path = csv_dir / f"{table_name}.csv"
+            csv_path = raw_dir / f"{table_name}.csv"
             tar.add(csv_path, arcname=csv_path.name)
 
-    print(f"  ✓ Archive created: {archive_path}", flush=True)
-
-    return archive_path, table_counts
+    print(f"  Archive created: {archive_path}", flush=True)
+    return archive_path
 
 
 def upload_archive_to_synapse(
@@ -178,9 +203,10 @@ def version_profile_tables(
     comment: str,
     archive_folder_id: str,
     table_subset: Optional[List[str]] = None,
-    csv_dir: Path = Path("data/csv"),
+    raw_dir: Path = Path("data/raw"),
+    from_cache: bool = False,
 ) -> tuple[str, int, Dict[str, int]]:
-    """Create CSV archive from data/csv and upload to Synapse.
+    """Fetch raw tables from Synapse (or use cached CSVs), archive, and upload.
 
     Args:
         syn: Authenticated Synapse client
@@ -189,7 +215,8 @@ def version_profile_tables(
         comment: Version comment for the archive
         archive_folder_id: Synapse folder ID to upload archive to
         table_subset: Optional list of specific table names to include
-        csv_dir: Directory containing CSV files (default: data/csv)
+        raw_dir: Directory to save raw CSVs (default: data/raw)
+        from_cache: If True, skip fetching and use existing CSVs in raw_dir
 
     Returns:
         Tuple of (archive_synapse_id, archive_version, table_row_counts)
@@ -206,11 +233,16 @@ def version_profile_tables(
         if not tables:
             raise ValueError(f"None of the specified tables found in profile '{profile}'")
 
-    print(f"Archiving {len(tables)} CSV files from {csv_dir}...\n", flush=True)
-
     try:
-        # Create archive from existing CSV files
-        archive_path, table_counts = create_csv_archive(tables, profile, comment, csv_dir)
+        if from_cache:
+            print(f"Using cached CSVs from {raw_dir}...\n", flush=True)
+            table_counts = count_raw_tables(tables, raw_dir)
+        else:
+            print(f"Fetching {len(tables)} tables from Synapse...\n", flush=True)
+            table_counts = fetch_raw_tables(syn, tables, raw_dir)
+
+        # Create archive from raw CSVs
+        archive_path = create_csv_archive(tables, profile, raw_dir)
 
         # Upload to Synapse
         archive_id, archive_version = upload_archive_to_synapse(
@@ -289,6 +321,17 @@ def main(argv: List[str] | None = None) -> int:
         help="Path to data_sources.yaml (default: data_sources.yaml)",
     )
     parser.add_argument(
+        "--raw-dir",
+        type=Path,
+        default=Path("data/raw"),
+        help="Directory to save raw CSVs (default: data/raw)",
+    )
+    parser.add_argument(
+        "--from-cache",
+        action="store_true",
+        help="Archive and upload existing CSVs in --raw-dir instead of fetching from Synapse",
+    )
+    parser.add_argument(
         "--archive-folder",
         type=str,
         default="syn73695288",
@@ -360,10 +403,11 @@ def main(argv: List[str] | None = None) -> int:
     syn.login(authToken=auth_token, silent=True)
     print("Authenticated successfully.\n", flush=True)
 
-    # Create archive from CSV files and upload
+    # Fetch (or use cached), archive, and upload
     try:
         archive_id, archive_version, table_counts = version_profile_tables(
-            syn, config, args.profile, args.comment, args.archive_folder, table_subset
+            syn, config, args.profile, args.comment, args.archive_folder,
+            table_subset, args.raw_dir, args.from_cache,
         )
     except Exception as e:
         print(f"\nError creating archive: {e}", file=sys.stderr)
