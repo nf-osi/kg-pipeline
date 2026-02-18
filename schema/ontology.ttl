@@ -8,8 +8,8 @@
 @prefix prov:  <http://www.w3.org/ns/prov#> .
 
 
-nf:ReferenceOntology a owl:Ontology ;
-    rdfs:label "NF Reference Ontology" ;
+nf:KGOntology a owl:Ontology ;
+    rdfs:label "NF KG Ontology" ;
     rdfs:comment "Ontology documenting classes and properties in the NF-OSI KG." .
 
 ################################################################################
@@ -507,7 +507,7 @@ nf:specimenID a owl:DatatypeProperty ;
 
 nf:tumorType a owl:DatatypeProperty ;
     rdfs:label "tumorType" ;
-    rdfs:comment "Tumor type of the biospecimen." ;
+    rdfs:comment "Tumor type of the source biospecimen." ;
     rdfs:range xsd:string .
 
 ################################################################################
@@ -531,7 +531,7 @@ nf:studyStatus a owl:DatatypeProperty ;
 
 nf:dataStatus a owl:DatatypeProperty ;
     rdfs:label "dataStatus" ;
-    rdfs:comment "Status of the study's data." ;
+    rdfs:comment "Status of the study's data, e.g. 'Under Embargo'." ;
     rdfs:domain nf:Study ;
     rdfs:range xsd:string .
 
@@ -842,11 +842,13 @@ nf:fromDonor a owl:ObjectProperty ;
     rdfs:range nf:Donor ;
     owl:inverseOf nf:hasDerivedResource .
 
-nf:hasDerivedResource a owl:ObjectProperty ;
-    rdfs:label "hasDerivedResource" ;
-    rdfs:comment "Links a donor to resources (cell lines, animal models) derived from it." ;
-    rdfs:domain nf:Donor ;
-    owl:inverseOf nf:fromDonor .
+# Do not use this yet 
+#
+# nf:hasDerivedResource a owl:ObjectProperty ;
+#    rdfs:label "hasDerivedResource" ;
+#    rdfs:comment "Links a donor to resources (cell lines, animal models) derived from it." ;
+#    rdfs:domain nf:Donor ;
+#    owl:inverseOf nf:fromDonor .
 
 # Cell Line
 nf:cellLineId a owl:DatatypeProperty ;
@@ -856,7 +858,6 @@ nf:cellLineId a owl:DatatypeProperty ;
 nf:cellLineCategory a owl:DatatypeProperty ;
     rdfs:domain nf:CellLine ;
     rdfs:range xsd:string .
-
 
 nf:originYear a owl:DatatypeProperty ;
     rdfs:label "originYear" ;
@@ -1063,7 +1064,7 @@ nf:dateModified a owl:DatatypeProperty ;
 
 nf:resourceId a owl:ObjectProperty ;
     rdfs:label "resourceId" ;
-    rdfs:comment "Links to a related resource." ;
+    rdfs:comment "Canonical resource ID." ;
     rdfs:range nf:Tool .
 
 # Funder
