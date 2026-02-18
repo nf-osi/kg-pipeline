@@ -26,17 +26,7 @@ class TableConfig:
 import sys
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from scripts.prepare_portal_tables import (
-    TABLES,
-    PORTAL_STUDIES_SELECT,
-    PORTAL_FILES_SELECT,
-    PORTAL_MUTATIONS_SELECT,
-    PORTAL_GENETIC_REAGENTS_SELECT,
-    PORTAL_ANIMAL_MODELS_SELECT,
-    PORTAL_CELL_LINES_SELECT,
-    PORTAL_DONORS_SELECT,
-    PORTAL_ANTIBODIES_SELECT,
-)
+from scripts.prepare_portal_tables import TABLES
 
 # Build TableConfig objects
 TABLE_CONFIGS: Dict[str, TableConfig] = {}
