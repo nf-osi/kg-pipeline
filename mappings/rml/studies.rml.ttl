@@ -27,7 +27,7 @@ map:StudyCore a rr:TriplesMap ;
     rml:logicalSource map:PortalStudiesSource ;
     rr:subjectMap [ rr:template "https://www.synapse.org/Synapse:{studyId}" ; rr:termType rr:IRI ] ;
     rr:predicateObjectMap [ rr:predicate rdf:type ; rr:objectMap [ rr:constant nf:Study ; rr:termType rr:IRI ] ] ;
-    rr:predicateObjectMap [ rr:predicate nf:studyName ; rr:objectMap [ rml:reference "studyName" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:name ; rr:objectMap [ rml:reference "studyName" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:description ; rr:objectMap [ rml:reference "summary" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [
         rr:predicate nf:initiative ;

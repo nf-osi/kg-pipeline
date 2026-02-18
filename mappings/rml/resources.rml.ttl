@@ -33,8 +33,8 @@ map:ResourceCore a rr:TriplesMap ;
     rr:predicateObjectMap [ rr:predicate nf:description ; rr:objectMap [ rml:reference "description" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:rrid ; rr:objectMap [ rml:reference "rrid" ; rr:termType rr:IRI ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:howToAcquire ; rr:objectMap [ rml:reference "howToAcquire" ; rr:datatype xsd:string ] ] ;
-    rr:predicateObjectMap [ rr:predicate nf:dateAdded ; rr:objectMap [ rml:reference "dateAdded" ; rr:datatype xsd:string ] ] ;
-    rr:predicateObjectMap [ rr:predicate nf:dateModified ; rr:objectMap [ rml:reference "dateModified" ; rr:datatype xsd:string ] ] .
+    rr:predicateObjectMap [ rr:predicate nf:dateAdded ; rr:objectMap [ rml:reference "dateAdded" ; rr:datatype xsd:long ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:dateModified ; rr:objectMap [ rml:reference "dateModified" ; rr:datatype xsd:long ] ] .
 
 ################################################################################
 # Resource list properties (pipe-delimited)
@@ -62,7 +62,7 @@ map:ResourceUsageRequirements a rr:TriplesMap ;
                 ] ;
                 rr:predicateObjectMap [
                     rr:predicate grel:p_string_sep ;
-                    rr:objectMap [ rr:constant "|" ; rr:termType rr:Literal ]
+                    rr:objectMap [ rr:constant "\\|" ; rr:termType rr:Literal ]
                 ]
             ]
         ]
@@ -90,7 +90,7 @@ map:ResourceSynonyms a rr:TriplesMap ;
                 ] ;
                 rr:predicateObjectMap [
                     rr:predicate grel:p_string_sep ;
-                    rr:objectMap [ rr:constant "|" ; rr:termType rr:Literal ]
+                    rr:objectMap [ rr:constant "\\|" ; rr:termType rr:Literal ]
                 ]
             ]
         ]

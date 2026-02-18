@@ -4,14 +4,14 @@
 @prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix nf:   <http://nf-osi.github.com/terms#> .
-@prefix map:  <http://nf-osi.github.com/mappings/portal-mutation-animal-model#> .
+@prefix map:  <http://nf-osi.github.com/mappings/mutation-model#> .
 
 ################################################################################
 # Logical source
 ################################################################################
 
-map:PortalMutationAnimalModelSource a rml:LogicalSource ;
-    rml:source "data/csv/mutation_animal_model.csv" ;
+map:MutationModelSource a rml:LogicalSource ;
+    rml:source "data/csv/mutation_model.csv" ;
     rml:referenceFormulation ql:CSV .
 
 ################################################################################
@@ -20,8 +20,24 @@ map:PortalMutationAnimalModelSource a rml:LogicalSource ;
 
 map:AnimalModelHasMutation a rr:TriplesMap ;
     rdfs:label "Animal Model Has Mutation" ;
-    rml:logicalSource map:PortalMutationAnimalModelSource ;
-    rr:subjectMap [ rr:template "http://nf-osi.github.com/terms#resource/{resourceId}" ; rr:termType rr:IRI ] ;
+    rml:logicalSource map:MutationModelSource ;
+    rr:subjectMap [ rr:template "http://nf-osi.github.com/terms#animalModel/{animalModelId}" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:hasMutation ;
+        rr:objectMap [
+            rr:template "http://nf-osi.github.com/terms#mutation/{mutationId}" ;
+            rr:termType rr:IRI
+        ]
+    ] .
+
+################################################################################
+# Cell Line -> Mutation relationship
+################################################################################
+
+map:CellLineHasMutation a rr:TriplesMap ;
+    rdfs:label "Cell Line Has Mutation" ;
+    rml:logicalSource map:MutationModelSource ;
+    rr:subjectMap [ rr:template "http://nf-osi.github.com/terms#cellLine/{cellLineId}" ; rr:termType rr:IRI ] ;
     rr:predicateObjectMap [
         rr:predicate nf:hasMutation ;
         rr:objectMap [

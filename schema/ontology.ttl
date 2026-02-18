@@ -291,17 +291,22 @@ nf:AnimalModel a owl:Class ;
     rdfs:label "Animal Model" ;
     rdfs:comment "An animal model used in research." .
 
+nf:Biobank a owl:Class ;
+    rdfs:subClassOf nf:Tool ;
+    rdfs:label "Biobank" ;
+    rdfs:comment "A biobank that stores and provides biospecimens for research." .
+
 nf:Development a owl:Class ;
     rdfs:label "Development" ;
-    rdfs:comment "Represents the development context for a resource, including associated funders, investigators, and publications." .
+    rdfs:comment "Development context linking a resource to funders, investigators, and publications." .
 
 nf:Funder a owl:Class ;
     rdfs:label "Funder" ;
-    rdfs:comment "An organization that provides funding for research and development." .
+    rdfs:comment "A funding organization." .
 
 nf:Investigator a owl:Class ;
     rdfs:label "Investigator" ;
-    rdfs:comment "A researcher or investigator involved in the development of a resource." .
+    rdfs:comment "A researcher involved in resource development." .
 
 nf:Publication a owl:Class ;
     rdfs:label "Publication" ;
@@ -387,7 +392,7 @@ nf:assay a owl:DatatypeProperty ;
 
 nf:platform a owl:DatatypeProperty ;
     rdfs:label "platform" ;
-    rdfs:comment "Instrument platform that generated the file, such as sequencer, microscope, spectroscope/plate reader, or other platform." ;
+    rdfs:comment "Instrument platform (e.g. sequencer, microscope, plate reader)." ;
     rdfs:domain nf:File ;
     rdfs:range xsd:string .
 
@@ -403,7 +408,7 @@ nf:dataType a owl:ObjectProperty ;
 
 nf:dataSubtype a owl:DatatypeProperty ;
     rdfs:label "dataSubtype" ;
-    rdfs:comment "Further qualification of dataType, which may be used to indicate the state of processing of the data or aggregation of the data." ;
+    rdfs:comment "Subtype of dataType, e.g. processing state or aggregation level." ;
     rdfs:range xsd:string .
 
 nf:fileFormat a owl:DatatypeProperty ;
@@ -414,19 +419,19 @@ nf:fileFormat a owl:DatatypeProperty ;
 
 nf:individualID a owl:DatatypeProperty ;
     rdfs:label "individualID" ;
-    rdfs:comment "A unique identifier (non-PII) that represents individual(s) from which the data came. This could be a patient or animal ID." ;
+    rdfs:comment "Non-PII identifier for the individual (patient or animal) the data came from." ;
     rdfs:domain nf:File ;
     rdfs:range xsd:string .
 
 nf:nf1Genotype a owl:DatatypeProperty ;
     rdfs:label "nf1Genotype" ;
-    rdfs:comment "Genotype of NF1 gene in the biospecimen from which the data were derived, if known." ;
+    rdfs:comment "NF1 genotype of the source biospecimen." ;
     rdfs:domain nf:File ;
     rdfs:range xsd:string .
 
 nf:nf2Genotype a owl:DatatypeProperty ;
     rdfs:label "nf2Genotype" ;
-    rdfs:comment "Genotype of NF2 gene in the biospecimen from which the data were derived, if known." ;
+    rdfs:comment "NF2 genotype of the source biospecimen." ;
     rdfs:domain nf:File ;
     rdfs:range xsd:string .
 
@@ -496,28 +501,22 @@ nf:diagnosis a owl:DatatypeProperty ;
 
 nf:specimenID a owl:DatatypeProperty ;
     rdfs:label "specimenID" ;
-    rdfs:comment "A unique identifier (non-PII) that represents the specimen from which the data came." ;
+    rdfs:comment "Non-PII identifier for the source specimen." ;
     rdfs:domain nf:File ;
     rdfs:range xsd:string .
 
 nf:tumorType a owl:DatatypeProperty ;
     rdfs:label "tumorType" ;
-    rdfs:comment "The type of tumor that the biospecimen used to generate the data." ;
+    rdfs:comment "Tumor type of the biospecimen." ;
     rdfs:range xsd:string .
 
 ################################################################################
 # Properties - Study related
 ################################################################################
 
-nf:studyName a owl:DatatypeProperty ;
-    rdfs:label "studyName" ;
-    rdfs:comment "The full name of the study." ;
-    rdfs:domain nf:Study ;
-    rdfs:range xsd:string .
-
 nf:description a owl:DatatypeProperty ;
     rdfs:label "description" ;
-    rdfs:comment "A summary or detailed description of a resource." ;
+    rdfs:comment "Description of the resource." ;
     rdfs:range xsd:string .
 
 nf:initiative a owl:ObjectProperty ;
@@ -563,7 +562,7 @@ nf:institutions a owl:DatatypeProperty ;
 
 nf:manifestation a owl:DatatypeProperty ;
     rdfs:label "manifestation" ;
-    rdfs:comment "Disease manifestation associated with a resource." ;
+    rdfs:comment "Disease phenotype modeled or studied by the resource." ;
     rdfs:range xsd:string .
 
 nf:diseaseFocus a owl:DatatypeProperty ;
@@ -764,7 +763,7 @@ nf:humanClinVarMutation a owl:DatatypeProperty ;
 
 nf:externalMutationID a owl:ObjectProperty ;
     rdfs:label "externalMutationID" ;
-    rdfs:comment "IRI linking to an external mutation database entry." ;
+    rdfs:comment "Link to an external mutation database entry." ;
     rdfs:domain nf:Mutation .
 
 nf:sequenceVariation a owl:DatatypeProperty ;
@@ -833,7 +832,7 @@ nf:transplantationDonorId a owl:ObjectProperty ;
 
 nf:parentDonorId a owl:ObjectProperty ;
     rdfs:label "parentDonorId" ;
-    rdfs:comment "Links a donor to its parent donor, used to represent isogenic or derivative relationships between cell lines or animal models." ;
+    rdfs:comment "Parent donor, representing isogenic or derivative lineage." ;
     rdfs:domain nf:Donor ;
     rdfs:range nf:Donor .
 
@@ -858,17 +857,6 @@ nf:cellLineCategory a owl:DatatypeProperty ;
     rdfs:domain nf:CellLine ;
     rdfs:range xsd:string .
 
-nf:cellLineManifestation a owl:DatatypeProperty ;
-    rdfs:label "cellLineManifestation" ;
-    rdfs:comment "Disease manifestation modeled by the cell line." ;
-    rdfs:domain nf:CellLine ;
-    rdfs:range xsd:string .
-
-nf:cellLineGeneticDisorder a owl:DatatypeProperty ;
-    rdfs:label "cellLineGeneticDisorder" ;
-    rdfs:comment "Genetic disorder associated with the cell line." ;
-    rdfs:domain nf:CellLine ;
-    rdfs:range xsd:string .
 
 nf:originYear a owl:DatatypeProperty ;
     rdfs:label "originYear" ;
@@ -878,7 +866,7 @@ nf:originYear a owl:DatatypeProperty ;
 
 nf:strProfile a owl:DatatypeProperty ;
     rdfs:label "strProfile" ;
-    rdfs:comment "Short tandem repeat (STR) authentication profile." ;
+    rdfs:comment "STR authentication profile." ;
     rdfs:domain nf:CellLine ;
     rdfs:range xsd:string .
 
@@ -890,7 +878,7 @@ nf:resistance a owl:DatatypeProperty ;
 
 nf:contaminatedMisidentified a owl:DatatypeProperty ;
     rdfs:label "contaminatedMisidentified" ;
-    rdfs:comment "Whether the cell line is known to be contaminated or misidentified." ;
+    rdfs:comment "Whether the cell line is contaminated or misidentified." ;
     rdfs:domain nf:CellLine ;
     rdfs:range xsd:string .
 
@@ -981,19 +969,61 @@ nf:generation a owl:DatatypeProperty ;
     rdfs:domain nf:AnimalModel ;
     rdfs:range xsd:string .
 
-nf:animalModelOfManifestation a owl:DatatypeProperty ;
-    rdfs:label "animalModelOfManifestation" ;
-    rdfs:comment "Disease manifestation modeled by the animal model." ;
-    rdfs:domain nf:AnimalModel ;
+
+# Biobank
+nf:biobankURL a owl:ObjectProperty ;
+    rdfs:label "biobankURL" ;
+    rdfs:comment "URL of the biobank's website." ;
+    rdfs:domain nf:Biobank .
+
+nf:contact a owl:DatatypeProperty ;
+    rdfs:label "contact" ;
+    rdfs:comment "Contact information for the biobank." ;
+    rdfs:domain nf:Biobank ;
     rdfs:range xsd:string .
 
-nf:animalModelGeneticDisorder a owl:DatatypeProperty ;
-    rdfs:label "animalModelGeneticDisorder" ;
-    rdfs:comment "Genetic disorder associated with the animal model." ;
-    rdfs:domain nf:AnimalModel ;
+nf:hasResource a owl:ObjectProperty ;
+    rdfs:label "hasResource" ;
+    rdfs:comment "Links a biobank to a resource it provides." ;
+    rdfs:domain nf:Biobank ;
+    rdfs:range nf:Tool .
+
+nf:diseaseType a owl:DatatypeProperty ;
+    rdfs:label "diseaseType" ;
+    rdfs:comment "Disease type of the biobank's specimens." ;
+    rdfs:domain nf:Biobank ;
+    rdfs:range xsd:string .
+
+nf:specimenPreparationMethod a owl:DatatypeProperty ;
+    rdfs:label "specimenPreparationMethod" ;
+    rdfs:comment "Method used to prepare specimens (e.g. Flash frozen, FFPE, Cryopreserved)." ;
+    rdfs:domain nf:Biobank ;
+    rdfs:range xsd:string .
+
+nf:specimenType a owl:DatatypeProperty ;
+    rdfs:label "specimenType" ;
+    rdfs:comment "Type of specimen available (e.g. cell lines, human tissue)." ;
+    rdfs:domain nf:Biobank ;
+    rdfs:range xsd:string .
+
+nf:specimenFormat a owl:DatatypeProperty ;
+    rdfs:label "specimenFormat" ;
+    rdfs:comment "Format of the specimen (e.g. DNA, RNA, whole tumor)." ;
+    rdfs:domain nf:Biobank ;
+    rdfs:range xsd:string .
+
+nf:specimenTissueType a owl:DatatypeProperty ;
+    rdfs:label "specimenTissueType" ;
+    rdfs:comment "Type of tissue the specimen is derived from (e.g. Tumor, Blood, Brain)." ;
+    rdfs:domain nf:Biobank ;
     rdfs:range xsd:string .
 
 # Shared properties
+nf:geneticDisorder a owl:DatatypeProperty ;
+    rdfs:label "geneticDisorder" ;
+    rdfs:comment "Genetic disorder associated with the resource." ;
+    rdfs:range xsd:string .
+
 nf:organ a owl:DatatypeProperty ;
     rdfs:domain [ a owl:Class ; owl:unionOf (nf:File nf:CellLine) ] ;
     rdfs:range xsd:string .
@@ -1009,34 +1039,27 @@ nf:usageRequirements a owl:DatatypeProperty ;
 
 nf:synonyms a owl:DatatypeProperty ;
     rdfs:label "synonyms" ;
-    rdfs:comment "Alternative names or synonyms for a resource." ;
+    rdfs:comment "Alternative names for the resource." ;
     rdfs:range xsd:string .
 
 nf:howToAcquire a owl:DatatypeProperty ;
     rdfs:label "howToAcquire" ;
-    rdfs:comment "Information about how to acquire or access a resource." ;
+    rdfs:comment "How to acquire the resource." ;
     rdfs:range xsd:string .
 
 nf:dateAdded a owl:DatatypeProperty ;
     rdfs:label "dateAdded" ;
-    rdfs:comment "Date when a resource was added to the system." ;
+    rdfs:comment "Date the resource was added." ;
     rdfs:range xsd:string .
 
 nf:dateModified a owl:DatatypeProperty ;
     rdfs:label "dateModified" ;
-    rdfs:comment "Date when a resource was last modified." ;
+    rdfs:comment "Date the resource was last modified." ;
     rdfs:range xsd:string .
 
 ################################################################################
 # Properties - Development related
 ################################################################################
-
-# Development
-nf:developmentId a owl:DatatypeProperty ;
-    rdfs:label "developmentId" ;
-    rdfs:comment "A unique identifier for a development record." ;
-    rdfs:domain nf:Development ;
-    rdfs:range xsd:string .
 
 nf:resourceId a owl:ObjectProperty ;
     rdfs:label "resourceId" ;
@@ -1044,37 +1067,13 @@ nf:resourceId a owl:ObjectProperty ;
     rdfs:range nf:Tool .
 
 # Funder
-nf:funderId a owl:DatatypeProperty ;
-    rdfs:label "funderId" ;
-    rdfs:comment "A unique identifier for a funder." ;
-    rdfs:domain nf:Funder ;
-    rdfs:range xsd:string .
-
-nf:funderName a owl:DatatypeProperty ;
-    rdfs:label "funderName" ;
-    rdfs:comment "Name of the funding organization." ;
-    rdfs:domain nf:Funder ;
-    rdfs:range xsd:string .
-
 nf:hasFunder a owl:ObjectProperty ;
     rdfs:label "hasFunder" ;
-    rdfs:comment "Links a resource (File, Study, or Development) to its funding organization." ;
+    rdfs:comment "Links to the funding organization." ;
     rdfs:domain [ a owl:Class ; owl:unionOf (nf:File nf:Study nf:Development) ] ;
     rdfs:range nf:Funder .
 
 # Investigator
-nf:investigatorId a owl:DatatypeProperty ;
-    rdfs:label "investigatorId" ;
-    rdfs:comment "A unique identifier for an investigator." ;
-    rdfs:domain nf:Investigator ;
-    rdfs:range xsd:string .
-
-nf:investigatorName a owl:DatatypeProperty ;
-    rdfs:label "investigatorName" ;
-    rdfs:comment "Name of the investigator." ;
-    rdfs:domain nf:Investigator ;
-    rdfs:range xsd:string .
-
 nf:investigatorSynapseId a owl:DatatypeProperty ;
     rdfs:label "investigatorSynapseId" ;
     rdfs:comment "Synapse user ID of the investigator." ;
@@ -1083,7 +1082,7 @@ nf:investigatorSynapseId a owl:DatatypeProperty ;
 
 nf:institution a owl:DatatypeProperty ;
     rdfs:label "institution" ;
-    rdfs:comment "Institution affiliated with an investigator." ;
+    rdfs:comment "Affiliated institution." ;
     rdfs:domain nf:Investigator ;
     rdfs:range xsd:string .
 
@@ -1100,19 +1099,13 @@ nf:hasInvestigator a owl:ObjectProperty ;
     rdfs:range nf:Investigator .
 
 # Publication
-nf:publicationId a owl:DatatypeProperty ;
-    rdfs:label "publicationId" ;
-    rdfs:comment "A unique identifier for a publication." ;
-    rdfs:domain nf:Publication ;
-    rdfs:range xsd:string .
-
-nf:doi a owl:ObjectPropertys ;
+nf:doi a owl:ObjectProperty ;
     rdfs:label "doi" ;
     rdfs:comment "DOI (Digital Object Identifier) of a resource." .
 
 nf:citation a owl:DatatypeProperty ;
     rdfs:label "citation" ;
-    rdfs:comment "The formatted citation for the publication." ;
+    rdfs:comment "Formatted citation string." ;
     rdfs:domain nf:Publication ;
     rdfs:range xsd:string .
 
@@ -1130,13 +1123,13 @@ nf:abstract a owl:DatatypeProperty ;
 
 nf:publicationDate a owl:DatatypeProperty ;
     rdfs:label "publicationDate" ;
-    rdfs:comment "Publication date as a string." ;
+    rdfs:comment "Publication date." ;
     rdfs:domain nf:Publication ;
     rdfs:range xsd:string .
 
 nf:publicationDateUnix a owl:DatatypeProperty ;
     rdfs:label "publicationDateUnix" ;
-    rdfs:comment "Publication date as a Unix timestamp." ;
+    rdfs:comment "Publication date as Unix timestamp." ;
     rdfs:domain nf:Publication ;
     rdfs:range xsd:string .
 
@@ -1181,7 +1174,7 @@ nf:observationText a owl:DatatypeProperty ;
 
 nf:observationSubmitterName a owl:DatatypeProperty ;
     rdfs:label "observationSubmitterName" ;
-    rdfs:comment "Name of the person who submitted the observation." ;
+    rdfs:comment "Submitter name." ;
     rdfs:domain nf:Observation ;
     rdfs:range xsd:string .
 
@@ -1205,18 +1198,18 @@ nf:observationTimeUnits a owl:DatatypeProperty ;
 
 nf:observationLink a owl:ObjectProperty ;
     rdfs:label "observationLink" ;
-    rdfs:comment "IRI linking to supporting material for the observation." ;
+    rdfs:comment "Link to supporting material." ;
     rdfs:domain nf:Observation .
 
 nf:reliabilityRating a owl:DatatypeProperty ;
     rdfs:label "reliabilityRating" ;
-    rdfs:comment "Reliability rating assigned to the observation." ;
+    rdfs:comment "Reliability rating." ;
     rdfs:domain nf:Observation ;
     rdfs:range xsd:string .
 
 nf:easeOfUseRating a owl:DatatypeProperty ;
     rdfs:label "easeOfUseRating" ;
-    rdfs:comment "Ease-of-use rating for the resource described in the observation." ;
+    rdfs:comment "Ease-of-use rating." ;
     rdfs:domain nf:Observation ;
     rdfs:range xsd:string .
 

@@ -52,7 +52,7 @@ map:AnimalModelManifestation a rr:TriplesMap ;
         rr:termType rr:IRI
     ] ;
     rr:predicateObjectMap [
-        rr:predicate nf:animalModelOfManifestation ;
+        rr:predicate nf:manifestation ;
         rr:objectMap [
             a fnml:FunctionTermMap ;
             rr:datatype xsd:string ;
@@ -83,7 +83,7 @@ map:AnimalModelGeneticDisorder a rr:TriplesMap ;
         rr:termType rr:IRI
     ] ;
     rr:predicateObjectMap [
-        rr:predicate nf:animalModelGeneticDisorder ;
+        rr:predicate nf:geneticDisorder ;
         rr:objectMap [
             a fnml:FunctionTermMap ;
             rr:datatype xsd:string ;

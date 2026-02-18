@@ -54,7 +54,7 @@ map:CellLineManifestation a rr:TriplesMap ;
         rr:termType rr:IRI
     ] ;
     rr:predicateObjectMap [
-        rr:predicate nf:cellLineManifestation ;
+        rr:predicate nf:manifestation ;
         rr:objectMap [
             a fnml:FunctionTermMap ;
             rr:datatype xsd:string ;
@@ -85,7 +85,7 @@ map:CellLineGeneticDisorder a rr:TriplesMap ;
         rr:termType rr:IRI
     ] ;
     rr:predicateObjectMap [
-        rr:predicate nf:cellLineGeneticDisorder ;
+        rr:predicate nf:geneticDisorder ;
         rr:objectMap [
             a fnml:FunctionTermMap ;
             rr:datatype xsd:string ;

@@ -37,7 +37,7 @@ map:FunderCore a rr:TriplesMap ;
     rml:logicalSource map:DevelopmentFunderSource ;
     rr:subjectMap [ rr:template "http://nf-osi.github.com/terms#funder/{funderId}" ; rr:termType rr:IRI ] ;
     rr:predicateObjectMap [ rr:predicate rdf:type ; rr:objectMap [ rr:constant nf:Funder ; rr:termType rr:IRI ] ] ;
-    rr:predicateObjectMap [ rr:predicate nf:funderName ; rr:objectMap [ rml:reference "funderName" ; rr:datatype xsd:string ] ] .
+    rr:predicateObjectMap [ rr:predicate nf:name ; rr:objectMap [ rml:reference "funderName" ; rr:datatype xsd:string ] ] .
 
 ################################################################################
 # Resource -> Funder relationship (via development)

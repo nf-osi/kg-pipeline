@@ -37,7 +37,7 @@ map:InvestigatorCore a rr:TriplesMap ;
     rml:logicalSource map:DevelopmentInvestigatorSource ;
     rr:subjectMap [ rr:template "http://nf-osi.github.com/terms#investigator/{investigatorId}" ; rr:termType rr:IRI ] ;
     rr:predicateObjectMap [ rr:predicate rdf:type ; rr:objectMap [ rr:constant nf:Investigator ; rr:termType rr:IRI ] ] ;
-    rr:predicateObjectMap [ rr:predicate nf:investigatorName ; rr:objectMap [ rml:reference "investigatorName" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:name ; rr:objectMap [ rml:reference "investigatorName" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:institution ; rr:objectMap [ rml:reference "institution" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:orcid ; rr:objectMap [ rr:template "https://orcid.org/{orcid}" ; rr:termType rr:IRI ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:investigatorSynapseId ; rr:objectMap [ rr:template "https://www.synapse.org/Profile:{investigatorSynapseId}" ; rr:termType rr:IRI ] ] .
