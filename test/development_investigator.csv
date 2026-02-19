@@ -1,4 +1,0 @@
-investigatorId,developmentId,resourceId,publicationId,funderId,investigatorSynapseId,institution,orcid,investigatorName
-inv-001,dev-001,test-res-001,pub-001,funder-ntap,syn123456,Johns Hopkins University,0000-0001-2345-6789,John Smith
-inv-002,dev-001,test-res-001,pub-001,funder-ctf,syn234567,Stanford University,0000-0002-3456-7890,Jane Doe
-inv-003,dev-002,test-res-002,pub-002,funder-nih,syn345678,Harvard Medical School,0000-0003-4567-8901,Bob Johnson
