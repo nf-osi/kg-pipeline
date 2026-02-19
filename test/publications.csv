@@ -1,0 +1,3 @@
+publicationId,doi,pmid,abstract,journal,publicationDate,citation,publicationDateUnix,authors,publicationTitle
+pub-001,10.1038/test001,38123456,This is a test abstract about neurofibromatosis research.,Nature Medicine,2024-01-15,Smith et al. 2024,1705276800,John Smith|Jane Doe|Alice Brown,Test Publication on NF1
+pub-002,10.1016/test002,37654321,Another test abstract describing therapeutic approaches.,Cell Reports,2023-06-20,Johnson et al. 2023,1687219200,Bob Johnson|Carol White,Novel Therapeutics for NF2

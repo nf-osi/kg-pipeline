@@ -5,7 +5,7 @@ Tests the biobanks.rml.ttl mapping against test/biobanks.csv
 """
 
 import pytest
-from rdflib import URIRef, Literal
+from rdflib import URIRef, Literal, Namespace
 from rdflib.namespace import RDF
 
 
@@ -68,22 +68,23 @@ class TestBiobanksCore:
             assert isinstance(row.url, URIRef), \
                 f"biobankURL should be IRI, got {type(row.url)}"
 
-    def test_has_resource_is_iri(self, biobanks_graph, namespaces):
-        """hasResource should link to a resource IRI"""
+    def test_same_as_resource_is_iri(self, biobanks_graph, namespaces):
+        """owl:sameAs should link to a resource IRI"""
         NF = namespaces["nf"]
+        OWL = Namespace("http://www.w3.org/2002/07/owl#")
 
         query = """
         SELECT ?biobank ?resource
         WHERE {
             ?biobank a nf:Biobank ;
-                     nf:hasResource ?resource .
+                     owl:sameAs ?resource .
         }
         """
-        results = list(biobanks_graph.query(query, initNs={"nf": NF}))
-        assert len(results) > 0, "No hasResource relationships found"
+        results = list(biobanks_graph.query(query, initNs={"nf": NF, "owl": OWL}))
+        assert len(results) > 0, "No owl:sameAs relationships found"
         for row in results:
             assert isinstance(row.resource, URIRef), \
-                f"hasResource should be IRI, got {type(row.resource)}"
+                f"owl:sameAs should be IRI, got {type(row.resource)}"
             assert "resource/" in str(row.resource), \
                 f"Expected resource/ IRI pattern, got {row.resource}"
 

@@ -2,9 +2,10 @@
 Tests for Development RML mappings
 
 Tests mappings for development-related entities:
-- development_funder.rml.ttl
-- development_investigator.rml.ttl
-- development_publication.rml.ttl
+- development.rml.ttl  (junction table relationships)
+- funders.rml.ttl
+- investigators.rml.ttl
+- publications.rml.ttl
 """
 
 import pytest
@@ -12,16 +13,16 @@ from rdflib import URIRef, Literal
 from rdflib.namespace import RDF
 
 
-class TestDevelopmentFunder:
-    """Test development funder relationships and entities"""
+class TestFunder:
+    """Test funder entity properties"""
 
     @pytest.fixture
     def funder_graph(self, rml_runner):
-        """Load development funder graph"""
+        """Load funder graph"""
         return rml_runner(
-            mapping_file="development_funder.rml.ttl",
+            mapping_file="funders.rml.ttl",
             csv_replacements={
-                "data/csv/development_funder.csv": "test/development_funder.csv"
+                "data/csv/funders.csv": "test/funders.csv"
             }
         )
 
@@ -50,33 +51,6 @@ class TestDevelopmentFunder:
         assert "NTAP" in names, "Expected NTAP funder from test data"
         assert "Children's Tumor Foundation" in names, "Expected CTF funder from test data"
 
-    def test_development_has_funder_relationship(self, funder_graph, namespaces):
-        """Development entities should link to funders via hasFunder"""
-        NF = namespaces["nf"]
-
-        query = """
-        SELECT ?dev ?funder
-        WHERE {
-            ?dev nf:hasFunder ?funder .
-        }
-        """
-        results = list(funder_graph.query(query, initNs={"nf": NF}))
-        assert len(results) > 0, "No hasFunder relationships found"
-
-    def test_resource_has_funder_relationship(self, funder_graph, namespaces):
-        """Resources should link to funders via hasFunder"""
-        NF = namespaces["nf"]
-
-        query = """
-        SELECT ?resource ?funder
-        WHERE {
-            ?resource nf:hasFunder ?funder .
-            FILTER(CONTAINS(STR(?resource), "test-res"))
-        }
-        """
-        results = list(funder_graph.query(query, initNs={"nf": NF}))
-        assert len(results) > 0, "No resource-funder relationships found"
-
     def test_funder_ids_are_iris(self, funder_graph, namespaces):
         """Funder IDs should be IRIs, not literals"""
         NF = namespaces["nf"]
@@ -94,16 +68,16 @@ class TestDevelopmentFunder:
                 f"Funder {row.funder} should be IRI, not literal"
 
 
-class TestDevelopmentInvestigator:
-    """Test development investigator relationships and entities"""
+class TestInvestigator:
+    """Test investigator entity properties"""
 
     @pytest.fixture
     def investigator_graph(self, rml_runner):
-        """Load development investigator graph"""
+        """Load investigator graph"""
         return rml_runner(
-            mapping_file="development_investigator.rml.ttl",
+            mapping_file="investigators.rml.ttl",
             csv_replacements={
-                "data/csv/development_investigator.csv": "test/development_investigator.csv"
+                "data/csv/investigators.csv": "test/investigators.csv"
             }
         )
 
@@ -168,44 +142,17 @@ class TestDevelopmentInvestigator:
             assert isinstance(row.orcid, URIRef), \
                 f"ORCID {row.orcid} should be IRI, not literal"
 
-    def test_development_has_investigator_relationship(self, investigator_graph, namespaces):
-        """Development entities should link to investigators via hasInvestigator"""
-        NF = namespaces["nf"]
 
-        query = """
-        SELECT ?dev ?investigator
-        WHERE {
-            ?dev nf:hasInvestigator ?investigator .
-        }
-        """
-        results = list(investigator_graph.query(query, initNs={"nf": NF}))
-        assert len(results) > 0, "No hasInvestigator relationships found"
-
-    def test_resource_has_investigator_relationship(self, investigator_graph, namespaces):
-        """Resources should link to investigators via hasInvestigator"""
-        NF = namespaces["nf"]
-
-        query = """
-        SELECT ?resource ?investigator
-        WHERE {
-            ?resource nf:hasInvestigator ?investigator .
-            FILTER(CONTAINS(STR(?resource), "test-res"))
-        }
-        """
-        results = list(investigator_graph.query(query, initNs={"nf": NF}))
-        assert len(results) > 0, "No resource-investigator relationships found"
-
-
-class TestDevelopmentPublication:
-    """Test development publication relationships and entities"""
+class TestPublication:
+    """Test publication entity properties"""
 
     @pytest.fixture
     def publication_graph(self, rml_runner):
-        """Load development publication graph"""
+        """Load publication graph"""
         return rml_runner(
-            mapping_file="development_publication.rml.ttl",
+            mapping_file="publications.rml.ttl",
             csv_replacements={
-                "data/csv/development_publication.csv": "test/development_publication.csv"
+                "data/csv/publications.csv": "test/publications.csv"
             }
         )
 
@@ -321,7 +268,49 @@ class TestDevelopmentPublication:
         assert "John Smith" in authors, "Expected 'John Smith' author"
         assert "Jane Doe" in authors, "Expected 'Jane Doe' author"
 
-    def test_development_has_publication_relationship(self, publication_graph, namespaces):
+
+class TestDevelopmentRelationships:
+    """Test development junction table relationships"""
+
+    @pytest.fixture
+    def development_graph(self, rml_runner):
+        """Load development graph"""
+        return rml_runner(
+            mapping_file="development.rml.ttl",
+            csv_replacements={
+                "data/csv/development.csv": "test/development.csv"
+            }
+        )
+
+    def test_development_has_funder_relationship(self, development_graph, namespaces):
+        """Development entities should link to funders via hasFunder"""
+        NF = namespaces["nf"]
+
+        query = """
+        SELECT ?dev ?funder
+        WHERE {
+            ?dev nf:hasFunder ?funder .
+            FILTER(CONTAINS(STR(?dev), "development/"))
+        }
+        """
+        results = list(development_graph.query(query, initNs={"nf": NF}))
+        assert len(results) > 0, "No development-funder relationships found"
+
+    def test_development_has_investigator_relationship(self, development_graph, namespaces):
+        """Development entities should link to investigators via hasInvestigator"""
+        NF = namespaces["nf"]
+
+        query = """
+        SELECT ?dev ?investigator
+        WHERE {
+            ?dev nf:hasInvestigator ?investigator .
+            FILTER(CONTAINS(STR(?dev), "development/"))
+        }
+        """
+        results = list(development_graph.query(query, initNs={"nf": NF}))
+        assert len(results) > 0, "No development-investigator relationships found"
+
+    def test_development_has_publication_relationship(self, development_graph, namespaces):
         """Development entities should link to publications via hasPublication"""
         NF = namespaces["nf"]
 
@@ -329,13 +318,56 @@ class TestDevelopmentPublication:
         SELECT ?dev ?publication
         WHERE {
             ?dev nf:hasPublication ?publication .
+            FILTER(CONTAINS(STR(?dev), "development/"))
         }
         """
-        results = list(publication_graph.query(query, initNs={"nf": NF}))
-        assert len(results) > 0, "No hasPublication relationships found"
+        results = list(development_graph.query(query, initNs={"nf": NF}))
+        assert len(results) > 0, "No development-publication relationships found"
 
-    def test_resource_has_publication_relationship(self, publication_graph, namespaces):
-        """Resources should link to publications via hasPublication"""
+    def test_development_has_resource_relationship(self, development_graph, namespaces):
+        """Development entities should link to resources via hasResource"""
+        NF = namespaces["nf"]
+
+        query = """
+        SELECT ?dev ?resource
+        WHERE {
+            ?dev nf:hasResource ?resource .
+            FILTER(CONTAINS(STR(?dev), "development/"))
+        }
+        """
+        results = list(development_graph.query(query, initNs={"nf": NF}))
+        assert len(results) > 0, "No development-resource relationships found"
+
+    def test_resource_has_funder_shortcut(self, development_graph, namespaces):
+        """Resources should link to funders via hasFunder shortcut"""
+        NF = namespaces["nf"]
+
+        query = """
+        SELECT ?resource ?funder
+        WHERE {
+            ?resource nf:hasFunder ?funder .
+            FILTER(CONTAINS(STR(?resource), "test-res"))
+        }
+        """
+        results = list(development_graph.query(query, initNs={"nf": NF}))
+        assert len(results) > 0, "No resource-funder relationships found"
+
+    def test_resource_has_investigator_shortcut(self, development_graph, namespaces):
+        """Resources should link to investigators via hasInvestigator shortcut"""
+        NF = namespaces["nf"]
+
+        query = """
+        SELECT ?resource ?investigator
+        WHERE {
+            ?resource nf:hasInvestigator ?investigator .
+            FILTER(CONTAINS(STR(?resource), "test-res"))
+        }
+        """
+        results = list(development_graph.query(query, initNs={"nf": NF}))
+        assert len(results) > 0, "No resource-investigator relationships found"
+
+    def test_resource_has_publication_shortcut(self, development_graph, namespaces):
+        """Resources should link to publications via hasPublication shortcut"""
         NF = namespaces["nf"]
 
         query = """
@@ -345,7 +377,7 @@ class TestDevelopmentPublication:
             FILTER(CONTAINS(STR(?resource), "test-res"))
         }
         """
-        results = list(publication_graph.query(query, initNs={"nf": NF}))
+        results = list(development_graph.query(query, initNs={"nf": NF}))
         assert len(results) > 0, "No resource-publication relationships found"
 
 
@@ -354,19 +386,18 @@ class TestDevelopmentEmptyFields:
 
     def test_no_triples_for_empty_institution(self, rml_runner, namespaces):
         """Empty institution field should not create triples"""
-        # Create test data with empty institution
         import tempfile
         import os
 
         with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False) as f:
-            f.write("investigatorId,developmentId,resourceId,publicationId,funderId,investigatorSynapseId,institution,orcid,investigatorName\n")
-            f.write("inv-empty,dev-001,res-001,pub-001,fund-001,syn123456,,0000-0001-2345-6789,Test Person\n")
+            f.write("investigatorId,investigatorSynapseId,orcid,institution,investigatorName\n")
+            f.write("inv-empty,syn123456,0000-0001-2345-6789,,Test Person\n")
             temp_csv = f.name
 
         try:
             graph = rml_runner(
-                mapping_file="development_investigator.rml.ttl",
-                csv_replacements={"data/csv/development_investigator.csv": temp_csv}
+                mapping_file="investigators.rml.ttl",
+                csv_replacements={"data/csv/investigators.csv": temp_csv}
             )
 
             NF = namespaces["nf"]
@@ -389,14 +420,14 @@ class TestDevelopmentEmptyFields:
         import os
 
         with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False) as f:
-            f.write("publicationId,developmentId,resourceId,doi,citation,publicationTitle,abstract,publicationDate,publicationDateUnix,journal,pmid,authors\n")
-            f.write("pub-empty,dev-001,res-001,10.1000/test,Test Citation,Test Title,,2024-01-01,1704067200,Test Journal,12345678,Author One\n")
+            f.write("publicationId,doi,pmid,abstract,journal,publicationDate,citation,publicationDateUnix,authors,publicationTitle\n")
+            f.write("pub-empty,10.1000/test,12345678,,Test Journal,2024-01-01,Test Citation,1704067200,Author One,Test Title\n")
             temp_csv = f.name
 
         try:
             graph = rml_runner(
-                mapping_file="development_publication.rml.ttl",
-                csv_replacements={"data/csv/development_publication.csv": temp_csv}
+                mapping_file="publications.rml.ttl",
+                csv_replacements={"data/csv/publications.csv": temp_csv}
             )
 
             NF = namespaces["nf"]
