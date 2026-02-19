@@ -45,7 +45,7 @@ nf:CRISPRReagent a owl:Class ;
 
 nf:sgRNA a owl:Class ;
     rdfs:subClassOf nf:CRISPRReagent ; 
-    owl:sameAs obo:SO_0001998 ;
+    owl:equivalentClass obo:SO_0001998 ;
     rdfs:label "sgRNA" ;
     rdfs:comment "Single guide RNA used in CRISPR experiments." .
 
@@ -71,7 +71,7 @@ nf:MouseTargetingVector a owl:Class ;
 
 nf:RNAiReagent a owl:Class ;
     rdfs:subClassOf nf:GeneticReagent ;
-    owl:sameAs obo:SO_0000337 ;
+    owl:equivalentClass obo:SO_0000337 ;
     rdfs:label "RNAi Reagent" .
 
 nf:TransferVector a owl:Class ;
@@ -174,7 +174,7 @@ nf:UnspecifiedMutation a owl:Class ;
     rdfs:comment "A mutation whose type is not specified." .
 
 nf:Genotype a owl:Class ;
-    owl:sameAs efo:EFO_0000513 ;
+    owl:equivalentClass efo:EFO_0000513 ;
     rdfs:label "Genotype" ;
     rdfs:comment "The genetic makeup at a specific locus." .
 
@@ -229,7 +229,7 @@ nf:CellLine a owl:Class ;
 
 nf:CancerCellLine a owl:Class ;
     rdfs:subClassOf nf:CellLine ;
-    owl:sameAs efo:EFO_0001639 ;
+    owl:equivalentClass efo:EFO_0001639 ;
     rdfs:label "Cancer Cell Line" ;
     rdfs:comment "A cell line derived from cancerous tissue." .
 
@@ -240,7 +240,7 @@ nf:TransformedCellLine a owl:Class ;
 
 nf:InducedPluripotentStemCellLine a owl:Class ;
     rdfs:subClassOf nf:CellLine ;
-    owl:sameAs efo:EFO_0005740;
+    owl:equivalentClass efo:EFO_0005740;
     rdfs:label "Induced Pluripotent Stem Cell Line" ;
     rdfs:comment "A cell line derived from iPS cells." .
 
@@ -251,7 +251,7 @@ nf:TelomeraseImmortalizedCellLine a owl:Class ;
 
 nf:EmbryonicStemCellLine a owl:Class ;
     rdfs:subClassOf nf:CellLine ;
-    owl:sameAs efo:EFO_0005738 ;
+    owl:equivalentClass efo:EFO_0005738 ;
     rdfs:label "Embryonic Stem Cell" ;
     rdfs:comment "A cell line derived from embryonic stem cells." .
 
@@ -287,7 +287,7 @@ nf:Antibody a owl:Class ;
 
 nf:AnimalModel a owl:Class ;
     rdfs:subClassOf nf:Tool ;
-    owl:sameAs efo:EFO_0022953 ;
+    owl:equivalentClass efo:EFO_0022953 ;
     rdfs:label "Animal Model" ;
     rdfs:comment "An animal model used in research." .
 

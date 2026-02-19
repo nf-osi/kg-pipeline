@@ -324,19 +324,22 @@ class TestDevelopmentRelationships:
         results = list(development_graph.query(query, initNs={"nf": NF}))
         assert len(results) > 0, "No development-publication relationships found"
 
-    def test_development_has_resource_relationship(self, development_graph, namespaces):
-        """Development entities should link to resources via hasResource"""
+    def test_development_has_resource_id(self, development_graph, namespaces):
+        """Development entities should link to resources via forResourceId"""
         NF = namespaces["nf"]
 
         query = """
-        SELECT ?dev ?resource
+        SELECT ?dev ?resourceId
         WHERE {
-            ?dev nf:hasResource ?resource .
+            ?dev nf:forResourceId ?resourceId .
             FILTER(CONTAINS(STR(?dev), "development/"))
         }
         """
         results = list(development_graph.query(query, initNs={"nf": NF}))
         assert len(results) > 0, "No development-resource relationships found"
+        for row in results:
+            assert isinstance(row.resourceId, Literal), \
+                f"forResourceId should be Literal, got {type(row.resourceId)}"
 
     def test_resource_has_funder_shortcut(self, development_graph, namespaces):
         """Resources should link to funders via hasFunder shortcut"""

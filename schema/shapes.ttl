@@ -325,6 +325,11 @@ shapes:CellLineShape a sh:NodeShape ;
     rdfs:label "Cell Line shape" ;
     rdfs:comment "Expected properties for CellLine instances." ;
     sh:property [
+        sh:path nf:resourceId ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
         sh:path nf:cellLineId ;
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
@@ -396,6 +401,11 @@ shapes:AnimalModelShape a sh:NodeShape ;
     rdfs:label "Animal Model shape" ;
     rdfs:comment "Expected properties for AnimalModel instances." ;
     sh:property [
+        sh:path nf:resourceId ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
         sh:path nf:animalModelId ;
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
@@ -462,6 +472,11 @@ shapes:AntibodyShape a sh:NodeShape ;
     rdfs:label "Antibody shape" ;
     rdfs:comment "Expected properties for Antibody instances." ;
     sh:property [
+        sh:path nf:resourceId ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
         sh:path nf:antibodyId ;
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
@@ -509,6 +524,11 @@ shapes:GeneticReagentShape a sh:NodeShape ;
     sh:targetClass nf:GeneticReagent ;
     rdfs:label "Genetic Reagent shape" ;
     rdfs:comment "Expected properties for GeneticReagent instances." ;
+    sh:property [
+        sh:path nf:resourceId ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
     sh:property [
         sh:path nf:geneticReagentId ;
         sh:datatype xsd:string ;
@@ -658,8 +678,9 @@ shapes:BiobankShape a sh:NodeShape ;
         sh:maxCount 1 ;
     ] ;
     sh:property [
-        sh:path nf:hasResource ;
-        sh:nodeKind sh:IRI ;
+        sh:path nf:resourceId ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
     ] ;
     sh:property [
         sh:path nf:diseaseType ;
@@ -806,8 +827,9 @@ shapes:DevelopmentShape a sh:NodeShape ;
     rdfs:label "Development shape" ;
     rdfs:comment "Expected properties for Development instances." ;
     sh:property [
-        sh:path nf:hasResource ;
-        sh:nodeKind sh:IRI ;
+        sh:path nf:forResourceId ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
     ] ;
     sh:property [
         sh:path nf:hasFunder ;
@@ -881,8 +903,9 @@ shapes:ObservationShape a sh:NodeShape ;
         sh:maxCount 1 ;
     ] ;
     sh:property [
-        sh:path nf:aboutResource ;
-        sh:nodeKind sh:IRI ;
+        sh:path nf:forResourceId ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
     ] ;
     sh:property [
         sh:path nf:referencesPublication ;
@@ -897,6 +920,11 @@ shapes:ToolShape a sh:NodeShape ;
     sh:targetClass nf:Tool ;
     rdfs:label "Tool shape" ;
     rdfs:comment "Expected properties for Tool (Resource) instances." ;
+    sh:property [
+        sh:path nf:resourceId ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
     sh:property [
         sh:path nf:name ;
         sh:datatype xsd:string ;

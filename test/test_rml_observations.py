@@ -208,24 +208,23 @@ class TestObservationsIRIFields:
 class TestObservationsRelationships:
     """Test observation relationships to other entities"""
 
-    def test_observation_about_resource(self, observations_graph, namespaces):
-        """Observations should link to resources via aboutResource"""
+    def test_observation_for_resource_id(self, observations_graph, namespaces):
+        """Observations should link to resources via forResourceId"""
         NF = namespaces["nf"]
 
         query = """
-        SELECT ?observation ?resource
+        SELECT ?observation ?resourceId
         WHERE {
             ?observation a nf:Observation ;
-                        nf:aboutResource ?resource .
+                        nf:forResourceId ?resourceId .
         }
         """
         results = list(observations_graph.query(query, initNs={"nf": NF}))
-        assert len(results) > 0, "No aboutResource relationships found"
+        assert len(results) > 0, "No forResourceId relationships found"
 
-        # Resource IDs should be IRIs
         for row in results:
-            assert isinstance(row.resource, URIRef), \
-                f"resourceId should be IRI, got {type(row.resource)}"
+            assert isinstance(row.resourceId, Literal), \
+                f"forResourceId should be Literal, got {type(row.resourceId)}"
 
     def test_observation_references_publication(self, observations_graph, namespaces):
         """Observations should link to publications via referencesPublication"""
@@ -251,11 +250,11 @@ class TestObservationsRelationships:
         NF = namespaces["nf"]
 
         query = """
-        SELECT ?observation ?resource ?publication
+        SELECT ?observation ?resourceId ?publication
         WHERE {
-            ?observation nf:aboutResource ?resource ;
+            ?observation nf:forResourceId ?resourceId ;
                         nf:referencesPublication ?publication .
-            FILTER(CONTAINS(STR(?resource), "test-res-001"))
+            FILTER(CONTAINS(STR(?resourceId), "test-res-001"))
         }
         """
         results = list(observations_graph.query(query, initNs={"nf": NF}))

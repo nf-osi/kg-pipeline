@@ -2,12 +2,12 @@
 Tests for Resources RML mapping
 
 Tests the resources.rml.ttl mapping against test/resources.csv
-Includes owl:sameAs relationships and pipe-delimited fields
+Includes resourceId on tool-specific subjects and pipe-delimited fields
 """
 
 import pytest
 from rdflib import URIRef, Literal
-from rdflib.namespace import RDF, OWL
+from rdflib.namespace import RDF
 
 
 @pytest.fixture
@@ -107,51 +107,48 @@ class TestResourcesIRIFields:
                 f"Expected RRID format, got {row.rrid}"
 
 
-class TestResourcesOwlSameAs:
-    """Test owl:sameAs relationships to tool-specific IDs"""
+class TestResourceIdOnToolSubjects:
+    """Test resourceId datatype property on tool-specific subjects"""
 
-    def test_owl_sameas_relationships_exist(self, resources_graph, namespaces):
-        """Resources should have owl:sameAs to tool-specific IDs"""
+    def test_tool_subjects_have_resource_id(self, resources_graph, namespaces):
+        """Tool-specific subjects should have nf:resourceId"""
         NF = namespaces["nf"]
 
         query = """
-        SELECT ?resource ?sameAs
+        SELECT ?tool ?resourceId
         WHERE {
-            ?resource a nf:Tool ;
-                      owl:sameAs ?sameAs .
+            ?tool nf:resourceId ?resourceId .
+            FILTER(!CONTAINS(STR(?tool), "resource/"))
         }
         """
-        results = list(resources_graph.query(query, initNs={"nf": NF, "owl": OWL}))
-        assert len(results) > 0, "No owl:sameAs relationships found"
+        results = list(resources_graph.query(query, initNs={"nf": NF}))
+        assert len(results) > 0, "No resourceId properties found on tool-specific subjects"
 
-    def test_owl_sameas_to_cell_line_id(self, resources_graph, namespaces):
-        """Resources should link to cellLineId via owl:sameAs"""
-        # Just verify some owl:sameAs relationships exist
-        query = """
-        SELECT ?resource ?sameAs
-        WHERE {
-            ?resource owl:sameAs ?sameAs .
-            FILTER(CONTAINS(STR(?sameAs), "e77e65be"))
-        }
-        """
-        results = list(resources_graph.query(query, initNs={"owl": OWL}))
-        # Test passes if there are any owl:sameAs relationships, even if specific IDs vary
-        assert len(resources_graph.query("SELECT ?s ?o WHERE { ?s owl:sameAs ?o }", initNs={"owl": OWL})) > 0, \
-            "Expected some owl:sameAs relationships"
+    def test_resource_id_is_string_literal(self, resources_graph, namespaces):
+        """resourceId should be a string literal, not an IRI"""
+        NF = namespaces["nf"]
 
-    def test_sameas_targets_are_iris(self, resources_graph):
-        """owl:sameAs targets should be IRIs"""
         query = """
-        SELECT ?resource ?sameAs
+        SELECT ?tool ?resourceId
         WHERE {
-            ?resource owl:sameAs ?sameAs .
+            ?tool nf:resourceId ?resourceId .
         }
         """
-        results = list(resources_graph.query(query, initNs={"owl": OWL}))
+        results = list(resources_graph.query(query, initNs={"nf": NF}))
 
         for row in results:
-            assert isinstance(row.sameAs, URIRef), \
-                f"owl:sameAs target should be IRI, got {type(row.sameAs)}"
+            assert isinstance(row.resourceId, Literal), \
+                f"resourceId should be Literal, got {type(row.resourceId)}"
+
+    def test_no_owl_sameas(self, resources_graph):
+        """Graph should not contain any owl:sameAs triples"""
+        from rdflib.namespace import OWL
+        results = list(resources_graph.query(
+            "SELECT ?s ?o WHERE { ?s owl:sameAs ?o }",
+            initNs={"owl": OWL}
+        ))
+        assert len(results) == 0, \
+            f"Expected no owl:sameAs triples, found {len(results)}"
 
 
 class TestResourcesMultiValueFields:
@@ -261,17 +258,20 @@ class TestResourcesEmptyFields:
 class TestResourcesDataQuality:
     """Test data quality and consistency"""
 
-    def test_all_resources_have_resource_id(self, resources_graph, namespaces):
-        """All Tool entities should have a resourceId in their IRI"""
+    def test_all_resources_use_tool_specific_iris(self, resources_graph, namespaces):
+        """All Tool entities should use tool-specific IRIs, not generic resource/ IRIs"""
         NF = namespaces["nf"]
+        tool_prefixes = ("cellLine/", "antibody/", "animalModel/", "geneticReagent/", "biobank/")
 
         tools = list(resources_graph.subjects(RDF.type, NF.Tool))
+        assert len(tools) > 0, "No tools found"
 
         for tool in tools:
             tool_str = str(tool)
-            # Should be a valid UUID-like ID
-            assert len(tool_str.split('/')[-1]) > 10, \
-                f"Resource IRI should contain resourceId: {tool_str}"
+            assert any(p in tool_str for p in tool_prefixes), \
+                f"Expected tool-specific IRI, got: {tool_str}"
+            assert "resource/" not in tool_str, \
+                f"Should not use generic resource/ IRI: {tool_str}"
 
     def test_dates_are_present(self, resources_graph, namespaces):
         """Resources should have date fields"""

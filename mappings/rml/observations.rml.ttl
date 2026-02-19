@@ -65,8 +65,8 @@ map:ObservationAboutResource a rr:TriplesMap ;
         rr:termType rr:IRI
     ] ;
     rr:predicateObjectMap [
-        rr:predicate nf:aboutResource ;
-        rr:objectMap [ rr:template "https://nf.synapse.org/Explore/Tools/DetailsPage/Details?resourceId={resourceId}" ; rr:termType rr:IRI ]
+        rr:predicate nf:forResourceId ;
+        rr:objectMap [ rml:reference "resourceId" ; rr:datatype xsd:string ]
     ] .
 
 ################################################################################
