@@ -50,7 +50,7 @@ scripts/
   classify_*.py                  Harmonization (one per entity type)
   harmonize_files.py             File-level harmonization (model systems, data types)
   validate_fks.py                CSV-level foreign key validation (see HARMONIZATION.md)
-  astabench_data.py              Build eval_data.yaml for astabench from ground-truth files
+  astabench.py                   Prepare eval data and run astabench across models
 data/
   csv/                           Source and harmonized CSVs
   rdf/                           Generated RDF (Turtle)
