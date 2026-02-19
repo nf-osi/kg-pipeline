@@ -17,6 +17,9 @@ test/temp_*.ttl
 # Ignore .env (API keys)
 .env
 
+# Ignore generated eval data
+astabench/astabench/evals/nf_rag/eval_data.yaml
+
 # Ignore Python cache artifacts
 __pycache__/
 *.py[cod]
