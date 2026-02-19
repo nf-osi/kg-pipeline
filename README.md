@@ -49,6 +49,7 @@ scripts/
   prepare_portal_tables.py       Synapse download + CSV normalization
   classify_*.py                  Harmonization (one per entity type)
   harmonize_files.py             File-level harmonization (model systems, data types)
+  validate_fks.py                CSV-level foreign key validation (see HARMONIZATION.md)
 data/
   csv/                           Source and harmonized CSVs
   rdf/                           Generated RDF (Turtle)
@@ -58,6 +59,26 @@ evaluation/                      Eval datasets for KG quality + RAG
 test/                            RML mapping tests (pytest + rdflib)
 tools/                           RMLMapper JAR + GREL function files
 ```
+
+### Dagster orchestration
+
+The full pipeline can be run as a Dagster asset graph. Each table produces
+CSV, (optional) harmonized CSV, and RDF assets. An FK validation asset runs
+after all CSVs complete.
+
+```bash
+cd orchestration
+dagster dev -m dagster_pipeline          # UI at http://localhost:3000
+dagster asset materialize -m dagster_pipeline  # materialize all
+```
+
+See [orchestration/README.md](orchestration/README.md) for setup, asset
+selection patterns, and details.
+
+### Data quality
+
+See [HARMONIZATION.md](HARMONIZATION.md) for harmonization scripts, FK
+validation, and known upstream data quality issues.
 
 ### Testing
 
