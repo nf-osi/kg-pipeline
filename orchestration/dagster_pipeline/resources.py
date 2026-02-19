@@ -13,9 +13,9 @@ class SynapseResource(ConfigurableResource):
     """Resource for interacting with Synapse."""
 
     def setup_for_execution(self, context: InitResourceContext) -> None:
-        """Initialize Synapse client."""
+        """Initialize Synapse client with anonymous access."""
+        # Do NOT call login() — anonymous access is used for public data only.
         self._client = synapseclient.Synapse()
-        self._client.login(silent=True)
 
     def fetch_table(
         self,
