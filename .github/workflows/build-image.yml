@@ -48,6 +48,27 @@ jobs:
       - name: Materialize pipeline
         run: dagster asset materialize -m dagster_pipeline --select "*"
 
+      - name: Validate RDF outputs
+        run: |
+          missing=0
+          for f in data/rdf/*.ttl; do
+            if [ ! -s "$f" ]; then
+              echo "::error::Empty or missing: $f"
+              missing=$((missing + 1))
+            fi
+          done
+          count=$(ls data/rdf/*.ttl 2>/dev/null | wc -l)
+          echo "Found $count .ttl files"
+          if [ "$count" -lt 17 ]; then
+            echo "::error::Expected 17 .ttl files, found $count"
+            exit 1
+          fi
+          if [ "$missing" -gt 0 ]; then
+            echo "::error::$missing empty .ttl files"
+            exit 1
+          fi
+          echo "All $count RDF outputs validated"
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:

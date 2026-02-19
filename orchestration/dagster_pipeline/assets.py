@@ -186,17 +186,30 @@ def create_rdf_asset(table_name: str, config: TableConfig):
     )
     def _rdf_asset(context: AssetExecutionContext, rml_mapper: RMLMapperResource) -> Path:
         """Generate RDF from CSV using RMLMapper."""
+        import subprocess
+
         project_root = Path(__file__).parent.parent.parent
 
         rml_file = config.rml_path
         output_file = config.rdf_path
 
         context.log.info(f"Running RMLMapper for {table_name}")
-        rml_mapper.run(
-            mapping_file=rml_file,
-            output_file=output_file,
-            log_file=config.log_path,
-        )
+        try:
+            rml_mapper.run(
+                mapping_file=rml_file,
+                output_file=output_file,
+                log_file=config.log_path,
+            )
+        except subprocess.CalledProcessError as e:
+            context.log.warning(
+                f"RMLMapper failed for {table_name} (exit {e.returncode}):\n{e.stderr}"
+            )
+            context.add_output_metadata({
+                "path": str(output_file),
+                "status": "failed",
+                "error": str(e.stderr)[:500],
+            })
+            return output_file
 
         abs_output = project_root / output_file
         size_mb = abs_output.stat().st_size / (1024 * 1024)

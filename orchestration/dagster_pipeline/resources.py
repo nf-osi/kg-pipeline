@@ -94,8 +94,13 @@ class RMLMapperResource(ConfigurableResource):
                 stderr=log,
                 stdout=subprocess.PIPE,
                 text=True,
-                check=True,
                 cwd=str(project_root),  # Run from project root
+            )
+
+        if result.returncode != 0:
+            log_content = abs_log_file.read_text()
+            raise subprocess.CalledProcessError(
+                result.returncode, cmd, output=result.stdout, stderr=log_content
             )
 
 
