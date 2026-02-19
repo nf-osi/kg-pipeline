@@ -1,0 +1,31 @@
+@prefix rr:   <http://www.w3.org/ns/r2rml#> .
+@prefix rml:  <http://semweb.mmlab.be/ns/rml#> .
+@prefix ql:   <http://semweb.mmlab.be/ns/ql#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix nf:   <http://nf-osi.github.com/terms#> .
+@prefix map:  <http://nf-osi.github.com/mappings/investigators#> .
+
+################################################################################
+# Logical source
+################################################################################
+
+map:InvestigatorsSource a rml:LogicalSource ;
+    rml:source "data/csv/investigators.csv" ;
+    rml:referenceFormulation ql:CSV .
+
+################################################################################
+# Investigator core facts
+################################################################################
+
+map:InvestigatorCore a rr:TriplesMap ;
+    rdfs:label "Investigator Core" ;
+    rml:logicalSource map:InvestigatorsSource ;
+    rr:subjectMap [ rr:template "http://nf-osi.github.com/terms#investigator/{investigatorId}" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [ rr:predicate rdf:type ; rr:objectMap [ rr:constant nf:Investigator ; rr:termType rr:IRI ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:investigatorId ; rr:objectMap [ rml:reference "investigatorId" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:name ; rr:objectMap [ rml:reference "investigatorName" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:institution ; rr:objectMap [ rml:reference "institution" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:orcid ; rr:objectMap [ rr:template "https://orcid.org/{orcid}" ; rr:termType rr:IRI ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:investigatorSynapseId ; rr:objectMap [ rr:template "https://www.synapse.org/Profile:{investigatorSynapseId}" ; rr:termType rr:IRI ] ] .

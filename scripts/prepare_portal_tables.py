@@ -162,39 +162,38 @@ clonality as clonality,
 targetAntigen as targetAntigen
 """
 
-DEVELOPMENT_FUNDER_SELECT = """
+DEVELOPMENT_SELECT = """
 developmentId as developmentId,
 resourceId as resourceId,
+investigatorId as investigatorId,
 publicationId as publicationId,
+funderId as funderId
+"""
+
+FUNDERS_SELECT = """
 funderId as funderId,
 funderName as funderName
 """
 
-DEVELOPMENT_INVESTIGATOR_SELECT = """
+INVESTIGATORS_SELECT = """
 investigatorId as investigatorId,
-developmentId as developmentId,
-resourceId as resourceId,
-publicationId as publicationId,
-funderId as funderId,
 investigatorSynapseId as investigatorSynapseId,
-institution as institution,
 orcid as orcid,
+institution as institution,
 investigatorName as investigatorName
 """
 
-DEVELOPMENT_PUBLICATION_SELECT = """
+PUBLICATIONS_SELECT = """
 publicationId as publicationId,
-developmentId as developmentId,
-resourceId as resourceId,
 doi as doi,
-citation as citation,
-publicationTitle as publicationTitle,
-abstract as abstract,
-publicationDate as publicationDate,
-publicationDateUnix as publicationDateUnix,
-journal as journal,
 pmid as pmid,
-authors as authors
+abstract as abstract,
+journal as journal,
+publicationDate as publicationDate,
+citation as citation,
+publicationDateUnix as publicationDateUnix,
+authors as authors,
+publicationTitle as publicationTitle
 """
 
 DONOR_TOOL_SELECT = """
@@ -203,8 +202,7 @@ resourceId as resourceId
 """
 
 MUTATION_MODEL_SELECT = """
-mutationId as mutationId,
-mutationDetailsId as mutationDetailsId,
+mutationDetailsId as mutationId,
 animalModelId as animalModelId,
 cellLineId as cellLineId
 """
@@ -269,9 +267,10 @@ TABLE_ALIASES = {
     "antibody": "antibodies",
     "resource": "resources",
     "observation": "observations",
-    "dev_funder": "development_funder",
-    "dev_investigator": "development_investigator",
-    "dev_publication": "development_publication",
+    "dev": "development",
+    "funder": "funders",
+    "investigator": "investigators",
+    "publication": "publications",
     "donor_tool": "donor_tool",
     "mutation_model": "mutation_model",
     "biobank": "biobanks",
@@ -410,8 +409,8 @@ TABLES: Dict[str, Dict[str, Any]] = {
         "select_clause": ANIMAL_MODELS_SELECT,
         "columns": [
             {"target": "animalModelId", "source": "animalModelId", "type": "iri"},
-            {"target": "donorId", "source": "donorId", "type": "iri"},
-            {"target": "transplantationDonorId", "source": "transplantationDonorId", "type": "iri"},
+            {"target": "donorId", "source": "donorId", "type": "iri", "references": {"table": "donors", "column": "donorId"}},
+            {"target": "transplantationDonorId", "source": "transplantationDonorId", "type": "iri", "references": {"table": "donors", "column": "donorId"}},
             {"target": "backgroundStrain", "source": "backgroundStrain", "type": "text"},
             {"target": "backgroundSubstrain", "source": "backgroundSubstrain", "type": "text"},
             {"target": "strainNomenclature", "source": "strainNomenclature", "type": "text"},
@@ -429,7 +428,7 @@ TABLES: Dict[str, Dict[str, Any]] = {
         "select_clause": CELL_LINES_SELECT,
         "columns": [
             {"target": "cellLineId", "source": "cellLineId", "type": "iri"},
-            {"target": "donorId", "source": "donorId", "type": "iri"},
+            {"target": "donorId", "source": "donorId", "type": "iri", "references": {"table": "donors", "column": "donorId"}},
             {"target": "originYear", "source": "originYear", "type": "text"},
             {"target": "organ", "source": "organ", "type": "text"},
             {"target": "strProfile", "source": "strProfile", "type": "text"},
@@ -449,12 +448,12 @@ TABLES: Dict[str, Dict[str, Any]] = {
         "select_clause": DONORS_SELECT,
         "columns": [
             {"target": "donorId", "source": "donorId", "type": "iri"},
-            {"target": "parentDonorId", "source": "parentDonorId", "type": "iri"},
+            {"target": "parentDonorId", "source": "parentDonorId", "type": "iri", "references": {"table": "donors", "column": "donorId"}},
             {"target": "species", "source": "species", "type": "text+", "transform": "string_list"},
             {"target": "race", "source": "race", "type": "text"},
             {"target": "sex", "source": "sex", "type": "text"},
             {"target": "age", "source": "age", "type": "text"},
-            {"target": "transplantationDonorId", "source": "transplantationDonorId", "type": "iri"},
+            {"target": "transplantationDonorId", "source": "transplantationDonorId", "type": "iri", "references": {"table": "donors", "column": "donorId"}},
         ],
     },
     "antibodies": {
@@ -480,11 +479,11 @@ TABLES: Dict[str, Dict[str, Any]] = {
         "select_clause": RESOURCES_SELECT,
         "columns": [
             {"target": "resourceId", "source": "resourceId", "type": "iri"},
-            {"target": "geneticReagentId", "source": "geneticReagentId", "type": "iri"},
-            {"target": "antibodyId", "source": "antibodyId", "type": "iri"},
-            {"target": "cellLineId", "source": "cellLineId", "type": "iri"},
-            {"target": "animalModelId", "source": "animalModelId", "type": "iri"},
-            {"target": "biobankId", "source": "biobankId", "type": "iri"},
+            {"target": "geneticReagentId", "source": "geneticReagentId", "type": "iri", "references": {"table": "genetic_reagents", "column": "geneticReagentId"}},
+            {"target": "antibodyId", "source": "antibodyId", "type": "iri", "references": {"table": "antibodies", "column": "antibodyId"}},
+            {"target": "cellLineId", "source": "cellLineId", "type": "iri", "references": {"table": "cell_lines", "column": "cellLineId"}},
+            {"target": "animalModelId", "source": "animalModelId", "type": "iri", "references": {"table": "animal_models", "column": "animalModelId"}},
+            {"target": "biobankId", "source": "biobankId", "type": "iri", "references": {"table": "biobanks", "column": "biobankId"}},
             {"target": "usageRequirements", "source": "usageRequirements", "type": "text"},
             {"target": "resourceName", "source": "resourceName", "type": "text"},
             {"target": "resourceType", "source": "resourceType", "type": "text"},
@@ -503,8 +502,8 @@ TABLES: Dict[str, Dict[str, Any]] = {
         "select_clause": OBSERVATIONS_SELECT,
         "columns": [
             {"target": "observationId", "source": "observationId", "type": "iri"},
-            {"target": "resourceId", "source": "resourceId", "type": "iri"},
-            {"target": "publicationId", "source": "publicationId", "type": "iri"},
+            {"target": "resourceId", "source": "resourceId", "type": "iri", "references": {"table": "resources", "column": "resourceId"}},
+            {"target": "publicationId", "source": "publicationId", "type": "iri", "references": {"table": "publications", "column": "publicationId"}},
             {"target": "observationSubmitterName", "source": "observationSubmitterName", "type": "text"},
             {"target": "synapseId", "source": "synapseId", "type": "iri", "transform": "synapse_id"},
             {"target": "observationText", "source": "observationText", "type": "text"},
@@ -517,54 +516,58 @@ TABLES: Dict[str, Dict[str, Any]] = {
             {"target": "observationLink", "source": "observationLink", "type": "iri"},
         ],
     },
-    "development_funder": {
-        "synapse_id": "syn51734076",
-        "csv_path": Path("data/csv/development_funder.csv"),
-        "raw_filename": "development_funder_raw.csv",
-        "select_clause": DEVELOPMENT_FUNDER_SELECT,
+    "development": {
+        "synapse_id": "syn26486807",
+        "csv_path": Path("data/csv/development.csv"),
+        "raw_filename": "development_raw.csv",
+        "select_clause": DEVELOPMENT_SELECT,
         "columns": [
             {"target": "developmentId", "source": "developmentId", "type": "iri"},
-            {"target": "resourceId", "source": "resourceId", "type": "iri"},
-            {"target": "publicationId", "source": "publicationId", "type": "iri"},
+            {"target": "resourceId", "source": "resourceId", "type": "iri", "references": {"table": "resources", "column": "resourceId"}},
+            {"target": "investigatorId", "source": "investigatorId", "type": "iri", "references": {"table": "investigators", "column": "investigatorId"}},
+            {"target": "publicationId", "source": "publicationId", "type": "iri", "references": {"table": "publications", "column": "publicationId"}},
+            {"target": "funderId", "source": "funderId", "type": "iri", "references": {"table": "funders", "column": "funderId"}},
+        ],
+    },
+    "funders": {
+        "synapse_id": "syn26486830",
+        "csv_path": Path("data/csv/funders.csv"),
+        "raw_filename": "funders_raw.csv",
+        "select_clause": FUNDERS_SELECT,
+        "columns": [
             {"target": "funderId", "source": "funderId", "type": "iri"},
             {"target": "funderName", "source": "funderName", "type": "text"},
         ],
     },
-    "development_investigator": {
-        "synapse_id": "syn51734029",
-        "csv_path": Path("data/csv/development_investigator.csv"),
-        "raw_filename": "development_investigator_raw.csv",
-        "select_clause": DEVELOPMENT_INVESTIGATOR_SELECT,
+    "investigators": {
+        "synapse_id": "syn26486833",
+        "csv_path": Path("data/csv/investigators.csv"),
+        "raw_filename": "investigators_raw.csv",
+        "select_clause": INVESTIGATORS_SELECT,
         "columns": [
             {"target": "investigatorId", "source": "investigatorId", "type": "iri"},
-            {"target": "developmentId", "source": "developmentId", "type": "iri"},
-            {"target": "resourceId", "source": "resourceId", "type": "iri"},
-            {"target": "publicationId", "source": "publicationId", "type": "iri"},
-            {"target": "funderId", "source": "funderId", "type": "iri"},
             {"target": "investigatorSynapseId", "source": "investigatorSynapseId", "type": "iri", "transform": "synapse_id"},
-            {"target": "institution", "source": "institution", "type": "text"},
             {"target": "orcid", "source": "orcid", "type": "iri"},
+            {"target": "institution", "source": "institution", "type": "text"},
             {"target": "investigatorName", "source": "investigatorName", "type": "text"},
         ],
     },
-    "development_publication": {
-        "synapse_id": "syn51735467",
-        "csv_path": Path("data/csv/development_publication.csv"),
-        "raw_filename": "development_publication_raw.csv",
-        "select_clause": DEVELOPMENT_PUBLICATION_SELECT,
+    "publications": {
+        "synapse_id": "syn26486839",
+        "csv_path": Path("data/csv/publications.csv"),
+        "raw_filename": "publications_raw.csv",
+        "select_clause": PUBLICATIONS_SELECT,
         "columns": [
             {"target": "publicationId", "source": "publicationId", "type": "iri"},
-            {"target": "developmentId", "source": "developmentId", "type": "iri"},
-            {"target": "resourceId", "source": "resourceId", "type": "iri"},
             {"target": "doi", "source": "doi", "type": "iri"},
-            {"target": "citation", "source": "citation", "type": "text"},
-            {"target": "publicationTitle", "source": "publicationTitle", "type": "text"},
-            {"target": "abstract", "source": "abstract", "type": "text"},
-            {"target": "publicationDate", "source": "publicationDate", "type": "text"},
-            {"target": "publicationDateUnix", "source": "publicationDateUnix", "type": "text"},
-            {"target": "journal", "source": "journal", "type": "text"},
             {"target": "pmid", "source": "pmid", "type": "iri"},
+            {"target": "abstract", "source": "abstract", "type": "text"},
+            {"target": "journal", "source": "journal", "type": "text"},
+            {"target": "publicationDate", "source": "publicationDate", "type": "text"},
+            {"target": "citation", "source": "citation", "type": "text"},
+            {"target": "publicationDateUnix", "source": "publicationDateUnix", "type": "text"},
             {"target": "authors", "source": "authors", "type": "text+", "transform": "string_list"},
+            {"target": "publicationTitle", "source": "publicationTitle", "type": "text"},
         ],
     },
     "donor_tool": {
@@ -573,8 +576,8 @@ TABLES: Dict[str, Dict[str, Any]] = {
         "raw_filename": "donor_tool_raw.csv",
         "select_clause": DONOR_TOOL_SELECT,
         "columns": [
-            {"target": "donorId", "source": "donorId", "type": "iri"},
-            {"target": "resourceId", "source": "resourceId", "type": "iri"},
+            {"target": "donorId", "source": "donorId", "type": "iri", "references": {"table": "donors", "column": "donorId"}},
+            {"target": "resourceId", "source": "resourceId", "type": "iri", "references": {"table": "resources", "column": "resourceId"}},
         ],
     },
     "mutation_model": {
@@ -583,10 +586,9 @@ TABLES: Dict[str, Dict[str, Any]] = {
         "raw_filename": "mutation_model_raw.csv",
         "select_clause": MUTATION_MODEL_SELECT,
         "columns": [
-            {"target": "mutationId", "source": "mutationId", "type": "iri"},
-            {"target": "mutationDetailsId", "source": "mutationDetailsId", "type": "iri"},
-            {"target": "animalModelId", "source": "animalModelId", "type": "iri"},
-            {"target": "cellLineId", "source": "cellLineId", "type": "iri"},
+            {"target": "mutationId", "source": "mutationId", "type": "iri", "references": {"table": "mutations", "column": "mutationId"}},
+            {"target": "animalModelId", "source": "animalModelId", "type": "iri", "references": {"table": "animal_models", "column": "animalModelId"}},
+            {"target": "cellLineId", "source": "cellLineId", "type": "iri", "references": {"table": "cell_lines", "column": "cellLineId"}},
         ],
     },
     "biobanks": {
@@ -596,7 +598,7 @@ TABLES: Dict[str, Dict[str, Any]] = {
         "select_clause": BIOBANKS_SELECT,
         "columns": [
             {"target": "biobankId", "source": "biobankId", "type": "iri"},
-            {"target": "resourceId", "source": "resourceId", "type": "iri"},
+            {"target": "resourceId", "source": "resourceId", "type": "iri", "references": {"table": "resources", "column": "resourceId"}},
             {"target": "diseaseType", "source": "diseaseType", "type": "text+", "transform": "string_list"},
             {"target": "biobankURL", "source": "biobankURL", "type": "iri"},
             {"target": "biobankName", "source": "biobankName", "type": "text"},
@@ -870,7 +872,7 @@ def main(argv: List[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         description=__doc__,
         epilog="Table names: study, file, mutation, reagent, animal, cell, donor, antibody, "
-               "resource, observation, dev_funder, dev_investigator, dev_publication, "
+               "resource, observation, dev, funder, investigator, publication, "
                "donor_tool, mutation_model, biobank"
     )
     parser.add_argument(
@@ -897,6 +899,11 @@ def main(argv: List[str] | None = None) -> int:
         const=Path("data_sources.yaml"),
         metavar="PATH",
         help="Check that TABLES matches data_sources.yaml (default path) and exit.",
+    )
+    parser.add_argument(
+        "--validate",
+        action="store_true",
+        help="Run FK validation on processed CSVs after writing.",
     )
     args = parser.parse_args(argv)
 
@@ -936,9 +943,27 @@ def main(argv: List[str] | None = None) -> int:
             print(f"  Retrieved {len(df)} rows", flush=True)
             write_raw(args.raw_dir, config["raw_filename"], df)
 
+        n_before = len(df)
+        # Synapse may return list-typed columns which are unhashable;
+        # convert to tuples so drop_duplicates() can hash every cell.
+        for col in df.columns:
+            if df[col].apply(lambda x: isinstance(x, list)).any():
+                df[col] = df[col].apply(lambda x: tuple(x) if isinstance(x, list) else x)
+        df = df.drop_duplicates()
+        n_dupes = n_before - len(df)
+        if n_dupes:
+            print(f"  Dropped {n_dupes} duplicate rows", flush=True)
+
         data_rows = build_rows(df, config["columns"])
         write_processed_csv(config["csv_path"], config["columns"], data_rows)
         print(f"  Wrote CSV -> {config['csv_path']}")
+
+    if args.validate:
+        print("\n--- FK validation ---", flush=True)
+        from validate_fks import validate_all, print_human
+        csv_dir = Path(TABLES[table_names[0]]["csv_path"]).parent
+        results = validate_all(csv_dir)
+        print_human(results)
 
     return 0
 
