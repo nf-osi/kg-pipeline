@@ -17,51 +17,71 @@ profiles:
       studies:
         synapse_id: syn52694652
         concrete_type: MaterializedView
+        note: Study metadata (name, summary, initiative, leads, institutions, disease focus, funding, status)
       files:
         synapse_id: syn16858331
         concrete_type: EntityView
+        note: File-level annotations (assay, platform, data type, diagnosis, species, tissue, etc.)
       mutations:
         synapse_id: syn26486835
         concrete_type: TableEntity
+        note: Mutation details (affected gene, allele type, mutation method, sequence/protein variation)
       genetic_reagents:
         synapse_id: syn26486832
         concrete_type: TableEntity
+        note: Genetic reagent details (vector type, insert, cloning method, primers, tags)
       animal_models:
         synapse_id: syn26486808
         concrete_type: TableEntity
+        note: Animal model details (strain, nomenclature, manifestation, genetic disorder, transplantation)
       cell_lines:
         synapse_id: syn26486823
         concrete_type: TableEntity
+        note: Cell line details (origin, organ, tissue, manifestation, resistance, genetic disorder)
       donors:
         synapse_id: syn26486829
         concrete_type: TableEntity
+        note: Donor demographics (species, race, sex, age, parent/transplantation donor links)
       antibodies:
         synapse_id: syn26486811
         concrete_type: TableEntity
+        note: Antibody details (UniProt ID, clone, reactive species, host organism, target antigen)
       resources:
         synapse_id: syn26450069
         concrete_type: TableEntity
+        note: Central resource registry linking to reagents, antibodies, cell lines, animal models, and biobanks
       observations:
         synapse_id: syn26486836
         concrete_type: TableEntity
-      development_funder:
-        synapse_id: syn51734076
-        concrete_type: MaterializedView
-      development_investigator:
-        synapse_id: syn51734029
-        concrete_type: MaterializedView
-      development_publication:
-        synapse_id: syn51735467
-        concrete_type: MaterializedView
+        note: Curator/community observations about resources with ratings and links
+      development:
+        synapse_id: syn26486807
+        concrete_type: TableEntity
+        note: Junction table linking development records to resources, investigators, publications, and funders
+      funders:
+        synapse_id: syn26486830
+        concrete_type: TableEntity
+        note: Funder details (name); linked from development table via funderId
+      investigators:
+        synapse_id: syn26486833
+        concrete_type: TableEntity
+        note: Investigator details (name, institution, ORCID, Synapse ID); linked from development table via investigatorId
+      publications:
+        synapse_id: syn26486839
+        concrete_type: TableEntity
+        note: Publication details (title, DOI, PMID, abstract, journal, authors, date); linked from development table via publicationId
       donor_tool:
         synapse_id: syn51735419
         concrete_type: MaterializedView
+        note: Materialized view linking donors to resources
       mutation_model:
         synapse_id: syn26486834
         concrete_type: TableEntity
+        note: Junction table linking mutations to animal models and cell lines
       biobanks:
         synapse_id: syn26486821
         concrete_type: TableEntity
+        note: Biobank details (disease type, specimen type/format/tissue, tumor type, contact)
   evaluation:
     version: KG v0.1-eval
     date: '2025-02-10'
@@ -107,15 +127,18 @@ profiles:
       observations:
         synapse_id: syn26486836
         concrete_type: TableEntity
-      development_funder:
-        synapse_id: syn51734076
-        concrete_type: MaterializedView
-      development_investigator:
-        synapse_id: syn51734029
-        concrete_type: MaterializedView
-      development_publication:
-        synapse_id: syn51735467
-        concrete_type: MaterializedView
+      development:
+        synapse_id: syn26486807
+        concrete_type: TableEntity
+      funders:
+        synapse_id: syn26486830
+        concrete_type: TableEntity
+      investigators:
+        synapse_id: syn26486833
+        concrete_type: TableEntity
+      publications:
+        synapse_id: syn26486839
+        concrete_type: TableEntity
       donor_tool:
         synapse_id: syn51735419
         concrete_type: MaterializedView
