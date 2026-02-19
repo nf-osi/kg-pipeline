@@ -7,6 +7,7 @@
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
 @prefix grel: <http://users.ugent.be/~bjdmeest/function/grel.ttl#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
 @prefix nf:   <http://nf-osi.github.com/terms#> .
 @prefix map:  <http://nf-osi.github.com/mappings/biobanks#> .
 
@@ -30,7 +31,7 @@ map:BiobankCore a rr:TriplesMap ;
     rr:predicateObjectMap [ rr:predicate nf:name ; rr:objectMap [ rml:reference "biobankName" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:biobankURL ; rr:objectMap [ rml:reference "biobankURL" ; rr:termType rr:IRI ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:contact ; rr:objectMap [ rml:reference "contact" ; rr:datatype xsd:string ] ] ;
-    rr:predicateObjectMap [ rr:predicate nf:hasResource ; rr:objectMap [ rr:template "http://nf-osi.github.com/terms#resource/{resourceId}" ; rr:termType rr:IRI ] ] .
+    rr:predicateObjectMap [ rr:predicate owl:sameAs ; rr:objectMap [ rr:template "http://nf-osi.github.com/terms#resource/{resourceId}" ; rr:termType rr:IRI ] ] .
 
 ################################################################################
 # Multi-valued fields (StringList, pipe-delimited)
