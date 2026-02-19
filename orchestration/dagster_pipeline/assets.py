@@ -26,7 +26,7 @@ def create_csv_asset(table_name: str, config: TableConfig):
     """Create a Dagster asset for downloading a CSV table from Synapse."""
 
     @asset(
-        name=f"{table_name}_csv",
+        name=table_name,
         key_prefix=["portal", "csv"],
         compute_kind="synapse",
         group_name=table_name,
@@ -65,11 +65,11 @@ def create_harmonize_asset(table_name: str, config: TableConfig):
     if not config.harmonize_script:
         return None
 
-    csv_asset_key = ["portal", "csv", f"{table_name}_csv"]
+    csv_asset_key = ["portal", "csv", table_name]
 
     @asset(
-        name=f"{table_name}_harmonized",
-        key_prefix=["portal", "csv"],
+        name=table_name,
+        key_prefix=["portal", "harmonized"],
         compute_kind="python",
         group_name=table_name,
         deps=[csv_asset_key],
@@ -118,17 +118,64 @@ def create_harmonize_asset(table_name: str, config: TableConfig):
     return _harmonize_asset
 
 
+def create_validation_asset(csv_asset_keys: list):
+    """Create a Dagster asset that validates FK constraints across all CSVs.
+
+    Non-blocking: logs results and attaches violation counts as metadata,
+    but never raises.
+    """
+
+    @asset(
+        name="fk_validation",
+        key_prefix=["portal", "quality"],
+        compute_kind="python",
+        group_name="validation",
+        deps=csv_asset_keys,
+    )
+    def _validation_asset(context: AssetExecutionContext) -> None:
+        """Run FK validation across all processed CSVs."""
+        import sys
+        sys.path.insert(0, str(Path(__file__).parent.parent.parent / "scripts"))
+        from validate_fks import validate_all
+
+        project_root = Path(__file__).parent.parent.parent
+        data_dir = project_root / "data" / "csv"
+
+        results = validate_all(data_dir)
+
+        failures = 0
+        for r in results:
+            label = f"{r.constraint.source_table}.{r.constraint.source_column}"
+            target = f"{r.constraint.target_table}.{r.constraint.target_column}"
+            if r.passed:
+                context.log.info(f" ok   {label} -> {target}")
+            else:
+                failures += 1
+                context.log.warning(
+                    f"FAIL  {label} -> {target}: "
+                    f"{r.orphaned}/{r.populated} orphaned ({r.orphan_pct:.1f}%)"
+                )
+
+        context.add_output_metadata({
+            "total_constraints": len(results),
+            "failures": failures,
+            "passed": len(results) - failures,
+        })
+
+    return _validation_asset
+
+
 def create_rdf_asset(table_name: str, config: TableConfig):
     """Create a Dagster asset for RML mapping (CSV -> RDF)."""
 
     # Depend on harmonized asset if it exists, otherwise on the CSV asset
     if config.harmonize_script:
-        dep_key = ["portal", "csv", f"{table_name}_harmonized"]
+        dep_key = ["portal", "harmonized", table_name]
     else:
-        dep_key = ["portal", "csv", f"{table_name}_csv"]
+        dep_key = ["portal", "csv", table_name]
 
     @asset(
-        name=f"{table_name}_rdf",
+        name=table_name,
         key_prefix=["portal", "rdf"],
         compute_kind="rml",
         group_name=table_name,
@@ -172,11 +219,13 @@ def create_rdf_asset(table_name: str, config: TableConfig):
 def generate_portal_assets() -> List:
     """Generate all portal table assets."""
     assets = []
+    csv_asset_keys = []
 
     for table_name, config in TABLE_CONFIGS.items():
         # Create CSV download asset
         csv_asset = create_csv_asset(table_name, config)
         assets.append(csv_asset)
+        csv_asset_keys.append(["portal", "csv", table_name])
 
         # Create harmonize asset if needed (runs between CSV and RDF)
         if config.harmonize_script:
@@ -187,6 +236,10 @@ def generate_portal_assets() -> List:
         # Create RDF generation asset
         rdf_asset = create_rdf_asset(table_name, config)
         assets.append(rdf_asset)
+
+    # Add FK validation asset (depends on all CSV assets)
+    validation_asset = create_validation_asset(csv_asset_keys)
+    assets.append(validation_asset)
 
     return assets
 

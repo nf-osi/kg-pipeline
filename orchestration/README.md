@@ -14,20 +14,25 @@ Synapse Tables → CSV → [Harmonize] → RML → RDF (.ttl)
 
 ### Asset Groups
 
-Each portal table (study, file, mutation, reagent, animal, cell, donor, antibody) has its own asset group:
+Each portal table has its own asset group (17 tables total):
 
-1. **CSV Asset** (`portal/csv/{table}_csv`)
+1. **CSV Asset** (`portal/csv/{table}`)
    - Downloads from Synapse
    - Applies transformations (string_list, synapse_id, etc.)
    - Writes to `data/csv/`
 
-2. **Harmonize Asset** (`portal/csv/{table}_harmonized`) - *studies, observations, files, genetic_reagents, mutations*
+2. **Harmonize Asset** (`portal/harmonized/{table}`) - *studies, observations, files, cell_lines, genetic_reagents, mutations*
    - Runs classification/linking scripts on CSV data
    - Writes to `data/csv/{table}_harmonized.csv`
 
-3. **RDF Asset** (`portal/rdf/{table}_rdf`)
+3. **RDF Asset** (`portal/rdf/{table}`)
    - Runs RMLMapper (CSV → RDF)
    - Writes to `data/rdf/`
+
+4. **FK Validation Asset** (`portal/quality/fk_validation`) - *single asset, runs once*
+   - Depends on all CSV assets
+   - Checks referential integrity across tables (see [HARMONIZATION.md](../HARMONIZATION.md))
+   - Non-blocking: logs results and attaches metadata but never raises
 
 ## Setup
 
@@ -42,7 +47,6 @@ source .venv/bin/activate
 
 # Install dependencies
 pip install -e ".[dev]"
-pip install "pyoxigraph>=0.4.0"  # required for dataType harmonization
 ```
 
 ## Usage
@@ -51,19 +55,22 @@ pip install "pyoxigraph>=0.4.0"  # required for dataType harmonization
 
 ```bash
 # Materialize all assets
-dagster asset materialize --module-name dagster_pipeline
+dagster asset materialize -m dagster_pipeline
 
-# Materialize specific table
-dagster asset materialize --module-name dagster_pipeline --select "portal_donors*"
+# Materialize a single asset
+dagster asset materialize -m dagster_pipeline --select "portal/csv/donors"
 
-# Materialize multiple tables
-dagster asset materialize --module-name dagster_pipeline --select "portal_donors* portal_antibodies*"
+# Materialize multiple assets (comma-separated)
+dagster asset materialize -m dagster_pipeline --select "portal/rdf/donors,portal/rdf/antibodies"
 
-# Materialize all CSV assets
-dagster asset materialize --module-name dagster_pipeline --select "tag:compute_kind=synapse"
+# Materialize all assets in a table group (CSV + harmonize + RDF)
+dagster asset materialize -m dagster_pipeline --select "group:donors"
 
-# Materialize all RML assets
-dagster asset materialize --module-name dagster_pipeline --select "tag:compute_kind=rml"
+# Materialize an asset and all its upstream dependencies
+dagster asset materialize -m dagster_pipeline --select "+portal/rdf/studies"
+
+# Run FK validation only
+dagster asset materialize -m dagster_pipeline --select "group:validation"
 ```
 
 ### With Dagster UI
@@ -82,14 +89,13 @@ Then open http://localhost:3000
 
 ## Asset Selection Patterns
 
-Dagster supports asset selection:
+Asset keys follow the pattern `portal/{stage}/{table}`:
 
-- `portal_donors_csv` - Single asset
-- `portal_donors*` - All assets in the donors group
-- `*rdf` - All RDF assets
-- `tag:compute_kind=rml` - All RML mapping assets
-- `+portal_studies_rdf` - Asset and all upstream dependencies
-- `portal_studies_rdf+` - Asset and all downstream dependencies
+- `portal/csv/donors` — single asset
+- `group:donors` — all assets in the donors group (CSV + harmonize + RDF)
+- `group:validation` — FK validation asset
+- `+portal/rdf/studies` — asset and all upstream dependencies
+- `portal/csv/studies+` — asset and all downstream dependents
 
 ## Project Structure
 
@@ -118,8 +124,8 @@ No need to modify Dagster code - assets are generated dynamically,
 
 ```bash
 # Test that assets load
-dagster asset list --module-name dagster_pipeline
+dagster asset list -m dagster_pipeline
 
 # Test a single asset
-dagster asset materialize --module-name dagster_pipeline --select portal_donors_csv
+dagster asset materialize -m dagster_pipeline --select portal/csv/donors
 ```
