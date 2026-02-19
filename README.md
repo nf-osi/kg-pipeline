@@ -50,11 +50,13 @@ scripts/
   classify_*.py                  Harmonization (one per entity type)
   harmonize_files.py             File-level harmonization (model systems, data types)
   validate_fks.py                CSV-level foreign key validation (see HARMONIZATION.md)
+  astabench_data.py              Build eval_data.yaml for astabench from ground-truth files
 data/
   csv/                           Source and harmonized CSVs
   rdf/                           Generated RDF (Turtle)
   raw/                           Raw Synapse exports (cache)
 orchestration/dagster_pipeline/  Dagster asset definitions for the full pipeline
+astabench/                       Eval framework (git submodule, see Evaluation)
 evaluation/                      Eval datasets for KG quality + RAG
 test/                            RML mapping tests (pytest + rdflib)
 tools/                           RMLMapper JAR + GREL function files
@@ -88,6 +90,59 @@ pytest test/
 
 Each RML mapping has a corresponding test that runs RMLMapper against a small
 fixture CSV and validates the output graph with SPARQL. See `test/README.md`.
+
+### Build and Release
+
+Pre-built [QLever](https://github.com/ad-freiburg/qlever) images with indexed data
+are published to GHCR on each tagged release.
+
+Run the image:
+
+```
+docker run -p 7001:7001 ghcr.io/nf-osi/kg-pipeline:latest
+```
+
+The SPARQL endpoint is available at `http://localhost:7001`.
+
+To build locally from materialized RDF instead:
+```
+docker compose run --rm qlever-index   # build index
+docker compose up qlever-server        # serve on :7001
+```
+
+### Evaluation
+
+Evaluation uses the [AstaBench](https://github.com/allenai/asta-bench) framework (built on [InspectAI](https://inspect.aisi.org.uk/)).
+`astabench` is a git submodule pointing to the [nf-osi fork](https://github.com/nf-osi/asta-bench) that adds NF-specific tasks.
+
+```bash
+git submodule update --init              # first time
+git submodule update --remote astabench  # pull latest from fork
+```
+
+Ground-truth datasets live in `evaluation/<dataset>/` as separate auto-generated and
+manually curated YAML files. Before running eval, merge them into the single
+`eval_data.yaml` that astabench expects:
+
+```bash
+python scripts/astabench_data.py --dataset main
+```
+
+Then serve the knowledge graph (either with a [released image](#build-and-release)
+or via `docker compose`), set up API keys, and run:
+
+```bash
+cd astabench
+# install deps as needed
+inspect eval astabench/nf_rag --solver react --model anthropic/claude-sonnet-4-5
+```
+
+See [`astabench/evals/nf_rag/README.md`](astabench/evals/nf_rag/README.md) for additional details and examples.
+
+#### Limitations
+
+This evaluates retrieval from one knowledge source in isolation.
+In production, an agent switches between two or more sources (e.g. the KG and a vector DB that indexes help documentation).
 
 ### Dependencies
 
