@@ -68,25 +68,22 @@ class TestBiobanksCore:
             assert isinstance(row.url, URIRef), \
                 f"biobankURL should be IRI, got {type(row.url)}"
 
-    def test_same_as_resource_is_iri(self, biobanks_graph, namespaces):
-        """owl:sameAs should link to a resource IRI"""
+    def test_resource_id_is_string(self, biobanks_graph, namespaces):
+        """resourceId should be a string literal"""
         NF = namespaces["nf"]
-        OWL = Namespace("http://www.w3.org/2002/07/owl#")
 
         query = """
-        SELECT ?biobank ?resource
+        SELECT ?biobank ?resourceId
         WHERE {
             ?biobank a nf:Biobank ;
-                     owl:sameAs ?resource .
+                     nf:resourceId ?resourceId .
         }
         """
-        results = list(biobanks_graph.query(query, initNs={"nf": NF, "owl": OWL}))
-        assert len(results) > 0, "No owl:sameAs relationships found"
+        results = list(biobanks_graph.query(query, initNs={"nf": NF}))
+        assert len(results) > 0, "No resourceId properties found"
         for row in results:
-            assert isinstance(row.resource, URIRef), \
-                f"owl:sameAs should be IRI, got {type(row.resource)}"
-            assert "resource/" in str(row.resource), \
-                f"Expected resource/ IRI pattern, got {row.resource}"
+            assert isinstance(row.resourceId, Literal), \
+                f"resourceId should be Literal, got {type(row.resourceId)}"
 
 
 class TestBiobanksMultiValue:

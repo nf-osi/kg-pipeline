@@ -28,13 +28,13 @@ map:DevelopmentCore a rr:TriplesMap ;
 # Development -> Resource relationship
 ################################################################################
 
-map:DevelopmentHasResource a rr:TriplesMap ;
-    rdfs:label "Development Has Resource" ;
+map:DevelopmentAboutResourceId a rr:TriplesMap ;
+    rdfs:label "Development About Resource ID" ;
     rml:logicalSource map:DevelopmentSource ;
     rr:subjectMap [ rr:template "http://nf-osi.github.com/terms#development/{developmentId}" ; rr:termType rr:IRI ] ;
     rr:predicateObjectMap [
-        rr:predicate nf:hasResource ;
-        rr:objectMap [ rr:template "http://nf-osi.github.com/terms#resource/{resourceId}" ; rr:termType rr:IRI ]
+        rr:predicate nf:forResourceId ;
+        rr:objectMap [ rml:reference "resourceId" ; rr:datatype xsd:string ]
     ] .
 
 ################################################################################
