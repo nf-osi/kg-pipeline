@@ -138,14 +138,3 @@ Two tables have foreign key columns populated with `resourceId` values from
 Both issues originate in the upstream Synapse tables and need to be corrected
 there. The pipeline currently passes them through as-is.
 
-### studyId format mismatch (files vs studies)
-
-The studies materialized view (syn52694652) stores `studyId` with a `syn:`
-prefix (e.g. `syn:syn2343195`), while the files entity view (syn16858331)
-stores bare Synapse IDs (e.g. `syn2343195`). The `format_synapse_id` transform
-in `prepare_portal_tables.py` is a pass-through, so the inconsistency
-propagates into the CSVs and ultimately into the RDF, where study and file
-entities generate different IRIs for the same study.
-
-After stripping the `syn:` prefix, 237 of 250 file `studyId` values match a
-study; 13 are truly orphaned (affecting 35 file rows out of ~485k).

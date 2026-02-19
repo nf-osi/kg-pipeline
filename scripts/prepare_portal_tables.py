@@ -685,6 +685,9 @@ def format_synapse_id(value: Any) -> str:
     raw = format_string(value).strip()
     if not raw:
         return ""
+    # Strip spurious "syn:" prefix from materialized views (e.g. "syn:syn2343195" -> "syn2343195")
+    if raw.startswith("syn:"):
+        raw = raw[len("syn:"):]
     return raw
 
 
