@@ -112,32 +112,43 @@ docker compose up qlever-server        # serve on :7001
 
 ### Evaluation
 
+Ground-truth datasets live in `evaluation/<dataset>/`.
+
 Evaluation uses the [AstaBench](https://github.com/allenai/asta-bench) framework (built on [InspectAI](https://inspect.aisi.org.uk/)).
 `astabench` is a git submodule pointing to the [nf-osi fork](https://github.com/nf-osi/asta-bench) that adds NF-specific tasks.
 
 ```bash
 git submodule update --init              # first time
 git submodule update --remote astabench  # pull latest from fork
-```
-
-Ground-truth datasets live in `evaluation/<dataset>/` as separate auto-generated and
-manually curated YAML files. Before running eval, merge them into the single
-`eval_data.yaml` that astabench expects:
-
-```bash
-python scripts/astabench_data.py --dataset main
-```
-
-Then serve the knowledge graph (either with a [released image](#build-and-release)
-or via `docker compose`), set up API keys, and run:
-
-```bash
 cd astabench
-# install deps as needed
-inspect eval astabench/nf_rag --solver react --model anthropic/claude-sonnet-4-5
+# install deps
 ```
 
-See [`astabench/evals/nf_rag/README.md`](astabench/evals/nf_rag/README.md) for additional details and examples.
+The convenience script for running eval will process ground truth files into the single
+`eval_data.yaml` expected and runs benchmarking with Anthropic models by default.
+
+Steps (from the repo root):
+1. Serve the knowledge graph; because ground truth is based on a specific snapshot of the data, 
+use the specific [released image](#build-and-release), unless using `docker compose` for a developing benchmark:
+
+```bash
+docker run -p 7001:7001 ghcr.io/nf-osi/kg-pipeline:eval-1 
+```
+
+2. Export API keys (`ANTHROPIC_API_KEY` for standard, additional keys for `--full`) and run:  
+
+```bash                                                                                                              
+export ANTHROPIC_API_KEY=...                   # required                                                            
+python scripts/astabench.py
+```
+
+```bash
+GOOGLE_API_KEY=... OPENAI_API_KEY=...   # for --full                                                          
+python scripts/astabench.py --full      # + gemini-2.5-flash, gpt-5.2                                         
+python scripts/astabench.py --full --epochs 3  # extra args forwarded to inspect eval   
+```
+
+See [`astabench/evals/nf_rag/README.md`](astabench/evals/nf_rag/README.md) for more details.
 
 #### Limitations
 
