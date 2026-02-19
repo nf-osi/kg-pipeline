@@ -1,0 +1,4 @@
+developmentId,resourceId,investigatorId,publicationId,funderId
+dev-001,test-res-001,inv-001,pub-001,funder-ntap
+dev-001,test-res-001,inv-002,pub-001,funder-ctf
+dev-002,test-res-002,inv-003,pub-002,funder-nih

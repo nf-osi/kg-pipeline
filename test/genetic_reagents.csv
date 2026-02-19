@@ -1,5 +1,5 @@
-geneticReagentId,vectorType,insertEntrezId,insertName,insertSpecies,insertSize,cloningMethod,copyNumber,nTerminalTag,cTerminalTag,totalSize,vectorBackbone,backboneSize,promoter,bacterialResistance,growthTemp,growthStrain,selectableMarker,5primer,3primer,5primeCloningSite,3primeCloningSite,5primeSiteDestroyed,3primeSiteDestroyed,gRNAshRNASequence,hazardous
-test-reagent-001,Plasmid|Viral,123456,NF1-GFP,Human|Mouse,2500,Gateway,High,GFP,FLAG,8500,pCDNA3,6000,CMV,Ampicillin,37,DH5alpha,Neomycin,ATGCGATCG,GCTAGCTAG,EcoRI,BamHI,No,Yes,AGCTAGCTAGCT,No
-test-reagent-002,Plasmid,789012,Empty Vector,E. coli,0,Restriction,Low,,,,5000,pUC19,5000,T7,Kanamycin,37,BL21,,,,,,,,,No
-test-reagent-003,CRISPR,,gRNA-NF2,,,,,,,,,,,,,,,,,,,,,GCTAGCTAGCTA,Yes
-test-reagent-004,Viral,111222,Luciferase,Firefly,1800,Gibson,,,mCherry,7200,AAV,5400,CAG,,,,,GCTAGCTA,ATCGATCG,NotI,XhoI,Yes,No,,No
+geneticReagentId,vectorType,insertEntrezId,insertName,insertSpecies,insertSize,cloningMethod,copyNumber,nTerminalTag,cTerminalTag,totalSize,vectorBackbone,backboneSize,promoter,bacterialResistance,growthTemp,growthStrain,selectableMarker,5primer,3primer,5primeCloningSite,3primeCloningSite,5primeSiteDestroyed,3primeSiteDestroyed,gRNAshRNASequence,hazardous,reagentClass
+test-reagent-001,Plasmid|Viral,123456,NF1-GFP,Human|Mouse,2500,Gateway,High,GFP,FLAG,8500,pCDNA3,6000,CMV,Ampicillin,37,DH5alpha,Neomycin,ATGCGATCG,GCTAGCTAG,EcoRI,BamHI,No,Yes,AGCTAGCTAGCT,No,
+test-reagent-002,Plasmid,789012,Empty Vector,E. coli,0,Restriction,Low,,,,5000,pUC19,5000,T7,Kanamycin,37,BL21,,,,,,,,,No,
+test-reagent-003,CRISPR,,gRNA-NF2,,,,,,,,,,,,,,,,,,,,,GCTAGCTAGCTA,Yes,http://nf-osi.github.com/terms#CRISPRReagent
+test-reagent-004,Viral,111222,Luciferase,Firefly,1800,Gibson,,,mCherry,7200,AAV,5400,CAG,,,,,GCTAGCTA,ATCGATCG,NotI,XhoI,Yes,No,,No,

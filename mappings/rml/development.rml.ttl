@@ -1,0 +1,155 @@
+@prefix rr:   <http://www.w3.org/ns/r2rml#> .
+@prefix rml:  <http://semweb.mmlab.be/ns/rml#> .
+@prefix ql:   <http://semweb.mmlab.be/ns/ql#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix nf:   <http://nf-osi.github.com/terms#> .
+@prefix map:  <http://nf-osi.github.com/mappings/development#> .
+
+################################################################################
+# Logical source
+################################################################################
+
+map:DevelopmentSource a rml:LogicalSource ;
+    rml:source "data/csv/development.csv" ;
+    rml:referenceFormulation ql:CSV .
+
+################################################################################
+# Development core
+################################################################################
+
+map:DevelopmentCore a rr:TriplesMap ;
+    rdfs:label "Development Core" ;
+    rml:logicalSource map:DevelopmentSource ;
+    rr:subjectMap [ rr:template "http://nf-osi.github.com/terms#development/{developmentId}" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [ rr:predicate rdf:type ; rr:objectMap [ rr:constant nf:Development ; rr:termType rr:IRI ] ] .
+
+################################################################################
+# Development -> Resource relationship
+################################################################################
+
+map:DevelopmentHasResource a rr:TriplesMap ;
+    rdfs:label "Development Has Resource" ;
+    rml:logicalSource map:DevelopmentSource ;
+    rr:subjectMap [ rr:template "http://nf-osi.github.com/terms#development/{developmentId}" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:hasResource ;
+        rr:objectMap [ rr:template "http://nf-osi.github.com/terms#resource/{resourceId}" ; rr:termType rr:IRI ]
+    ] .
+
+################################################################################
+# Development -> Funder relationship
+################################################################################
+
+map:DevelopmentHasFunder a rr:TriplesMap ;
+    rdfs:label "Development Has Funder" ;
+    rml:logicalSource map:DevelopmentSource ;
+    rr:subjectMap [ rr:template "http://nf-osi.github.com/terms#development/{developmentId}" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:hasFunder ;
+        rr:objectMap [ rr:template "http://nf-osi.github.com/terms#funder/{funderId}" ; rr:termType rr:IRI ]
+    ] .
+
+################################################################################
+# Development -> Investigator relationship
+################################################################################
+
+map:DevelopmentHasInvestigator a rr:TriplesMap ;
+    rdfs:label "Development Has Investigator" ;
+    rml:logicalSource map:DevelopmentSource ;
+    rr:subjectMap [ rr:template "http://nf-osi.github.com/terms#development/{developmentId}" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:hasInvestigator ;
+        rr:objectMap [ rr:template "http://nf-osi.github.com/terms#investigator/{investigatorId}" ; rr:termType rr:IRI ]
+    ] .
+
+################################################################################
+# Development -> Publication relationship
+################################################################################
+
+map:DevelopmentHasPublication a rr:TriplesMap ;
+    rdfs:label "Development Has Publication" ;
+    rml:logicalSource map:DevelopmentSource ;
+    rr:subjectMap [ rr:template "http://nf-osi.github.com/terms#development/{developmentId}" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:hasPublication ;
+        rr:objectMap [ rr:template "http://nf-osi.github.com/terms#publication/{publicationId}" ; rr:termType rr:IRI ]
+    ] .
+
+################################################################################
+# Resource -> Funder shortcut (via development)
+################################################################################
+
+map:ResourceHasFunder a rr:TriplesMap ;
+    rdfs:label "Resource Has Funder" ;
+    rml:logicalSource map:DevelopmentSource ;
+    rr:subjectMap [ rr:template "http://nf-osi.github.com/terms#resource/{resourceId}" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:hasFunder ;
+        rr:objectMap [ rr:template "http://nf-osi.github.com/terms#funder/{funderId}" ; rr:termType rr:IRI ]
+    ] .
+
+################################################################################
+# Resource -> Investigator shortcut (via development)
+################################################################################
+
+map:ResourceHasInvestigator a rr:TriplesMap ;
+    rdfs:label "Resource Has Investigator" ;
+    rml:logicalSource map:DevelopmentSource ;
+    rr:subjectMap [ rr:template "http://nf-osi.github.com/terms#resource/{resourceId}" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:hasInvestigator ;
+        rr:objectMap [ rr:template "http://nf-osi.github.com/terms#investigator/{investigatorId}" ; rr:termType rr:IRI ]
+    ] .
+
+################################################################################
+# Resource -> Publication shortcut (via development)
+################################################################################
+
+map:ResourceHasPublication a rr:TriplesMap ;
+    rdfs:label "Resource Has Publication" ;
+    rml:logicalSource map:DevelopmentSource ;
+    rr:subjectMap [ rr:template "http://nf-osi.github.com/terms#resource/{resourceId}" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:hasPublication ;
+        rr:objectMap [ rr:template "http://nf-osi.github.com/terms#publication/{publicationId}" ; rr:termType rr:IRI ]
+    ] .
+
+################################################################################
+# Publication -> Funder shortcut (via development)
+################################################################################
+
+map:PublicationHasFunder a rr:TriplesMap ;
+    rdfs:label "Publication Has Funder" ;
+    rml:logicalSource map:DevelopmentSource ;
+    rr:subjectMap [ rr:template "http://nf-osi.github.com/terms#publication/{publicationId}" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:hasFunder ;
+        rr:objectMap [ rr:template "http://nf-osi.github.com/terms#funder/{funderId}" ; rr:termType rr:IRI ]
+    ] .
+
+################################################################################
+# Publication -> Investigator shortcut (via development)
+################################################################################
+
+map:PublicationHasInvestigator a rr:TriplesMap ;
+    rdfs:label "Publication Has Investigator" ;
+    rml:logicalSource map:DevelopmentSource ;
+    rr:subjectMap [ rr:template "http://nf-osi.github.com/terms#publication/{publicationId}" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:hasInvestigator ;
+        rr:objectMap [ rr:template "http://nf-osi.github.com/terms#investigator/{investigatorId}" ; rr:termType rr:IRI ]
+    ] .
+
+################################################################################
+# Funder -> Investigator shortcut (via development)
+################################################################################
+
+map:FunderHasInvestigator a rr:TriplesMap ;
+    rdfs:label "Funder Has Investigator" ;
+    rml:logicalSource map:DevelopmentSource ;
+    rr:subjectMap [ rr:template "http://nf-osi.github.com/terms#funder/{funderId}" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:hasInvestigator ;
+        rr:objectMap [ rr:template "http://nf-osi.github.com/terms#investigator/{investigatorId}" ; rr:termType rr:IRI ]
+    ] .

@@ -15,7 +15,7 @@
 ################################################################################
 
 map:PortalStudiesSource a rml:LogicalSource ;
-    rml:source "data/csv/studies.csv" ;
+    rml:source "data/csv/studies_harmonized.csv" ;
     rml:referenceFormulation ql:CSV .
 
 ################################################################################
@@ -25,9 +25,9 @@ map:PortalStudiesSource a rml:LogicalSource ;
 map:StudyCore a rr:TriplesMap ;
     rdfs:label "Study Core" ;
     rml:logicalSource map:PortalStudiesSource ;
-    rr:subjectMap [ rml:reference "studyId" ; rr:termType rr:IRI ] ;
+    rr:subjectMap [ rr:template "https://www.synapse.org/Synapse:{studyId}" ; rr:termType rr:IRI ] ;
     rr:predicateObjectMap [ rr:predicate rdf:type ; rr:objectMap [ rr:constant nf:Study ; rr:termType rr:IRI ] ] ;
-    rr:predicateObjectMap [ rr:predicate nf:studyName ; rr:objectMap [ rml:reference "studyName" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:name ; rr:objectMap [ rml:reference "studyName" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:description ; rr:objectMap [ rml:reference "summary" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [
         rr:predicate nf:initiative ;
@@ -62,7 +62,7 @@ map:StudyCore a rr:TriplesMap ;
     rr:predicateObjectMap [ rr:predicate nf:acknowledgementStatements ; rr:objectMap [ rml:reference "acknowledgementStatements" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [
         rr:predicate nf:studyFileviewId ;
-        rr:objectMap [ rml:reference "studyFileviewId" ; rr:termType rr:IRI ]
+        rr:objectMap [ rr:template "https://www.synapse.org/Synapse:{studyFileviewId}" ; rr:termType rr:IRI ]
     ] .
 
 ################################################################################
@@ -72,7 +72,7 @@ map:StudyCore a rr:TriplesMap ;
 map:StudyLeads a rr:TriplesMap ;
     rdfs:label "Study Leads" ;
     rml:logicalSource map:PortalStudiesSource ;
-    rr:subjectMap [ rml:reference "studyId" ; rr:termType rr:IRI ] ;
+    rr:subjectMap [ rr:template "https://www.synapse.org/Synapse:{studyId}" ; rr:termType rr:IRI ] ;
     rr:predicateObjectMap [
         rr:predicate nf:studyLeads ;
         rr:objectMap [
@@ -100,7 +100,7 @@ map:StudyLeads a rr:TriplesMap ;
 map:StudyInstitutions a rr:TriplesMap ;
     rdfs:label "Study Institutions" ;
     rml:logicalSource map:PortalStudiesSource ;
-    rr:subjectMap [ rml:reference "studyId" ; rr:termType rr:IRI ] ;
+    rr:subjectMap [ rr:template "https://www.synapse.org/Synapse:{studyId}" ; rr:termType rr:IRI ] ;
     rr:predicateObjectMap [
         rr:predicate nf:institutions ;
         rr:objectMap [
@@ -128,7 +128,7 @@ map:StudyInstitutions a rr:TriplesMap ;
 map:StudyManifestation a rr:TriplesMap ;
     rdfs:label "Study Manifestation" ;
     rml:logicalSource map:PortalStudiesSource ;
-    rr:subjectMap [ rml:reference "studyId" ; rr:termType rr:IRI ] ;
+    rr:subjectMap [ rr:template "https://www.synapse.org/Synapse:{studyId}" ; rr:termType rr:IRI ] ;
     rr:predicateObjectMap [
         rr:predicate nf:manifestation ;
         rr:objectMap [
@@ -156,7 +156,7 @@ map:StudyManifestation a rr:TriplesMap ;
 map:StudyDiseaseFocus a rr:TriplesMap ;
     rdfs:label "Study Disease Focus" ;
     rml:logicalSource map:PortalStudiesSource ;
-    rr:subjectMap [ rml:reference "studyId" ; rr:termType rr:IRI ] ;
+    rr:subjectMap [ rr:template "https://www.synapse.org/Synapse:{studyId}" ; rr:termType rr:IRI ] ;
     rr:predicateObjectMap [
         rr:predicate nf:diseaseFocus ;
         rr:objectMap [
@@ -184,7 +184,7 @@ map:StudyDiseaseFocus a rr:TriplesMap ;
 map:StudyFundingAgency a rr:TriplesMap ;
     rdfs:label "Study Funding Agency" ;
     rml:logicalSource map:PortalStudiesSource ;
-    rr:subjectMap [ rml:reference "studyId" ; rr:termType rr:IRI ] ;
+    rr:subjectMap [ rr:template "https://www.synapse.org/Synapse:{studyId}" ; rr:termType rr:IRI ] ;
     rr:predicateObjectMap [
         rr:predicate nf:hasFunder ;
         rr:objectMap [
@@ -256,12 +256,12 @@ map:StudyFundingAgency a rr:TriplesMap ;
 map:StudyDataType a rr:TriplesMap ;
     rdfs:label "Study Data Type" ;
     rml:logicalSource map:PortalStudiesSource ;
-    rr:subjectMap [ rml:reference "studyId" ; rr:termType rr:IRI ] ;
+    rr:subjectMap [ rr:template "https://www.synapse.org/Synapse:{studyId}" ; rr:termType rr:IRI ] ;
     rr:predicateObjectMap [
         rr:predicate nf:dataType ;
         rr:objectMap [
             a fnml:FunctionTermMap ;
-            rr:datatype xsd:string ;
+            rr:termType rr:IRI ;
             fnml:functionValue [
                 a fno:Execution ;
                 rml:logicalSource map:PortalStudiesSource ;
@@ -271,7 +271,7 @@ map:StudyDataType a rr:TriplesMap ;
                 ] ;
                 rr:predicateObjectMap [
                     rr:predicate grel:valueParameter ;
-                    rr:objectMap [ rml:reference "dataType" ; rr:termType rr:Literal ]
+                    rr:objectMap [ rml:reference "dataTypeIRI" ; rr:termType rr:Literal ]
                 ] ;
                 rr:predicateObjectMap [
                     rr:predicate grel:p_string_sep ;
@@ -284,7 +284,7 @@ map:StudyDataType a rr:TriplesMap ;
 map:StudyRelatedStudies a rr:TriplesMap ;
     rdfs:label "Study Related Studies" ;
     rml:logicalSource map:PortalStudiesSource ;
-    rr:subjectMap [ rml:reference "studyId" ; rr:termType rr:IRI ] ;
+    rr:subjectMap [ rr:template "https://www.synapse.org/Synapse:{studyId}" ; rr:termType rr:IRI ] ;
     rr:predicateObjectMap [
         rr:predicate nf:relatedStudies ;
         rr:objectMap [
@@ -312,7 +312,7 @@ map:StudyRelatedStudies a rr:TriplesMap ;
 map:StudyGrantDOI a rr:TriplesMap ;
     rdfs:label "Study Grant DOI" ;
     rml:logicalSource map:PortalStudiesSource ;
-    rr:subjectMap [ rml:reference "studyId" ; rr:termType rr:IRI ] ;
+    rr:subjectMap [ rr:template "https://www.synapse.org/Synapse:{studyId}" ; rr:termType rr:IRI ] ;
     rr:predicateObjectMap [
         rr:predicate nf:grantDOI ;
         rr:objectMap [

@@ -19,8 +19,7 @@ def load_data():
         'reagents': 'genetic_reagents.csv',
         'antibodies': 'antibodies.csv',
         'mutations': 'mutations.csv',
-        'mutation_models': 'mutation_animal_model.csv',
-        'mutation_cells': 'mutation_cell_line.csv',
+        'mutation_model': 'mutation_model.csv',
         'resources': 'resources.csv',
         'investigators': 'development_investigator.csv',
         'funders': 'development_funder.csv',
@@ -74,15 +73,10 @@ def run_queries(data):
         cells_donors = pd.DataFrame()
 
     # Mutation joins
-    if not data['mutations'].empty and not data['mutation_models'].empty:
-        mut_models = pd.merge(data['mutations'], data['mutation_models'], on='mutationId', how='inner')
+    if not data['mutations'].empty and not data['mutation_model'].empty:
+        mut_joined = pd.merge(data['mutations'], data['mutation_model'], on='mutationId', how='inner')
     else:
-        mut_models = pd.DataFrame()
-
-    if not data['mutations'].empty and not data['mutation_cells'].empty:
-        mut_cells = pd.merge(data['mutations'], data['mutation_cells'], on='mutationId', how='inner')
-    else:
-        mut_cells = pd.DataFrame()
+        mut_joined = pd.DataFrame()
 
     # Create mapping from primary tool IDs to resourceId using the new resources table
     primary_to_res = {}
@@ -129,12 +123,12 @@ def run_queries(data):
 
     # MUT-001: ClinVar mutation
     term_mut001 = "NM_000267.3(NF1):c.2041C>T (p.Arg681Ter)"
-    if not mut_models.empty or not mut_cells.empty:
+    if not mut_joined.empty:
+        matched = mut_joined[mut_joined['humanClinVarMutation'] == term_mut001]
         ids = []
-        if not mut_models.empty:
-            ids.extend(mut_models[mut_models['humanClinVarMutation'] == term_mut001]['resourceId'].tolist())
-        if not mut_cells.empty:
-            ids.extend(mut_cells[mut_cells['humanClinVarMutation'] == term_mut001]['resourceId'].tolist())
+        ids.extend(matched['animalModelId'].dropna().tolist())
+        ids.extend(matched['cellLineId'].dropna().tolist())
+        ids = ensure_resource_id(ids)
         if ids:
             results['MUT-001'] = [i for i in set(ids) if pd.notna(i)]
 
@@ -146,53 +140,53 @@ def run_queries(data):
             (data['mutations']['mutationMethod'].str.contains(flox_patterns, case=False, na=False)) |
             (data['mutations']['mutationType'].str.contains(flox_patterns, case=False, na=False))
         ]['mutationId'].tolist()
-        if flox_mut_ids and not data['mutation_models'].empty:
-            ids_mut002.extend(data['mutation_models'][data['mutation_models']['mutationId'].isin(flox_mut_ids)]['resourceId'].tolist())
+        if flox_mut_ids and not data['mutation_model'].empty:
+            matched = data['mutation_model'][data['mutation_model']['mutationId'].isin(flox_mut_ids)]
+            ids_mut002.extend(ensure_resource_id(matched['animalModelId'].dropna().tolist()))
     if not data['models'].empty:
         ids_mut002.extend(ensure_resource_id(data['models'][data['models']['strainNomenclature'].str.contains('flox', case=False, na=False)]['animalModelId'].tolist()))
     if ids_mut002:
         results['MUT-002'] = [i for i in set(ids_mut002) if pd.notna(i)]
 
     # MUT-003: c.104del sequence variation
-    if not mut_cells.empty:
-        results['MUT-003'] = [i for i in set(mut_cells[mut_cells['sequenceVariation'].str.contains('c.104del', case=False, na=False)]['resourceId'].tolist()) if pd.notna(i)]
+    if not mut_joined.empty:
+        matched = mut_joined[mut_joined['sequenceVariation'].str.contains('c.104del', case=False, na=False)]
+        ids = ensure_resource_id(matched['cellLineId'].dropna().tolist())
+        results['MUT-003'] = [i for i in set(ids) if pd.notna(i)]
 
     # MUT-004: splice-site variants
     splice_patterns = r'\+1|\+2|\-1|\-2|splice'
     ids_mut004 = []
-    if not mut_models.empty:
-        ids_mut004.extend(mut_models[
-            (mut_models['humanClinVarMutation'].str.contains(splice_patterns, case=False, na=False)) |
-            (mut_models['mutationType'].str.contains('splice', case=False, na=False))
-        ]['resourceId'].tolist())
-    if not mut_cells.empty:
-        ids_mut004.extend(mut_cells[
-            (mut_cells['humanClinVarMutation'].str.contains(splice_patterns, case=False, na=False)) |
-            (mut_cells['mutationType'].str.contains('splice', case=False, na=False))
-        ]['resourceId'].tolist())
+    if not mut_joined.empty:
+        matched = mut_joined[
+            (mut_joined['humanClinVarMutation'].str.contains(splice_patterns, case=False, na=False)) |
+            (mut_joined['mutationType'].str.contains('splice', case=False, na=False))
+        ]
+        ids_mut004.extend(ensure_resource_id(matched['animalModelId'].dropna().tolist()))
+        ids_mut004.extend(ensure_resource_id(matched['cellLineId'].dropna().tolist()))
     if ids_mut004:
         results['MUT-004'] = [i for i in set(ids_mut004) if pd.notna(i)]
 
     # MUT-005: Cell lines with mutations in multiple genes
     ids_mut005 = []
-    if not mut_cells.empty:
-        # Count unique genes per cell line
-        res_gene_counts = mut_cells.groupby('resourceId')['affectedGeneSymbol'].nunique()
-        # Find cell lines with mutations in multiple genes (>1)
-        multi_gene_resources = res_gene_counts[res_gene_counts > 1].index.tolist()
-        ids_mut005.extend(multi_gene_resources)
-    # Include results (even if empty - shows gaps)
+    if not mut_joined.empty:
+        # Filter to cell line rows only
+        mut_cells = mut_joined[mut_joined['cellLineId'].notna()]
+        if not mut_cells.empty:
+            # Count unique genes per cell line
+            res_gene_counts = mut_cells.groupby('cellLineId')['affectedGeneSymbol'].nunique()
+            # Find cell lines with mutations in multiple genes (>1)
+            multi_gene_cell_lines = res_gene_counts[res_gene_counts > 1].index.tolist()
+            ids_mut005.extend(ensure_resource_id(multi_gene_cell_lines))
     results['MUT-005'] = [i for i in set(ids_mut005) if pd.notna(i)]
 
     # MUT-006: Mutations present in both animal models and cell lines
-    if not mut_models.empty and not mut_cells.empty:
-        # Find mutationIds present in both animal models and cell lines
-        am_mutations = set(mut_models['mutationId'].dropna())
-        cl_mutations = set(mut_cells['mutationId'].dropna())
+    if not mut_joined.empty:
+        am_mutations = set(mut_joined[mut_joined['animalModelId'].notna()]['mutationId'].dropna())
+        cl_mutations = set(mut_joined[mut_joined['cellLineId'].notna()]['mutationId'].dropna())
         shared_mutations = am_mutations & cl_mutations
 
         if shared_mutations:
-            # Return the mutation IDs themselves (not the resource pairs)
             results['MUT-006'] = sorted([str(mid) for mid in shared_mutations if pd.notna(mid)])
 
     # --- Animal Models ---

@@ -54,7 +54,7 @@ def rml_runner(project_paths):
 
     Usage:
         graph = rml_runner(
-            mapping_file="portal_mutations.rml.ttl",
+            mapping_file="mutations.rml.ttl",
             csv_replacements={"data/csv/mutations.csv": "test/mutations.csv"}
         )
     """
@@ -133,79 +133,6 @@ def rml_runner(project_paths):
                 pass
 
     return _run
-
-
-@pytest.fixture
-def transform_iris(project_paths):
-    """
-    Fixture to run IRI transformation on a graph
-
-    Usage:
-        transformed_graph = transform_iris(input_graph)
-    """
-    def _transform(input_graph: Graph) -> Graph:
-        """
-        Apply IRI transformation to graph
-
-        Args:
-            input_graph: RDFLib Graph before transformation
-
-        Returns:
-            Transformed RDFLib Graph
-        """
-        transform_script = project_paths["project_dir"] / "scripts" / "transform_iris.py"
-
-        # Save input graph to temp file
-        with tempfile.NamedTemporaryFile(
-            mode='w', suffix='.ttl', delete=False, dir=project_paths["test_data_dir"]
-        ) as temp_input:
-            input_graph.serialize(temp_input.name, format="turtle")
-            input_path = temp_input.name
-
-        # Create temp output file
-        with tempfile.NamedTemporaryFile(
-            mode='w', suffix='.ttl', delete=False, dir=project_paths["test_data_dir"]
-        ) as temp_output:
-            output_path = temp_output.name
-
-        try:
-            # Run transformation script with --input and --output flags
-            cmd = [
-                "python", str(transform_script),
-                "--input", input_path,
-                "--output", output_path
-            ]
-
-            result = subprocess.run(
-                cmd,
-                capture_output=True,
-                text=True,
-                cwd=str(project_paths["project_dir"])
-            )
-
-            if result.returncode != 0:
-                raise RuntimeError(f"IRI transformation failed: {result.stderr}")
-
-            # Load transformed output
-            g = Graph()
-            g.parse(output_path, format="turtle")
-            g.bind("nf", NF)
-            g.bind("syn", SYN)
-
-            return g
-
-        finally:
-            # Cleanup temp files
-            try:
-                os.unlink(input_path)
-            except:
-                pass
-            try:
-                os.unlink(output_path)
-            except:
-                pass
-
-    return _transform
 
 
 # Pytest configuration

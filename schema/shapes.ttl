@@ -1,0 +1,958 @@
+@prefix sh:   <http://www.w3.org/ns/shacl#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix nf:   <http://nf-osi.github.com/terms#> .
+@prefix shapes: <http://nf-osi.github.com/shapes#> .
+
+################################################################################
+# File
+################################################################################
+
+shapes:FileShape a sh:NodeShape ;
+    sh:targetClass nf:File ;
+    rdfs:label "File shape" ;
+    rdfs:comment "Expected properties for File instances." ;
+    sh:property [
+        sh:path nf:name ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:parentStudy ;
+        sh:nodeKind sh:IRI ;
+    ] ;
+    sh:property [
+        sh:path nf:assay ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:platform ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:resourceType ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:dataType ;
+        sh:nodeKind sh:IRI ;
+    ] ;
+    sh:property [
+        sh:path nf:dataSubtype ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:fileFormat ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:individualID ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nf:specimenID ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nf:sex ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:species ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:nf1Genotype ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nf:nf2Genotype ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nf:hasNF1Genotype ;
+        sh:nodeKind sh:IRI ;
+    ] ;
+    sh:property [
+        sh:path nf:hasNF2Genotype ;
+        sh:nodeKind sh:IRI ;
+    ] ;
+    sh:property [
+        sh:path nf:cellType ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nf:tissue ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nf:organ ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nf:diagnosis ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nf:tumorType ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nf:compoundName ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nf:experimentalCondition ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nf:modelSystemName ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nf:hasModelSystem ;
+        sh:nodeKind sh:IRI ;
+    ] ;
+    sh:property [
+        sh:path nf:reportMilestone ;
+        sh:datatype xsd:double ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:hasFunder ;
+        sh:nodeKind sh:IRI ;
+    ] .
+
+################################################################################
+# Study
+################################################################################
+
+shapes:StudyShape a sh:NodeShape ;
+    sh:targetClass nf:Study ;
+    rdfs:label "Study shape" ;
+    rdfs:comment "Expected properties for Study instances." ;
+    sh:property [
+        sh:path nf:name ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:description ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:initiative ;
+        sh:nodeKind sh:IRI ;
+    ] ;
+    sh:property [
+        sh:path nf:studyStatus ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:dataStatus ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:accessRequirements ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:acknowledgementStatements ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:studyFileviewId ;
+        sh:nodeKind sh:IRI ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:studyLeads ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nf:institutions ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nf:manifestation ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nf:diseaseFocus ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nf:hasFunder ;
+        sh:nodeKind sh:IRI ;
+    ] ;
+    sh:property [
+        sh:path nf:dataType ;
+        sh:nodeKind sh:IRI ;
+    ] ;
+    sh:property [
+        sh:path nf:relatedStudies ;
+        sh:nodeKind sh:IRI ;
+    ] ;
+    sh:property [
+        sh:path nf:grantDOI ;
+        sh:nodeKind sh:IRI ;
+    ] .
+
+################################################################################
+# Mutation
+################################################################################
+
+shapes:MutationShape a sh:NodeShape ;
+    sh:targetClass nf:Mutation ;
+    rdfs:label "Mutation shape" ;
+    rdfs:comment "Expected properties for Mutation instances." ;
+    sh:property [
+        sh:path nf:mutationId ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:affectedGeneSymbol ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:affectedGeneName ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:humanClinVarMutation ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:externalMutationID ;
+        sh:nodeKind sh:IRI ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:sequenceVariation ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:proteinVariation ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:chromosome ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:animalModelMutation ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:alleleType ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nf:mutationMethod ;
+        sh:datatype xsd:string ;
+    ] .
+
+################################################################################
+# Donor
+################################################################################
+
+shapes:DonorShape a sh:NodeShape ;
+    sh:targetClass nf:Donor ;
+    rdfs:label "Donor shape" ;
+    rdfs:comment "Expected properties for Donor instances." ;
+    sh:property [
+        sh:path nf:donorId ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:age ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:race ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:sex ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:species ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nf:parentDonorId ;
+        sh:nodeKind sh:IRI ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:transplantationDonorId ;
+        sh:nodeKind sh:IRI ;
+        sh:maxCount 1 ;
+    ] .
+
+################################################################################
+# Cell Line
+################################################################################
+
+shapes:CellLineShape a sh:NodeShape ;
+    sh:targetClass nf:CellLine ;
+    rdfs:label "Cell Line shape" ;
+    rdfs:comment "Expected properties for CellLine instances." ;
+    sh:property [
+        sh:path nf:cellLineId ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:donorId ;
+        sh:nodeKind sh:IRI ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:originYear ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:organ ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:strProfile ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:tissue ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:resistance ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:cellLineCategory ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:contaminatedMisidentified ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:populationDoublingTime ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:manifestation ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nf:geneticDisorder ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nf:hasMutation ;
+        sh:nodeKind sh:IRI ;
+    ] .
+
+################################################################################
+# Animal Model
+################################################################################
+
+shapes:AnimalModelShape a sh:NodeShape ;
+    sh:targetClass nf:AnimalModel ;
+    rdfs:label "Animal Model shape" ;
+    rdfs:comment "Expected properties for AnimalModel instances." ;
+    sh:property [
+        sh:path nf:animalModelId ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:donorId ;
+        sh:nodeKind sh:IRI ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:transplantationDonorId ;
+        sh:nodeKind sh:IRI ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:backgroundStrain ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:backgroundSubstrain ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:strainNomenclature ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:transplantationType ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:animalState ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:generation ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:manifestation ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nf:geneticDisorder ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nf:hasMutation ;
+        sh:nodeKind sh:IRI ;
+    ] .
+
+################################################################################
+# Antibody
+################################################################################
+
+shapes:AntibodyShape a sh:NodeShape ;
+    sh:targetClass nf:Antibody ;
+    rdfs:label "Antibody shape" ;
+    rdfs:comment "Expected properties for Antibody instances." ;
+    sh:property [
+        sh:path nf:antibodyId ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:targetAntigen ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:uniprotId ;
+        sh:nodeKind sh:IRI ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:cloneId ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:hostOrganism ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:conjugate ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:clonality ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:reactiveSpecies ;
+        sh:datatype xsd:string ;
+    ] .
+
+################################################################################
+# Genetic Reagent
+################################################################################
+
+shapes:GeneticReagentShape a sh:NodeShape ;
+    sh:targetClass nf:GeneticReagent ;
+    rdfs:label "Genetic Reagent shape" ;
+    rdfs:comment "Expected properties for GeneticReagent instances." ;
+    sh:property [
+        sh:path nf:geneticReagentId ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:insertName ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:insertSpecies ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nf:insertEntrezId ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:insertSize ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:vectorBackbone ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:totalSize ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:backboneSize ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:cloningMethod ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:copyNumber ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:promoter ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:bacterialResistance ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:growthTemp ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:growthStrain ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:selectableMarker ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:nTerminalTag ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:cTerminalTag ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:fivePrimer ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:threePrimer ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:fivePrimeCloningSite ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:threePrimeCloningSite ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:fivePrimeSiteDestroyed ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:threePrimeSiteDestroyed ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:gRNAshRNASequence ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:hazardous ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] .
+
+################################################################################
+# Biobank
+################################################################################
+
+shapes:BiobankShape a sh:NodeShape ;
+    sh:targetClass nf:Biobank ;
+    rdfs:label "Biobank shape" ;
+    rdfs:comment "Expected properties for Biobank instances." ;
+    sh:property [
+        sh:path nf:name ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:biobankURL ;
+        sh:nodeKind sh:IRI ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:contact ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:hasResource ;
+        sh:nodeKind sh:IRI ;
+    ] ;
+    sh:property [
+        sh:path nf:diseaseType ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nf:specimenPreparationMethod ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nf:specimenType ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nf:tumorType ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nf:specimenFormat ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nf:specimenTissueType ;
+        sh:datatype xsd:string ;
+    ] .
+
+################################################################################
+# Publication
+################################################################################
+
+shapes:PublicationShape a sh:NodeShape ;
+    sh:targetClass nf:Publication ;
+    rdfs:label "Publication shape" ;
+    rdfs:comment "Expected properties for Publication instances." ;
+    sh:property [
+        sh:path nf:publicationId ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:publicationTitle ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:abstract ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:citation ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:publicationDate ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:publicationDateUnix ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:journal ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:doi ;
+        sh:nodeKind sh:IRI ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:pmid ;
+        sh:nodeKind sh:IRI ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:authors ;
+        sh:datatype xsd:string ;
+    ] .
+
+################################################################################
+# Investigator
+################################################################################
+
+shapes:InvestigatorShape a sh:NodeShape ;
+    sh:targetClass nf:Investigator ;
+    rdfs:label "Investigator shape" ;
+    rdfs:comment "Expected properties for Investigator instances." ;
+    sh:property [
+        sh:path nf:investigatorId ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:name ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:institution ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:orcid ;
+        sh:nodeKind sh:IRI ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:investigatorSynapseId ;
+        sh:nodeKind sh:IRI ;
+        sh:maxCount 1 ;
+    ] .
+
+################################################################################
+# Funder
+################################################################################
+
+shapes:FunderShape a sh:NodeShape ;
+    sh:targetClass nf:Funder ;
+    rdfs:label "Funder shape" ;
+    rdfs:comment "Expected properties for Funder instances." ;
+    sh:property [
+        sh:path nf:funderId ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:name ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] .
+
+################################################################################
+# Development
+################################################################################
+
+shapes:DevelopmentShape a sh:NodeShape ;
+    sh:targetClass nf:Development ;
+    rdfs:label "Development shape" ;
+    rdfs:comment "Expected properties for Development instances." ;
+    sh:property [
+        sh:path nf:hasResource ;
+        sh:nodeKind sh:IRI ;
+    ] ;
+    sh:property [
+        sh:path nf:hasFunder ;
+        sh:nodeKind sh:IRI ;
+    ] ;
+    sh:property [
+        sh:path nf:hasInvestigator ;
+        sh:nodeKind sh:IRI ;
+    ] ;
+    sh:property [
+        sh:path nf:hasPublication ;
+        sh:nodeKind sh:IRI ;
+    ] .
+
+################################################################################
+# Observation
+################################################################################
+
+shapes:ObservationShape a sh:NodeShape ;
+    sh:targetClass nf:Observation ;
+    rdfs:label "Observation shape" ;
+    rdfs:comment "Expected properties for Observation instances." ;
+    sh:property [
+        sh:path nf:observationId ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:observationText ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:observationSubmitterName ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:observationPhase ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:observationTime ;
+        sh:datatype xsd:decimal ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:observationTimeUnits ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:observationLink ;
+        sh:nodeKind sh:IRI ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:reliabilityRating ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:easeOfUseRating ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:investigatorSynapseId ;
+        sh:nodeKind sh:IRI ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:aboutResource ;
+        sh:nodeKind sh:IRI ;
+    ] ;
+    sh:property [
+        sh:path nf:referencesPublication ;
+        sh:nodeKind sh:IRI ;
+    ] .
+
+################################################################################
+# Tool (Resource)
+################################################################################
+
+shapes:ToolShape a sh:NodeShape ;
+    sh:targetClass nf:Tool ;
+    rdfs:label "Tool shape" ;
+    rdfs:comment "Expected properties for Tool (Resource) instances." ;
+    sh:property [
+        sh:path nf:name ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:resourceType ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:description ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:rrid ;
+        sh:nodeKind sh:IRI ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:howToAcquire ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:dateAdded ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:dateModified ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:usageRequirements ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nf:synonyms ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nf:fromDonor ;
+        sh:nodeKind sh:IRI ;
+    ] ;
+    sh:property [
+        sh:path nf:hasPublication ;
+        sh:nodeKind sh:IRI ;
+    ] ;
+    sh:property [
+        sh:path nf:hasFunder ;
+        sh:nodeKind sh:IRI ;
+    ] ;
+    sh:property [
+        sh:path nf:hasInvestigator ;
+        sh:nodeKind sh:IRI ;
+    ] .

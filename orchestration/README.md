@@ -7,32 +7,32 @@ This directory contains the Dagster orchestration for the NF Knowledge Graph pip
 The pipeline is organized as a DAG of **assets**:
 
 ```
-Synapse Tables → CSV Files → RML RDF (.rml.ttl) → Final RDF (.ttl)
-                                                  (transform for studies/files only)
+Synapse Tables → CSV → [Harmonize] → RML → RDF (.ttl)
 ```
 
-**File Naming:**
-- `.rml.ttl` - RMLMapper output (intermediate)
-- `.ttl` - Final output (IRI-transformed for studies/files, copied for others)
+- **Harmonize** (studies, observations, files, genetic_reagents, mutations): classify/link CSV data before RML mapping
 
 ### Asset Groups
 
-Each portal table (study, file, mutation, reagent, animal, cell, donor, antibody) has its own asset group:
+Each portal table has its own asset group (17 tables total):
 
-1. **CSV Asset** (`portal/csv/{table}_csv`)
+1. **CSV Asset** (`portal/csv/{table}`)
    - Downloads from Synapse
    - Applies transformations (string_list, synapse_id, etc.)
    - Writes to `data/csv/`
 
-2. **RDF Asset** (`portal/rdf/{table}_rdf_raw` or `portal/rdf/{table}_rdf`)
-   - Runs RMLMapper
-   - Generates RDF from CSV
+2. **Harmonize Asset** (`portal/harmonized/{table}`) - *studies, observations, files, cell_lines, genetic_reagents, mutations*
+   - Runs classification/linking scripts on CSV data
+   - Writes to `data/csv/{table}_harmonized.csv`
+
+3. **RDF Asset** (`portal/rdf/{table}`)
+   - Runs RMLMapper (CSV → RDF)
    - Writes to `data/rdf/`
 
-3. **Transform Asset** (`portal/rdf/{table}_rdf`) - *studies/files only*
-   - Runs IRI transformation via SPARQL
-   - Converts literals to IRIs
-   - Writes final RDF to `data/rdf/`
+4. **FK Validation Asset** (`portal/quality/fk_validation`) - *single asset, runs once*
+   - Depends on all CSV assets
+   - Checks referential integrity across tables (see [HARMONIZATION.md](../HARMONIZATION.md))
+   - Non-blocking: logs results and attaches metadata but never raises
 
 ## Setup
 
@@ -47,12 +47,31 @@ source .venv/bin/activate
 
 # Install dependencies
 pip install -e ".[dev]"
-
-# Or with uv (faster)
-uv pip install -e ".[dev]"
 ```
 
 ## Usage
+
+**With CLI:**
+
+```bash
+# Materialize all assets
+dagster asset materialize -m dagster_pipeline
+
+# Materialize a single asset
+dagster asset materialize -m dagster_pipeline --select "portal/csv/donors"
+
+# Materialize multiple assets (comma-separated)
+dagster asset materialize -m dagster_pipeline --select "portal/rdf/donors,portal/rdf/antibodies"
+
+# Materialize all assets in a table group (CSV + harmonize + RDF)
+dagster asset materialize -m dagster_pipeline --select "group:donors"
+
+# Materialize an asset and all its upstream dependencies
+dagster asset materialize -m dagster_pipeline --select "+portal/rdf/studies"
+
+# Run FK validation only
+dagster asset materialize -m dagster_pipeline --select "group:validation"
+```
 
 ### With Dagster UI
 
@@ -68,35 +87,15 @@ Then open http://localhost:3000
 - Select the assets you want to build
 - Click "Materialize selected"
 
-**With CLI:**
-
-```bash
-# Materialize all assets
-dagster asset materialize --module-name dagster_pipeline
-
-# Materialize specific table
-dagster asset materialize --module-name dagster_pipeline --select "portal_donors*"
-
-# Materialize multiple tables
-dagster asset materialize --module-name dagster_pipeline --select "portal_donors* portal_antibodies*"
-
-# Materialize all CSV assets
-dagster asset materialize --module-name dagster_pipeline --select "tag:compute_kind=synapse"
-
-# Materialize all RML assets
-dagster asset materialize --module-name dagster_pipeline --select "tag:compute_kind=rml"
-```
-
 ## Asset Selection Patterns
 
-Dagster supports asset selection:
+Asset keys follow the pattern `portal/{stage}/{table}`:
 
-- `portal_donors_csv` - Single asset
-- `portal_donors*` - All assets in the donors group
-- `*rdf` - All RDF assets
-- `tag:compute_kind=rml` - All RML mapping assets
-- `+portal_studies_rdf` - Asset and all upstream dependencies
-- `portal_studies_rdf+` - Asset and all downstream dependencies
+- `portal/csv/donors` — single asset
+- `group:donors` — all assets in the donors group (CSV + harmonize + RDF)
+- `group:validation` — FK validation asset
+- `+portal/rdf/studies` — asset and all upstream dependencies
+- `portal/csv/studies+` — asset and all downstream dependents
 
 ## Project Structure
 
@@ -125,9 +124,8 @@ No need to modify Dagster code - assets are generated dynamically,
 
 ```bash
 # Test that assets load
-dagster asset list --module-name dagster_pipeline
+dagster asset list -m dagster_pipeline
 
 # Test a single asset
-dagster asset materialize --module-name dagster_pipeline --select portal_donors_csv
+dagster asset materialize -m dagster_pipeline --select portal/csv/donors
 ```
-

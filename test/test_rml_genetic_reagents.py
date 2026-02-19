@@ -1,7 +1,7 @@
 """
 Tests for Genetic Reagents RML mapping
 
-Tests the portal_genetic_reagents.rml.ttl mapping against test/genetic_reagents.csv
+Tests the genetic_reagents.rml.ttl mapping against test/genetic_reagents.csv
 """
 
 import pytest
@@ -13,8 +13,8 @@ from rdflib.namespace import RDF
 def genetic_reagents_graph(rml_runner, namespaces):
     """Load genetic reagents RDF graph from test data"""
     graph = rml_runner(
-        mapping_file="portal_genetic_reagents.rml.ttl",
-        csv_replacements={"data/csv/genetic_reagents.csv": "test/genetic_reagents.csv"}
+        mapping_file="genetic_reagents.rml.ttl",
+        csv_replacements={"data/csv/genetic_reagents_harmonized.csv": "test/genetic_reagents.csv"}
     )
     return graph
 
@@ -39,23 +39,13 @@ class TestGeneticReagentsCore:
 class TestGeneticReagentsMultiValue:
     """Test multi-value field handling (pipe-delimited lists)"""
 
-    def test_vector_type_multi_value_split(self, genetic_reagents_graph, namespaces):
-        """VectorType should split on pipe delimiter"""
+    def test_reagent_class_emits_rdf_type(self, genetic_reagents_graph, namespaces):
+        """reagentClass IRI should be emitted as rdf:type"""
         NF = namespaces["nf"]
-
-        query = """
-        SELECT ?reagent ?vectorType
-        WHERE {
-            ?reagent a nf:GeneticReagent ;
-                      nf:vectorType ?vectorType .
-        }
-        """
-        results = genetic_reagents_graph.query(query, initNs={"nf": NF})
-        vector_types = [str(row.vectorType) for row in results]
-
-        # Should have both values from pipe-delimited list (test-reagent-001 has "Plasmid|Viral")
-        assert "Plasmid" in vector_types, "Expected 'Plasmid' vectorType"
-        assert "Viral" in vector_types, "Expected 'Viral' vectorType"
+        reagent = URIRef("http://nf-osi.github.com/terms#geneticReagent/test-reagent-003")
+        types = list(genetic_reagents_graph.objects(reagent, RDF.type))
+        assert NF.CRISPRReagent in types, \
+            f"Expected CRISPRReagent from reagentClass, got {types}"
 
     def test_insert_species_multi_value_split(self, genetic_reagents_graph, namespaces):
         """InsertSpecies should split on pipe delimiter"""
@@ -187,6 +177,35 @@ class TestGeneticReagentsDataTypes:
         for row in results:
             assert isinstance(row.name, Literal), \
                 f"Name should be Literal, got {type(row.name)}"
+
+
+class TestGeneticReagentsReagentClass:
+    """Test reagentClass -> rdf:type subclass mapping"""
+
+    def test_crispr_reagent_has_subclass_type(self, genetic_reagents_graph, namespaces):
+        """test-reagent-003 with reagentClass should get CRISPRReagent type"""
+        NF = namespaces["nf"]
+        reagent = URIRef("http://nf-osi.github.com/terms#geneticReagent/test-reagent-003")
+        types = list(genetic_reagents_graph.objects(reagent, RDF.type))
+        assert NF.CRISPRReagent in types, \
+            f"Expected CRISPRReagent type, got {types}"
+
+    def test_empty_reagent_class_no_extra_type(self, genetic_reagents_graph, namespaces):
+        """Reagents with empty reagentClass should only have base GeneticReagent type"""
+        NF = namespaces["nf"]
+        reagent = URIRef("http://nf-osi.github.com/terms#geneticReagent/test-reagent-001")
+        types = list(genetic_reagents_graph.objects(reagent, RDF.type))
+        assert NF.GeneticReagent in types, "Should have base GeneticReagent type"
+        non_base = [t for t in types if t != NF.GeneticReagent]
+        assert len(non_base) == 0, \
+            f"Should not have extra types, got {non_base}"
+
+    def test_all_reagents_have_base_type(self, genetic_reagents_graph, namespaces):
+        """All reagents should have GeneticReagent as base type"""
+        NF = namespaces["nf"]
+        reagents = list(genetic_reagents_graph.subjects(RDF.type, NF.GeneticReagent))
+        assert len(reagents) >= 4, \
+            f"Expected at least 4 reagents with base type, got {len(reagents)}"
 
 
 # Run with: pytest test/test_rml_genetic_reagents.py -v

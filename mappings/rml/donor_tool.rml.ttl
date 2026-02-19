@@ -21,8 +21,8 @@ map:DonorToolSource a rml:LogicalSource ;
 map:ToolFromDonor a rr:TriplesMap ;
     rdfs:label "Tool From Donor" ;
     rml:logicalSource map:DonorToolSource ;
-    rr:subjectMap [ rml:reference "resourceId" ; rr:termType rr:IRI ] ;
+    rr:subjectMap [ rr:template "http://nf-osi.github.com/terms#resource/{resourceId}" ; rr:termType rr:IRI ] ;
     rr:predicateObjectMap [
         rr:predicate nf:fromDonor ;
-        rr:objectMap [ rml:reference "donorId" ; rr:termType rr:IRI ]
+        rr:objectMap [ rr:template "http://nf-osi.github.com/terms#donor/{donorId}" ; rr:termType rr:IRI ]
     ] .

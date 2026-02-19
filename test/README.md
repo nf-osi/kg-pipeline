@@ -47,7 +47,7 @@ Tests run in parallel by default (via pytest.ini). Each test is isolated and ind
 
 ```
 test/
-├── conftest.py                 # Shared fixtures (rml_runner, transform_iris)
+├── conftest.py                 # Shared fixtures (rml_runner)
 ├── test_rml_mutations.py       # Mutations mapping (10 tests)
 ├── test_rml_genetic_reagents.py # Genetic reagents (10 tests)
 ├── test_rml_animal_models.py   # Animal models (11 tests)
@@ -98,7 +98,7 @@ def test_entity_has_correct_type(self, entity_graph, namespaces):
 def my_graph(rml_runner, namespaces):
     """Load specific graph for tests"""
     return rml_runner(
-        mapping_file="portal_entity.rml.ttl",
+        mapping_file="entity.rml.ttl",
         csv_replacements={"data/csv/entity.csv": "test/entity.csv"}
     )
 
@@ -113,7 +113,6 @@ def test_something(my_graph, namespaces):
 ### Available Fixtures (conftest.py)
 
 - `rml_runner(mapping_file, csv_replacements)` - Run RMLMapper and return RDF graph
-- `transform_iris(graph)` - Apply IRI transformation to graph
 - `namespaces` - Dict of RDF namespaces (nf, syn, owl, etc.)
 - `project_paths` - Dict of important paths
 

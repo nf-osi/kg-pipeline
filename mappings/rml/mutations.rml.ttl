@@ -15,7 +15,7 @@
 ################################################################################
 
 map:PortalMutationsSource a rml:LogicalSource ;
-    rml:source "data/csv/mutations.csv" ;
+    rml:source "data/csv/mutations_harmonized.csv" ;
     rml:referenceFormulation ql:CSV .
 
 ################################################################################
@@ -106,18 +106,18 @@ map:MutationMethod a rr:TriplesMap ;
         ]
     ] .
 
-map:MutationType a rr:TriplesMap ;
-    rdfs:label "Mutation Type" ;
+map:MutationTypeClass a rr:TriplesMap ;
+    rdfs:label "Mutation Type Class" ;
     rml:logicalSource map:PortalMutationsSource ;
     rr:subjectMap [
         rr:template "http://nf-osi.github.com/terms#mutation/{mutationId}" ;
         rr:termType rr:IRI
     ] ;
     rr:predicateObjectMap [
-        rr:predicate nf:mutationType ;
+        rr:predicate rdf:type ;
         rr:objectMap [
             a fnml:FunctionTermMap ;
-            rr:datatype xsd:string ;
+            rr:termType rr:IRI ;
             fnml:functionValue [
                 a fno:Execution ;
                 rml:logicalSource map:PortalMutationsSource ;
@@ -127,7 +127,7 @@ map:MutationType a rr:TriplesMap ;
                 ] ;
                 rr:predicateObjectMap [
                     rr:predicate grel:valueParameter ;
-                    rr:objectMap [ rml:reference "mutationType" ; rr:termType rr:Literal ]
+                    rr:objectMap [ rml:reference "mutationTypeClass" ; rr:termType rr:Literal ]
                 ] ;
                 rr:predicateObjectMap [
                     rr:predicate grel:p_string_sep ;

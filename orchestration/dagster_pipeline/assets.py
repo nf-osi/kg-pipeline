@@ -26,7 +26,7 @@ def create_csv_asset(table_name: str, config: TableConfig):
     """Create a Dagster asset for downloading a CSV table from Synapse."""
 
     @asset(
-        name=f"{table_name}_csv",
+        name=table_name,
         key_prefix=["portal", "csv"],
         compute_kind="synapse",
         group_name=table_name,
@@ -59,134 +59,156 @@ def create_csv_asset(table_name: str, config: TableConfig):
     return _csv_asset
 
 
-def create_rdf_asset(table_name: str, config: TableConfig):
-    """Create a Dagster asset for RML mapping (CSV -> RDF)."""
-    import shutil
+def create_harmonize_asset(table_name: str, config: TableConfig):
+    """Create a Dagster asset for harmonizing CSV data before RML mapping."""
 
-    csv_asset_key = ["portal", "csv", f"{table_name}_csv"]
+    if not config.harmonize_script:
+        return None
 
-    # For tables with transform, this creates the .rml.ttl intermediate file
-    # For tables without transform, this creates .rml.ttl and copies to .ttl
-    asset_name = f"{table_name}_rdf_rml" if config.needs_transform else f"{table_name}_rdf"
+    csv_asset_key = ["portal", "csv", table_name]
 
     @asset(
-        name=asset_name,
-        key_prefix=["portal", "rdf"],
-        compute_kind="rml",
+        name=table_name,
+        key_prefix=["portal", "harmonized"],
+        compute_kind="python",
         group_name=table_name,
         deps=[csv_asset_key],
         metadata={
             "table": table_name,
-            "needs_transform": config.needs_transform,
+            "script": config.harmonize_script,
         },
     )
-    def _rdf_asset(context: AssetExecutionContext, rml_mapper: RMLMapperResource) -> Path:
-        """Generate RDF from CSV using RMLMapper."""
-        # Get project root
+    def _harmonize_asset(context: AssetExecutionContext) -> Path:
+        """Harmonize CSV data using a classification script."""
+        import subprocess
+
         project_root = Path(__file__).parent.parent.parent
 
-        rml_file = config.rml_path
-        csv_file = config.csv_path
-        # Always output to .rml.ttl first
-        rml_output = config.rdf_raw_path
+        cmd = ["python", config.harmonize_script] + (config.harmonize_args or [])
 
-        context.log.info(f"Running RMLMapper for {table_name}")
-        rml_mapper.run(
-            mapping_file=rml_file,
-            output_file=rml_output,
-            log_file=config.log_path,
+        context.log.info(f"Running harmonization for {table_name}: {' '.join(cmd)}")
+
+        result = subprocess.run(
+            cmd,
+            capture_output=True,
+            text=True,
+            cwd=str(project_root),
         )
 
-        # Get file size for metadata (use absolute path)
-        abs_rml_output = project_root / rml_output
-        size_mb = abs_rml_output.stat().st_size / (1024 * 1024)
+        if result.stdout:
+            context.log.info(f"Harmonize output:\n{result.stdout}")
+        if result.stderr:
+            context.log.warning(f"Harmonize stderr: {result.stderr}")
+
+        if result.returncode != 0:
+            raise RuntimeError(
+                f"Harmonization script failed with code {result.returncode}: {result.stderr}"
+            )
+
+        abs_output = project_root / config.harmonize_output
+        num_rows = sum(1 for _ in open(abs_output)) - 1  # subtract header
 
         context.add_output_metadata({
-            "path": str(rml_output),
-            "size_mb": round(size_mb, 2),
+            "path": str(config.harmonize_output),
+            "num_rows": num_rows,
         })
 
-        # For tables without transform, copy .rml.ttl to .ttl (final output)
-        if not config.needs_transform:
-            abs_final = project_root / config.rdf_path
-            context.log.info(f"Copying {rml_output} to {config.rdf_path} (final output)")
-            shutil.copy2(abs_rml_output, abs_final)
+        return config.harmonize_output
 
-            context.add_output_metadata({
-                "final_path": str(config.rdf_path),
-            })
-
-        return rml_output
-
-    return _rdf_asset
+    return _harmonize_asset
 
 
-def create_transform_asset(table_name: str, config: TableConfig):
-    """Create a Dagster asset for IRI transformation (RML RDF -> final RDF)."""
+def create_validation_asset(csv_asset_keys: list):
+    """Create a Dagster asset that validates FK constraints across all CSVs.
 
-    if not config.needs_transform:
-        return None
-
-    rml_rdf_asset_key = ["portal", "rdf", f"{table_name}_rdf_rml"]
+    Non-blocking: logs results and attaches violation counts as metadata,
+    but never raises.
+    """
 
     @asset(
-        name=f"{table_name}_rdf",
+        name="fk_validation",
+        key_prefix=["portal", "quality"],
+        compute_kind="python",
+        group_name="validation",
+        deps=csv_asset_keys,
+    )
+    def _validation_asset(context: AssetExecutionContext) -> None:
+        """Run FK validation across all processed CSVs."""
+        import sys
+        sys.path.insert(0, str(Path(__file__).parent.parent.parent / "scripts"))
+        from validate_fks import validate_all
+
+        project_root = Path(__file__).parent.parent.parent
+        data_dir = project_root / "data" / "csv"
+
+        results = validate_all(data_dir)
+
+        failures = 0
+        for r in results:
+            label = f"{r.constraint.source_table}.{r.constraint.source_column}"
+            target = f"{r.constraint.target_table}.{r.constraint.target_column}"
+            if r.passed:
+                context.log.info(f" ok   {label} -> {target}")
+            else:
+                failures += 1
+                context.log.warning(
+                    f"FAIL  {label} -> {target}: "
+                    f"{r.orphaned}/{r.populated} orphaned ({r.orphan_pct:.1f}%)"
+                )
+
+        context.add_output_metadata({
+            "total_constraints": len(results),
+            "failures": failures,
+            "passed": len(results) - failures,
+        })
+
+    return _validation_asset
+
+
+def create_rdf_asset(table_name: str, config: TableConfig):
+    """Create a Dagster asset for RML mapping (CSV -> RDF)."""
+
+    # Depend on harmonized asset if it exists, otherwise on the CSV asset
+    if config.harmonize_script:
+        dep_key = ["portal", "harmonized", table_name]
+    else:
+        dep_key = ["portal", "csv", table_name]
+
+    @asset(
+        name=table_name,
         key_prefix=["portal", "rdf"],
-        compute_kind="transform",
+        compute_kind="rml",
         group_name=table_name,
-        deps=[rml_rdf_asset_key],
+        deps=[dep_key],
         metadata={
             "table": table_name,
         },
     )
-    def _transform_asset(context: AssetExecutionContext) -> Path:
-        """Transform literal values to IRIs using SPARQL."""
-        import subprocess
-
-        # Get project root
+    def _rdf_asset(context: AssetExecutionContext, rml_mapper: RMLMapperResource) -> Path:
+        """Generate RDF from CSV using RMLMapper."""
         project_root = Path(__file__).parent.parent.parent
 
-        rml_file = config.rdf_raw_path  # Input: .rml.ttl
-        final_file = config.rdf_path     # Output: .ttl
-        lookup_file = Path("mappings/data_lookup.ttl")
+        rml_file = config.rml_path
+        output_file = config.rdf_path
 
-        context.log.info(f"Running IRI transform for {table_name}")
-
-        result = subprocess.run(
-            [
-                "python",
-                "scripts/transform_iris.py",
-                "--input", str(rml_file),
-                "--output", str(final_file),
-                "--lookup", str(lookup_file),
-            ],
-            capture_output=True,
-            text=True,
-            cwd=str(project_root),  # Run from project root
+        context.log.info(f"Running RMLMapper for {table_name}")
+        rml_mapper.run(
+            mapping_file=rml_file,
+            output_file=output_file,
+            log_file=config.log_path,
         )
 
-        # Log output
-        if result.stdout:
-            context.log.info(f"Transform output: {result.stdout}")
-        if result.stderr:
-            context.log.warning(f"Transform stderr: {result.stderr}")
-
-        # Check return code
-        if result.returncode != 0:
-            raise RuntimeError(f"Transform script failed with code {result.returncode}")
-
-        # Get file size (use absolute path)
-        abs_final_file = project_root / final_file
-        size_mb = abs_final_file.stat().st_size / (1024 * 1024)
+        abs_output = project_root / output_file
+        size_mb = abs_output.stat().st_size / (1024 * 1024)
 
         context.add_output_metadata({
-            "path": str(final_file),
+            "path": str(output_file),
             "size_mb": round(size_mb, 2),
         })
 
-        return final_file
+        return output_file
 
-    return _transform_asset
+    return _rdf_asset
 
 
 # =============================================================================
@@ -197,21 +219,27 @@ def create_transform_asset(table_name: str, config: TableConfig):
 def generate_portal_assets() -> List:
     """Generate all portal table assets."""
     assets = []
+    csv_asset_keys = []
 
     for table_name, config in TABLE_CONFIGS.items():
         # Create CSV download asset
         csv_asset = create_csv_asset(table_name, config)
         assets.append(csv_asset)
+        csv_asset_keys.append(["portal", "csv", table_name])
+
+        # Create harmonize asset if needed (runs between CSV and RDF)
+        if config.harmonize_script:
+            harmonize_asset = create_harmonize_asset(table_name, config)
+            if harmonize_asset:
+                assets.append(harmonize_asset)
 
         # Create RDF generation asset
         rdf_asset = create_rdf_asset(table_name, config)
         assets.append(rdf_asset)
 
-        # Create transform asset if needed
-        if config.needs_transform:
-            transform_asset = create_transform_asset(table_name, config)
-            if transform_asset:
-                assets.append(transform_asset)
+    # Add FK validation asset (depends on all CSV assets)
+    validation_asset = create_validation_asset(csv_asset_keys)
+    assets.append(validation_asset)
 
     return assets
 

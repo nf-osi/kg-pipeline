@@ -31,11 +31,11 @@ map:DonorCore a rr:TriplesMap ;
     ] ;
     rr:predicateObjectMap [ rr:predicate rdf:type ; rr:objectMap [ rr:constant nf:Donor ; rr:termType rr:IRI ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:donorId ; rr:objectMap [ rml:reference "donorId" ; rr:datatype xsd:string ] ] ;
-    rr:predicateObjectMap [ rr:predicate nf:parentDonorId ; rr:objectMap [ rml:reference "parentDonorId" ; rr:termType rr:IRI ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:parentDonorId ; rr:objectMap [ rr:template "http://nf-osi.github.com/terms#donor/{parentDonorId}" ; rr:termType rr:IRI ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:race ; rr:objectMap [ rml:reference "race" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:sex ; rr:objectMap [ rml:reference "sex" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:age ; rr:objectMap [ rml:reference "age" ; rr:datatype xsd:string ] ] ;
-    rr:predicateObjectMap [ rr:predicate nf:transplantationDonorId ; rr:objectMap [ rml:reference "transplantationDonorId" ; rr:termType rr:IRI ] ] .
+    rr:predicateObjectMap [ rr:predicate nf:transplantationDonorId ; rr:objectMap [ rr:template "http://nf-osi.github.com/terms#donor/{transplantationDonorId}" ; rr:termType rr:IRI ] ] .
 
 ################################################################################
 # Multi-valued fields (StringList)

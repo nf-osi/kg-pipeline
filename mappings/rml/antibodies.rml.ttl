@@ -31,7 +31,7 @@ map:AntibodyCore a rr:TriplesMap ;
     ] ;
     rr:predicateObjectMap [ rr:predicate rdf:type ; rr:objectMap [ rr:constant nf:Antibody ; rr:termType rr:IRI ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:antibodyId ; rr:objectMap [ rml:reference "antibodyId" ; rr:datatype xsd:string ] ] ;
-    rr:predicateObjectMap [ rr:predicate nf:uniprotId ; rr:objectMap [ rml:reference "uniprotId" ; rr:termType rr:IRI ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:uniprotId ; rr:objectMap [ rr:template "https://www.uniprot.org/uniprot/{uniprotId}" ; rr:termType rr:IRI ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:cloneId ; rr:objectMap [ rml:reference "cloneId" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:hostOrganism ; rr:objectMap [ rml:reference "hostOrganism" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:conjugate ; rr:objectMap [ rml:reference "conjugate" ; rr:datatype xsd:string ] ] ;

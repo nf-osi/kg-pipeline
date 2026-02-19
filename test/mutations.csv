@@ -1,5 +1,5 @@
-mutationId,humanClinVarMutation,alleleType,affectedGeneSymbol,mutationMethod,externalMutationID,affectedGeneName,sequenceVariation,chromosome,proteinVariation,animalModelMutation,mutationType
-test-mut-001,Yes,Germline,NF1,CRISPR,COSM123456,Neurofibromin 1,c.1234G>A,17,p.Arg412Gln,,Missense
-test-mut-002,No,Somatic|Germline,NF2,Spontaneous|ENU,MGI:98765,Merlin,c.456T>C,22,p.Leu152Pro,Yes,Nonsense|Frameshift
-test-mut-003,,,EGFR,,,,,,,,Deletion
-test-mut-004,Yes,Somatic,TP53,TALEN,,,c.789C>T,17,,,Splice site
+mutationId,humanClinVarMutation,alleleType,affectedGeneSymbol,mutationMethod,externalMutationID,affectedGeneName,sequenceVariation,chromosome,proteinVariation,animalModelMutation,mutationType,mutationTypeClass
+test-mut-001,Yes,Germline,NF1,CRISPR,COSM123456,Neurofibromin 1,c.1234G>A,17,p.Arg412Gln,,Missense,http://nf-osi.github.com/terms#SinglePointMutation
+test-mut-002,No,Somatic|Germline,NF2,Spontaneous|ENU,MGI:98765,Merlin,c.456T>C,22,p.Leu152Pro,Yes,Nonsense|Frameshift,http://nf-osi.github.com/terms#IntragenicDeletion|http://nf-osi.github.com/terms#Insertion
+test-mut-003,,,EGFR,,,,,,,,Deletion,
+test-mut-004,Yes,Somatic,TP53,TALEN,,,c.789C>T,17,,,Splice site,http://nf-osi.github.com/terms#NucleotideSubstitutions

@@ -14,7 +14,7 @@ def observations_graph(rml_runner, namespaces):
     """Load observations RDF graph from test data"""
     graph = rml_runner(
         mapping_file="observations.rml.ttl",
-        csv_replacements={"data/csv/observations.csv": "test/observations.csv"}
+        csv_replacements={"data/csv/observation_harmonized.csv": "test/observations.csv"}
     )
     return graph
 
@@ -144,23 +144,23 @@ class TestObservationsMultiValue:
 class TestObservationsIRIFields:
     """Test IRI vs literal field types"""
 
-    def test_synapse_id_is_iri(self, observations_graph, namespaces):
-        """Synapse ID should be IRI, not literal"""
+    def test_investigator_synapse_id_is_iri(self, observations_graph, namespaces):
+        """Investigator Synapse ID should be IRI, not literal"""
         NF = namespaces["nf"]
 
         query = """
         SELECT ?observation ?synapseId
         WHERE {
             ?observation a nf:Observation ;
-                        nf:synapseId ?synapseId .
+                        nf:investigatorSynapseId ?synapseId .
         }
         """
         results = list(observations_graph.query(query, initNs={"nf": NF}))
-        assert len(results) > 0, "No observations with synapseId found"
+        assert len(results) > 0, "No observations with investigatorSynapseId found"
 
         for row in results:
             assert isinstance(row.synapseId, URIRef), \
-                f"synapseId should be IRI, got {type(row.synapseId)}"
+                f"investigatorSynapseId should be IRI, got {type(row.synapseId)}"
 
     def test_observation_link_is_iri(self, observations_graph, namespaces):
         """Observation link should be IRI, not literal"""

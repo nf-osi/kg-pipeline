@@ -15,7 +15,7 @@
 ################################################################################
 
 map:ObservationsSource a rml:LogicalSource ;
-    rml:source "data/csv/observations.csv" ;
+    rml:source "data/csv/observation_harmonized.csv" ;
     rml:referenceFormulation ql:CSV .
 
 ################################################################################
@@ -34,7 +34,7 @@ map:ObservationCore a rr:TriplesMap ;
     rr:predicateObjectMap [ rr:predicate nf:observationSubmitterName ; rr:objectMap [ rml:reference "observationSubmitterName" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:observationText ; rr:objectMap [ rml:reference "observationText" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:observationPhase ; rr:objectMap [ rml:reference "observationPhase" ; rr:datatype xsd:string ] ] ;
-    rr:predicateObjectMap [ rr:predicate nf:observationTime ; rr:objectMap [ rml:reference "observationTime" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:observationTime ; rr:objectMap [ rml:reference "observationTime" ; rr:datatype xsd:decimal ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:observationTimeUnits ; rr:objectMap [ rml:reference "observationTimeUnits" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:reliabilityRating ; rr:objectMap [ rml:reference "reliabilityRating" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:easeOfUseRating ; rr:objectMap [ rml:reference "easeOfUseRating" ; rr:datatype xsd:string ] ] .
@@ -50,7 +50,7 @@ map:ObservationIRIs a rr:TriplesMap ;
         rr:template "http://nf-osi.github.com/terms#observation/{observationId}" ;
         rr:termType rr:IRI
     ] ;
-    rr:predicateObjectMap [ rr:predicate nf:synapseId ; rr:objectMap [ rml:reference "synapseId" ; rr:termType rr:IRI ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:investigatorSynapseId ; rr:objectMap [ rr:template "https://www.synapse.org/Profile:{synapseId}" ; rr:termType rr:IRI ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:observationLink ; rr:objectMap [ rml:reference "observationLink" ; rr:termType rr:IRI ] ] .
 
 ################################################################################
@@ -66,7 +66,7 @@ map:ObservationAboutResource a rr:TriplesMap ;
     ] ;
     rr:predicateObjectMap [
         rr:predicate nf:aboutResource ;
-        rr:objectMap [ rml:reference "resourceId" ; rr:termType rr:IRI ]
+        rr:objectMap [ rr:template "https://nf.synapse.org/Explore/Tools/DetailsPage/Details?resourceId={resourceId}" ; rr:termType rr:IRI ]
     ] .
 
 ################################################################################
@@ -82,7 +82,7 @@ map:ObservationReferencesPublication a rr:TriplesMap ;
     ] ;
     rr:predicateObjectMap [
         rr:predicate nf:referencesPublication ;
-        rr:objectMap [ rml:reference "publicationId" ; rr:termType rr:IRI ]
+        rr:objectMap [ rr:template "http://nf-osi.github.com/terms#publication/{publicationId}" ; rr:termType rr:IRI ]
     ] .
 
 ################################################################################
@@ -111,6 +111,41 @@ map:ObservationType a rr:TriplesMap ;
                 rr:predicateObjectMap [
                     rr:predicate grel:valueParameter ;
                     rr:objectMap [ rml:reference "observationType" ; rr:termType rr:Literal ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:p_string_sep ;
+                    rr:objectMap [ rr:constant "\\|" ; rr:termType rr:Literal ]
+                ]
+            ]
+        ]
+    ] .
+
+################################################################################
+# Observation class (IRI-typed via rdf:type)
+################################################################################
+
+map:ObservationClass a rr:TriplesMap ;
+    rdfs:label "Observation Class" ;
+    rml:logicalSource map:ObservationsSource ;
+    rr:subjectMap [
+        rr:template "http://nf-osi.github.com/terms#observation/{observationId}" ;
+        rr:termType rr:IRI
+    ] ;
+    rr:predicateObjectMap [
+        rr:predicate rdf:type ;
+        rr:objectMap [
+            a fnml:FunctionTermMap ;
+            rr:termType rr:IRI ;
+            fnml:functionValue [
+                a fno:Execution ;
+                rml:logicalSource map:ObservationsSource ;
+                rr:predicateObjectMap [
+                    rr:predicate fno:executes ;
+                    rr:objectMap [ rr:constant grel:string_split ; rr:termType rr:IRI ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:valueParameter ;
+                    rr:objectMap [ rml:reference "observationClass" ; rr:termType rr:Literal ]
                 ] ;
                 rr:predicateObjectMap [
                     rr:predicate grel:p_string_sep ;

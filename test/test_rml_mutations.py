@@ -1,7 +1,7 @@
 """
 Tests for Mutations RML mapping
 
-Tests the portal_mutations.rml.ttl mapping against test/mutations.csv
+Tests the mutations.rml.ttl mapping against test/mutations.csv
 """
 
 import pytest
@@ -13,8 +13,8 @@ from rdflib.namespace import RDF
 def mutations_graph(rml_runner, namespaces):
     """Load mutations RDF graph from test data"""
     graph = rml_runner(
-        mapping_file="portal_mutations.rml.ttl",
-        csv_replacements={"data/csv/mutations.csv": "test/mutations.csv"}
+        mapping_file="mutations.rml.ttl",
+        csv_replacements={"data/csv/mutations_harmonized.csv": "test/mutations.csv"}
     )
     return graph
 
@@ -88,22 +88,18 @@ class TestMutationsMultiValue:
         assert "Spontaneous" in methods, "Expected 'Spontaneous' mutation method"
         assert "ENU" in methods, "Expected 'ENU' mutation method"
 
-    def test_mutation_type_multi_value_split(self, mutations_graph, namespaces):
-        """MutationType should split on pipe delimiter"""
+    def test_mutation_type_class_multi_value_split(self, mutations_graph, namespaces):
+        """mutationTypeClass should split on pipe and produce multiple rdf:type IRIs"""
         NF = namespaces["nf"]
 
-        query = """
-        SELECT ?mutation ?type
-        WHERE {
-            ?mutation a nf:Mutation ;
-                      nf:mutationType ?type .
-        }
-        """
-        results = mutations_graph.query(query, initNs={"nf": NF})
-        types = [str(row.type) for row in results]
+        # test-mut-002 has pipe-delimited mutationTypeClass
+        test_mut_002 = URIRef("http://nf-osi.github.com/terms#mutation/test-mut-002")
+        types = list(mutations_graph.objects(test_mut_002, RDF.type))
 
-        assert "Nonsense" in types, "Expected 'Nonsense' mutation type"
-        assert "Frameshift" in types, "Expected 'Frameshift' mutation type"
+        assert NF.IntragenicDeletion in types, \
+            f"Expected IntragenicDeletion type from mutationTypeClass, got {types}"
+        assert NF.Insertion in types, \
+            f"Expected Insertion type from mutationTypeClass, got {types}"
 
 
 class TestMutationsIRIFields:
