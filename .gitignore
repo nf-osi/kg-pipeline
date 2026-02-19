@@ -14,6 +14,9 @@ test/output.ttl
 test/*.log
 test/temp_*.ttl
 
+# Ignore .env (API keys)
+.env
+
 # Ignore Python cache artifacts
 __pycache__/
 *.py[cod]

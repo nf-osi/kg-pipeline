@@ -135,17 +135,20 @@ use the specific [released image](#build-and-release), unless using `docker comp
 docker run -p 7001:7001 ghcr.io/nf-osi/kg-pipeline:eval-1 
 ```
 
-2. Export API keys (`ANTHROPIC_API_KEY` for standard, additional keys for `--full`) and run:  
+2. Set API keys (`ANTHROPIC_API_KEY` for standard, additional keys for `--full`/`--google`/`--openai`).
+Keys can be exported in the shell or placed in a `.env` file at the repo root:
 
-```bash                                                                                                              
-export ANTHROPIC_API_KEY=...                   # required                                                            
+```bash
+export ANTHROPIC_API_KEY=...                   # required
 python scripts/astabench.py
 ```
 
 ```bash
-GOOGLE_API_KEY=... OPENAI_API_KEY=...   # for --full                                                          
-python scripts/astabench.py --full      # + gemini-2.5-flash, gpt-5.2                                         
-python scripts/astabench.py --full --epochs 3  # extra args forwarded to inspect eval   
+python scripts/astabench.py --full             # + gemini-2.5-pro, gpt-5.2
+python scripts/astabench.py --google       # Gemini only (no Anthropic key needed)
+python scripts/astabench.py --openai       # OpenAI only (no Anthropic key needed)
+python scripts/astabench.py --google --openai  # both non-Anthropic providers
+python scripts/astabench.py --full --epochs 3  # extra args forwarded to inspect eval
 ```
 
 See [`astabench/evals/nf_rag/README.md`](astabench/evals/nf_rag/README.md) for more details.
