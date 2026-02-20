@@ -51,7 +51,4 @@ python scripts/astabench.py --full --epochs 3  # extra args forwarded to inspect
 
 See [`astabench/evals/nf_rag/README.md`](astabench/evals/nf_rag/README.md) for more details.
 
-### Limitations
 
-This evaluates retrieval from one knowledge source in isolation.
-In production, an agent switches between two or more sources (e.g. the KG and a vector DB that indexes help documentation).
