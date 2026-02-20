@@ -216,17 +216,12 @@ def create_rdf_asset(table_name: str, config: TableConfig):
             for line in list(unique_errors)[:5]:
                 summary += f"\n  {line[:200]}"
             context.log.warning(summary)
-            context.add_output_metadata({
-                "path": str(output_file),
-                "status": "failed",
-                "log_lines": len(lines),
-                "unique_errors": len(unique_errors),
-            })
-            return output_file
 
         abs_output = project_root / output_file
-        size_mb = abs_output.stat().st_size / (1024 * 1024)
+        if not abs_output.exists() or abs_output.stat().st_size == 0:
+            raise RuntimeError(f"RMLMapper did not produce output: {output_file}")
 
+        size_mb = abs_output.stat().st_size / (1024 * 1024)
         context.add_output_metadata({
             "path": str(output_file),
             "size_mb": round(size_mb, 2),
