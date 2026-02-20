@@ -204,11 +204,20 @@ def create_rdf_asset(table_name: str, config: TableConfig):
 
         context.log.info(f"Running RMLMapper for {table_name}")
         try:
-            rml_mapper.run(
-                mapping_file=rml_file,
-                output_file=output_file,
-                log_file=config.log_path,
-            )
+            if config.chunk_rows:
+                context.log.info(f"Using chunked processing ({config.chunk_rows} rows per chunk)")
+                rml_mapper.run_chunked(
+                    mapping_file=rml_file,
+                    output_file=output_file,
+                    log_file=config.log_path,
+                    chunk_rows=config.chunk_rows,
+                )
+            else:
+                rml_mapper.run(
+                    mapping_file=rml_file,
+                    output_file=output_file,
+                    log_file=config.log_path,
+                )
         except subprocess.CalledProcessError as e:
             stderr = e.stderr or ""
             # Show full log when short (real errors), summarize when long (known warnings)
