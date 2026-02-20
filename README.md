@@ -99,7 +99,7 @@ are published to GHCR on each tagged release.
 Run the image:
 
 ```
-docker run -p 7001:7001 ghcr.io/nf-osi/kg-pipeline:latest
+docker run -p 7001:7001 ghcr.io/nf-osi/kg-qlever:latest
 ```
 
 The SPARQL endpoint is available at `http://localhost:7001`.
@@ -128,11 +128,19 @@ The convenience script for running eval will process ground truth files into the
 `eval_data.yaml` expected and runs benchmarking with Anthropic models by default.
 
 Steps (from the repo root):
-1. Serve the knowledge graph; because ground truth is based on a specific snapshot of the data, 
-use the specific [released image](#build-and-release), unless using `docker compose` for a developing benchmark:
+1. Serve the knowledge graph; because ground truth is developed with specific snapshots of the data, 
+pull and run the appropriate [eval-tagged image](https://github.com/orgs/nf-osi/packages?repo_name=kg-pipeline).
+
+For example:
 
 ```bash
-docker run -p 7001:7001 ghcr.io/nf-osi/kg-pipeline:eval-1 
+docker run -p 7001:7001 ghcr.io/nf-osi/kg-qlever:eval-main-latest 
+```
+
+or 
+
+```bash
+docker run -p 7001:7001 ghcr.io/nf-osi/kg-qlever:eval-paperqa-v0.1 
 ```
 
 2. Set API keys (`ANTHROPIC_API_KEY` for standard, additional keys for `--full`/`--google`/`--openai`).
