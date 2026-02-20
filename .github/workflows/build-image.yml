@@ -50,24 +50,24 @@ jobs:
 
       - name: Validate RDF outputs
         run: |
-          missing=0
-          for f in data/rdf/*.ttl; do
-            if [ ! -s "$f" ]; then
-              echo "::error::Empty or missing: $f"
-              missing=$((missing + 1))
+          expected="animal_models antibodies biobanks cell_lines development donor_tool donors files funders genetic_reagents investigators mutation_model mutations observations publications resources studies"
+          fail=0
+          for name in $expected; do
+            f="data/rdf/${name}.ttl"
+            if [ ! -e "$f" ]; then
+              echo "::error::Missing: $f"
+              fail=$((fail + 1))
+            elif [ ! -s "$f" ]; then
+              echo "::error::Empty: $f"
+              fail=$((fail + 1))
+            else
+              echo "  ok: $f ($(wc -c < "$f") bytes)"
             fi
           done
-          count=$(ls data/rdf/*.ttl 2>/dev/null | wc -l)
-          echo "Found $count .ttl files"
-          if [ "$count" -lt 17 ]; then
-            echo "::error::Expected 17 .ttl files, found $count"
+          if [ "$fail" -gt 0 ]; then
             exit 1
           fi
-          if [ "$missing" -gt 0 ]; then
-            echo "::error::$missing empty .ttl files"
-            exit 1
-          fi
-          echo "All $count RDF outputs validated"
+          echo "All 17 RDF outputs validated"
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
@@ -77,6 +77,7 @@ jobs:
             data/raw/
             data/csv/
             data/rdf/
+            reports/
             schema/
 
       # Build and push Docker image

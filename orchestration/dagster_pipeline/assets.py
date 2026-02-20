@@ -100,6 +100,14 @@ def create_harmonize_asset(table_name: str, config: TableConfig):
         if result.stderr:
             context.log.warning(f"Harmonize stderr: {result.stderr}")
 
+        # Save harmonization report for artifact upload
+        report_dir = project_root / "reports"
+        report_dir.mkdir(parents=True, exist_ok=True)
+        report_file = report_dir / f"{table_name}_harmonize.txt"
+        report_file.write_text(
+            (result.stdout or "") + (result.stderr or "")
+        )
+
         if result.returncode != 0:
             raise RuntimeError(
                 f"Harmonization script failed with code {result.returncode}: {result.stderr}"
@@ -111,6 +119,7 @@ def create_harmonize_asset(table_name: str, config: TableConfig):
         context.add_output_metadata({
             "path": str(config.harmonize_output),
             "num_rows": num_rows,
+            "report": str(report_file.relative_to(project_root)),
         })
 
         return config.harmonize_output
@@ -201,13 +210,17 @@ def create_rdf_asset(table_name: str, config: TableConfig):
                 log_file=config.log_path,
             )
         except subprocess.CalledProcessError as e:
-            context.log.warning(
-                f"RMLMapper failed for {table_name} (exit {e.returncode}):\n{e.stderr}"
-            )
+            lines = (e.stderr or "").splitlines()
+            unique_errors = set(lines)
+            summary = f"RMLMapper for {table_name} exited {e.returncode}: {len(lines)} log lines, {len(unique_errors)} unique"
+            for line in list(unique_errors)[:5]:
+                summary += f"\n  {line[:200]}"
+            context.log.warning(summary)
             context.add_output_metadata({
                 "path": str(output_file),
                 "status": "failed",
-                "error": str(e.stderr)[:500],
+                "log_lines": len(lines),
+                "unique_errors": len(unique_errors),
             })
             return output_file
 

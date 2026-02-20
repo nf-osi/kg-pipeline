@@ -6,6 +6,9 @@ data/
 # Ignore RMLMapper logs
 logs/
 
+# Ignore harmonization reports
+reports/
+
 # Ignore local RMLMapper binary
 tools/rmlmapper-8.1.0.jar
 
