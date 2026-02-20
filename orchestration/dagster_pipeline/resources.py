@@ -49,7 +49,7 @@ class RMLMapperResource(ConfigurableResource):
     """Resource for running RMLMapper."""
 
     jar_path: str = "tools/rmlmapper-8.1.0.jar"
-    java_max_heap: str = os.environ.get("JAVA_MAX_HEAP", "4g")
+    java_max_heap: str = os.environ.get("JAVA_MAX_HEAP", "6g")
     function_files: List[str] = [
         "tools/functions_grel.ttl",
         "tools/grel_java_mapping.ttl",
