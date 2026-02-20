@@ -72,9 +72,11 @@ class RMLMapperResource(ConfigurableResource):
         abs_log_file.parent.mkdir(parents=True, exist_ok=True)
 
         # Build command with relative paths (relative to project root)
+        logback_config = project_root / "tools" / "logback-rmlmapper.xml"
         cmd = [
             "java",
             f"-Xmx{self.java_max_heap}",
+            f"-Dlogback.configurationFile={logback_config}",
             "-jar",
             self.jar_path,
         ]
