@@ -100,6 +100,14 @@ def create_harmonize_asset(table_name: str, config: TableConfig):
         if result.stderr:
             context.log.warning(f"Harmonize stderr: {result.stderr}")
 
+        # Save harmonization report for artifact upload
+        report_dir = project_root / "reports"
+        report_dir.mkdir(parents=True, exist_ok=True)
+        report_file = report_dir / f"{table_name}_harmonize.txt"
+        report_file.write_text(
+            (result.stdout or "") + (result.stderr or "")
+        )
+
         if result.returncode != 0:
             raise RuntimeError(
                 f"Harmonization script failed with code {result.returncode}: {result.stderr}"
@@ -111,6 +119,7 @@ def create_harmonize_asset(table_name: str, config: TableConfig):
         context.add_output_metadata({
             "path": str(config.harmonize_output),
             "num_rows": num_rows,
+            "report": str(report_file.relative_to(project_root)),
         })
 
         return config.harmonize_output
@@ -186,21 +195,49 @@ def create_rdf_asset(table_name: str, config: TableConfig):
     )
     def _rdf_asset(context: AssetExecutionContext, rml_mapper: RMLMapperResource) -> Path:
         """Generate RDF from CSV using RMLMapper."""
+        import subprocess
+
         project_root = Path(__file__).parent.parent.parent
 
         rml_file = config.rml_path
         output_file = config.rdf_path
 
         context.log.info(f"Running RMLMapper for {table_name}")
-        rml_mapper.run(
-            mapping_file=rml_file,
-            output_file=output_file,
-            log_file=config.log_path,
-        )
+        try:
+            if config.chunk_rows:
+                context.log.info(f"Using chunked processing ({config.chunk_rows} rows per chunk)")
+                rml_mapper.run_chunked(
+                    mapping_file=rml_file,
+                    output_file=output_file,
+                    log_file=config.log_path,
+                    chunk_rows=config.chunk_rows,
+                )
+            else:
+                rml_mapper.run(
+                    mapping_file=rml_file,
+                    output_file=output_file,
+                    log_file=config.log_path,
+                )
+        except subprocess.CalledProcessError as e:
+            stderr = e.stderr or ""
+            # Show full log when short (real errors), summarize when long (known warnings)
+            if len(stderr) < 5000:
+                context.log.warning(
+                    f"RMLMapper for {table_name} exited {e.returncode}:\n{stderr}"
+                )
+            else:
+                lines = stderr.splitlines()
+                unique_errors = set(lines)
+                summary = f"RMLMapper for {table_name} exited {e.returncode}: {len(lines)} log lines, {len(unique_errors)} unique"
+                for line in list(unique_errors)[:5]:
+                    summary += f"\n  {line[:200]}"
+                context.log.warning(summary)
 
         abs_output = project_root / output_file
-        size_mb = abs_output.stat().st_size / (1024 * 1024)
+        if not abs_output.exists() or abs_output.stat().st_size == 0:
+            raise RuntimeError(f"RMLMapper did not produce output: {output_file}")
 
+        size_mb = abs_output.stat().st_size / (1024 * 1024)
         context.add_output_metadata({
             "path": str(output_file),
             "size_mb": round(size_mb, 2),

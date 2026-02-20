@@ -925,8 +925,8 @@ def main(argv: List[str] | None = None) -> int:
 
     syn = None
     if not args.from_cache:
+        # Do NOT call login() — anonymous access is used for public data only.
         syn = synapseclient.Synapse()
-        syn.login(silent=True)
 
     for table_name in table_names:
         config = TABLES[table_name]

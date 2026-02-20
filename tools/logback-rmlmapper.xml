@@ -1,0 +1,15 @@
+<configuration>
+  <!-- Suppress string_split-on-null errors (millions of harmless warnings from nullable multi-value columns) -->
+  <logger name="be.ugent.rml.functions.DynamicMultipleRecordsFunctionExecutor" level="OFF" />
+
+  <root level="INFO">
+    <appender-ref ref="STDERR" />
+  </root>
+
+  <appender name="STDERR" class="ch.qos.logback.core.ConsoleAppender">
+    <target>System.err</target>
+    <encoder>
+      <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+    </encoder>
+  </appender>
+</configuration>

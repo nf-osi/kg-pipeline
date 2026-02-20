@@ -20,6 +20,7 @@ class TableConfig:
     harmonize_script: Optional[str] = None
     harmonize_output: Optional[Path] = None
     harmonize_args: Optional[List[str]] = None
+    chunk_rows: Optional[int] = None
 
 
 # Import from prepare_portal_tables.py
@@ -73,6 +74,7 @@ TABLE_CONFIGS["files"].harmonize_args = [
     "--nf1-lookup", "mappings/sssom/nf1_genotype_lookup.sssom.tsv",
     "--nf2-lookup", "mappings/sssom/nf2_genotype_lookup.sssom.tsv",
 ]
+TABLE_CONFIGS["files"].chunk_rows = 100_000
 
 # Configure harmonization for cell lines (cellLineCategory to subclass IRIs)
 TABLE_CONFIGS["cell_lines"].harmonize_script = "scripts/classify_cell_lines.py"

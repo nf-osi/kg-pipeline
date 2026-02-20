@@ -110,6 +110,18 @@ orchestration/
 └── README.md             # This file
 ```
 
+## Configuration
+
+| Environment Variable | Default | Description |
+|---|---|---|
+| `JAVA_MAX_HEAP` | `4g` | Max JVM heap for RMLMapper (e.g. `8g`, `16g`) |
+
+The default is sized for CI runners (7GB RAM). For local runs with large tables (e.g. files, 408K+ rows), set a higher value:
+
+```bash
+export JAVA_MAX_HEAP=8g
+```
+
 ## Development
 
 ### Adding a New Table
