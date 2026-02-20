@@ -210,12 +210,19 @@ def create_rdf_asset(table_name: str, config: TableConfig):
                 log_file=config.log_path,
             )
         except subprocess.CalledProcessError as e:
-            lines = (e.stderr or "").splitlines()
-            unique_errors = set(lines)
-            summary = f"RMLMapper for {table_name} exited {e.returncode}: {len(lines)} log lines, {len(unique_errors)} unique"
-            for line in list(unique_errors)[:5]:
-                summary += f"\n  {line[:200]}"
-            context.log.warning(summary)
+            stderr = e.stderr or ""
+            # Show full log when short (real errors), summarize when long (known warnings)
+            if len(stderr) < 5000:
+                context.log.warning(
+                    f"RMLMapper for {table_name} exited {e.returncode}:\n{stderr}"
+                )
+            else:
+                lines = stderr.splitlines()
+                unique_errors = set(lines)
+                summary = f"RMLMapper for {table_name} exited {e.returncode}: {len(lines)} log lines, {len(unique_errors)} unique"
+                for line in list(unique_errors)[:5]:
+                    summary += f"\n  {line[:200]}"
+                context.log.warning(summary)
 
         abs_output = project_root / output_file
         if not abs_output.exists() or abs_output.stat().st_size == 0:
