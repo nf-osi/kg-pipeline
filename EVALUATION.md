@@ -22,7 +22,7 @@ pull and run the appropriate [eval-tagged image](https://github.com/orgs/nf-osi/
 For example:
 
 ```bash
-docker run -p 7001:7001 ghcr.io/nf-osi/kg-qlever:eval-main-latest
+docker run -p 7001:7001 ghcr.io/nf-osi/kg-qlever:eval-main-v1
 ```
 
 or
