@@ -50,11 +50,13 @@ scripts/
   classify_*.py                  Harmonization (one per entity type)
   harmonize_files.py             File-level harmonization (model systems, data types)
   validate_fks.py                CSV-level foreign key validation (see HARMONIZATION.md)
+  astabench.py                   Prepare eval data and run astabench across models
 data/
   csv/                           Source and harmonized CSVs
   rdf/                           Generated RDF (Turtle)
   raw/                           Raw Synapse exports (cache)
 orchestration/dagster_pipeline/  Dagster asset definitions for the full pipeline
+astabench/                       Eval framework (git submodule, see Evaluation)
 evaluation/                      Eval datasets for KG quality + RAG
 test/                            RML mapping tests (pytest + rdflib)
 tools/                           RMLMapper JAR + GREL function files
@@ -88,6 +90,29 @@ pytest test/
 
 Each RML mapping has a corresponding test that runs RMLMapper against a small
 fixture CSV and validates the output graph with SPARQL. See `test/README.md`.
+
+### Build and Release
+
+Pre-built [QLever](https://github.com/ad-freiburg/qlever) images with indexed data
+are published to GHCR on each tagged release.
+
+Run the image:
+
+```
+docker run -p 7001:7001 ghcr.io/nf-osi/kg-qlever:latest
+```
+
+The SPARQL endpoint is available at `http://localhost:7001`.
+
+To build locally from materialized RDF instead:
+```
+docker compose run --rm qlever-index   # build index
+docker compose up qlever-server        # serve on :7001
+```
+
+### Evaluation
+
+See [EVALUATION.md](EVALUATION.md).
 
 ### Dependencies
 
