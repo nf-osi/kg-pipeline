@@ -3,11 +3,10 @@ name: Publish Evaluation Results
 on:
   push:
     branches:
-      - main
+      - develop
     paths:
       - 'evaluation/runs.json'
       - 'scripts/build_site.py'
-      - 'evaluation/main/eval_tools.yaml'
 
 concurrency:
   group: "pages"
