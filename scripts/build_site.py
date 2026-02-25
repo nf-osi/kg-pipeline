@@ -220,12 +220,12 @@ def render_table(
     difficulty_cols = ""
     if has_difficulty:
         difficulty_cols = "".join(
-            f"<th>{DIFFICULTY_LABELS[k]}</th>" for k in DIFFICULTY_KEYS
+            f"<th class='perf'>{DIFFICULTY_LABELS[k]}</th>" for k in DIFFICULTY_KEYS
         )
     category_cols = ""
     if has_categories:
         category_cols = "".join(
-            f"<th>{CATEGORY_LABELS[k]}</th>" for k in CATEGORY_KEYS
+            f"<th class='category'>{CATEGORY_LABELS[k]}</th>" for k in CATEGORY_KEYS
         )
 
     def _difficulty_cells(run: RunSummary) -> str:
@@ -267,20 +267,20 @@ def render_table(
 <table id="runs-table">
   <thead>
     <tr>
-      <th>Task</th>
-      <th>Model</th>
-      <th>Solver</th>
-      <th>Samples</th>
-      <th>Recall</th>
+      <th class="info">Task</th>
+      <th class="info">Model</th>
+      <th class="info">Solver</th>
+      <th class="info">Samples</th>
+      <th class="recall">Recall</th>
       {difficulty_cols}
       {category_cols}
-      <th>Total Cost (USD)</th>
-      <th>Date</th>
-      <th>Total Time</th>
-      <th>Avg Time / Sample</th>
-      <th>Shortest Sample</th>
-      <th>Longest Sample</th>
-      <th>Commit</th>
+      <th class="cost">Total Cost (USD)</th>
+      <th class="time">Date</th>
+      <th class="time">Total Time</th>
+      <th class="time">Avg Time / Sample</th>
+      <th class="time">Shortest Sample</th>
+      <th class="time">Longest Sample</th>
+      <th class="meta">Commit</th>
     </tr>
   </thead>
   <tbody>
@@ -387,7 +387,9 @@ def _build_sweet_spot_table(
         top_score = max(model_scores.values())
         if top_score < recall_threshold:
             continue
-        top_model = max(model_scores, key=lambda m: model_scores[m])
+        # Get all models that achieved the top score (handle ties)
+        top_models = [m for m, score in model_scores.items() if score == top_score]
+        top_models_str = ", ".join(sorted(top_models))
         meta = question_meta.get(qid, {})
         rows.append(
             {
@@ -396,7 +398,7 @@ def _build_sweet_spot_table(
                     f"frustration/{frust}", frust
                 ),
                 "best_recall": top_score,
-                "best_model": top_model,
+                "best_model": top_models_str,
                 "complexity": meta.get("complexity", ""),
             }
         )
@@ -910,7 +912,15 @@ document.addEventListener("DOMContentLoaded", function() {{
     body {{ font-family: sans-serif; margin: 2rem; }}
     table {{ border-collapse: collapse; width: 100%; }}
     th, td {{ border: 1px solid #ccc; padding: 0.5rem; text-align: left; }}
-    th {{ background: #f2f2f2; cursor: pointer; }}
+    th {{ cursor: pointer; font-weight: 600; }}
+    /* Column group colors for better readability */
+    th.info {{ background: #e3f2fd; }}     /* Run info: soft blue */
+    th.recall {{ background: #c8e6c9; }}   /* Overall recall: emphasized green */
+    th.perf {{ background: #e8f5e9; }}     /* Difficulty breakdown: soft green */
+    th.category {{ background: #e0f2f1; }} /* Category breakdown: soft teal */
+    th.cost {{ background: #fff3e0; }}     /* Cost: soft amber */
+    th.time {{ background: #f3e5f5; }}     /* Timing: soft purple */
+    th.meta {{ background: #f5f5f5; }}     /* Metadata: light gray */
     .charts {{ display: flex; flex-wrap: wrap; gap: 2rem; justify-content: center; }}
     .charts figure {{ margin: 0; text-align: center; }}
     .charts figcaption {{ font-weight: bold; margin-bottom: 0.5rem; }}
