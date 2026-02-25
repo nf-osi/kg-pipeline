@@ -1,14 +1,11 @@
 #!/usr/bin/env python3
-"""Aggregate scored runs and publish them to a docs branch for GH Pages."""
+"""Generate HTML dashboard from evaluation/runs.json."""
 from __future__ import annotations
 
 import argparse
 import html
 import json
-import shutil
-import subprocess
 import sys
-import tempfile
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -21,12 +18,12 @@ except ImportError:
 
 @dataclass
 class RunSummary:
+    """Reconstructed from JSON for compatibility with existing chart functions."""
     name: str
     model: str | None
     solver: str | None
     overall_score: float | None
     overall_cost: float | None
-    summary_path: Path
     started_at: str | None = None
     completed_at: str | None = None
     total_samples: int | None = None
@@ -45,13 +42,12 @@ class RunSummary:
     task_stats: dict[str, dict] = field(default_factory=dict)
 
 
-QuestionMeta = dict[str, dict[str, str]]  # id -> {level, complexity, user_frustration}
+QuestionMeta = dict[str, dict[str, str]]
 
 
 def load_question_metadata(yaml_path: Path) -> QuestionMeta:
     """Load question difficulty metadata from eval_tools.yaml."""
     if yaml is None:
-        print("PyYAML not installed; skipping difficulty breakdown", file=sys.stderr)
         return {}
     if not yaml_path.exists():
         return {}
@@ -73,203 +69,34 @@ def load_question_metadata(yaml_path: Path) -> QuestionMeta:
     return meta
 
 
-def _compute_sample_breakdowns(
-    summaries_data: list[dict],
-    question_meta: QuestionMeta,
-) -> tuple[
-    dict[str, float],
-    dict[str, float],
-    dict[str, float],
-    list[dict],
-    list[dict],
-    list[dict],
-]:
-    """Compute mean recall grouped by difficulty, category, and frustration."""
-    diff_groups: dict[str, list[float]] = {}
-    cat_groups: dict[str, list[float]] = {}
-    frust_groups: dict[str, list[float]] = {}
-    frust_samples: list[dict] = []
-    level_samples: list[dict] = []
-    complexity_samples: list[dict] = []
-    for sample in summaries_data:
-        sid = sample.get("id", "")
-        scores = sample.get("scores", {})
-        # Find the first scorer's value
-        score_val = None
-        for scorer in scores.values():
-            if isinstance(scorer, dict) and "value" in scorer:
-                score_val = scorer["value"]
-                break
-        if score_val is None:
-            continue
-        # Difficulty + frustration breakdown (from eval_tools.yaml metadata)
-        meta = question_meta.get(sid)
-        if meta:
-            level = meta.get("level", "")
-            complexity = meta.get("complexity", "")
-            frustration = meta.get("user_frustration", "")
-            if level:
-                diff_groups.setdefault(f"level/{level}", []).append(score_val)
-                level_samples.append(
-                    {"id": sid, "level": level, "score": score_val}
-                )
-            if complexity:
-                diff_groups.setdefault(f"complexity/{complexity}", []).append(score_val)
-                complexity_samples.append(
-                    {"id": sid, "complexity": complexity, "score": score_val}
-                )
-            if frustration:
-                frust_groups.setdefault(f"frustration/{frustration}", []).append(
-                    score_val
-                )
-                frust_samples.append(
-                    {"id": sid, "frustration": frustration, "score": score_val}
-                )
-        # Category breakdown (from per-sample metadata)
-        category = (sample.get("metadata") or {}).get("category", "")
-        if category:
-            cat_groups.setdefault(f"category/{category}", []).append(score_val)
-    difficulty_scores = {k: sum(v) / len(v) for k, v in diff_groups.items() if v}
-    category_scores = {k: sum(v) / len(v) for k, v in cat_groups.items() if v}
-    frustration_scores = {k: sum(v) / len(v) for k, v in frust_groups.items() if v}
-    return (
-        difficulty_scores,
-        category_scores,
-        frustration_scores,
-        frust_samples,
-        level_samples,
-        complexity_samples,
-    )
-
-
-def _duration_seconds(start: str | None, end: str | None) -> float | None:
-    if not start or not end:
-        return None
-    try:
-        s = datetime.fromisoformat(start)
-        e = datetime.fromisoformat(end)
-        return (e - s).total_seconds()
-    except (ValueError, TypeError):
-        return None
-
-
-def _format_duration(seconds: float | None) -> str:
-    if seconds is None:
-        return ""
-    m, s = divmod(int(seconds), 60)
-    h, m = divmod(m, 60)
-    if h:
-        return f"{h}h {m:02d}m {s:02d}s"
-    return f"{m}m {s:02d}s"
-
-
-def load_runs(
-    log_root: Path,
-    question_meta: QuestionMeta,
-) -> list[RunSummary]:
-    runs: list[RunSummary] = []
-    for run_dir in sorted(log_root.iterdir()):
-        if not run_dir.is_dir():
-            continue
-        summary_file = run_dir / "summary_stats.json"
-        scores_file = run_dir / "scores.json"
-        if not summary_file.exists() or not scores_file.exists():
-            continue
-        try:
-            summary_data = json.loads(summary_file.read_text())
-            overall = summary_data.get("stats", {}).get("overall", {})
-            scores = json.loads(scores_file.read_text())
-            eval_spec = (
-                scores.get("results", [{}])[0].get("eval_spec")
-                if scores.get("results")
-                else None
-            )
-        except json.JSONDecodeError as exc:  # pragma: no cover - defensive
-            print(f"Skipping {run_dir}: failed to parse JSON ({exc})", file=sys.stderr)
-            continue
-
-        # Extract per-task/tag breakdown from summary_stats.json
-        task_stats: dict[str, dict] = {}
-        for key, val in summary_data.get("stats", {}).items():
-            if key.startswith("task/") or key.startswith("tag/"):
-                task_stats[key] = val
-
-        # Read header.json for extra metadata
-        started_at = None
-        completed_at = None
-        total_samples = None
-        git_commit = None
-        task_name = None
-        header_file = run_dir / "header.json"
-        if header_file.exists():
-            try:
-                header = json.loads(header_file.read_text())
-                stats = header.get("stats", {})
-                started_at = stats.get("started_at")
-                completed_at = stats.get("completed_at")
-                results = header.get("results", {})
-                total_samples = results.get("total_samples")
-                eval_info = header.get("eval", {})
-                task_name = eval_info.get("task")
-                revision = eval_info.get("revision", {})
-                git_commit = revision.get("commit")
-            except json.JSONDecodeError:
-                pass  # header.json is optional enrichment
-
-        # Read summaries.json for per-sample timing and difficulty breakdown
-        min_sample_time = None
-        max_sample_time = None
-        avg_sample_time = None
-        difficulty_scores: dict[str, float] = {}
-        category_scores: dict[str, float] = {}
-        frustration_scores: dict[str, float] = {}
-        frustration_samples: list[dict] = []
-        level_samples: list[dict] = []
-        complexity_samples: list[dict] = []
-        summaries_file = run_dir / "summaries.json"
-        if summaries_file.exists():
-            try:
-                samples = json.loads(summaries_file.read_text())
-                times = [s["total_time"] for s in samples if "total_time" in s]
-                if times:
-                    min_sample_time = min(times)
-                    max_sample_time = max(times)
-                    avg_sample_time = sum(times) / len(times)
-                (
-                    difficulty_scores,
-                    category_scores,
-                    frustration_scores,
-                    frustration_samples,
-                    level_samples,
-                    complexity_samples,
-                ) = _compute_sample_breakdowns(samples, question_meta)
-            except (json.JSONDecodeError, TypeError):
-                pass
-
+def load_runs_from_json(json_path: Path) -> list[RunSummary]:
+    """Load runs from JSON and reconstruct RunSummary objects."""
+    data = json.loads(json_path.read_text())
+    runs = []
+    for r in data:
         runs.append(
             RunSummary(
-                name=run_dir.name,
-                model=(eval_spec or {}).get("model"),
-                solver=(eval_spec or {}).get("solver"),
-                overall_score=overall.get("score"),
-                overall_cost=overall.get("cost"),
-                summary_path=summary_file,
-                started_at=started_at,
-                completed_at=completed_at,
-                total_samples=total_samples,
-                git_commit=git_commit,
-                task_name=task_name,
-                score_stderr=overall.get("score_stderr"),
-                min_sample_time=min_sample_time,
-                max_sample_time=max_sample_time,
-                avg_sample_time=avg_sample_time,
-                difficulty_scores=difficulty_scores,
-                category_scores=category_scores,
-                frustration_scores=frustration_scores,
-                frustration_samples=frustration_samples,
-                level_samples=level_samples,
-                complexity_samples=complexity_samples,
-                task_stats=task_stats,
+                name=r.get("run", ""),
+                model=r.get("model"),
+                solver=r.get("solver"),
+                overall_score=r.get("score"),
+                overall_cost=r.get("cost"),
+                started_at=r.get("started_at"),
+                completed_at=r.get("completed_at"),
+                total_samples=r.get("total_samples"),
+                git_commit=r.get("git_commit"),
+                task_name=r.get("task_name"),
+                score_stderr=r.get("score_stderr"),
+                min_sample_time=r.get("min_sample_time"),
+                max_sample_time=r.get("max_sample_time"),
+                avg_sample_time=r.get("avg_sample_time"),
+                difficulty_scores=r.get("difficulty_scores", {}),
+                category_scores=r.get("category_scores", {}),
+                frustration_scores=r.get("frustration_scores", {}),
+                frustration_samples=r.get("frustration_samples", []),
+                level_samples=r.get("level_samples", []),
+                complexity_samples=r.get("complexity_samples", []),
+                task_stats=r.get("task_stats", {}),
             )
         )
     return runs
@@ -306,6 +133,27 @@ def _format_score(value: float | None) -> str:
 
 def _esc(value: str | None) -> str:
     return html.escape(value) if value else ""
+
+
+def _duration_seconds(start: str | None, end: str | None) -> float | None:
+    if not start or not end:
+        return None
+    try:
+        s = datetime.fromisoformat(start)
+        e = datetime.fromisoformat(end)
+        return (e - s).total_seconds()
+    except (ValueError, TypeError):
+        return None
+
+
+def _format_duration(seconds: float | None) -> str:
+    if seconds is None:
+        return ""
+    m, s = divmod(int(seconds), 60)
+    h, m = divmod(m, 60)
+    if h:
+        return f"{h}h {m:02d}m {s:02d}s"
+    return f"{m}m {s:02d}s"
 
 
 # Ordered keys for difficulty columns
@@ -1098,119 +946,37 @@ document.addEventListener("DOMContentLoaded", function() {{
     (destination / "index.html").write_text(html_content)
 
 
-def run_git(*args: str) -> subprocess.CompletedProcess[str]:
-    return subprocess.run(args, check=True, text=True, capture_output=True)
-
-
-def ensure_clean_worktree() -> None:
-    status = run_git("git", "status", "--porcelain")
-    if status.stdout.strip():
-        raise SystemExit("Working tree must be clean before running publish_docs.py")
-
-
-def update_docs_branch(
-    site_dir: Path,
-    doc_branch: str,
-    push: bool,
-    commit_message: str,
-) -> None:
-    worktree_path = Path(tempfile.mkdtemp(prefix="docs-worktree-"))
-    try:
-        subprocess.run(
-            ["git", "worktree", "add", "-B", doc_branch, str(worktree_path)],
-            check=True,
-        )
-        # wipe existing contents except .git
-        for item in worktree_path.iterdir():
-            if item.name == ".git":
-                continue
-            if item.is_dir():
-                shutil.rmtree(item)
-            else:
-                item.unlink()
-        # copy new site
-        for item in site_dir.iterdir():
-            dest = worktree_path / item.name
-            if item.is_dir():
-                shutil.copytree(item, dest, dirs_exist_ok=True)
-            else:
-                shutil.copy2(item, dest)
-        subprocess.run(["git", "-C", str(worktree_path), "add", "."], check=True)
-        status = subprocess.run(
-            ["git", "-C", str(worktree_path), "status", "--short"],
-            check=True,
-            capture_output=True,
-            text=True,
-        )
-        if status.stdout.strip():
-            subprocess.run(
-                [
-                    "git",
-                    "-C",
-                    str(worktree_path),
-                    "commit",
-                    "-m",
-                    commit_message,
-                ],
-                check=True,
-            )
-            if push:
-                subprocess.run(
-                    ["git", "-C", str(worktree_path), "push", "origin", doc_branch],
-                    check=True,
-                )
-        else:
-            print("Docs branch already up to date; no commit created.")
-    finally:
-        subprocess.run(
-            ["git", "worktree", "remove", "--force", str(worktree_path)],
-            check=True,
-        )
-
-
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--log-dir", type=Path, default=Path("astabench/logs"))
+    parser.add_argument(
+        "runs_json",
+        type=Path,
+        help="Path to runs.json file",
+    )
+    parser.add_argument(
+        "--out",
+        type=Path,
+        default=Path("_site"),
+        help="Output directory for generated site",
+    )
     parser.add_argument(
         "--eval-metadata",
         type=Path,
         default=Path("evaluation/main/eval_tools.yaml"),
-        help="Path to eval_tools.yaml for difficulty metadata",
-    )
-    parser.add_argument("--doc-branch", default="docs")
-    parser.add_argument("--commit-message", default="Update docs")
-    parser.add_argument("--push", action="store_true")
-    parser.add_argument(
-        "--preview",
-        type=Path,
-        nargs="?",
-        const=Path("preview"),
-        default=None,
-        help="Write site to a local directory for preview (default: preview/)",
+        help="Path to eval_tools.yaml for question metadata (for sweet spot table)",
     )
     args = parser.parse_args()
 
-    if not args.log_dir.exists():
-        raise SystemExit(f"Log directory {args.log_dir} does not exist")
+    if not args.runs_json.exists():
+        raise SystemExit(f"Input file {args.runs_json} does not exist")
+
+    runs = load_runs_from_json(args.runs_json)
+    if not runs:
+        raise SystemExit("No runs found in JSON file")
 
     question_meta = load_question_metadata(args.eval_metadata)
-    runs = load_runs(args.log_dir, question_meta)
-    if not runs:
-        raise SystemExit("No scored runs found in logs directory")
-
-    if args.preview is not None:
-        args.preview.mkdir(parents=True, exist_ok=True)
-        write_site(runs, args.preview, question_meta)
-        print(f"Preview site written to {args.preview}/")
-        return
-
-    ensure_clean_worktree()
-    site_dir = Path(tempfile.mkdtemp(prefix="docs-site-"))
-    try:
-        write_site(runs, site_dir, question_meta)
-        update_docs_branch(site_dir, args.doc_branch, args.push, args.commit_message)
-    finally:
-        shutil.rmtree(site_dir, ignore_errors=True)
+    write_site(runs, args.out, question_meta)
+    print(f"✓ Site generated at {args.out}/index.html")
 
 
 if __name__ == "__main__":
