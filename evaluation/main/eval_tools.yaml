@@ -22,11 +22,11 @@
 #   - Both models link to genetic disorders
 #
 # Dataset Item Attributes:
-#   - user_story: User story behind query with format "As a {persona}, I want..." 
+#   - user_story: User story behind query with format "As a {persona}, I want..."
 #   - complexity: Number of hops required (1-hop, 2-hop, 3-hop)
 #   - level: Difficulty/capability level of the question
 #       * "baseline" - baseline functionality established by current portal technologies and configuration
-#       * "advanced" - questions not handled by current portal infra (highly linked, with ranking/aggregation, need semantics) 
+#       * "advanced" - questions not handled by current portal infra (highly linked, with ranking/aggregation, need semantics)
 #   - facet_answerable: For feature comparison, whether this can be answered via portal UI facets alone
 #       * "yes" - fully answerable using available facets
 #       * "partial" - answerable but requires workarounds, manual filtering, or multiple steps
@@ -37,6 +37,11 @@
 #       * "partial" - answerable but with limitations, missing results, or requires knowing exact terms
 #       * "no" - cannot be answered via text search
 #   - text_search_note: (optional) Explanation for text search flow
+#   - user_frustration: Researcher frustration level when trying to answer with current tools
+#       * "low" - Answerable with minimal effort via facets or text search
+#       * "moderate" - Requires knowing the right approach, extra steps, or domain knowledge
+#       * "high" - Incomplete/misleading results, painful workarounds, or only one weak path
+#       * "very_high" - Dead end; cannot be answered with current tools
 #   - target_milestone: (optional) Roadmap milestone where we expect this to be working/fully supported
 #   - demo_priority: (optional) Priority for demonstration/showcase purposes
 #       * "high" - Essential demo candidate: realistic use case, interesting results, showcases innovation
@@ -70,6 +75,7 @@ components:
         facet_note: "Select both Animal Model and Cell Line for Resource Type -> look for 'Human Clin Var Mutation' filter to show list and enable selection -> blocked bc filter not available)"
         text_search_answerable: yes
         text_search_note: "Use mutation as search term, e.g. 'NM_000267.3(NF1):c.2041C>T (p.Arg681Ter)', get exact relevant results"
+        user_frustration: moderate
         demo_priority: medium
         demo_rationale: "Cross-resource query, realistic clinical mutation workflow; however, current text search handles this well"
 
@@ -81,6 +87,7 @@ components:
         facet_answerable: no
         text_search_answerable: yes
         text_search_note: "Using 'floxed' returns some relevant results"
+        user_frustration: moderate
         demo_priority: medium
         demo_rationale: "Common experimental need but straightforward search"
 
@@ -93,6 +100,7 @@ components:
         facet_note: "Relevant filter Sequence Variation not available"
         text_search_answerable: no
         text_search_note: "No results for 'c.104del' without any filters; Sequence Variation not indexed"
+        user_frustration: very_high
         demo_priority: medium
         demo_rationale: "Realistic sequence variant search"
 
@@ -104,15 +112,16 @@ components:
         facet_answerable: no
         facet_note: "Same blocked flow as MUT-001"
         text_search_answerable: partial
-        text_search_note: > 
+        text_search_note: >
           Type in "splice" to see some relevant cell lines that mention it in the description,
-          but MISSING relevant animal models. 
+          but MISSING relevant animal models.
 
-          The field `humanClinVarMutation` field contains HGVS c. notation, 
+          The field `humanClinVarMutation` field contains HGVS c. notation,
           so canonical splice-site variants are usually written with + or - offsets from an exon boundary.
-          For example, NM_000546.6(TP53):c.96+1G>A and NM_001042492.3(NF1):c.6704+1G>T are currently ones in the db. 
+          For example, NM_000546.6(TP53):c.96+1G>A and NM_001042492.3(NF1):c.6704+1G>T are currently ones in the db.
           Can attempt to use this as alternative search term, e.g. type in `+1`, `+2`, `-1`, or `-2`,
           since we know `humanClinVarMutation` is indexed, but won't work because get the message that these terms are too short.
+        user_frustration: very_high
         see_also: https://pmc.ncbi.nlm.nih.gov/articles/PMC8705852/
         demo_priority: high
         demo_rationale: "Overcomes technical limitations of current search (short terms); critical for gene therapy workflows"
@@ -126,6 +135,7 @@ components:
         facet_note: "No filter for grouping mutations by affected genes or identifying compound mutations"
         text_search_answerable: no
         text_search_note: "Cannot systematically identify cell lines with multiple gene mutations through text search alone"
+        user_frustration: very_high
         demo_priority: high
         demo_rationale: "Enables discovery of models for studying genetic interactions, synthetic lethality, and compound mutation effects - critical for understanding complex disease mechanisms"
         note: "Query mutation_cell_line joined with mutations table, group by resourceId and count distinct affectedGeneSymbol. Return cell lines with >1 gene. Reveals models valuable for epistasis studies and combination therapy development"
@@ -139,6 +149,7 @@ components:
         facet_note: "Requires grouping resources by shared mutationId across animal models and cell lines"
         text_search_answerable: partial
         text_search_note: "Can search for specific mutation text, but cannot identify which models share the same mutation without manual comparison"
+        user_frustration: very_high
         demo_priority: high
         demo_rationale: "Enables cross-validation between cell and animal models; showcases mutation as integration point; critical for experimental design requiring matched in vitro/in vivo systems"
         note: "Query mutation_animal_model and mutation_cell_line tables for mutationIds present in both. Returns the mutation IDs (not individual resources), enabling researchers to identify which mutations have both model types available. Also reveals model gaps: most mutations exist in only one model type, highlighting opportunities for tool development"
@@ -154,7 +165,8 @@ components:
         facet_answerable: yes
         facet_note: "Resource Type = 'Animal Model' + Animal Model of Manifestation = 'Optic Nerve Glioma'"
         text_search_answerable: yes
-        text_search_note: 
+        text_search_note:
+        user_frustration: low
         note: Part of the current canned "Suggested Searches"
         demo_priority: medium
         demo_rationale: "Straightforward manifestation search, baseline capability"
@@ -168,7 +180,8 @@ components:
         facet_note: "Filter 'Animal Model of Manifestation' -> select closest term 'Metabolic Function'"
         text_search_answerable: partial
         text_search_note: "Type in 'energy expenditure', no results; type in 'metabolic', some possibly relevant results returned"
-        note: Need translation from 'energy expenditure' -> 'metabolic function' via ontology; 
+        user_frustration: high
+        note: Need translation from 'energy expenditure' -> 'metabolic function' via ontology;
         see_also: https://www.humangeneticsjournal.com/articles/resting-energy-expenditure-in-neurofibromatosis-type-1-indirect-calorimetry-versus-predictive-equations.html
         demo_priority: medium
         demo_rationale: "Showcases semantic reasoning and ontology bridging for metabolism concepts"
@@ -182,6 +195,7 @@ components:
         facet_note: "Resource Type = 'Animal Model' + background Strain = 'Ossabaw'/'Yucatan'"
         text_search_answerable: partial
         text_search_note: Hard to use text search for negated terms; users would have to manually try a variety of species in search
+        user_frustration: low
         demo_priority: low
         demo_rationale: "Simple species filter, not innovative"
 
@@ -192,10 +206,11 @@ components:
         complexity: 1-hop
         facet_answerable: no
         text_search_answerable: no
+        user_frustration: very_high
         note: Without correct mouse selection, this returns a zebrafish model
         demo_priority: high
         demo_rationale: "Showcases temporal/observation data, interesting ranking query"
-      
+
       - id: AM-005
         question: "Find transplantation mouse models (xenografts) and related donor cell lines"
         user_story: "As a researcher, I want to find xenograft models and their related donor cell lines to understand the tumor source and plan xenograft experiments"
@@ -205,6 +220,7 @@ components:
         facet_note: "No direct facet linking xenografts to donor cell lines"
         text_search_answerable: no
         text_search_note: "Requires traversing transplantation relationships and donor linkages"
+        user_frustration: very_high
         demo_priority: high
         demo_rationale: "Cross-resource transplantation tracking, xenograft-to-cell-line donor linkage"
 
@@ -217,6 +233,7 @@ components:
         facet_note: "Specific phenotypic features like café-au-lait spots not available as filterable observations"
         text_search_answerable: no
         text_search_note: "Current infra does not allow Observations to be indexed/linked"
+        user_frustration: very_high
         demo_priority: high
         demo_rationale: "Phenotype-based discovery for iconic NF1 symptoms; visually evocative"
 
@@ -231,6 +248,7 @@ components:
         complexity: 0-hop
         facet_answerable: yes
         text_search_answerable: yes
+        user_frustration: low
         note: Part of the current canned "Suggested Searches"
         demo_priority: low
         demo_rationale: "Simple baseline search, well-established"
@@ -243,9 +261,10 @@ components:
         facet_answerable: yes
         facet_note: "Filter Cell Line Category = 'Hybridoma'"
         text_search_answerable: yes
+        user_frustration: low
         demo_priority: low
         demo_rationale: "Simple category filter"
-      
+
       - id: CL-003
         question: "I need normal schwann cell lines"
         user_story: "As a researcher, I want to find normal schwann cell lines to use as controls in my experiments"
@@ -255,7 +274,8 @@ components:
         facet_note: "Missing cell type as filterable, so text search required"
         text_search_answerable: yes
         text_search_note: "Resource Type = 'Cell Line' + 'Cell Line Genetic Disorder' = 'No known genetic disorder' + 'schwann' in text search; relevant hits at bottom"
-        note: Text search returns healthy cell lines at very bottom bc affected cell lines are incorrectly categorized w/ 'No known genetic disorder'; issues with data rather than search capability 
+        user_frustration: moderate
+        note: Text search returns healthy cell lines at very bottom bc affected cell lines are incorrectly categorized w/ 'No known genetic disorder'; issues with data rather than search capability
         demo_priority: medium
         demo_rationale: "Control lines for experiments, common need"
 
@@ -268,9 +288,10 @@ components:
         facet_note: "Use Species + Cell Line Genetic Disorder + Race filters"
         text_search_answerable: partial
         text_search_note: "Terms like 'black' return relevant results, but in this case using facets alone is better UX"
+        user_frustration: low
         demo_priority: medium
         demo_rationale: "Diversity/equity angle, donor demographics"
-      
+
       - id: CL-005
         question: "Find human cell lines from pediatric donors"
         user_story: "As a researcher, I want to find human cell lines from pediatric donors to study age-specific disease characteristics"
@@ -279,6 +300,7 @@ components:
         facet_answerable: partial
         facet_note: "Can manually select all ages < 18 using Age filter, but very poor UX"
         text_search_answerable: no
+        user_frustration: high
         demo_priority: medium
         demo_rationale: "Age-specific research, pediatric focus"
 
@@ -291,9 +313,10 @@ components:
         facet_note: "Would require Organ='Lung' filter"
         text_search_answerable: yes
         text_search_note: "Searching 'lung' returns lung cell lines, use filter to ensure human species only"
+        user_frustration: moderate
         demo_priority: medium
         demo_rationale: "Species + organ filtering for toxicology; valuable but less innovative than quantitative or graph queries"
-        
+
       - id: CL-007
         question: "Find MPNST cell lines with population doubling times under 48 hours"
         user_story: "As a researcher (drug screening expert), I want to find MPNST cell lines with doubling times under 48 hours to be optimized for my particular screening assay"
@@ -303,6 +326,7 @@ components:
         facet_note: "No facet for population doubling time filtering"
         text_search_answerable: no
         text_search_note: "Requires parsing and numerical comparison of doubling time values"
+        user_frustration: very_high
         note: >
           MPNST cell lines have median doubling time of 28h (range 24-64h).
           48h threshold captures fast-growing lines suitable for standard 48h screening assays.
@@ -320,6 +344,7 @@ components:
         facet_note: "Requires traversing parentDonorId relationship to find derivative lines from common parent"
         text_search_answerable: no
         text_search_note: "Isogenic relationships not searchable via text; requires graph traversal through donor lineage"
+        user_frustration: very_high
         note: "Uses parentDonorId property added to schema; enables powerful experimental designs comparing NF1+/+ vs NF1+/- vs NF1-/- from same genetic background"
         demo_priority: high
         demo_rationale: "Isogenic pair discovery, uses parentDonorId, powerful experimental design"
@@ -333,6 +358,7 @@ components:
         facet_note: "No 'group by donor' or 'related cell lines' functionality in current facets"
         text_search_answerable: no
         text_search_note: "Donor IDs not exposed in searchable interface; requires querying by donorId relationship"
+        user_frustration: very_high
         note: "Enables within-subject comparisons across tissues (e.g., dermal vs plexiform neurofibroma from same patient); requires grouping Cell Lines by Donor ID and finding those with multiple distinct tissues"
         demo_priority: high
         demo_rationale: "Enables high-value intra-donor comparison impossible via current facets"
@@ -349,6 +375,7 @@ components:
         facet_note: "Filter Reactive Species = 'Drosophila'"
         text_search_answerable: yes
         text_search_note: "Search for 'drosophila' in text"
+        user_frustration: low
         demo_priority: low
         demo_rationale: "Simple species filter, niche model system"
 
@@ -361,6 +388,7 @@ components:
         facet_note: "No facet for epitope region selection"
         text_search_answerable: yes
         text_search_note: "Search for 'C-term' or 'C-terminal' in antibody descriptions"
+        user_frustration: moderate
         demo_priority: medium
         demo_rationale: "Epitope-region selection, truncation detection capability"
 
@@ -373,9 +401,10 @@ components:
         facet_note: "No facet for phospho-specific antibodies or PTM detection"
         text_search_answerable: partial
         text_search_note: "Can search 'phospho' but may miss variants and requires understanding target antigen field"
+        user_frustration: high
         demo_priority: high
         demo_rationale: "Phospho-proteomics capability, signaling pathway analysis, PTM research"
-  
+
   - name: "Genetic Reagent Discovery"
     description: "Finding vectors, plasmids, and other genetic tools"
     questions:
@@ -386,6 +415,7 @@ components:
         complexity: 0-hop
         facet_answerable: yes
         text_search_answerable: yes
+        user_frustration: low
         demo_priority: low
         demo_rationale: "Simple category filter"
 
@@ -398,6 +428,7 @@ components:
         facet_note: "Filter Vector Type contains 'Lentiviral' and 'RNAi'"
         text_search_answerable: yes
         text_search_note: "Search for 'lentiviral RNAi' returns relevant results"
+        user_frustration: low
         demo_priority: low
         demo_rationale: "Simple vector type combination"
 
@@ -410,6 +441,7 @@ components:
         facet_note: "Promoter field is not available as a facet"
         text_search_answerable: yes
         text_search_note: "Search 'CMV' returns relevant results"
+        user_frustration: moderate
         demo_priority: medium
         demo_rationale: "Promoter-based search, regulatory element filtering"
 
@@ -422,6 +454,7 @@ components:
         facet_note: "Copy Number property not available as a filter"
         text_search_answerable: partial
         text_search_note: "Search 'NF1' + filter for vectors, but copy number requires reading descriptions"
+        user_frustration: high
         demo_priority: medium
         demo_rationale: "Copy number requirement, realistic cloning workflow"
 
@@ -434,6 +467,7 @@ components:
         facet_note: "Selectable Marker property not available as a filter"
         text_search_answerable: no
         text_search_note: "Mammalian selection markers (Puromycin, G418, etc.) not indexed"
+        user_frustration: very_high
         demo_priority: medium
         demo_rationale: "Selection marker search, practical genetic engineering"
 
@@ -447,6 +481,7 @@ components:
         complexity: 1-hop
         facet_answerable: yes
         text_search_answerable: yes
+        user_frustration: low
         demo_priority: low
         demo_rationale: "Simple investigator attribution"
 
@@ -459,6 +494,7 @@ components:
         facet_note: "No direct facet for funder, only investigator name"
         text_search_answerable: no
         text_search_note: "Shows some tools if GFF mentioned explictly in description, but not reliable to get correct number"
+        user_frustration: very_high
         demo_priority: high
         demo_rationale: "Aggregation query, funding provenance tracking, strategic planning"
 
@@ -474,6 +510,7 @@ components:
         facet_note: "HDAC inhibitor responses not available as filterable observations"
         text_search_answerable: partial
         text_search_note: "Can search for 'HDAC' or specific drug names, but cannot systematically identify all cell lines with documented sensitivity"
+        user_frustration: high
         demo_priority: high
         demo_rationale: "Showcases Observations integration for practical drug discovery; addresses critical need for pre-validated screening models; HDAC inhibitors are promising epigenetic therapeutics for NF tumors"
         note: "Query observations.observationText for HDAC inhibitor terms (HDAC, histone deacetylase, valproic acid, vorinostat, PCI-24781, etc.) with evidence of sensitivity/response. Requires manual curation to distinguish sensitivity from resistance or neutral observations"
@@ -485,6 +522,7 @@ components:
         complexity: 2-hop
         facet_answerable: no
         text_search_answerable: no
+        user_frustration: very_high
         demo_priority: high
         demo_rationale: "Requires cross-resource aggregation and ranking; high value for multi-omics integration"
         note: "Requires using the modelSystemName attribute in Files to link to cell line, rank by dataType"
@@ -496,5 +534,6 @@ components:
         complexity: 2-hop
         facet_answerable: no
         text_search_answerable: no
+        user_frustration: very_high
         demo_priority: high
         demo_rationale: "Cross-resource matching, donor-based integration"
