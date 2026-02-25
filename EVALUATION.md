@@ -56,7 +56,7 @@ See [`astabench/evals/nf_rag/README.md`](astabench/evals/nf_rag/README.md) for m
 The evaluation results dashboard is automatically published to GitHub Pages via CI when `evaluation/runs.json` is updated. The workflow:
 
 1. **Extract runs**: Use `scripts/extract_runs.py` to aggregate scored runs from `astabench/logs/` into `evaluation/runs.json`
-2. **Commit & push**: When `evaluation/runs.json` is pushed to `main`, GitHub Actions builds and deploys the dashboard
+2. **Commit & push**: When `evaluation/runs.json` is pushed to `develop`, GitHub Actions builds and deploys the dashboard
 3. **View results**: Dashboard is available at the GitHub Pages URL
 
 The dashboard includes:
@@ -82,7 +82,7 @@ Then commit and push:
 ```bash
 git add evaluation/runs.json
 git commit -m "Add evaluation runs"
-git push origin main
+git push origin develop
 # CI will automatically build and deploy the updated dashboard
 ```
 
@@ -93,7 +93,7 @@ Optional arguments for `extract_runs.py`:
 
 #### Preview Locally
 
-To preview the dashboard before committing:
+To preview the dashboard:
 
 ```bash
 python scripts/build_site.py evaluation/runs.json --out preview/
