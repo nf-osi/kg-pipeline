@@ -51,4 +51,57 @@ python scripts/astabench.py --full --epochs 3  # extra args forwarded to inspect
 
 See [`astabench/evals/nf_rag/README.md`](astabench/evals/nf_rag/README.md) for more details.
 
+### Publishing Results
+
+The evaluation results dashboard is automatically published to GitHub Pages via CI when `evaluation/runs.json` is updated. The workflow:
+
+1. **Extract runs**: Use `scripts/extract_runs.py` to aggregate scored runs from `astabench/logs/` into `evaluation/runs.json`
+2. **Commit & push**: When `evaluation/runs.json` is pushed to `develop`, GitHub Actions builds and deploys the dashboard
+3. **View results**: Dashboard is available at the GitHub Pages URL
+
+The dashboard includes:
+- Summary table of all runs (sortable, filterable by model)
+- Cost vs recall and time vs recall scatter plots
+- Breakdown by difficulty level (baseline/advanced) and complexity (0-hop/1-hop/2-hop)
+- Category analysis (mutations, animal models, cell lines, etc.)
+- User frustration analysis showing recall degradation
+- High-impact questions table (queries users struggle with that the KG handles well)
+
+#### Adding New Runs
+
+After running evaluations, append new runs to the JSON file:
+
+```bash
+python scripts/extract_runs.py
+# Reads astabench/logs/, updates evaluation/runs.json
+# Deduplicates by run name, sorts by date
+```
+
+Then commit and push:
+
+```bash
+git add evaluation/runs.json
+git commit -m "Add evaluation runs"
+git push origin develop
+# CI will automatically build and deploy the updated dashboard
+```
+
+Optional arguments for `extract_runs.py`:
+- `--log-dir PATH`: Custom logs directory (default: `astabench/logs`)
+- `--eval-metadata PATH`: Custom metadata file (default: `evaluation/main/eval_tools.yaml`)
+- `--output PATH`: Output JSON file (default: `evaluation/runs.json`)
+
+#### Preview Locally
+
+To preview the dashboard:
+
+```bash
+python scripts/build_site.py evaluation/runs.json --out preview/
+# View preview/index.html in a browser
+```
+
+Optional arguments for `build_site.py`:
+- `--out PATH`: Output directory (default: `_site`)
+- `--eval-metadata PATH`: Custom metadata file (default: `evaluation/main/eval_tools.yaml`)
+
 

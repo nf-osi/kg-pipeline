@@ -36,3 +36,6 @@ env/
 # Ignore Dagster temporary directories
 .tmp_dagster_home_*/
 .dagster_home/
+
+# Ignore local preview of docs site
+preview/
