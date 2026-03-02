@@ -899,6 +899,16 @@ document.addEventListener("DOMContentLoaded", function() {{
         frustration_section = """
     <figure>
       <figcaption>Recall Degradation by User Frustration</figcaption>
+      <details style="font-size:0.85rem; margin-bottom:0.5rem; max-width:900px; text-align:left;">
+        <summary style="cursor:pointer; color:#555;">What is user frustration?</summary>
+        <p style="margin:0.4rem 0;">User frustration estimates how difficult a query is to answer with the current portal&rsquo;s faceted search and text search.</p>
+        <ul style="margin:0.3rem 0; padding-left:1.3rem;">
+          <li><strong>Low</strong> &ndash; Answerable with minimal effort via facets or text search</li>
+          <li><strong>Moderate</strong> &ndash; Requires knowing the right approach, extra steps, or domain knowledge</li>
+          <li><strong>High</strong> &ndash; Incomplete/misleading results, painful workarounds, or only one weak path</li>
+          <li><strong>Very High</strong> &ndash; Cannot be answered at all, or requires expert-level workarounds that most users would never find</li>
+        </ul>
+      </details>
       <canvas id="frustration-slope" width="900" height="420"></canvas>
     </figure>"""
 
