@@ -316,9 +316,9 @@ ul.checks li::before{content:'✓';background:none;color:#4ade80;font-size:.9rem
       <h3 style="color:#f59e0b;margin-top:.5rem">Discovery</h3>
       <p style="font-size:1.5rem;font-weight:800;color:#f59e0b;margin-top:.3rem">R&amp;D</p>
       <ul style="text-align:left;margin-top:.6rem;font-size:.78rem;color:#94a3b8">
-        <li>User research</li>
         <li>Explore agent architectures &amp; RAG formats</li>
         <li>Set up agent with vector DB</li>
+        <li>Define desired user interactions and evaluation metrics</li>
       </ul>
     </div>
     <div class="ms done">
@@ -376,17 +376,17 @@ ul.checks li::before{content:'✓';background:none;color:#4ade80;font-size:.9rem
     <div class="pipe-arrow">&rarr;</div>
     <div class="pipe-step">
       <div class="label">Extract</div>
-      <div class="desc">CSV download<br>&amp; normalization</div>
+      <div class="desc">Table ingest<br>&amp; normalization</div>
     </div>
     <div class="pipe-arrow">&rarr;</div>
     <div class="pipe-step">
       <div class="label">Harmonize</div>
-      <div class="desc">SSSOM lookup<br>labels &rarr; IRIs</div>
+      <div class="desc">SSSOM mappings<br>labels &rarr; IRIs</div>
     </div>
     <div class="pipe-arrow">&rarr;</div>
     <div class="pipe-step">
       <div class="label">Transform</div>
-      <div class="desc">RML mapping<br>CSV &rarr; RDF</div>
+      <div class="desc">RML mapping<br>tabular &rarr; RDF</div>
     </div>
     <div class="pipe-arrow">&rarr;</div>
     <div class="pipe-step">
@@ -401,13 +401,18 @@ ul.checks li::before{content:'✓';background:none;color:#4ade80;font-size:.9rem
     </div>
     <div class="card" style="text-align:center">
       <h3>Quality</h3>
-      <p>FK validation, RML tests<br>SPARQL output checks</p>
+      <p>Referential integrity validation,<br>RML tests, SPARQL output checks</p>
     </div>
     <div class="card" style="text-align:center">
       <h3>Distribution</h3>
-      <p>Pre-built Docker images<br>GHCR tagged releases</p>
+      <p>Docker images for K8s<br>Tagged releases</p>
     </div>
   </div>
+  <p style="margin-top:1.5rem;font-size:.75rem;color:#475569;max-width:58rem">
+    <strong style="color:#64748b">SSSOM</strong> Simple Standard for Sharing Ontology Mappings &middot;
+    <strong style="color:#64748b">RML</strong> RDF Mapping Language &middot;
+    <strong style="color:#64748b">QLever</strong> High-performance graph engine
+  </p>
 </div>
 
 <!-- ════════════════════ SLIDE 7: Eval approach ════════════════════ -->
@@ -504,13 +509,16 @@ ul.checks li::before{content:'✓';background:none;color:#4ade80;font-size:.9rem
   </p>
 </div>
 
-<!-- ════════════════════ SLIDE 12: Phase 1 summary ═════════════════ -->
+<!-- ════════════════════ SLIDE 12: Phase 1 & 2 ═════════════════════ -->
 <div class="slide" data-slide="11">
-  <div style="display:flex;align-items:center;gap:1rem;margin-bottom:.8rem"><h2 style="margin:0">Phase 1 Summary</h2><span class="tag done">Completed Feb 23</span></div>
-  <h3>Prove the core system works end-to-end</h3>
+  <h2>Phase 1 &amp; Phase 2</h2>
   <div class="cols" style="max-width:56rem">
-    <div>
-      <h3 style="color:#e2e8f0">Deliverables</h3>
+    <div class="card" style="border-color:#065f46">
+      <div style="display:flex;align-items:center;gap:.8rem;margin-bottom:.8rem">
+        <h3 style="margin:0;color:#10b981">Phase 1</h3>
+        <span class="tag done">Completed Feb 23</span>
+      </div>
+      <p style="font-size:.9rem;color:#94a3b8;margin-bottom:.8rem">KG pipeline, agent system, and evaluation framework delivered</p>
       <ul class="checks">
         <li>Base data sources integrated</li>
         <li>Knowledge graph constructed &amp; queryable</li>
@@ -520,30 +528,17 @@ ul.checks li::before{content:'✓';background:none;color:#4ade80;font-size:.9rem
         <li>AI agent &ge;70% accuracy on benchmark</li>
         <li>Reproducible evaluation framework</li>
       </ul>
-    </div>
-    <div>
-      <h3 style="color:#e2e8f0">Acceptance Criteria</h3>
-      <ul class="checks">
-        <li>One-command local run</li>
-        <li>Benchmark versioned &amp; stable</li>
-        <li>Results repeatable</li>
-        <li>Known failure modes documented</li>
-      </ul>
-      <div class="metric" style="margin-top:1.5rem;background:#0f2922;border-color:#065f46">
+      <div class="metric" style="margin-top:1rem;background:#0f2922;border-color:#065f46">
         <div class="num green">80%</div>
         <div class="lbl">Achieved Recall<br>(Sonnet 4.5, exceeded 70% target)</div>
       </div>
     </div>
-  </div>
-</div>
-
-<!-- ════════════════════ SLIDE 13: Phase 2 overview ═══════════════ -->
-<div class="slide" data-slide="12">
-  <div style="display:flex;align-items:center;gap:1rem;margin-bottom:.8rem"><h2 style="margin:0">Phase 2 &mdash; Beta</h2><span class="tag active">Current</span></div>
-  <h3>Take working prototype closer to production</h3>
-  <div class="cols" style="max-width:56rem">
-    <div>
-      <h3 style="color:#e2e8f0">Deliverables</h3>
+    <div class="card" style="border-color:#1e3a5f">
+      <div style="display:flex;align-items:center;gap:.8rem;margin-bottom:.8rem">
+        <h3 style="margin:0;color:#38bdf8">Phase 2</h3>
+        <span class="tag active">Current</span>
+      </div>
+      <p style="font-size:.9rem;color:#94a3b8;margin-bottom:.8rem">Expand data coverage, improve reliability, deploy staging agent</p>
       <ul>
         <li>More robust orchestrator pipelines</li>
         <li>KG improvements: new layers &amp; validation</li>
@@ -552,16 +547,7 @@ ul.checks li::before{content:'✓';background:none;color:#4ade80;font-size:.9rem
         <li>Accuracy improved to <strong class="accent">&ge;85%</strong></li>
         <li>Staging-like environment (internal)</li>
       </ul>
-    </div>
-    <div>
-      <h3 style="color:#e2e8f0">Acceptance Criteria</h3>
-      <ul>
-        <li>System runs unattended for N cycles</li>
-        <li>Failures detectable &amp; debuggable</li>
-        <li>Benchmark regressions caught</li>
-        <li>Clear go/no-go signal for production</li>
-      </ul>
-      <div class="metric" style="margin-top:1.5rem;background:#0c1a2e;border-color:#1e3a5f">
+      <div class="metric" style="margin-top:1rem;background:#0c1a2e;border-color:#1e3a5f">
         <div class="num accent">85%</div>
         <div class="lbl">Target Recall<br>(+5pp from current best)</div>
       </div>
@@ -569,37 +555,19 @@ ul.checks li::before{content:'✓';background:none;color:#4ade80;font-size:.9rem
   </div>
 </div>
 
-<!-- ════════════════════ SLIDE 14: Summary ════════════════════════ -->
-<div class="slide" data-slide="13">
-  <h2>Summary &amp; Next Steps</h2>
-  <div class="cols" style="max-width:56rem">
-    <div class="card" style="border-color:#065f46">
-      <h3 style="color:#10b981">Phase 1 Outcomes</h3>
-      <ul class="checks">
-        <li>End-to-end pipeline proven</li>
-        <li>80% recall achieved (target was 70%)</li>
-        <li>13 high-frustration queries at 100%</li>
-        <li>Reproducible eval framework live</li>
-        <li>Docker images auto-published</li>
-      </ul>
+<!-- ════════════════════ SLIDE 13: Summary ════════════════════════ -->
+<div class="slide" data-slide="12">
+  <h2>Next Dates</h2>
+  <div class="full" style="max-width:44rem">
+    <div style="display:flex;align-items:baseline;gap:1.5rem;padding:1.2rem 0;border-bottom:1px solid #334155">
+      <span style="font-size:1.3rem;font-weight:800;color:#38bdf8;min-width:8rem">March 31</span>
+      <span style="font-size:1.05rem;color:#e2e8f0">Find users to chat with staging agent</span>
     </div>
-    <div class="card" style="border-color:#1e3a5f">
-      <h3 style="color:#38bdf8">Phase 2 Focus</h3>
-      <ul>
-        <li>Improve recall from 80% &rarr; 85%</li>
-        <li>Strengthen weak categories (AM, CR)</li>
-        <li>Add KG validation layers</li>
-        <li>Expand benchmark coverage</li>
-        <li>Establish staging environment</li>
-        <li>Automated regression detection</li>
-      </ul>
+    <div style="display:flex;align-items:baseline;gap:1.5rem;padding:1.2rem 0;border-bottom:1px solid #334155">
+      <span style="font-size:1.3rem;font-weight:800;color:#a855f7;min-width:8rem">April 30</span>
+      <span style="font-size:1.05rem;color:#e2e8f0">Production deployment deadline</span>
     </div>
   </div>
-  <p style="margin-top:2rem;text-align:center">
-    <span class="tag hero" style="font-size:1rem;padding:.5rem 1.5rem">
-      github.com/nf-osi/kg-pipeline
-    </span>
-  </p>
 </div>
 
 </div><!-- /deck -->
