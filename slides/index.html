@@ -65,9 +65,11 @@ ul.checks li::before{content:'✓';background:none;color:#4ade80;font-size:.9rem
 
 /* ── Milestone timeline ────────────────────────────────────── */
 .timeline{display:flex;gap:0;width:100%;max-width:58rem;position:relative;margin:1.5rem 0}
-.ms{flex:1;text-align:center;position:relative;padding-top:2.5rem}
+.ms{flex:1;text-align:center;position:relative;padding-top:2.5rem;padding-left:1.2rem;padding-right:1.2rem}
 .ms::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;border-radius:2px}
 .ms.done::before{background:linear-gradient(90deg,#065f46,#10b981)}
+.ms.discovery::before{background:linear-gradient(90deg,#78350f,#f59e0b)}
+.ms.discovery .dot{background:#f59e0b}
 .ms.current::before{background:linear-gradient(90deg,#1d4ed8,#38bdf8)}
 .ms.future::before{background:linear-gradient(90deg,#581c87,#a855f7)}
 .ms .dot{position:absolute;top:-6px;left:50%;transform:translateX(-50%);width:16px;height:16px;border-radius:50%;border:3px solid #0f172a}
@@ -111,41 +113,261 @@ ul.checks li::before{content:'✓';background:none;color:#4ade80;font-size:.9rem
 <!-- ════════════════════ SLIDE 1: Title ════════════════════ -->
 <div class="slide active" data-slide="0">
   <div class="center">
-    <span class="tag hero">nf-osi / kg-pipeline</span>
-    <h1 style="margin-top:1.2rem">NF Knowledge Graph<br>Pipeline</h1>
-    <p class="subtitle">Semantic search over neurofibromatosis research data</p>
-    <p class="dim" style="font-size:.9rem">Milestone 2 Progress Review &middot; March 2026</p>
+    <span class="tag hero">Deliverable 1.1.2</span>
+    <h1 style="margin-top:1.2rem">AI-Powered Exploration with RAG<br>for NF Research Tools</h1>
+    <p class="subtitle">Review of Phase 1 and Phase 2 for system architecture and benchmarking</p>
   </div>
 </div>
 
-<!-- ════════════════════ SLIDE 2: Problem ════════════════════ -->
+<!-- ════════════════════ SLIDE 2: Big picture ════════════════════ -->
 <div class="slide" data-slide="1">
-  <h2>The Problem</h2>
+  <h2>Two Parallel Efforts to Improve Tools Portal Experience</h2>
+  <h3 style="color:#94a3b8;font-weight:400;font-size:1rem;margin-bottom:1.2rem">Deploy integrated search and tool ecosystem with AI enhancement (GFF Addendum 7 &mdash; Year 1)</h3>
+  <div class="cols" style="max-width:60rem;margin-top:.5rem">
+    <div class="card" style="border-color:#475569">
+      <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.8rem">
+        <h3 style="margin:0;color:#f1f5f9">OpenSearch</h3>
+        <span class="dim" style="font-size:.75rem">Deliverable 1.1.1</span>
+      </div>
+      <p style="color:#94a3b8;font-size:.95rem;margin-bottom:.8rem">Transition to improved <span class="accent">OpenSearch</span> infrastructure for faster, more relevant keyword and faceted search.</p>
+      <ul>
+        <li>Better ranking &amp; relevance</li>
+        <li>Faceted filtering improvements</li>
+        <li>Faster query performance</li>
+      </ul>
+      <div style="margin-top:1rem;padding:.7rem 1rem;background:#1a1a2e;border-radius:8px;border:1px solid #334155">
+        <p style="font-size:.85rem;color:#94a3b8;margin:0"><strong style="color:#cbd5e1">Scope:</strong> Keyword matching, filtering, and sorting over <em>existing</em> table data</p>
+      </div>
+    </div>
+    <div class="card" style="border-color:#38bdf8;border-width:2px">
+      <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.8rem">
+        <h3 style="margin:0;color:#f1f5f9">AI Portal Assistant</h3>
+        <span class="dim" style="font-size:.75rem">Deliverable 1.1.2</span>
+      </div>
+      <p style="color:#94a3b8;font-size:.95rem;margin-bottom:.8rem">An <span class="accent">AI agent</span> backed by a <span class="accent">knowledge graph</span> for natural-language question answering over portal data.</p>
+      <ul>
+        <li>Cross-entity reasoning (joins, hops)</li>
+        <li>Additional data integration</li>
+        <li>Aggregation &amp; comparison queries</li>
+        <li>Natural-language interface</li>
+      </ul>
+      <div style="margin-top:1rem;padding:.7rem 1rem;background:#0c1a2e;border-radius:8px;border:1px solid #1e3a5f">
+        <p style="font-size:.85rem;color:#7dd3fc;margin:0"><strong style="color:#e2e8f0">Scope:</strong> Semantic retrieval, multi-hop reasoning, and conversational QA &mdash; queries that search <em>cannot</em> answer</p>
+      </div>
+    </div>
+  </div>
+  <p style="margin-top:1.5rem;text-align:center;font-size:1rem;color:#cbd5e1;max-width:52rem">
+    These efforts are <strong style="color:#f1f5f9">complementary</strong>. Better search improves everyday discovery, but some questions are <strong class="accent">categorically different</strong> &mdash; they require an AI agent that can traverse a knowledge graph, not just match keywords.
+  </p>
+</div>
+
+<!-- ════════════════════ SLIDE 3: Problem ════════════════════ -->
+<div class="slide" data-slide="2">
+  <h2>Why a Knowledge Graph for RAG?</h2>
   <div class="cols" style="max-width:56rem">
     <div class="card">
-      <h3>Portal Limitations</h3>
+      <h3>What Search Will Do</h3>
       <ul>
-        <li>NF portal data locked in flat Synapse tables</li>
-        <li>Cross-entity queries require manual joins</li>
-        <li>No semantic relationships between resources</li>
-        <li>Complex questions frustrate researchers</li>
+        <li>Find studies by keyword</li>
+        <li>Filter files by data type</li>
+        <li>Sort results by date or relevance</li>
       </ul>
     </div>
-    <div class="card">
-      <h3>KG Pipeline Solution</h3>
+    <div class="card" style="border-color:#38bdf8">
+      <h3 style="color:#38bdf8">What Only a KG + Agent Will Do</h3>
       <ul>
-        <li>Build a <span class="accent">knowledge graph</span> from portal data</li>
-        <li>Map labels to <span class="accent">ontology IRIs</span> (SSSOM)</li>
-        <li>Enable <span class="accent">SPARQL queries</span> over linked data</li>
-        <li>Power an <span class="accent">AI agent</span> for natural-language QA</li>
+        <li><em>&ldquo;Which cell lines carry NF1 mutations<br>and have associated RNA-seq data?&rdquo;</em></li>
+        <li><em>&ldquo;What genetic reagents target genes<br>studied in schwannoma models?&rdquo;</em></li>
+        <li><em>&ldquo;Compare mutation coverage across<br>animal model organisms&rdquo;</em></li>
+        <li>Multi-hop joins, aggregation, reasoning</li>
       </ul>
     </div>
   </div>
+  <div style="margin-top:1.5rem;width:100%;max-width:56rem;background:#1e293b;border:1px solid #334155;border-radius:12px;padding:1rem 1.5rem">
+    <div style="display:flex;align-items:baseline;gap:.8rem;margin-bottom:.8rem">
+      <span style="font-size:.95rem;font-weight:700;color:#f1f5f9">Example evaluation questions</span>
+      <span class="tag" style="background:#78350f;color:#fcd34d;font-size:.65rem">Very High Frustration</span>
+      <span class="tag" style="background:#3b0764;color:#d8b4fe;font-size:.65rem">Advanced</span>
+    </div>
+    <div style="display:grid;grid-template-columns:auto 1fr auto;gap:.3rem 1rem;align-items:baseline;font-size:.95rem">
+      <span style="color:#64748b;font-size:.75rem;font-weight:600">CR-002</span>
+      <span style="color:#e2e8f0;font-style:italic">&ldquo;Find human cell lines with the most diverse data types available on the portal&rdquo;</span>
+      <span class="tag" style="background:#1e3a5f;color:#7dd3fc;font-size:.6rem">2-hop</span>
+      <span style="color:#64748b;font-size:.75rem;font-weight:600">CR-001</span>
+      <span style="color:#e2e8f0;font-style:italic">&ldquo;Which cell lines have shown sensitivity to HDAC inhibitors?&rdquo;</span>
+      <span class="tag" style="background:#1e3a5f;color:#7dd3fc;font-size:.6rem">1-hop</span>
+      <span style="color:#64748b;font-size:.75rem;font-weight:600">MUT-006</span>
+      <span style="color:#e2e8f0;font-style:italic">&ldquo;Which mutations are available in both animal models and cell lines?&rdquo;</span>
+      <span class="tag" style="background:#1e3a5f;color:#7dd3fc;font-size:.6rem">2-hop</span>
+    </div>
+    <p style="font-size:.8rem;color:#64748b;margin:.6rem 0 0">These require cross-resource aggregation, observation integration, or multi-table joins &mdash; impossible with keyword search or faceted filtering.</p>
+  </div>
 </div>
 
-<!-- ════════════════════ SLIDE 3: Architecture ════════════════════ -->
-<div class="slide" data-slide="2">
-  <h2>Pipeline Architecture</h2>
+<!-- ════════════════════ SLIDE 4: System Architecture ═════════════ -->
+<div class="slide" data-slide="3">
+  <h2>System Architecture</h2>
+  <div style="width:100%;max-width:64rem;margin:0 auto">
+    <svg viewBox="0 0 1200 480" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto">
+      <defs>
+        <marker id="arrow" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#475569"/></marker>
+        <marker id="arrow-blue" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#38bdf8"/></marker>
+        <marker id="arrow-green" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#10b981"/></marker>
+      </defs>
+
+      <!-- User / Chat -->
+      <rect x="20" y="185" width="140" height="90" rx="12" fill="#1e293b" stroke="#475569"/>
+      <text x="90" y="220" text-anchor="middle" fill="#f1f5f9" font-size="13" font-weight="700">Researcher</text>
+      <text x="90" y="240" text-anchor="middle" fill="#94a3b8" font-size="11">Portal chat UI</text>
+
+      <!-- Arrow: User -> Agent -->
+      <line x1="160" y1="230" x2="230" y2="230" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+      <text x="195" y="220" text-anchor="middle" fill="#64748b" font-size="9">NL query</text>
+
+      <!-- Agent -->
+      <rect x="230" y="165" width="160" height="130" rx="12" fill="#0c1a2e" stroke="#38bdf8" stroke-width="2"/>
+      <text x="310" y="198" text-anchor="middle" fill="#38bdf8" font-size="14" font-weight="700">AI Agent</text>
+      <text x="310" y="218" text-anchor="middle" fill="#94a3b8" font-size="10">Reasoning</text>
+      <text x="310" y="233" text-anchor="middle" fill="#94a3b8" font-size="10">Tool selection</text>
+      <text x="310" y="248" text-anchor="middle" fill="#94a3b8" font-size="10">Response synthesis</text>
+      <rect x="250" y="260" width="120" height="22" rx="6" fill="#1e293b" stroke="#334155"/>
+      <text x="310" y="275" text-anchor="middle" fill="#7dd3fc" font-size="9" font-weight="600">RAG orchestration</text>
+
+      <!-- Arrow: Agent -> Vector DB -->
+      <line x1="390" y1="200" x2="490" y2="115" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+
+      <!-- Arrow: Agent -> KG -->
+      <line x1="390" y1="260" x2="490" y2="310" stroke="#38bdf8" stroke-width="2" marker-end="url(#arrow-blue)"/>
+
+      <!-- Vector DB -->
+      <rect x="490" y="60" width="160" height="100" rx="12" fill="#1e293b" stroke="#475569"/>
+      <text x="570" y="92" text-anchor="middle" fill="#f1f5f9" font-size="13" font-weight="700">Vector DB</text>
+      <text x="570" y="112" text-anchor="middle" fill="#94a3b8" font-size="10">Help docs</text>
+      <text x="570" y="127" text-anchor="middle" fill="#94a3b8" font-size="10">Portal documentation</text>
+      <text x="570" y="142" text-anchor="middle" fill="#94a3b8" font-size="10">User guides</text>
+
+      <!-- Knowledge Graph -->
+      <rect x="490" y="265" width="160" height="110" rx="12" fill="#0f2922" stroke="#10b981" stroke-width="2"/>
+      <text x="570" y="297" text-anchor="middle" fill="#4ade80" font-size="13" font-weight="700">Knowledge Graph</text>
+      <text x="570" y="317" text-anchor="middle" fill="#94a3b8" font-size="10">SPARQL + text index</text>
+      <text x="570" y="332" text-anchor="middle" fill="#94a3b8" font-size="10">Linked portal entities</text>
+      <text x="570" y="347" text-anchor="middle" fill="#94a3b8" font-size="10">Ontology-mapped</text>
+      <text x="570" y="362" text-anchor="middle" fill="#6ee7b7" font-size="9" font-style="italic">+ additional data layers</text>
+
+      <!-- Arrows: KG -> data sources -->
+      <line x1="650" y1="295" x2="710" y2="200" stroke="#10b981" stroke-width="2" marker-end="url(#arrow-green)"/>
+      <line x1="650" y1="320" x2="710" y2="345" stroke="#10b981" stroke-width="2" marker-end="url(#arrow-green)"/>
+      <line x1="650" y1="350" x2="710" y2="455" stroke="#10b981" stroke-width="2" marker-end="url(#arrow-green)"/>
+
+      <!-- Portal Tables -->
+      <rect x="710" y="120" width="155" height="175" rx="12" fill="#1e293b" stroke="#334155"/>
+      <text x="787" y="145" text-anchor="middle" fill="#f1f5f9" font-size="12" font-weight="700">Portal Tables</text>
+      <line x1="724" y1="154" x2="851" y2="154" stroke="#334155" stroke-width="1"/>
+      <text x="787" y="172" text-anchor="middle" fill="#94a3b8" font-size="10">Mutations</text>
+      <text x="787" y="189" text-anchor="middle" fill="#94a3b8" font-size="10">Animal Models</text>
+      <text x="787" y="206" text-anchor="middle" fill="#94a3b8" font-size="10">Cell Lines</text>
+      <text x="787" y="223" text-anchor="middle" fill="#94a3b8" font-size="10">Antibodies</text>
+      <text x="787" y="240" text-anchor="middle" fill="#94a3b8" font-size="10">Genetic Reagents</text>
+      <text x="787" y="257" text-anchor="middle" fill="#64748b" font-size="12" letter-spacing="2">&#x2026;</text>
+      <line x1="724" y1="268" x2="851" y2="268" stroke="#334155" stroke-width="1"/>
+      <text x="787" y="285" text-anchor="middle" fill="#64748b" font-size="9" font-style="italic">Synapse (open data)</text>
+
+      <!-- Publications -->
+      <rect x="710" y="310" width="155" height="75" rx="12" fill="#1e293b" stroke="#334155"/>
+      <text x="787" y="337" text-anchor="middle" fill="#f1f5f9" font-size="12" font-weight="700">Publications</text>
+      <line x1="724" y1="346" x2="851" y2="346" stroke="#334155" stroke-width="1"/>
+      <text x="787" y="365" text-anchor="middle" fill="#94a3b8" font-size="10">Full-text indexing</text>
+      <text x="787" y="380" text-anchor="middle" fill="#94a3b8" font-size="10">Study&ndash;publication links</text>
+
+      <!-- Ontologies & External -->
+      <rect x="710" y="400" width="155" height="75" rx="12" fill="#1e293b" stroke="#334155"/>
+      <text x="787" y="425" text-anchor="middle" fill="#f1f5f9" font-size="12" font-weight="700">Ontologies &amp; External</text>
+      <line x1="724" y1="434" x2="851" y2="434" stroke="#334155" stroke-width="1"/>
+      <text x="787" y="452" text-anchor="middle" fill="#94a3b8" font-size="10">External ontologies</text>
+      <text x="787" y="467" text-anchor="middle" fill="#94a3b8" font-size="10">OpenTargets, etc.</text>
+
+      <!-- Vertical divider + Notes -->
+      <line x1="900" y1="70" x2="900" y2="460" stroke="#334155" stroke-width="1" stroke-dasharray="4,4"/>
+
+      <text x="920" y="100" fill="#94a3b8" font-size="11" font-weight="700">Notes</text>
+
+      <text x="920" y="130" fill="#64748b" font-size="10">&#x2022; For MVP, KG rebuilds weekly &mdash;</text>
+      <text x="928" y="145" fill="#64748b" font-size="10">on par with OpenSearch</text>
+      <text x="928" y="160" fill="#64748b" font-size="10">re-indexing cadence</text>
+
+      <text x="920" y="190" fill="#64748b" font-size="10">&#x2022; Will move to daily updates</text>
+      <text x="928" y="205" fill="#64748b" font-size="10">after MVP</text>
+
+      <text x="920" y="240" fill="#64748b" font-size="10">&#x2022; Architecture is provisional &mdash;</text>
+      <text x="928" y="255" fill="#64748b" font-size="10">may move to multi-agent</text>
+      <text x="928" y="270" fill="#64748b" font-size="10">setup with a delegating</text>
+      <text x="928" y="285" fill="#64748b" font-size="10">orchestrator agent (TBD)</text>
+    </svg>
+  </div>
+</div>
+
+<!-- ════════════════════ SLIDE 5: Roadmap ═════════════════════════ -->
+<div class="slide" data-slide="4">
+  <h2>Roadmap</h2>
+  <div class="timeline" style="max-width:64rem">
+    <div class="ms discovery">
+      <div class="dot"></div>
+      <span class="tag" style="background:#78350f;color:#fcd34d;margin-bottom:.5rem">Completed</span>
+      <h3 style="color:#f59e0b;margin-top:.5rem">Discovery</h3>
+      <p style="font-size:1.5rem;font-weight:800;color:#f59e0b;margin-top:.3rem">R&amp;D</p>
+      <ul style="text-align:left;margin-top:.6rem;font-size:.78rem;color:#94a3b8">
+        <li>User research</li>
+        <li>Explore agent architectures &amp; RAG formats</li>
+        <li>Set up agent with vector DB</li>
+      </ul>
+    </div>
+    <div class="ms done">
+      <div class="dot"></div>
+      <span class="tag done" style="margin-bottom:.5rem">Completed</span>
+      <h3 style="color:#10b981;margin-top:.5rem">Phase 1</h3>
+      <p style="font-size:1.5rem;font-weight:800;color:#10b981;margin-top:.3rem">&ge;70%</p>
+      <p class="dim" style="font-size:.8rem">Closed Feb 23</p>
+      <ul style="text-align:left;margin-top:.6rem;font-size:.78rem;color:#94a3b8">
+        <li>Base data integration (internal, ontologies, some external)</li>
+        <li>End-to-end agent system proof</li>
+        <li>Benchmarking framework with initial eval set &amp; results</li>
+      </ul>
+    </div>
+    <div class="ms current">
+      <div class="dot"></div>
+      <span class="tag active" style="margin-bottom:.5rem">In Progress</span>
+      <h3 style="color:#38bdf8;margin-top:.5rem">Phase 2</h3>
+      <p style="font-size:1.5rem;font-weight:800;color:#38bdf8;margin-top:.3rem">&ge;85%</p>
+      <p class="dim" style="font-size:.8rem">Now &ndash; March 31</p>
+      <ul style="text-align:left;margin-top:.6rem;font-size:.78rem;color:#94a3b8">
+        <li>Publication text indexing</li>
+        <li>More external data (ontologies, datasets)</li>
+        <li>Expand benchmarks</li>
+        <li>Staging agent in Synapse (dedicated page)</li>
+        <li>Design ticket for prod portal integration</li>
+      </ul>
+    </div>
+    <div class="ms future">
+      <div class="dot"></div>
+      <span class="tag planned" style="margin-bottom:.5rem">Planned</span>
+      <h3 style="color:#a855f7;margin-top:.5rem">Phase 3</h3>
+      <p style="font-size:1.5rem;font-weight:800;color:#a855f7;margin-top:.3rem">&ge;95%</p>
+      <p class="dim" style="font-size:.8rem">Deadline: April 30</p>
+      <ul style="text-align:left;margin-top:.6rem;font-size:.78rem;color:#94a3b8">
+        <li>Production deployment (AWS)</li>
+        <li>Portal integration</li>
+        <li>User-facing launch</li>
+      </ul>
+    </div>
+  </div>
+  <p style="margin-top:1.2rem;font-size:.9rem;text-align:center" class="dim">
+    Accuracy progression: <span class="green">70%</span> &rarr; <span class="accent">85%</span> &rarr; <span style="color:#d8b4fe">95%</span>
+  </p>
+</div>
+
+<!-- ════════════════════ SLIDE 6: KG Pipeline ═══════════════════ -->
+<div class="slide" data-slide="5">
+  <div style="display:flex;align-items:center;gap:1rem;margin-bottom:.8rem"><h2 style="margin:0">Pipeline Architecture</h2><span class="tag done">Phase 1</span></div>
   <div class="pipeline">
     <div class="pipe-step">
       <div class="label">Synapse</div>
@@ -188,38 +410,41 @@ ul.checks li::before{content:'✓';background:none;color:#4ade80;font-size:.9rem
   </div>
 </div>
 
-<!-- ════════════════════ SLIDE 4: Eval approach ════════════════════ -->
-<div class="slide" data-slide="3">
-  <h2>Evaluation Framework</h2>
-  <div class="cols" style="max-width:56rem">
-    <div>
-      <h3 style="color:#e2e8f0">AstaBench</h3>
-      <p>Built on <span class="accent">InspectAI</span>. NF-specific tasks via custom fork.<br>Reproducible, multi-model benchmarking.</p>
-      <ul style="margin-top:1rem">
-        <li><strong>34 samples</strong> across 7 categories</li>
-        <li>Baseline &amp; advanced difficulty levels</li>
-        <li>0-hop, 1-hop, 2-hop complexity</li>
-        <li>User-frustration scoring</li>
-      </ul>
-    </div>
-    <div>
-      <h3 style="color:#e2e8f0">Metrics Tracked</h3>
-      <ul>
-        <li>Recall (primary accuracy metric)</li>
-        <li>Cost per evaluation run</li>
-        <li>Time per sample</li>
-        <li>Category-level breakdown</li>
-        <li>Difficulty &amp; complexity breakdowns</li>
-        <li>Frustration-weighted impact scores</li>
-      </ul>
-      <p style="margin-top:1rem;font-size:.9rem">Results published to <span class="accent">GitHub Pages</span> dashboard via CI.</p>
+<!-- ════════════════════ SLIDE 7: Eval approach ════════════════════ -->
+<div class="slide" data-slide="6">
+  <div style="display:flex;align-items:center;gap:1rem;margin-bottom:.8rem"><h2 style="margin:0">Evaluation Framework</h2><span class="tag done">Phase 1</span></div>
+  <div style="display:grid;grid-template-columns:auto 1fr;gap:2.5rem;width:100%;max-width:64rem;align-items:start">
+    <img src="astabench.png" alt="AstaBench evaluation run" style="border-radius:12px;max-height:380px;width:auto;border:1px solid #334155">
+    <div class="cols" style="gap:2rem;max-width:none">
+      <div>
+        <h3 style="color:#e2e8f0">AstaBench</h3>
+        <p>Built on <span class="accent">InspectAI</span>. NF-specific tasks via custom fork.<br>Reproducible, multi-model benchmarking.</p>
+        <ul style="margin-top:1rem">
+          <li><strong>34 samples</strong> across 7 categories</li>
+          <li>Baseline &amp; advanced difficulty levels</li>
+          <li>0-hop, 1-hop, 2-hop complexity</li>
+          <li>User-frustration scoring</li>
+        </ul>
+      </div>
+      <div>
+        <h3 style="color:#e2e8f0">Metrics Tracked</h3>
+        <ul>
+          <li>Recall (primary accuracy metric)</li>
+          <li>Cost per evaluation run</li>
+          <li>Time per sample</li>
+          <li>Category-level breakdown</li>
+          <li>Difficulty &amp; complexity breakdowns</li>
+          <li>Frustration-weighted impact scores</li>
+        </ul>
+        <p style="margin-top:1rem;font-size:.9rem"><a href="https://nf-osi.github.io/kg-pipeline/" target="_blank" style="color:#38bdf8;text-decoration:none">&#x1F517; Results dashboard</a></p>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- ════════════════════ SLIDE 5: Model comparison ════════════════════ -->
-<div class="slide" data-slide="4">
-  <h2>Model Performance &mdash; Best Recall</h2>
+<!-- ════════════════════ SLIDE 8: Model comparison ════════════════════ -->
+<div class="slide" data-slide="7">
+  <div style="display:flex;align-items:center;gap:1rem;margin-bottom:.8rem"><h2 style="margin:0">Model Performance &mdash; Best Recall</h2><span class="tag done">Phase 1</span></div>
   <div class="chart-wrap full" style="max-width:52rem">
     <div class="bar-chart" id="recall-chart" style="height:240px"></div>
   </div>
@@ -231,9 +456,9 @@ ul.checks li::before{content:'✓';background:none;color:#4ade80;font-size:.9rem
   </div>
 </div>
 
-<!-- ════════════════════ SLIDE 6: Difficulty breakdown ════════════════════ -->
-<div class="slide" data-slide="5">
-  <h2>Recall by Difficulty &amp; Complexity</h2>
+<!-- ════════════════════ SLIDE 9: Difficulty breakdown ════════════════════ -->
+<div class="slide" data-slide="8">
+  <div style="display:flex;align-items:center;gap:1rem;margin-bottom:.8rem"><h2 style="margin:0">Recall by Difficulty &amp; Complexity</h2><span class="tag done">Phase 1</span></div>
   <div class="cols full" style="max-width:60rem">
     <div class="chart-wrap">
       <div class="chart-title">Baseline vs Advanced</div>
@@ -249,18 +474,18 @@ ul.checks li::before{content:'✓';background:none;color:#4ade80;font-size:.9rem
   </p>
 </div>
 
-<!-- ════════════════════ SLIDE 7: Category heatmap ════════════════════ -->
-<div class="slide" data-slide="6">
-  <h2>Recall by Category &mdash; Best Run</h2>
+<!-- ════════════════════ SLIDE 10: Category heatmap ═══════════════════ -->
+<div class="slide" data-slide="9">
+  <div style="display:flex;align-items:center;gap:1rem;margin-bottom:.8rem"><h2 style="margin:0">Recall by Category &mdash; Best Run</h2><span class="tag done">Phase 1</span></div>
   <div class="heat-grid" id="heat-grid"></div>
   <p style="margin-top:1.2rem;font-size:.9rem;text-align:center" class="dim">
     Sonnet 4.5 achieves <span class="green">100%</span> on Antibodies, Mutations, and Investigator categories.
   </p>
 </div>
 
-<!-- ════════════════════ SLIDE 8: High-impact ═══════════════════════ -->
-<div class="slide" data-slide="7">
-  <h2>High-Impact Questions</h2>
+<!-- ════════════════════ SLIDE 11: High-impact ══════════════════════ -->
+<div class="slide" data-slide="10">
+  <div style="display:flex;align-items:center;gap:1rem;margin-bottom:.8rem"><h2 style="margin:0">High-Impact Questions</h2><span class="tag done">Phase 1</span></div>
   <h3>Questions with high user frustration where KG achieves perfect recall</h3>
   <table class="impact-table">
     <thead><tr><th>Question ID</th><th>Frustration</th><th>Complexity</th><th>Best Recall</th><th>Best Model(s)</th></tr></thead>
@@ -279,40 +504,9 @@ ul.checks li::before{content:'✓';background:none;color:#4ade80;font-size:.9rem
   </p>
 </div>
 
-<!-- ════════════════════ SLIDE 9: Milestones overview ══════════════ -->
-<div class="slide" data-slide="8">
-  <h2>Development Milestones</h2>
-  <div class="timeline">
-    <div class="ms done">
-      <div class="dot"></div>
-      <span class="tag done" style="margin-bottom:.5rem">Completed</span>
-      <h3 style="color:#10b981;margin-top:.5rem">Alpha</h3>
-      <p style="font-size:.9rem">Core infrastructure<br>&amp; end-to-end proof</p>
-      <p style="font-size:1.5rem;font-weight:800;color:#10b981;margin-top:.5rem">&ge;70%</p>
-      <p class="dim" style="font-size:.8rem">Closed Feb 23</p>
-    </div>
-    <div class="ms current">
-      <div class="dot"></div>
-      <span class="tag active" style="margin-bottom:.5rem">In Progress</span>
-      <h3 style="color:#38bdf8;margin-top:.5rem">Beta</h3>
-      <p style="font-size:.9rem">Robustness &amp;<br>reliability</p>
-      <p style="font-size:1.5rem;font-weight:800;color:#38bdf8;margin-top:.5rem">&ge;85%</p>
-      <p class="dim" style="font-size:.8rem">3 open issues</p>
-    </div>
-    <div class="ms future">
-      <div class="dot"></div>
-      <span class="tag planned" style="margin-bottom:.5rem">Planned</span>
-      <h3 style="color:#a855f7;margin-top:.5rem">Production</h3>
-      <p style="font-size:.9rem">User-facing<br>deployment</p>
-      <p style="font-size:1.5rem;font-weight:800;color:#a855f7;margin-top:.5rem">&ge;95%</p>
-      <p class="dim" style="font-size:.8rem">AWS prod</p>
-    </div>
-  </div>
-</div>
-
-<!-- ════════════════════ SLIDE 10: Milestone 1 detail ══════════════ -->
-<div class="slide" data-slide="9">
-  <div style="display:flex;align-items:center;gap:1rem;margin-bottom:.8rem"><h2 style="margin:0">Milestone 1 &mdash; Alpha</h2><span class="tag done">Completed</span></div>
+<!-- ════════════════════ SLIDE 12: Phase 1 summary ═════════════════ -->
+<div class="slide" data-slide="11">
+  <div style="display:flex;align-items:center;gap:1rem;margin-bottom:.8rem"><h2 style="margin:0">Phase 1 Summary</h2><span class="tag done">Completed Feb 23</span></div>
   <h3>Prove the core system works end-to-end</h3>
   <div class="cols" style="max-width:56rem">
     <div>
@@ -322,7 +516,7 @@ ul.checks li::before{content:'✓';background:none;color:#4ade80;font-size:.9rem
         <li>Knowledge graph constructed &amp; queryable</li>
         <li>Dagster orchestrator pipeline</li>
         <li>Local execution environment</li>
-        <li>Initial evaluation benchmark</li>
+        <li>Initial evaluation benchmark (34 samples)</li>
         <li>AI agent &ge;70% accuracy on benchmark</li>
         <li>Reproducible evaluation framework</li>
       </ul>
@@ -343,15 +537,15 @@ ul.checks li::before{content:'✓';background:none;color:#4ade80;font-size:.9rem
   </div>
 </div>
 
-<!-- ════════════════════ SLIDE 11: Milestone 2 detail ══════════════ -->
-<div class="slide" data-slide="10">
-  <div style="display:flex;align-items:center;gap:1rem;margin-bottom:.8rem"><h2 style="margin:0">Milestone 2 &mdash; Beta</h2><span class="tag active">Current</span></div>
+<!-- ════════════════════ SLIDE 13: Phase 2 overview ═══════════════ -->
+<div class="slide" data-slide="12">
+  <div style="display:flex;align-items:center;gap:1rem;margin-bottom:.8rem"><h2 style="margin:0">Phase 2 &mdash; Beta</h2><span class="tag active">Current</span></div>
   <h3>Take working prototype closer to production</h3>
   <div class="cols" style="max-width:56rem">
     <div>
       <h3 style="color:#e2e8f0">Deliverables</h3>
       <ul>
-        <li>Robust orchestrator pipelines</li>
+        <li>More robust orchestrator pipelines</li>
         <li>KG improvements: new layers &amp; validation</li>
         <li>Expanded evaluation framework</li>
         <li>AI agent prompt / reasoning refinement</li>
@@ -375,42 +569,12 @@ ul.checks li::before{content:'✓';background:none;color:#4ade80;font-size:.9rem
   </div>
 </div>
 
-<!-- ════════════════════ SLIDE 12: Milestone 3 detail ══════════════ -->
-<div class="slide" data-slide="11">
-  <div style="display:flex;align-items:center;gap:1rem;margin-bottom:.8rem"><h2 style="margin:0">Milestone 3 &mdash; Production</h2><span class="tag planned">Planned</span></div>
-  <h3>Deliver real user value</h3>
-  <div class="cols" style="max-width:56rem">
-    <div>
-      <h3 style="color:#e2e8f0">Deliverables</h3>
-      <ul>
-        <li>Production deployment in AWS prod account</li>
-        <li>Frontend &amp; UX integration</li>
-        <li><strong class="accent">&ge;95%</strong> benchmark accuracy</li>
-        <li>Monitoring &amp; analytics (usage, satisfaction)</li>
-        <li>User-facing documentation &amp; marketing</li>
-      </ul>
-    </div>
-    <div>
-      <h3 style="color:#e2e8f0">Acceptance Criteria</h3>
-      <ul>
-        <li>&ge;95% benchmark accuracy</li>
-        <li>Users complete expected interactions with high satisfaction</li>
-      </ul>
-      <h3 style="color:#e2e8f0;margin-top:1.5rem">Out of Scope (Beta)</h3>
-      <ul>
-        <li style="color:#64748b">Full product UI polish</li>
-        <li style="color:#64748b">External launch</li>
-      </ul>
-    </div>
-  </div>
-</div>
-
-<!-- ════════════════════ SLIDE 13: Summary ════════════════════════ -->
-<div class="slide" data-slide="12">
+<!-- ════════════════════ SLIDE 14: Summary ════════════════════════ -->
+<div class="slide" data-slide="13">
   <h2>Summary &amp; Next Steps</h2>
   <div class="cols" style="max-width:56rem">
     <div class="card" style="border-color:#065f46">
-      <h3 style="color:#10b981">Where We Are</h3>
+      <h3 style="color:#10b981">Phase 1 Outcomes</h3>
       <ul class="checks">
         <li>End-to-end pipeline proven</li>
         <li>80% recall achieved (target was 70%)</li>
@@ -420,7 +584,7 @@ ul.checks li::before{content:'✓';background:none;color:#4ade80;font-size:.9rem
       </ul>
     </div>
     <div class="card" style="border-color:#1e3a5f">
-      <h3 style="color:#38bdf8">Immediate Focus (M2)</h3>
+      <h3 style="color:#38bdf8">Phase 2 Focus</h3>
       <ul>
         <li>Improve recall from 80% &rarr; 85%</li>
         <li>Strengthen weak categories (AM, CR)</li>
