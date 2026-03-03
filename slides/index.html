@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>NF Knowledge Graph Pipeline</title>
+<style>
+/* ── Reset & base ──────────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#0f172a;color:#e2e8f0}
+
+/* ── Slide container ───────────────────────────────────────── */
+.deck{position:relative;width:100%;height:100%}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:3rem 5rem;opacity:0;pointer-events:none;transition:opacity .45s ease,transform .45s ease;transform:translateX(40px)}
+.slide.active{opacity:1;pointer-events:auto;transform:translateX(0)}
+.slide.exit{opacity:0;transform:translateX(-40px)}
+
+/* ── Typography ────────────────────────────────────────────── */
+h1{font-size:2.8rem;font-weight:700;line-height:1.15;color:#f8fafc;margin-bottom:.6rem}
+h2{font-size:2rem;font-weight:700;color:#f8fafc;margin-bottom:1.2rem;letter-spacing:-.02em}
+h3{font-size:1.25rem;font-weight:600;color:#94a3b8;margin-bottom:1rem}
+p,.body{font-size:1.05rem;line-height:1.65;color:#cbd5e1;max-width:56rem}
+.subtitle{font-size:1.3rem;color:#94a3b8;margin-bottom:1.8rem;font-weight:400}
+.tag{display:inline-block;font-size:.75rem;font-weight:600;padding:.2rem .7rem;border-radius:9999px;text-transform:uppercase;letter-spacing:.06em}
+.tag.done{background:#065f46;color:#6ee7b7}
+.tag.active{background:#1e3a5f;color:#7dd3fc}
+.tag.planned{background:#3b0764;color:#d8b4fe}
+.tag.hero{background:#312e81;color:#a5b4fc;font-size:.85rem;padding:.3rem .9rem}
+.accent{color:#38bdf8}
+.green{color:#4ade80}
+.amber{color:#fbbf24}
+.dim{color:#64748b}
+
+/* ── Layout helpers ────────────────────────────────────────── */
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:2.5rem;width:100%;max-width:60rem}
+.cols-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem;width:100%;max-width:64rem}
+.full{width:100%;max-width:64rem}
+.center{text-align:center}
+ul{list-style:none;padding:0}
+ul li{padding:.35rem 0;padding-left:1.4rem;position:relative;font-size:1.05rem;color:#cbd5e1}
+ul li::before{content:'';position:absolute;left:0;top:.7rem;width:6px;height:6px;border-radius:50%;background:#38bdf8}
+ul.checks li::before{content:'✓';background:none;color:#4ade80;font-size:.9rem;top:.35rem;left:0;width:auto;height:auto;border-radius:0}
+
+/* ── Cards ─────────────────────────────────────────────────── */
+.card{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:1.5rem;transition:border-color .2s}
+.card:hover{border-color:#475569}
+.card h3{color:#f1f5f9;margin-bottom:.5rem}
+.card p,.card li{font-size:.95rem;color:#94a3b8}
+
+/* ── Pipeline diagram ──────────────────────────────────────── */
+.pipeline{display:flex;align-items:center;gap:0;width:100%;max-width:58rem;justify-content:center;flex-wrap:wrap}
+.pipe-step{background:#1e293b;border:1px solid #334155;border-radius:10px;padding:1rem 1.4rem;text-align:center;min-width:9rem}
+.pipe-step .label{font-weight:700;color:#f1f5f9;font-size:1rem;margin-bottom:.25rem}
+.pipe-step .desc{font-size:.8rem;color:#94a3b8}
+.pipe-arrow{font-size:1.5rem;color:#475569;padding:0 .4rem}
+
+/* ── Chart containers ──────────────────────────────────────── */
+.chart-wrap{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:1.5rem;width:100%}
+.chart-title{font-size:1rem;font-weight:600;color:#e2e8f0;margin-bottom:1rem;text-align:center}
+.bar-chart{display:flex;align-items:flex-end;gap:1.2rem;height:220px;padding:0 1rem;justify-content:center}
+.bar-group{display:flex;flex-direction:column;align-items:center;gap:.4rem;flex:1;max-width:10rem}
+.bar{width:100%;border-radius:6px 6px 0 0;position:relative;transition:height .6s ease;min-height:2px}
+.bar .val{position:absolute;top:-1.5rem;left:50%;transform:translateX(-50%);font-size:.85rem;font-weight:700;white-space:nowrap}
+.bar-label{font-size:.78rem;color:#94a3b8;text-align:center;line-height:1.2;margin-top:.15rem}
+
+/* ── Milestone timeline ────────────────────────────────────── */
+.timeline{display:flex;gap:0;width:100%;max-width:58rem;position:relative;margin:1.5rem 0}
+.ms{flex:1;text-align:center;position:relative;padding-top:2.5rem}
+.ms::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;border-radius:2px}
+.ms.done::before{background:linear-gradient(90deg,#065f46,#10b981)}
+.ms.current::before{background:linear-gradient(90deg,#1d4ed8,#38bdf8)}
+.ms.future::before{background:linear-gradient(90deg,#581c87,#a855f7)}
+.ms .dot{position:absolute;top:-6px;left:50%;transform:translateX(-50%);width:16px;height:16px;border-radius:50%;border:3px solid #0f172a}
+.ms.done .dot{background:#10b981}
+.ms.current .dot{background:#38bdf8;box-shadow:0 0 12px rgba(56,189,248,.5)}
+.ms.future .dot{background:#a855f7}
+
+/* ── Metric row ────────────────────────────────────────────── */
+.metrics{display:flex;gap:1.5rem;justify-content:center;flex-wrap:wrap}
+.metric{text-align:center;background:#1e293b;border:1px solid #334155;border-radius:12px;padding:1.2rem 1.8rem;min-width:7rem}
+.metric .num{font-size:2rem;font-weight:800;line-height:1}
+.metric .lbl{font-size:.8rem;color:#94a3b8;margin-top:.3rem}
+
+/* ── Category heat grid ────────────────────────────────────── */
+.heat-grid{display:grid;grid-template-columns:auto repeat(3,1fr);gap:2px;font-size:.85rem;width:100%;max-width:44rem}
+.heat-grid .hdr{font-weight:700;color:#94a3b8;padding:.5rem .8rem;text-align:center}
+.heat-grid .row-label{font-weight:600;color:#e2e8f0;padding:.5rem .8rem;text-align:left;white-space:nowrap}
+.heat-cell{padding:.5rem .8rem;text-align:center;font-weight:700;border-radius:4px}
+
+/* ── High-impact table ─────────────────────────────────────── */
+.impact-table{width:100%;max-width:56rem;border-collapse:separate;border-spacing:0;font-size:.9rem}
+.impact-table th{text-align:left;padding:.6rem .8rem;color:#94a3b8;font-weight:600;border-bottom:2px solid #334155}
+.impact-table td{padding:.5rem .8rem;border-bottom:1px solid #1e293b;color:#cbd5e1}
+.impact-table tr:nth-child(even) td{background:rgba(30,41,59,.4)}
+
+/* ── Progress bar (bottom) ─────────────────────────────────── */
+#progress{position:fixed;bottom:0;left:0;height:3px;background:linear-gradient(90deg,#38bdf8,#818cf8);transition:width .35s ease;z-index:100}
+#slide-num{position:fixed;bottom:.8rem;right:1.2rem;font-size:.8rem;color:#475569;z-index:100;font-variant-numeric:tabular-nums}
+
+/* ── Nav arrows ────────────────────────────────────────────── */
+.nav{position:fixed;top:50%;transform:translateY(-50%);background:rgba(30,41,59,.7);border:1px solid #334155;color:#94a3b8;font-size:1.4rem;width:2.6rem;height:2.6rem;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:100;transition:background .2s,color .2s}
+.nav:hover{background:#334155;color:#e2e8f0}
+#prev{left:.8rem}
+#next{right:.8rem}
+</style>
+</head>
+<body>
+
+<div class="deck" id="deck">
+
+<!-- ════════════════════ SLIDE 1: Title ════════════════════ -->
+<div class="slide active" data-slide="0">
+  <div class="center">
+    <span class="tag hero">nf-osi / kg-pipeline</span>
+    <h1 style="margin-top:1.2rem">NF Knowledge Graph<br>Pipeline</h1>
+    <p class="subtitle">Semantic search over neurofibromatosis research data</p>
+    <p class="dim" style="font-size:.9rem">Milestone 2 Progress Review &middot; March 2026</p>
+  </div>
+</div>
+
+<!-- ════════════════════ SLIDE 2: Problem ════════════════════ -->
+<div class="slide" data-slide="1">
+  <h2>The Problem</h2>
+  <div class="cols" style="max-width:56rem">
+    <div class="card">
+      <h3>Portal Limitations</h3>
+      <ul>
+        <li>NF portal data locked in flat Synapse tables</li>
+        <li>Cross-entity queries require manual joins</li>
+        <li>No semantic relationships between resources</li>
+        <li>Complex questions frustrate researchers</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>KG Pipeline Solution</h3>
+      <ul>
+        <li>Build a <span class="accent">knowledge graph</span> from portal data</li>
+        <li>Map labels to <span class="accent">ontology IRIs</span> (SSSOM)</li>
+        <li>Enable <span class="accent">SPARQL queries</span> over linked data</li>
+        <li>Power an <span class="accent">AI agent</span> for natural-language QA</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════ SLIDE 3: Architecture ════════════════════ -->
+<div class="slide" data-slide="2">
+  <h2>Pipeline Architecture</h2>
+  <div class="pipeline">
+    <div class="pipe-step">
+      <div class="label">Synapse</div>
+      <div class="desc">Portal tables<br>(open data)</div>
+    </div>
+    <div class="pipe-arrow">&rarr;</div>
+    <div class="pipe-step">
+      <div class="label">Extract</div>
+      <div class="desc">CSV download<br>&amp; normalization</div>
+    </div>
+    <div class="pipe-arrow">&rarr;</div>
+    <div class="pipe-step">
+      <div class="label">Harmonize</div>
+      <div class="desc">SSSOM lookup<br>labels &rarr; IRIs</div>
+    </div>
+    <div class="pipe-arrow">&rarr;</div>
+    <div class="pipe-step">
+      <div class="label">Transform</div>
+      <div class="desc">RML mapping<br>CSV &rarr; RDF</div>
+    </div>
+    <div class="pipe-arrow">&rarr;</div>
+    <div class="pipe-step">
+      <div class="label" style="color:#38bdf8">KG</div>
+      <div class="desc">QLever SPARQL<br>endpoint</div>
+    </div>
+  </div>
+  <div class="cols-3" style="margin-top:2rem">
+    <div class="card" style="text-align:center">
+      <h3>Orchestration</h3>
+      <p>Dagster asset graph<br>One-command materialize</p>
+    </div>
+    <div class="card" style="text-align:center">
+      <h3>Quality</h3>
+      <p>FK validation, RML tests<br>SPARQL output checks</p>
+    </div>
+    <div class="card" style="text-align:center">
+      <h3>Distribution</h3>
+      <p>Pre-built Docker images<br>GHCR tagged releases</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════ SLIDE 4: Eval approach ════════════════════ -->
+<div class="slide" data-slide="3">
+  <h2>Evaluation Framework</h2>
+  <div class="cols" style="max-width:56rem">
+    <div>
+      <h3 style="color:#e2e8f0">AstaBench</h3>
+      <p>Built on <span class="accent">InspectAI</span>. NF-specific tasks via custom fork.<br>Reproducible, multi-model benchmarking.</p>
+      <ul style="margin-top:1rem">
+        <li><strong>34 samples</strong> across 7 categories</li>
+        <li>Baseline &amp; advanced difficulty levels</li>
+        <li>0-hop, 1-hop, 2-hop complexity</li>
+        <li>User-frustration scoring</li>
+      </ul>
+    </div>
+    <div>
+      <h3 style="color:#e2e8f0">Metrics Tracked</h3>
+      <ul>
+        <li>Recall (primary accuracy metric)</li>
+        <li>Cost per evaluation run</li>
+        <li>Time per sample</li>
+        <li>Category-level breakdown</li>
+        <li>Difficulty &amp; complexity breakdowns</li>
+        <li>Frustration-weighted impact scores</li>
+      </ul>
+      <p style="margin-top:1rem;font-size:.9rem">Results published to <span class="accent">GitHub Pages</span> dashboard via CI.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════ SLIDE 5: Model comparison ════════════════════ -->
+<div class="slide" data-slide="4">
+  <h2>Model Performance &mdash; Best Recall</h2>
+  <div class="chart-wrap full" style="max-width:52rem">
+    <div class="bar-chart" id="recall-chart" style="height:240px"></div>
+  </div>
+  <div class="metrics" style="margin-top:1.5rem">
+    <div class="metric"><div class="num green">80%</div><div class="lbl">Best Recall<br>Sonnet 4.5</div></div>
+    <div class="metric"><div class="num accent">61%</div><div class="lbl">Best Recall<br>Haiku 4.5</div></div>
+    <div class="metric"><div class="num amber">41%</div><div class="lbl">Best Recall<br>GPT-5.2</div></div>
+    <div class="metric"><div class="num" style="color:#e2e8f0">34</div><div class="lbl">Benchmark<br>Samples</div></div>
+  </div>
+</div>
+
+<!-- ════════════════════ SLIDE 6: Difficulty breakdown ════════════════════ -->
+<div class="slide" data-slide="5">
+  <h2>Recall by Difficulty &amp; Complexity</h2>
+  <div class="cols full" style="max-width:60rem">
+    <div class="chart-wrap">
+      <div class="chart-title">Baseline vs Advanced</div>
+      <div class="bar-chart" id="difficulty-chart" style="height:200px"></div>
+    </div>
+    <div class="chart-wrap">
+      <div class="chart-title">Hop Complexity</div>
+      <div class="bar-chart" id="complexity-chart" style="height:200px"></div>
+    </div>
+  </div>
+  <p style="margin-top:1.2rem;font-size:.9rem;text-align:center" class="dim">
+    Best run per model shown. Sonnet 4.5 maintains strong recall even on advanced 2-hop queries.
+  </p>
+</div>
+
+<!-- ════════════════════ SLIDE 7: Category heatmap ════════════════════ -->
+<div class="slide" data-slide="6">
+  <h2>Recall by Category &mdash; Best Run</h2>
+  <div class="heat-grid" id="heat-grid"></div>
+  <p style="margin-top:1.2rem;font-size:.9rem;text-align:center" class="dim">
+    Sonnet 4.5 achieves <span class="green">100%</span> on Antibodies, Mutations, and Investigator categories.
+  </p>
+</div>
+
+<!-- ════════════════════ SLIDE 8: High-impact ═══════════════════════ -->
+<div class="slide" data-slide="7">
+  <h2>High-Impact Questions</h2>
+  <h3>Questions with high user frustration where KG achieves perfect recall</h3>
+  <table class="impact-table">
+    <thead><tr><th>Question ID</th><th>Frustration</th><th>Complexity</th><th>Best Recall</th><th>Best Model(s)</th></tr></thead>
+    <tbody>
+      <tr><td>MUT-003</td><td><span class="amber">Very High</span></td><td>1-hop</td><td class="green">1.00</td><td>All three models</td></tr>
+      <tr><td>MUT-005</td><td><span class="amber">Very High</span></td><td>1-hop</td><td class="green">1.00</td><td>All three models</td></tr>
+      <tr><td>GR-005</td><td><span class="amber">Very High</span></td><td>1-hop</td><td class="green">1.00</td><td>All three models</td></tr>
+      <tr><td>AM-005</td><td><span class="amber">Very High</span></td><td>2-hop</td><td class="green">1.00</td><td>All three models</td></tr>
+      <tr><td>CR-003</td><td><span class="amber">Very High</span></td><td>2-hop</td><td class="green">1.00</td><td>Sonnet 4.5</td></tr>
+      <tr><td>AM-006</td><td><span class="amber">Very High</span></td><td>1-hop</td><td class="green">1.00</td><td>Sonnet 4.5</td></tr>
+      <tr><td>PI-002</td><td><span class="amber">Very High</span></td><td>2-hop</td><td class="green">1.00</td><td>Haiku 4.5, Sonnet 4.5</td></tr>
+    </tbody>
+  </table>
+  <p style="margin-top:1rem;font-size:.9rem" class="dim">
+    13 high-frustration questions reach <span class="green">100% recall</span> &mdash; queries the current portal can't handle well.
+  </p>
+</div>
+
+<!-- ════════════════════ SLIDE 9: Milestones overview ══════════════ -->
+<div class="slide" data-slide="8">
+  <h2>Development Milestones</h2>
+  <div class="timeline">
+    <div class="ms done">
+      <div class="dot"></div>
+      <span class="tag done" style="margin-bottom:.5rem">Completed</span>
+      <h3 style="color:#10b981;margin-top:.5rem">Alpha</h3>
+      <p style="font-size:.9rem">Core infrastructure<br>&amp; end-to-end proof</p>
+      <p style="font-size:1.5rem;font-weight:800;color:#10b981;margin-top:.5rem">&ge;70%</p>
+      <p class="dim" style="font-size:.8rem">Closed Feb 23</p>
+    </div>
+    <div class="ms current">
+      <div class="dot"></div>
+      <span class="tag active" style="margin-bottom:.5rem">In Progress</span>
+      <h3 style="color:#38bdf8;margin-top:.5rem">Beta</h3>
+      <p style="font-size:.9rem">Robustness &amp;<br>reliability</p>
+      <p style="font-size:1.5rem;font-weight:800;color:#38bdf8;margin-top:.5rem">&ge;85%</p>
+      <p class="dim" style="font-size:.8rem">3 open issues</p>
+    </div>
+    <div class="ms future">
+      <div class="dot"></div>
+      <span class="tag planned" style="margin-bottom:.5rem">Planned</span>
+      <h3 style="color:#a855f7;margin-top:.5rem">Production</h3>
+      <p style="font-size:.9rem">User-facing<br>deployment</p>
+      <p style="font-size:1.5rem;font-weight:800;color:#a855f7;margin-top:.5rem">&ge;95%</p>
+      <p class="dim" style="font-size:.8rem">AWS prod</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════ SLIDE 10: Milestone 1 detail ══════════════ -->
+<div class="slide" data-slide="9">
+  <div style="display:flex;align-items:center;gap:1rem;margin-bottom:.8rem"><h2 style="margin:0">Milestone 1 &mdash; Alpha</h2><span class="tag done">Completed</span></div>
+  <h3>Prove the core system works end-to-end</h3>
+  <div class="cols" style="max-width:56rem">
+    <div>
+      <h3 style="color:#e2e8f0">Deliverables</h3>
+      <ul class="checks">
+        <li>Base data sources integrated</li>
+        <li>Knowledge graph constructed &amp; queryable</li>
+        <li>Dagster orchestrator pipeline</li>
+        <li>Local execution environment</li>
+        <li>Initial evaluation benchmark</li>
+        <li>AI agent &ge;70% accuracy on benchmark</li>
+        <li>Reproducible evaluation framework</li>
+      </ul>
+    </div>
+    <div>
+      <h3 style="color:#e2e8f0">Acceptance Criteria</h3>
+      <ul class="checks">
+        <li>One-command local run</li>
+        <li>Benchmark versioned &amp; stable</li>
+        <li>Results repeatable</li>
+        <li>Known failure modes documented</li>
+      </ul>
+      <div class="metric" style="margin-top:1.5rem;background:#0f2922;border-color:#065f46">
+        <div class="num green">80%</div>
+        <div class="lbl">Achieved Recall<br>(Sonnet 4.5, exceeded 70% target)</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════ SLIDE 11: Milestone 2 detail ══════════════ -->
+<div class="slide" data-slide="10">
+  <div style="display:flex;align-items:center;gap:1rem;margin-bottom:.8rem"><h2 style="margin:0">Milestone 2 &mdash; Beta</h2><span class="tag active">Current</span></div>
+  <h3>Take working prototype closer to production</h3>
+  <div class="cols" style="max-width:56rem">
+    <div>
+      <h3 style="color:#e2e8f0">Deliverables</h3>
+      <ul>
+        <li>Robust orchestrator pipelines</li>
+        <li>KG improvements: new layers &amp; validation</li>
+        <li>Expanded evaluation framework</li>
+        <li>AI agent prompt / reasoning refinement</li>
+        <li>Accuracy improved to <strong class="accent">&ge;85%</strong></li>
+        <li>Staging-like environment (internal)</li>
+      </ul>
+    </div>
+    <div>
+      <h3 style="color:#e2e8f0">Acceptance Criteria</h3>
+      <ul>
+        <li>System runs unattended for N cycles</li>
+        <li>Failures detectable &amp; debuggable</li>
+        <li>Benchmark regressions caught</li>
+        <li>Clear go/no-go signal for production</li>
+      </ul>
+      <div class="metric" style="margin-top:1.5rem;background:#0c1a2e;border-color:#1e3a5f">
+        <div class="num accent">85%</div>
+        <div class="lbl">Target Recall<br>(+5pp from current best)</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════ SLIDE 12: Milestone 3 detail ══════════════ -->
+<div class="slide" data-slide="11">
+  <div style="display:flex;align-items:center;gap:1rem;margin-bottom:.8rem"><h2 style="margin:0">Milestone 3 &mdash; Production</h2><span class="tag planned">Planned</span></div>
+  <h3>Deliver real user value</h3>
+  <div class="cols" style="max-width:56rem">
+    <div>
+      <h3 style="color:#e2e8f0">Deliverables</h3>
+      <ul>
+        <li>Production deployment in AWS prod account</li>
+        <li>Frontend &amp; UX integration</li>
+        <li><strong class="accent">&ge;95%</strong> benchmark accuracy</li>
+        <li>Monitoring &amp; analytics (usage, satisfaction)</li>
+        <li>User-facing documentation &amp; marketing</li>
+      </ul>
+    </div>
+    <div>
+      <h3 style="color:#e2e8f0">Acceptance Criteria</h3>
+      <ul>
+        <li>&ge;95% benchmark accuracy</li>
+        <li>Users complete expected interactions with high satisfaction</li>
+      </ul>
+      <h3 style="color:#e2e8f0;margin-top:1.5rem">Out of Scope (Beta)</h3>
+      <ul>
+        <li style="color:#64748b">Full product UI polish</li>
+        <li style="color:#64748b">External launch</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════ SLIDE 13: Summary ════════════════════════ -->
+<div class="slide" data-slide="12">
+  <h2>Summary &amp; Next Steps</h2>
+  <div class="cols" style="max-width:56rem">
+    <div class="card" style="border-color:#065f46">
+      <h3 style="color:#10b981">Where We Are</h3>
+      <ul class="checks">
+        <li>End-to-end pipeline proven</li>
+        <li>80% recall achieved (target was 70%)</li>
+        <li>13 high-frustration queries at 100%</li>
+        <li>Reproducible eval framework live</li>
+        <li>Docker images auto-published</li>
+      </ul>
+    </div>
+    <div class="card" style="border-color:#1e3a5f">
+      <h3 style="color:#38bdf8">Immediate Focus (M2)</h3>
+      <ul>
+        <li>Improve recall from 80% &rarr; 85%</li>
+        <li>Strengthen weak categories (AM, CR)</li>
+        <li>Add KG validation layers</li>
+        <li>Expand benchmark coverage</li>
+        <li>Establish staging environment</li>
+        <li>Automated regression detection</li>
+      </ul>
+    </div>
+  </div>
+  <p style="margin-top:2rem;text-align:center">
+    <span class="tag hero" style="font-size:1rem;padding:.5rem 1.5rem">
+      github.com/nf-osi/kg-pipeline
+    </span>
+  </p>
+</div>
+
+</div><!-- /deck -->
+
+<!-- Nav controls -->
+<button class="nav" id="prev" aria-label="Previous">&larr;</button>
+<button class="nav" id="next" aria-label="Next">&rarr;</button>
+<div id="progress"></div>
+<div id="slide-num"></div>
+
+<script>
+(function(){
+  /* ── Slide navigation ──────────────────────────────────── */
+  var slides = document.querySelectorAll('.slide');
+  var total = slides.length;
+  var cur = 0;
+
+  function go(n) {
+    if (n < 0 || n >= total || n === cur) return;
+    slides[cur].classList.remove('active');
+    slides[cur].classList.add('exit');
+    setTimeout(function(){ slides[cur === n ? cur : (n > cur ? cur : cur)].classList.remove('exit'); }, 460);
+    var prev = cur;
+    cur = n;
+    slides[cur].classList.add('active');
+    setTimeout(function(){ slides[prev].classList.remove('exit'); }, 460);
+    document.getElementById('progress').style.width = ((cur / (total - 1)) * 100) + '%';
+    document.getElementById('slide-num').textContent = (cur + 1) + ' / ' + total;
+  }
+
+  document.getElementById('prev').addEventListener('click', function(){ go(cur - 1); });
+  document.getElementById('next').addEventListener('click', function(){ go(cur + 1); });
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); go(cur + 1); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); go(cur - 1); }
+    if (e.key === 'Home') { e.preventDefault(); go(0); }
+    if (e.key === 'End') { e.preventDefault(); go(total - 1); }
+  });
+
+  document.getElementById('slide-num').textContent = '1 / ' + total;
+  document.getElementById('progress').style.width = '0%';
+
+  /* ── Chart: overall recall ─────────────────────────────── */
+  var bestRuns = [
+    { label: 'Sonnet 4.5', score: 0.7984, color: '#4ade80' },
+    { label: 'Haiku 4.5',  score: 0.6059, color: '#38bdf8' },
+    { label: 'GPT-5.2',    score: 0.4063, color: '#fbbf24' }
+  ];
+
+  function renderBarChart(containerId, items, maxVal) {
+    var c = document.getElementById(containerId);
+    if (!c) return;
+    c.innerHTML = '';
+    items.forEach(function(item) {
+      var pct = (item.score / maxVal) * 100;
+      var group = document.createElement('div');
+      group.className = 'bar-group';
+      group.innerHTML =
+        '<div class="bar" style="height:' + pct + '%;background:' + item.color + '">' +
+          '<span class="val" style="color:' + item.color + '">' + (item.score * 100).toFixed(0) + '%</span>' +
+        '</div>' +
+        '<div class="bar-label">' + item.label + '</div>';
+      c.appendChild(group);
+    });
+  }
+
+  renderBarChart('recall-chart', bestRuns, 1);
+
+  /* ── Chart: difficulty ─────────────────────────────────── */
+  var diffData = [
+    { label: 'Sonnet 4.5\nBaseline', score: 0.7704, color: '#4ade80' },
+    { label: 'Sonnet 4.5\nAdvanced', score: 0.8301, color: '#22c55e' },
+    { label: 'Haiku 4.5\nBaseline',  score: 0.7451, color: '#38bdf8' },
+    { label: 'Haiku 4.5\nAdvanced',  score: 0.4667, color: '#0ea5e9' },
+    { label: 'GPT-5.2\nBaseline',    score: 0.5087, color: '#fbbf24' },
+    { label: 'GPT-5.2\nAdvanced',    score: 0.3039, color: '#f59e0b' }
+  ];
+  renderBarChart('difficulty-chart', diffData, 1);
+
+  /* ── Chart: complexity ─────────────────────────────────── */
+  var compData = [
+    { label: 'Sonnet\n0-hop', score: 0.8095, color: '#4ade80' },
+    { label: 'Sonnet\n1-hop', score: 0.7859, color: '#22c55e' },
+    { label: 'Sonnet\n2-hop', score: 0.7974, color: '#16a34a' },
+    { label: 'Haiku\n0-hop',  score: 0.7024, color: '#38bdf8' },
+    { label: 'Haiku\n1-hop',  score: 0.5905, color: '#0ea5e9' },
+    { label: 'Haiku\n2-hop',  score: 0.4167, color: '#0284c7' },
+    { label: 'GPT-5.2\n0-hop', score: 0.5463, color: '#fbbf24' },
+    { label: 'GPT-5.2\n1-hop', score: 0.4048, color: '#f59e0b' },
+    { label: 'GPT-5.2\n2-hop', score: 0.0833, color: '#d97706' }
+  ];
+  renderBarChart('complexity-chart', compData, 1);
+
+  /* ── Heatmap: category ─────────────────────────────────── */
+  var cats = [
+    { name: 'Mutation',         key: 'MUT', sonnet: 1.00,  haiku: 0.83, gpt: 0.67 },
+    { name: 'Antibody',         key: 'AB',  sonnet: 1.00,  haiku: 1.00, gpt: 0.67 },
+    { name: 'Investigator',     key: 'PI',  sonnet: 1.00,  haiku: 1.00, gpt: 0.00 },
+    { name: 'Animal Model',     key: 'AM',  sonnet: 0.80,  haiku: 0.54, gpt: 0.17 },
+    { name: 'Genetic Reagent',  key: 'GR',  sonnet: 0.80,  haiku: 0.60, gpt: 0.80 },
+    { name: 'Cell Line',        key: 'CL',  sonnet: 0.73,  haiku: 0.50, gpt: 0.33 },
+    { name: 'Cross-Resource',   key: 'CR',  sonnet: 0.67,  haiku: 0.17, gpt: 0.11 }
+  ];
+
+  function heatColor(v) {
+    if (v >= 0.9) return 'background:#065f46;color:#6ee7b7';
+    if (v >= 0.7) return 'background:#14532d;color:#86efac';
+    if (v >= 0.5) return 'background:#1e3a5f;color:#7dd3fc';
+    if (v >= 0.3) return 'background:#78350f;color:#fcd34d';
+    return 'background:#7f1d1d;color:#fca5a5';
+  }
+
+  var grid = document.getElementById('heat-grid');
+  grid.innerHTML =
+    '<div class="hdr"></div><div class="hdr">Sonnet 4.5</div><div class="hdr">Haiku 4.5</div><div class="hdr">GPT-5.2</div>';
+  cats.forEach(function(c) {
+    grid.innerHTML +=
+      '<div class="row-label">' + c.name + '</div>' +
+      '<div class="heat-cell" style="' + heatColor(c.sonnet) + '">' + (c.sonnet * 100).toFixed(0) + '%</div>' +
+      '<div class="heat-cell" style="' + heatColor(c.haiku)  + '">' + (c.haiku  * 100).toFixed(0) + '%</div>' +
+      '<div class="heat-cell" style="' + heatColor(c.gpt)    + '">' + (c.gpt    * 100).toFixed(0) + '%</div>';
+  });
+
+})();
+</script>
+</body>
+</html>
