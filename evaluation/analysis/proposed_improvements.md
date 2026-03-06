@@ -1,4 +1,4 @@
-# Context
+## Proposed
 
 Analysis of recall from first phase suggests improvements that can be mostly categorized as better graph construction/configuration, prompt engineering, or tooling.
 
