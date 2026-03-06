@@ -26,8 +26,6 @@ The model interprets "normal" as "not cancer" (a reasonable interpretation), fin
 
 The correct answer likely requires filtering for `cellLineGeneticDisorder = "No known genetic disorder"` AND schwann cell type — a specific combination the model didn't narrow down to.
 
-**Data quality note:** Text search returns healthy cell lines at very bottom because affected cell lines are incorrectly categorized.
-
 ### 2. AM-002: "Help me find animal models suitable for energy expenditure studies"
 
 **Target:** 2 UUIDs | **All models:** No valid answer (ran out of turns)
@@ -55,7 +53,7 @@ The `copyNumber` property exists in the schema but is **not populated** in the d
 
 **Root Cause: Missed species constraint — returned zebrafish instead of mouse**
 
-The question explicitly asks for "mouse model" but all models found a zebrafish with earlier tumor onset (7 days larval phase) and returned that instead. The species constraint parsing failure is consistent across all models — even the best models don't add a species filter to their SPARQL queries.
+The question explicitly asks for "mouse model" but all models found a zebrafish with earlier tumor onset (7 days larval phase) and returned that instead. The species constraint parsing failure is consistent across all models — even the best models don't add a species filter to their SPARQL queries. (Note: this was predicted in the benchmark.)
 
 ### 5. CR-001: "Which cell lines have shown sensitivity to HDAC inhibitors?"
 
