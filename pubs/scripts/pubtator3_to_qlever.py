@@ -19,14 +19,16 @@ from urllib.parse import quote
 
 NF = "http://nf-osi.github.com/terms#"
 
-# PubTator3 type -> (class local name, class label)
+# PubTator3 type -> (rdf_class, class label)
+# rdf_class is a CURIE using prefixes declared in write_ttl().
+# Most use the nf: prefix; Species reuses obo:NCBITaxon_species directly.
 TYPE_CLASSES = {
-    "Gene": ("Gene", "Gene"),
-    "Disease": ("DiseaseConcept", "Disease Concept"),
-    "Chemical": ("Chemical", "Chemical"),
-    "Species": ("Species", "Species"),
-    "CellLine": ("CellLine", "Cell Line"),
-    "Variant": ("Variant", "Variant"),
+    "Gene": ("nf:Gene", "Gene"),
+    "Disease": ("nf:DiseaseAnnotation", "Disease Annotation"),
+    "Chemical": ("nf:Chemical", "Chemical"),
+    "Species": ("obo:NCBITaxon_species", "Species"),
+    "CellLine": ("nf:CellLine", "Cell Line"),
+    "Variant": ("nf:Variant", "Variant"),
 }
 
 WORD_RE = re.compile(r"[a-z0-9]+")
@@ -126,22 +128,18 @@ def write_ttl(
     with open(output_path, "w", encoding="utf-8") as f:
         f.write("@prefix owl:  <http://www.w3.org/2002/07/owl#> .\n")
         f.write("@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .\n")
+        f.write("@prefix obo:  <http://purl.obolibrary.org/obo/> .\n")
         f.write(f"@prefix nf:   <{NF}> .\n")
         f.write("\n")
 
-        # Declare classes
-        for entity_type, (local_name, class_label) in sorted(TYPE_CLASSES.items()):
-            f.write(f"nf:{local_name} a owl:Class ;\n")
-            f.write(f'    rdfs:label "{class_label}" .\n\n')
-
-        # Entity instances
+        # Entity instances (classes are declared in schema/ontology.ttl)
         for iri in sorted(entities):
             entity_type, label = entities[iri]
             class_info = TYPE_CLASSES.get(entity_type)
             if not class_info:
                 continue
-            local_name = class_info[0]
-            f.write(f"<{iri}> a nf:{local_name}")
+            rdf_class = class_info[0]
+            f.write(f"<{iri}> a {rdf_class}")
             if label:
                 f.write(f' ;\n    rdfs:label "{escape_ttl(label)}"')
             f.write(" .\n")

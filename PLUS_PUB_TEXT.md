@@ -16,7 +16,7 @@ pubtator3/*.json  (139 BioC JSON files, 71,791 annotations)
 qlever_text/
   ├── wordsfile.tsv       words + entity IRIs per passage
   ├── docsfile.tsv        passage text per record
-  └── text_entities.ttl   companion RDF (entity types + labels)
+  └── text_entities.ttl   entity instance triples (type + label)
         │
         ▼  docker compose run --rm qlever-index-text
 QLever index with text  (qlever-index -w ... -d ... -t)
@@ -79,18 +79,23 @@ record_id	passage_text
 
 ## Companion RDF
 
-`text_entities.ttl` declares entity classes and labels so that entities
-referenced in the wordsfile exist in the RDF graph for joins:
+`text_entities.ttl` provides entity instance triples (type + label) so that
+entities referenced in the wordsfile exist in the RDF graph for joins:
 
 ```turtle
-nf:Gene a owl:Class ; rdfs:label "Gene" .
-
 <https://www.ncbi.nlm.nih.gov/gene/4763> a nf:Gene ; rdfs:label "NF1" .
-<http://id.nlm.nih.gov/mesh/D009456> a nf:DiseaseConcept ; rdfs:label "Neurofibromatosis 1" .
+<http://id.nlm.nih.gov/mesh/D009456> a nf:DiseaseAnnotation ; rdfs:label "Neurofibromatosis 1" .
+<http://purl.obolibrary.org/obo/NCBITaxon_9606> a obo:NCBITaxon_species ; rdfs:label "Homo sapiens" .
 ```
 
-Classes: `nf:Gene`, `nf:DiseaseConcept`, `nf:Chemical`, `nf:Species`,
-`nf:CellLine` (already in ontology), `nf:Variant`.
+Entity classes are defined in `schema/ontology.ttl`:
+- `nf:Gene` — equivalent to `<http://purl.uniprot.org/core/Gene>`
+- `nf:DiseaseAnnotation` — subclass of `<http://purl.uniprot.org/core/Disease_Annotation>`
+- `nf:Chemical`
+- `nf:Variant` — equivalent to `obo:SO_0001564` (gene_variant)
+- `nf:CellLine` (already in ontology)
+
+Species entities use `obo:NCBITaxon_species` directly (no nf: class).
 
 Publication IRIs (`<https://pubmed.ncbi.nlm.nih.gov/{pmid}>`) are included in
 the wordsfile to link passages to papers. These require the upstream KG to use
@@ -103,7 +108,7 @@ but text search still works.
 |---|---|---|
 | `wordsfile.tsv` | 902,655 | 15 MB |
 | `docsfile.tsv` | 11,109 | 5.3 MB |
-| `text_entities.ttl` | 9,830 | 432 KB |
+| `text_entities.ttl` | 9,813 | 432 KB |
 
 | Metric | Count |
 |---|---|
@@ -145,10 +150,10 @@ The compose file defines two service pairs. The base pair (`qlever-index` /
 | `qlever-index-text` | Build RDF + text index (mounts `pubs/qlever_text/`) |
 | `qlever-server-text` | Serve RDF + text on :7001 (`-t` flag) |
 
-The text indexer adds three flags to `qlever-index`:
+The text indexer extends `qlever-index` with:
 - `-w /input/text/wordsfile.tsv` — wordsfile
 - `-d /input/text/docsfile.tsv` — docsfile
-- Feeds `text_entities.ttl` into the RDF input stream
+- `text_entities.ttl` fed into the RDF input stream (entity instance triples)
 
 The text server requires `-t` to load the text index at startup.
 
@@ -247,6 +252,3 @@ Sample result from the last query:
 - **No `ql:score()` in SELECT** — QLever's current version does not support
   `ql:score()` as a SPARQL function. Score boosting affects result ordering
   internally but cannot be projected.
-- **Companion RDF not in ontology** — the new classes (`nf:Gene`,
-  `nf:DiseaseConcept`, etc.) are declared in `text_entities.ttl` only, not in
-  `schema/ontology.ttl`.
