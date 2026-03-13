@@ -91,6 +91,12 @@ pytest test/
 Each RML mapping has a corresponding test that runs RMLMapper against a small
 fixture CSV and validates the output graph with SPARQL. See `test/README.md`.
 
+### SPARQL+Text
+
+Publication full-text from 139 NF papers is indexed alongside the RDF graph,
+enabling combined text search and graph queries. See
+[PLUS_PUB_TEXT.md](PLUS_PUB_TEXT.md) for design, scripts, and query examples.
+
 ### Build and Release
 
 Pre-built [QLever](https://github.com/ad-freiburg/qlever) images with indexed data
