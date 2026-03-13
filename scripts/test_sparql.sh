@@ -30,3 +30,4 @@ query "Sample NF instances" \
   "SELECT ?s ?type WHERE { ?s a ?type . FILTER(STRSTARTS(STR(?type), 'http://nf-osi.github.com/terms#')) } LIMIT 10"
 
 echo "All queries completed."
+echo "Log: $LOG_FILE"

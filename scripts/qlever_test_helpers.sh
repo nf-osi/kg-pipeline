@@ -5,11 +5,21 @@
 #
 # Provides:
 #   ENDPOINT, query(), server lifecycle (start/wait/stop via trap)
+#   LOG_FILE — all output is tee'd here for review
 
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[1]}")" && pwd)"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
+
+# Log file: scripts/test_sparql.sh → test/test_sparql.log
+CALLER_NAME="$(basename "${BASH_SOURCE[1]}" .sh)"
+LOG_DIR="$PROJECT_DIR/test"
+mkdir -p "$LOG_DIR"
+LOG_FILE="$LOG_DIR/${CALLER_NAME}.log"
+
+# Tee all stdout and stderr to the log file
+exec > >(tee "$LOG_FILE") 2>&1
 
 MANAGED=false
 if [ -n "${1:-}" ]; then
