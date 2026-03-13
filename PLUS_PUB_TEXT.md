@@ -186,7 +186,9 @@ management and query an already-running endpoint.
 ### SPARQL+Text query examples
 
 QLever text queries use the `ql:` namespace. Every `ql:contains-entity` must
-be paired with a `ql:contains-word` in the same pattern.
+be paired with a `ql:contains-word` in the same pattern (enforced by the query
+planner). When you only need entity matching, use `ql:contains-word "*"` as a
+wildcard that matches any word.
 
 **Word search** — find passages mentioning "neurofibromatosis":
 ```sparql
@@ -207,6 +209,14 @@ SELECT ?text WHERE {
 SELECT (COUNT(?text) AS ?count) WHERE {
   ?text ql:contains-entity <https://www.ncbi.nlm.nih.gov/gene/4763> .
   ?text ql:contains-word "mutation*"
+}
+```
+
+**Publication passages** — count passages for a paper (uses `"*"` wildcard):
+```sparql
+SELECT (COUNT(DISTINCT ?text) AS ?passages) WHERE {
+  ?text ql:contains-entity <https://pubmed.ncbi.nlm.nih.gov/16822308> .
+  ?text ql:contains-word "*"
 }
 ```
 

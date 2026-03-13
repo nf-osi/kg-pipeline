@@ -97,5 +97,12 @@ query "Multi-word search: clinical trial*" \
     ?text ql:contains-word \"clinical trial*\"
   }"
 
+# 12. Publication passage count — entity-only via wildcard trick
+query "Publication passages: PMID 16822308" \
+  "SELECT (COUNT(DISTINCT ?text) AS ?passages) WHERE {
+    ?text ql:contains-entity <https://pubmed.ncbi.nlm.nih.gov/16822308> .
+    ?text ql:contains-word \"*\"
+  }"
+
 echo "All queries completed."
 echo "Log: $LOG_FILE"
