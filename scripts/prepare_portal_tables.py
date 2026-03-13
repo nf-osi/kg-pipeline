@@ -559,8 +559,8 @@ TABLES: Dict[str, Dict[str, Any]] = {
         "select_clause": PUBLICATIONS_SELECT,
         "columns": [
             {"target": "publicationId", "source": "publicationId", "type": "iri"},
-            {"target": "doi", "source": "doi", "type": "iri"},
-            {"target": "pmid", "source": "pmid", "type": "iri"},
+            {"target": "doi", "source": "doi", "type": "iri", "transform": "doi"},
+            {"target": "pmid", "source": "pmid", "type": "iri", "transform": "pmid"},
             {"target": "abstract", "source": "abstract", "type": "text"},
             {"target": "journal", "source": "journal", "type": "text"},
             {"target": "publicationDate", "source": "publicationDate", "type": "text"},
@@ -697,6 +697,23 @@ def format_synapse_list(value: Any) -> str:
     )
 
 
+def format_pmid(value: Any) -> str:
+    """Strip ``PMID:`` prefix so the bare numeric ID can be used in IRI templates."""
+    s = format_string(value)
+    if s.startswith("PMID:"):
+        return s[5:]
+    return s
+
+
+def format_doi(value: Any) -> str:
+    """Strip URL prefix so the bare DOI path can be used in IRI templates."""
+    s = format_string(value)
+    for prefix in ("https://www.doi.org/", "https://doi.org/", "http://doi.org/"):
+        if s.startswith(prefix):
+            return s[len(prefix):]
+    return s
+
+
 def format_iri_list(value: Any) -> str:
     cleaned: List[str] = []
     for entry in ensure_list(value):
@@ -719,6 +736,8 @@ TRANSFORMS = {
     "synapse_id_list": format_synapse_list,
     "iri_list": format_iri_list,
     "number": format_number,
+    "pmid": format_pmid,
+    "doi": format_doi,
 }
 
 
