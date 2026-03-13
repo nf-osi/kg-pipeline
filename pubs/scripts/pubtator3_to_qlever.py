@@ -246,7 +246,7 @@ def main():
                     df.write(f"{rid}\t{text}\n")
 
                     # wordsfile: publication IRI as entity
-                    wf.write(f"{pub_iri}\t1\t{rid}\t{score}\n")
+                    wf.write(f"<{pub_iri}>\t1\t{rid}\t{score}\n")
                     total_entity_refs += 1
 
                     # wordsfile: tokenized words
@@ -280,7 +280,7 @@ def main():
                             continue
                         seen_iris.add(iri)
 
-                        wf.write(f"{iri}\t1\t{rid}\t{score}\n")
+                        wf.write(f"<{iri}>\t1\t{rid}\t{score}\n")
                         total_entity_refs += 1
 
                         # Collect for TTL (keep first seen label)

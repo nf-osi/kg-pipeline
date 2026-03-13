@@ -2,7 +2,21 @@
 
 ## Overview
 
-[PubTator 3.0](https://academic.oup.com/nar/article/52/W1/W540/7640526) is an NCBI service that provides pre-computed biomedical entity annotations for PubMed abstracts and PMC full-text articles. We use it to enrich our paper markdown files with recognized entities for downstream golden test case generation.
+[PubTator 3.0](https://academic.oup.com/nar/article/52/W1/W540/7640526) is an NCBI service that provides pre-computed biomedical entity annotations for PubMed abstracts and PMC full-text articles. We use PubTator3 data because:
+
+1. **Semantic chunking** — Pubtator already splits text at section boundaries (see `section_type`).
+2. **Entity-linked text** — Pubtator has recognized entities as annotations which can be indexed.
+3. **Targeted ground generation** — Can select by entities to generate questions that specifically test entity recognition, relationships between genes/diseases/chemicals, or factual recall of normalized identifiers.
+
+## Pipeline Integration
+
+### Current files
+
+- `pubtator3/*.json` — BioC JSON for incorporated papers (full text), one file per PMCID
+- `subsets/pubtator3_entities.tsv` — unique entities with mention/paper counts
+- `scripts/fetch_pubtator3.py` — fetching script
+- `scripts/pubtator3_stats.py` — stats script
+- `scripts/pubtator3_entities.py` — entity export script
 
 ## API
 
@@ -68,7 +82,7 @@ Each annotation includes:
 }
 ```
 
-Passages include a `section_type` field that maps to the paper structure. All values observed across the 122-paper corpus:
+Passages include a `section_type` field that maps to the paper structure. All values observed across the corpus:
 
 | `section_type` | Passages | Description |
 |---|---|---|
@@ -146,18 +160,39 @@ Exports all unique entities across the corpus to `subsets/pubtator3_entities.tsv
 python scripts/pubtator3_entities.py
 ```
 
-## Pipeline Integration
+### Sample passages for eval generation: `scripts/sample_pubtator3_passages.py`
 
-### Current files
+Samples passage-level contexts from `pubtator3/*.json` and writes JSONL records for
+downstream question/answer/distractor generation.
 
-- `pubtator3/*.json` — BioC JSON for all 122 permissive papers (full text), one file per PMCID
-- `subsets/pubtator3_entities.tsv` — 4,567 unique entities with mention/paper counts
-- `scripts/fetch_pubtator3.py` — fetching script
-- `scripts/pubtator3_stats.py` — stats script
-- `scripts/pubtator3_entities.py` — entity export script
+Default behavior:
 
-### Advantages
+- samples without replacement
+- keeps sections useful for evaluation context (`TITLE`, `ABSTRACT`, `INTRO`, `METHODS`, `RESULTS`, `DISCUSS`, `CONCL`, `FIG`, `TABLE`, `SUPPL`, `APPENDIX`)
+- excludes low-value sections such as references and acknowledgements
+- filters to passages with at least 300 characters and at least 1 annotation
+- emits a stable passage `id` (`PMCID:passage_index`), passage metadata, `key-passage`, compact `entities` labels such as `Gene#4763`, and compact weighted matches
 
-1. **Semantic chunking** — Pubtator already splits text at section boundaries (see `section_type`).
-2. **Entity-linked text** — Pubtator has recognized entities as annotations which can be indexed.
-3. **Targeted ground generation** — Can select by entities to generate questions that specifically test entity recognition, relationships between genes/diseases/chemicals, or factual recall of normalized identifiers.
+```bash
+# Uniform sampling across eligible passages
+python scripts/sample_pubtator3_passages.py -n 50 \
+  -o evaluation/pubtator3_passage_samples.jsonl
+
+# Bias toward passages mentioning specific entities
+cat > entity_weights.tsv <<'EOF'
+type	identifier	weight
+Gene	4763	10
+Disease	MESH:D009456	8
+Chemical	C517975	6
+EOF
+
+python scripts/sample_pubtator3_passages.py -n 50 \
+  --weights entity_weights.tsv \
+  --score-mode sum \
+  --weighted-only \
+  -o evaluation/pubtator3_weighted_passage_samples.jsonl
+```
+
+Weight files can be `.tsv`, `.csv`, or `.json` with `type`, `identifier` (or `name`), and `weight`.
+Passage sampling weight is `base_weight + matched_entity_bonus`, where the bonus is either the sum
+or max of the matched positive weights depending on `--score-mode`.

@@ -160,6 +160,7 @@ Pre-computed biomedical entity annotations (genes, diseases, chemicals, species,
 python scripts/fetch_pubtator3.py subsets/tools-portal-pmc-derivatives-ok.tsv  # Fetch annotations
 python scripts/pubtator3_stats.py                                              # Print corpus stats
 python scripts/pubtator3_entities.py                                           # Export unique entities
+python scripts/sample_pubtator3_passages.py -n 50                              # Sample passages for eval generation
 ```
 
 Output: `pubtator3/<PMCID>.json` (139 papers, 71,791 entity annotations, 5,181 unique entities)
