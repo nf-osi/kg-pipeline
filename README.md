@@ -120,6 +120,16 @@ docker compose up qlever-server        # serve on :7001
 
 See [EVALUATION.md](EVALUATION.md).
 
+### License
+
+The base KG image (Synapse metadata only) is distributed under
+[CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+
+The text-indexed image additionally includes a publication text corpus derived
+from PMC articles under CC-BY, CC-BY-4.0, CC-BY-NC, CC-BY-NC-SA, and Public
+Domain licenses; the derived corpus is distributed under
+[CC-BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/).
+
 ### Dependencies
 
 - Java 21+ (RMLMapper 8.x)

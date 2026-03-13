@@ -128,8 +128,8 @@ License is derived from the `<license>` element (parsed from `href` attribute or
 A good number of publications have a standard license, while the rest state "fair use", point to journal-specific terms, or are not yet clearly specified/retrievable. 
 Use `scripts/select_pubs.py --analyze` to get current counts for defined sets as well as by each license type. 
 
-For a RAG application, substantial content needs to be indexed, which likely exceeds what publishers consider fair use. 
-Because an agentic RAG system remixes/transforms original content, no-derivatives licenses are excluded. 
+For a RAG application, substantial content is indexed and redistributed, which exceeds [fair use](https://www.copyright.gov/fair-use/) -- papers with "fair use" terms are excluded. 
+Because an agentic RAG system remixes/transforms original content, papers with no-derivatives terms are excluded. 
 
 The most permissive set is defined as some version of CC-BY and Public Domain licenses. 
 Because we are a non-commercial product that intends to comply with ShareAlike (sharing our derivatives publicly), an expanded feasible set of papers is the `--derivatives-ok`.
