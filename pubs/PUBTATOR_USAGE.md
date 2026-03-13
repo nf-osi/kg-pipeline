@@ -2,7 +2,7 @@
 
 ## Overview
 
-[PubTator 3.0](https://academic.oup.com/nar/article/52/W1/W540/7640526) is an NCBI service that provides pre-computed biomedical entity annotations for PubMed abstracts and PMC full-text articles. The advantages of the PubTator3 data:
+[PubTator 3.0](https://doi.org/10.1093/nar/gkae235) is an NCBI service that provides pre-computed biomedical entity annotations for PubMed abstracts and PMC full-text articles. The advantages of the PubTator3 data:
 
 1. **Semantic chunking** — PubTator3 already provides text passages semantically chunked, saving us resources on this processing step.
 2. **Entity-linked text** — PubTator3 provides recognized entities using state-of-the-art biomedical NER models, so we get high-quality annotations that can be indexed and used for improved RAG. Entities are already resolved to NCBI Gene, MeSH, OMIM, NCBITaxon, Cellosaurus, and HGVS identifiers, which map directly to KG IRIs without needing us to build a custom entity normalization pipeline.
@@ -159,42 +159,3 @@ Exports all unique entities across the corpus to `subsets/pubtator3_entities.tsv
 ```bash
 python scripts/pubtator3_entities.py
 ```
-
-### Sample passages for eval generation: `scripts/sample_pubtator3_passages.py`
-
-Samples passage-level contexts from `pubtator3/*.json` and writes YAML records for
-downstream question/answer/distractor generation.
-
-Default behavior:
-
-- samples without replacement
-- keeps sections useful for evaluation context (`TITLE`, `ABSTRACT`, `INTRO`, `METHODS`, `RESULTS`, `DISCUSS`, `CONCL`, `FIG`, `TABLE`, `SUPPL`, `APPENDIX`)
-- excludes low-value sections such as references and acknowledgements
-- filters to passages with at least 300 characters and at least 1 annotation
-- emits a stable passage `id` (`PMCID:passage_index`), passage metadata, `key-passage`, compact `entities` labels such as `Gene#4763`, and compact weighted matches
-
-```bash
-# Uniform sampling across eligible passages
-python scripts/sample_pubtator3_passages.py -n 50 \
-  -o evaluation/pubtator3_passage_samples.yaml
-
-# Bias toward passages mentioning specific entities
-cat > entity_weights.tsv <<'EOF'
-type	identifier	weight
-Gene	4763	10
-Disease	MESH:D009456	8
-Chemical	C517975	6
-EOF
-
-python scripts/sample_pubtator3_passages.py -n 50 \
-  --weights entity_weights.tsv \
-  --score-mode sum \
-  --weighted-only \
-  -o evaluation/pubtator3_weighted_passage_samples.yaml
-```
-
-Weight files can be `.tsv`, `.csv`, or `.json` with `type`, `identifier` (or `name`), and `weight`.
-Passage sampling weight is `base_weight + matched_entity_bonus`, where the bonus is either the sum
-or max of the matched positive weights depending on `--score-mode`.
-
-Reference schema: `evaluation/pubtator3_passage_sample.schema.json`

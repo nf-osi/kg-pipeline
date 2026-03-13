@@ -1,11 +1,11 @@
 # SPARQL+Text: Publication Full-Text Index
 
 QLever supports combining SPARQL graph queries with full-text search over
-text records via its [SPARQL+Text](https://github.com/ad-freiburg/qlever/blob/master/docs/sparql_plus_text.md)
+text records via its [SPARQL+Text](https://raw.githubusercontent.com/ullingerc/qlever/036214d22e4478a84025f650434f49a9ca20c107/docs/sparql_plus_text.md)
 feature. We use this to index passage-level text and biomedical entity
 annotations from 139 NF-related publications (sourced via PubTator 3.0) so
-that the KG endpoint can answer queries like "which genes are mentioned in
-papers about neurofibromatosis treatment?"
+that the KG endpoint can answer queries like "which genes are mentioned
+together in neurofibromatosis treatment?"
 
 ## Pipeline overview
 
@@ -121,7 +121,9 @@ but text search still works.
 | Skipped (no identifier) | 47 |
 | Skipped (no IRI) | 162 |
 
-## Scripts
+## Publication-specific ETL source code
+
+The `pubs` directory is the source for this pipeline.
 
 **`pubs/scripts/pubtator3_to_qlever.py`** — stdlib-only Python, single-pass
 over all JSON files. Outputs wordsfile, docsfile, and companion TTL.
@@ -177,7 +179,7 @@ Two test scripts share common helpers via `scripts/qlever_test_helpers.sh`:
 | Script | Services | Queries |
 |---|---|---|
 | `scripts/test_sparql.sh` | `qlever-server` | 5 graph queries |
-| `scripts/test_sparql_with_text.sh` | `qlever-server-text` | 3 graph + 8 text queries |
+| `scripts/test_sparql_with_text.sh` | `qlever-server-text` | 4 graph + 8 text queries |
 
 Both scripts manage the server lifecycle automatically (start, wait for
 readiness, run queries, stop on exit). Pass a URL argument to skip lifecycle
@@ -255,11 +257,11 @@ Sample result from the last query:
 
 ## Known limitations
 
-- **Publication subject IRIs differ from PubMed IRIs** — publication subjects
-  use `nf:publication/{UUID}` while the wordsfile uses
+- **Publication subject IRIs differ from PubMed IRIs** — publication subjects in KG
+  use `nf:publication/{UUID}` while the text subject entity IRI uses
   `<https://pubmed.ncbi.nlm.nih.gov/{pmid}>`. The PubMed IRIs exist in the KG
   as `nf:pmid` objects, so joins through `nf:pmid` work, but there is no direct
   subject-level link between a publication node and its text passages.
-- **No `ql:score()` in SELECT** — QLever's current version does not support
+- **`ql:score()` not externally usable** — QLever's current version does not seem to support
   `ql:score()` as a SPARQL function. Score boosting affects result ordering
   internally but cannot be projected.
