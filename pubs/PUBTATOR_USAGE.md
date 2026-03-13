@@ -2,11 +2,11 @@
 
 ## Overview
 
-[PubTator 3.0](https://academic.oup.com/nar/article/52/W1/W540/7640526) is an NCBI service that provides pre-computed biomedical entity annotations for PubMed abstracts and PMC full-text articles. We use PubTator3 data because:
+[PubTator 3.0](https://academic.oup.com/nar/article/52/W1/W540/7640526) is an NCBI service that provides pre-computed biomedical entity annotations for PubMed abstracts and PMC full-text articles. The advantages of the PubTator3 data:
 
-1. **Semantic chunking** — Pubtator already splits text at section boundaries (see `section_type`).
-2. **Entity-linked text** — Pubtator has recognized entities as annotations which can be indexed.
-3. **Targeted ground generation** — Can select by entities to generate questions that specifically test entity recognition, relationships between genes/diseases/chemicals, or factual recall of normalized identifiers.
+1. **Semantic chunking** — PubTator3 already provides text passages semantically chunked, saving us resources on this processing step.
+2. **Entity-linked text** — PubTator3 provides recognized entities using state-of-the-art biomedical NER models, so we get high-quality annotations that can be indexed and used for improved RAG. Entities are already resolved to NCBI Gene, MeSH, OMIM, NCBITaxon, Cellosaurus, and HGVS identifiers, which map directly to KG IRIs without needing us to build a custom entity normalization pipeline.
+3. **Improved ground generation** — Entity-linked text also makes it easier to create ground truth evaluation datasets. For example, passages annotated with multiple entity types, such as both gene and disease or both disease and chemical, can be selected for generating highly natural questions asking about relationships between these entities.
 
 ## Pipeline Integration
 
