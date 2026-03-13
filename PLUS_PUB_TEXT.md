@@ -245,10 +245,11 @@ Sample result from the last query:
 
 ## Known limitations
 
-- **Publication IRIs not in KG yet** — `<https://pubmed.ncbi.nlm.nih.gov/{pmid}>`
-  is used in the wordsfile but the upstream KG uses different publication IRIs.
-  QLever warns about 11,109 unmatched entity mentions. Text search still works;
-  publication-entity joins will work once the KG adopts the same IRI scheme.
+- **Publication subject IRIs differ from PubMed IRIs** — publication subjects
+  use `nf:publication/{UUID}` while the wordsfile uses
+  `<https://pubmed.ncbi.nlm.nih.gov/{pmid}>`. The PubMed IRIs exist in the KG
+  as `nf:pmid` objects, so joins through `nf:pmid` work, but there is no direct
+  subject-level link between a publication node and its text passages.
 - **No `ql:score()` in SELECT** — QLever's current version does not support
   `ql:score()` as a SPARQL function. Score boosting affects result ordering
   internally but cannot be projected.
