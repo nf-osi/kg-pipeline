@@ -262,6 +262,10 @@ Sample result from the last query:
   `<https://pubmed.ncbi.nlm.nih.gov/{pmid}>`. The PubMed IRIs exist in the KG
   as `nf:pmid` objects, so joins through `nf:pmid` work, but there is no direct
   subject-level link between a publication node and its text passages.
+- **Text records are not addressable by IRI** — QLever text records are only
+  accessible through `ql:contains-word` / `ql:contains-entity` predicates, not
+  as RDF resources. There is no way to retrieve a specific passage by ID without
+  going through the text search path.
 - **`ql:score()` not externally usable** — QLever's current version does not seem to support
   `ql:score()` as a SPARQL function. Score boosting affects result ordering
   internally but cannot be projected.

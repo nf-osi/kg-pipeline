@@ -221,6 +221,7 @@ def main():
                 if not pmid:
                     continue
                 pub_iri = f"https://pubmed.ncbi.nlm.nih.gov/{pmid}"
+                passage_num = 0
 
                 for passage in pub.get("passages", []):
                     infons = passage.get("infons", {})
@@ -234,14 +235,17 @@ def main():
                     if not text:
                         continue
 
+                    passage_num += 1
                     score = passage_score(
                         section_type, args.title_boost, args.abstract_boost
                     )
                     rid = str(record_id)
                     record_id += 1
 
-                    # docsfile: record_id \t passage_text
-                    df.write(f"{rid}\t{text}\n")
+                    # docsfile: record_id \t [context] passage_text
+                    section_tag = section_type.lower() if section_type else "unknown"
+                    doc_text = f"[PMID{pmid}-{passage_num}-{section_tag}] {text}"
+                    df.write(f"{rid}\t{doc_text}\n")
 
                     # wordsfile: publication IRI as entity
                     wf.write(f"<{pub_iri}>\t1\t{rid}\t{score}\n")
