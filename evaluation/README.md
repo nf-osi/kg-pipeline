@@ -1,11 +1,85 @@
 # Evaluation Suite
 
-**Personas** referenced in the evaluation datasets have descriptions [here](https://docs.google.com/spreadsheets/d/15KSQJn4F7nk8d3v2N9StILFhdyD5AiamTtnfr-QwusQ/edit?gid=0#gid=0).
+This directory contains two evaluation tracks:
 
-For **reproducibility**, evaluation datasets are versioned and accompanied by data archive. 
+| Track | Directory | Purpose |
+|-------|-----------|---------|
+| **Research Tools Discovery** | [`main/`](main/) | Structured queries against the Research Tools Portal (facets, text search, graph hops) |
+| **Publication QA** | [`qa/`](qa/) | LLM-generated question-answer pairs grounded in PubTator3 full-text papers |
+
+For **reproducibility**, evaluation datasets are versioned and accompanied by data archives.
 Download the appropriate archive from linked Synapse ID and extract to `evaluation/data` as needed.
 
+---
+
+## Publication QA Evaluation
+
+Multiple-choice QA pairs generated from PubTator3 full-text papers in `pubs/pubtator3/`.
+Each paper yields 5-15 questions spanning different difficulty levels and question types.
+
+### Files
+
+| File | Description |
+|------|-------------|
+| `qa/qa.schema.json` | JSON Schema for QA items |
+| `qa/generate_qa.py` | Generation script (prompt-only by default, `--generate` to call API) |
+| `qa/qa_{PMCID}.jsonl` | Generated QA pairs, one file per paper |
+
+### Schema Fields
+
+Each QA item contains: `pmcid`, `question`, `ideal`, `distractors`, `passage_indices`, `difficulty`, `question_type`.
+
+- **difficulty**: `easy` (single-fact lookup), `medium` (within-passage synthesis), `hard` (cross-passage inference)
+- **question_type**: `factual`, `causal`, `comparative`, `inferential`, `methodological`, `hypothetical`, `other` — weighted toward factual, comparative, and methodological
+
+### Usage
+
+```bash
+# Preview prompt for a specific paper
+python evaluation/qa/generate_qa.py --pmcid PMC7952412
+
+# Generate QA pairs (calls Anthropic API)
+python evaluation/qa/generate_qa.py --generate --pmcid PMC7952412
+
+# Generate for the default random-15 selection
+python evaluation/qa/generate_qa.py --generate
+
+# Validate all generated output files
+python evaluation/qa/generate_qa.py --validate-only
+```
+
+<!-- BEGIN AUTO-GENERATED QA STATS -->
+
+### Dataset Statistics
+
+- **Total Papers**: 8
+- **Total Questions**: 100
+- **Average Questions/Paper**: 12.5
+
+#### By Difficulty
+- **Easy**: 31 (31.0%)
+- **Medium**: 42 (42.0%)
+- **Hard**: 27 (27.0%)
+
+#### By Question Type
+- **factual**: 41 (41.0%)
+- **methodological**: 22 (22.0%)
+- **comparative**: 20 (20.0%)
+- **causal**: 10 (10.0%)
+- **inferential**: 7 (7.0%)
+
+#### By Author/Model
+- **claude-opus-4-6**: 92 (92.0%)
+- **gemini-3.1-pro-preview**: 8 (8.0%)
+
+
+<!-- END AUTO-GENERATED QA STATS -->
+
+---
+
 ## Research Tools Discovery Evaluation
+
+**Personas** referenced in the evaluation datasets have descriptions [here](https://docs.google.com/spreadsheets/d/15KSQJn4F7nk8d3v2N9StILFhdyD5AiamTtnfr-QwusQ/edit?gid=0#gid=0).
 
 Benchmark suite for evaluating queries across the Research Tools Portal entities.
 

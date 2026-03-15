@@ -1,0 +1,240 @@
+- id: PMC9184558-01
+  pmcid: PMC9184558
+  author: claude-opus-4-6
+  question: How many well-characterized isogenic cell lines compose the final Cancer Pathway Knockout Panel?
+  user_query: how many cell lines in the final panel?
+  ideal: The final panel consists of 100 well-characterized isogenic cell lines covering 19 frequently lost cancer pathways.
+  choices:
+  - '152'
+  - '100'
+  - '302'
+  - Not in knowledgebase
+  correct_choice_index: 1
+  passage_indices: [2, 30]
+  difficulty: easy
+  question_type: factual
+- id: PMC9184558-02
+  pmcid: PMC9184558
+  author: claude-opus-4-6
+  question: Which three normal human cell lines were used as parental backgrounds for creating the isogenic cell line panel?
+  user_query: what were the 3 parental cell lines used?
+  ideal: The three parental cell lines were RPE1 (retinal), MCF10A (breast), and RPTec (renal).
+  choices:
+  - RPE1, MCF10A, and HEK293
+  - RPE1, MCF10A, and RPTec
+  - MCF10A, RPTec, and HeLa
+  - Not in knowledgebase
+  correct_choice_index: 1
+  passage_indices: [21]
+  difficulty: easy
+  question_type: factual
+- id: PMC9184558-03
+  pmcid: PMC9184558
+  author: claude-opus-4-6
+  question: What compound was identified as a selective growth inhibitor of TP53-deficient cells in the high-throughput screen
+    of FDA-approved compounds?
+  user_query: what drug selectively killed TP53 knockout cells in the screen
+  ideal: MK-1775 (also known as AZD1775), a Wee1 inhibitor, was identified as selectively inhibiting the growth of cells with
+    TP53 inactivation.
+  choices:
+  - Nutlin-3a
+  - Staurosporine
+  - MK-1775 (AZD1775)
+  - Not in knowledgebase
+  correct_choice_index: 2
+  passage_indices: [2, 42, 44, 45]
+  difficulty: easy
+  question_type: factual
+- id: PMC9184558-04
+  pmcid: PMC9184558
+  author: claude-opus-4-6
+  question: What was the only known pre-existing genetic alteration among the three parental cell lines, and in which cell
+    line was it found?
+  user_query: did any of the parental lines already have a mutation before CRISPR?
+  ideal: The only known genetic alteration was a homozygous deletion of the CDKN2A gene in MCF10A.
+  choices:
+  - A TP53 mutation in RPE1
+  - A homozygous deletion of CDKN2A in MCF10A
+  - A PTEN deletion in RPTec
+  - Not in knowledgebase
+  correct_choice_index: 1
+  passage_indices: [21]
+  difficulty: medium
+  question_type: factual
+- id: PMC9184558-05
+  pmcid: PMC9184558
+  author: claude-opus-4-6
+  question: What hierarchical validation strategy was used to orthogonally confirm gene knockout in the 302 candidate cell
+    lines?
+  user_query: how did they validate the knockouts beyond sequencing?
+  ideal: The hierarchical validation strategy first used Western blot analysis to establish loss of protein, followed by immunohistochemistry
+    (IHC), and finally loss of wild-type transcript by RNA-Seq transcriptome analysis.
+  choices:
+  - First IHC, then Western blot, then FISH
+  - First Western blot, then IHC, then RNA-Seq transcriptome analysis
+  - First RNA-Seq, then mass spectrometry, then flow cytometry
+  - Not in knowledgebase
+  correct_choice_index: 1
+  passage_indices: [30]
+  difficulty: medium
+  question_type: methodological
+- id: PMC9184558-06
+  pmcid: PMC9184558
+  author: claude-opus-4-6
+  question: Why did only 302 out of more than 1,800 CRISPR-targeted cell lines meet the criteria for successful gene disruption?
+  user_query: why was the success rate of CRISPR knockouts so low?
+  ideal: 'The criteria were particularly stringent: both alleles had to contain out-of-frame insertions or deletions that
+    could not be rescued by exon skipping during splicing, and high-depth sequencing required that fewer than 1% of reads
+    contained an intact targeting site.'
+  choices:
+  - Most cell lines died during puromycin selection before expansion
+  - The gRNAs had low binding efficiency due to poor design
+  - Stringent biallelic disruption criteria requiring out-of-frame indels on both alleles, no possibility of exon skipping,
+    and <1% intact reads by deep sequencing
+  - Not in knowledgebase
+  correct_choice_index: 2
+  passage_indices: [2, 28]
+  difficulty: medium
+  question_type: causal
+- id: PMC9184558-07
+  pmcid: PMC9184558
+  author: claude-opus-4-6
+  question: How does the multiplex screening approach use sequencing to measure relative cell growth in drug-treated wells?
+  user_query: how does the sequencing-based pooled screen work to measure cell growth?
+  ideal: Each cell line contains a unique integrated gRNA that serves as a DNA barcode. After co-culturing multiple cell lines
+    in a single well and treating with drugs, universal primers amplify all integrated gRNAs. Sequencing of the amplification
+    products reveals the representation of individual barcodes, which reflects the number of cells with each particular pathway
+    disruption relative to others in the same well, providing ratiometric measurements of growth.
+  choices:
+  - Cells are sorted by FACS after drug treatment and counted individually
+  - Each cell line has a unique gRNA barcode that is PCR-amplified and sequenced; barcode representation reflects relative
+    cell number after drug treatment
+  - Cell viability is measured by ATP-based luminescence assay after pooling
+  - Not in knowledgebase
+  correct_choice_index: 1
+  passage_indices: [38, 39]
+  difficulty: medium
+  question_type: methodological
+- id: PMC9184558-08
+  pmcid: PMC9184558
+  author: claude-opus-4-6
+  question: What was the false positive rate observed for negative control (DMSO-only) wells in the high-throughput screening
+    assay?
+  user_query: false positive rate in DMSO control wells?
+  ideal: The false positive rate for negative control (DMSO only, no drug) wells was 0.11%.
+  choices:
+  - 0.11%
+  - 1.5%
+  - 5%
+  - Not in knowledgebase
+  correct_choice_index: 0
+  passage_indices: [39]
+  difficulty: easy
+  question_type: factual
+- id: PMC9184558-09
+  pmcid: PMC9184558
+  author: claude-opus-4-6
+  question: Compare the roles of Nutlin-3a and staurosporine as positive controls in the high-throughput screen. What different
+    aspects of assay performance did each control address?
+  user_query: what was the difference between nutlin and staurosporine as controls in the screen?
+  ideal: Nutlin-3a served as a pathway-specific positive control by inhibiting MDM2 and thereby increasing p53 protein levels,
+    which causes selective cell death/senescence in TP53 wild-type cells but not TP53 null cells, thus testing the assay's
+    ability to detect pathway-specific differential effects. Staurosporine served as a non-specific cytotoxic control, producing
+    general marked reduction in growth across all cell lines, testing the assay's ability to detect general toxicity.
+  choices:
+  - Nutlin-3a tested pathway-specific differential killing (TP53-dependent), while staurosporine tested non-specific cytotoxicity
+    across all lines
+  - Both served as non-specific cytotoxic controls but at different concentrations
+  - Staurosporine was the pathway-specific control for DNA damage, while Nutlin-3a was the general toxicity control
+  - Not in knowledgebase
+  correct_choice_index: 0
+  passage_indices: [31, 41]
+  difficulty: hard
+  question_type: comparative
+- id: PMC9184558-10
+  pmcid: PMC9184558
+  author: claude-opus-4-6
+  question: How many total compound-cell line interactions were scored in the FDA-approved compound screen, and how many hits
+    emerged after applying all stringent filters?
+  user_query: how many compound-cell line combos were tested and how many hits?
+  ideal: 'A total of 430,596 compound-cell line interactions were scored, and after applying stringent statistical and biological
+    significance filters requiring confirmation in two parental cell backgrounds, only 1 hit emerged: TP53 loss sensitized
+    cells to MK-1775.'
+  choices:
+  - 430,596 interactions scored; 1 hit (TP53 loss + MK-1775)
+  - 430,596 interactions scored; 22 hits across multiple pathways
+  - 2,658 interactions scored; 5 hits
+  - Not in knowledgebase
+  correct_choice_index: 0
+  passage_indices: [42]
+  difficulty: medium
+  question_type: factual
+- id: PMC9184558-11
+  pmcid: PMC9184558
+  author: claude-opus-4-6
+  question: What criteria had to be met for a compound to be classified as a 'hit' in the high-throughput screen, considering
+    both statistical and biological significance as well as reproducibility requirements?
+  user_query: what were the hit criteria in the screen? z-score and stuff?
+  ideal: 'A compound had to meet three criteria: (1) a statistically significant Z-score of -1.5 or less (or -1.0 for low-powered
+    cell lines), (2) a biologically significant effect of greater than 50% growth inhibition, and (3) this criteria had to
+    be satisfied by independent cell lines with the same pathway disrupted in two different parental cell backgrounds. Additionally,
+    compounds causing non-specific killing (less than two-fold more UIDs than staurosporine controls) were excluded.'
+  choices:
+  - Only Z-score < -2.0 was required with no biological significance threshold
+  - Z-score ≤ -1.5, >50% growth inhibition, confirmed in two parental cell backgrounds, and exclusion of non-specific killers
+  - Any compound with >25% growth inhibition in a single cell line was considered a hit
+  - Not in knowledgebase
+  correct_choice_index: 1
+  passage_indices: [42, 86, 87]
+  difficulty: hard
+  question_type: methodological
+- id: PMC9184558-12
+  pmcid: PMC9184558
+  author: claude-opus-4-6
+  question: What are the stated limitations of the isogenic cell line panel study?
+  user_query: what limitations do the authors mention?
+  ideal: The study was performed in non-cancerous cell lines from tissues of origin that may not best reflect the biology
+    of the targeted cancer pathways. Additionally, not all targeted genes were represented by two or more knockouts in every
+    background, which may make results for these genes less reproducible than originally desired.
+  choices:
+  - The CRISPR system had off-target effects that could not be controlled
+  - The study used non-cancerous cell lines that may not reflect cancer biology, and not all genes had two or more knockouts
+    in every background
+  - The drug library was too small to identify meaningful hits
+  - Not in knowledgebase
+  correct_choice_index: 1
+  passage_indices: [49, 50]
+  difficulty: easy
+  question_type: factual
+- id: PMC9184558-13
+  pmcid: PMC9184558
+  author: claude-opus-4-6
+  question: Why is MTAP included as a control gene of particular interest in the panel, and how does this relate to CDKN2A?
+  user_query: why is MTAP special among the control genes?
+  ideal: MTAP is of particular interest because it is frequently co-deleted with CDKN2A, making it a passenger mutation that
+    is potentially targetable for therapeutic benefit in human cancers.
+  choices:
+  - MTAP is an oncogene that drives cancer independently of CDKN2A
+  - MTAP is frequently co-deleted with CDKN2A as a passenger mutation, making it potentially targetable for therapeutic benefit
+  - MTAP encodes a drug resistance protein that interferes with CDKN2A function
+  - Not in knowledgebase
+  correct_choice_index: 1
+  passage_indices: [62]
+  difficulty: medium
+  question_type: causal
+- id: PMC9184558-14
+  pmcid: PMC9184558
+  author: claude-opus-4-6
+  question: Considering the in silico power analysis, what percentage of wells would yield a Z-score of -1.5 or less for a
+    90% reduction in cell line reads in RPE1-derived lines versus MCF10A-derived lines?
+  user_query: power analysis results for 90% read reduction RPE1 vs MCF10A
+  ideal: A 90% reduction in reads would yield a Z-score of -1.5 in 94% of wells for RPE1 and 79% of wells for MCF10A.
+  choices:
+  - 94% for RPE1 and 79% for MCF10A
+  - 79% for RPE1 and 94% for MCF10A
+  - 75% for RPE1 and 38% for MCF10A
+  - Not in knowledgebase
+  correct_choice_index: 0
+  passage_indices: [43]
+  difficulty: hard
+  question_type: comparative

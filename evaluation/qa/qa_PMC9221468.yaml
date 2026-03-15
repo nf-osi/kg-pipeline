@@ -1,0 +1,261 @@
+- id: PMC9221468-01
+  pmcid: PMC9221468
+  author: claude-opus-4-6
+  question: What is the only currently FDA-approved pharmacotherapy for symptomatic and inoperable plexiform neurofibromas
+    in pediatric NF1 patients?
+  user_query: whats the only FDA approved drug for plexiform neurofibromas?
+  ideal: Selumetinib, a MEK inhibitor, is the only currently FDA-approved pharmacotherapy for symptomatic and inoperable plexiform
+    neurofibromas in pediatric NF1 patients.
+  choices:
+  - Everolimus
+  - Selumetinib
+  - Tofacitinib
+  - Not in knowledgebase
+  correct_choice_index: 1
+  passage_indices: [1, 3]
+  difficulty: easy
+  question_type: factual
+- id: PMC9221468-02
+  pmcid: PMC9221468
+  author: claude-opus-4-6
+  question: What is the incidence of Neurofibromatosis Type 1 (NF1) in the population?
+  user_query: how common is NF1?
+  ideal: NF1 affects up to 1 in 2500 individuals (or newborns).
+  choices:
+  - 1 in 10,000 individuals
+  - 1 in 2500 individuals
+  - 1 in 500 individuals
+  - Not in knowledgebase
+  correct_choice_index: 1
+  passage_indices: [1, 3]
+  difficulty: easy
+  question_type: factual
+- id: PMC9221468-03
+  pmcid: PMC9221468
+  author: claude-opus-4-6
+  question: What two genes were overexpressed to immortalize the PN cell lines used in the drug screening?
+  user_query: what genes did they use to immortalize the cell lines?
+  ideal: The cell lines were immortalized through genetic overexpression of mouse CDK4 and human TERT genes.
+  choices:
+  - Mouse CDK4 and human TERT
+  - Human NF1 and mouse SOX10
+  - Mouse ERBB3 and human NGFR
+  - Not in knowledgebase
+  correct_choice_index: 0
+  passage_indices: [21]
+  difficulty: easy
+  question_type: factual
+- id: PMC9221468-04
+  pmcid: PMC9221468
+  author: claude-opus-4-6
+  question: Which gene ontology term was highly associated with the blue preserved network module, and how does this relate
+    to the known biology of NF1-associated plexiform neurofibromas?
+  user_query: what GO term was enriched in the blue module and why is it relevant to NF1 PNs?
+  ideal: The 'Ras protein signal transduction' GO term was highly associated with the blue module, reflecting the cardinal
+    feature of NF1-associated PNs, since loss of NF1 potentiates RAS/MEK signaling, which is the hallmark molecular derangement
+    in these benign tumors.
+  choices:
+  - The 'Ras protein signal transduction' term, reflecting the hallmark RAS/MEK signaling derangement caused by NF1 loss
+  - The 'peripheral nervous system development' term, reflecting Schwann cell origin of the tumors
+  - The 'cell cycle regulation' term, reflecting hyperproliferation in NF1 tumors
+  - Not in knowledgebase
+  correct_choice_index: 0
+  passage_indices: [25, 26]
+  difficulty: medium
+  question_type: causal
+- id: PMC9221468-05
+  pmcid: PMC9221468
+  author: claude-opus-4-6
+  question: What biological features were enriched in the magenta preserved network module, and what is their significance
+    in PN biology?
+  user_query: what was special about the magenta module in the network analysis?
+  ideal: The magenta module was strongly enriched in terms describing development regulation of the peripheral nervous system
+    and interactions between neurons and Schwann cells. It contained neural crest progenitor markers such as NES, SOX10, ERBB3,
+    and NGFR, which are highly expressed markers of Schwann cell progenitors and signatures of stem-like tumor cells in NF1
+    tumors, consistent with cancer stem cell theory.
+  choices:
+  - It was enriched in immune signaling and inflammatory response pathways
+  - It was enriched in peripheral nervous system development regulation, neuron-Schwann cell interactions, and contained stem-like
+    tumor cell markers (NES, SOX10, ERBB3, NGFR)
+  - It was enriched in Ras protein signal transduction terms
+  - Not in knowledgebase
+  correct_choice_index: 1
+  passage_indices: [25, 39]
+  difficulty: medium
+  question_type: factual
+- id: PMC9221468-06
+  pmcid: PMC9221468
+  author: claude-opus-4-6
+  question: How were the conserved gene regulation network modules constructed, and what criteria were used to determine module
+    preservation?
+  user_query: how did they build the gene networks and decide which modules were preserved?
+  ideal: The gene regulation networks were constructed using the WGCNA package. Gene expression data from five PN cell lines
+    were filtered by MAD > 1000 and merged with primary tumor transcriptomes to build a scale-free network with a soft-thresholding
+    power of 8. Twenty-six network modules were established, and nine modules were determined to be conserved based on a Z-summary
+    score > 5.
+  choices:
+  - Networks were built using differential expression analysis with a p-value cutoff of 0.05 for preservation
+  - Networks were constructed using WGCNA with soft-thresholding power of 8; modules with Z-summary score > 5 were considered
+    preserved
+  - Networks were built using machine learning clustering with a silhouette score > 0.8 for preservation
+  - Not in knowledgebase
+  correct_choice_index: 1
+  passage_indices: [14]
+  difficulty: medium
+  question_type: methodological
+- id: PMC9221468-07
+  pmcid: PMC9221468
+  author: claude-opus-4-6
+  question: What drug combination strategy did the authors propose using the concept of 'drug fingerprints', and how do vertical
+    and horizontal combination strategies differ in this context?
+  user_query: how did they use drug fingerprints to pick drug combos, and what's the diff between vertical and horizontal
+    strategies?
+  ideal: Drug fingerprints were defined by the pattern of correlation between drug responses and conserved network module
+    eigengenes. Vertical combinations combine drugs with similar fingerprint patterns (targeting the same biological process/pathway),
+    which can minimize drug resistance. Horizontal combinations combine drugs with complementary fingerprint patterns that
+    target different biological processes simultaneously. For example, Selumetinib in DrugCluster 4 has a complementary pattern
+    to DrugCluster 5, suggesting horizontal combination potential.
+  choices:
+  - Vertical combinations target different pathways while horizontal combinations target the same pathway at multiple points
+  - Vertical combinations target the same pathway/process (similar fingerprints) to minimize resistance, while horizontal
+    combinations target different processes (complementary fingerprints) simultaneously
+  - Both strategies are identical but applied to different drug clusters
+  - Not in knowledgebase
+  correct_choice_index: 1
+  passage_indices: [31, 33]
+  difficulty: hard
+  question_type: comparative
+- id: PMC9221468-08
+  pmcid: PMC9221468
+  author: claude-opus-4-6
+  question: Why did the authors argue that AZD-1480 combined with Selumetinib would be a logical drug combination to investigate,
+    and what are the known limitations of AZD-1480 as a monotherapy?
+  user_query: why is AZD-1480 + selumetinib interesting but AZD-1480 alone failed?
+  ideal: AZD-1480 is an oral small molecule ATP-competitive JAK2/3 inhibitor. Its combination with Selumetinib is logical
+    because JAK/STAT and RAS/MEK signaling are parallel and synonymous pathways in promoting cell mitosis. JAK2 signaling
+    is implicated in neurofibromagenesis, and JAK/STAT signaling within myelocytes in the tumor microenvironment may contribute
+    to tumor formation. However, AZD-1480 as monotherapy failed to achieve safety endpoints or clinical benefit in advanced
+    solid tumors, though combining it with Selumetinib might allow lower drug doses while still targeting both pathways.
+  choices:
+  - AZD-1480 targets JAK/STAT signaling parallel to RAS/MEK, but failed as monotherapy due to lack of safety/clinical benefit
+    in solid tumors; combination with Selumetinib could allow lower doses targeting both pathways
+  - AZD-1480 targets the same pathway as Selumetinib and failed due to redundancy; combination is proposed to increase the
+    dose of MEK inhibition
+  - AZD-1480 is an mTOR inhibitor that works synergistically with MEK inhibitors but was never tested in humans
+  - Not in knowledgebase
+  correct_choice_index: 0
+  passage_indices: [36, 38, 39]
+  difficulty: hard
+  question_type: inferential
+- id: PMC9221468-09
+  pmcid: PMC9221468
+  author: claude-opus-4-6
+  question: How many drug clusters were identified through consensus clustering analysis, and in which cluster was Selumetinib
+    located?
+  user_query: how many drug clusters were there and which one had selumetinib?
+  ideal: Six drug clusters were identified through consensus clustering analysis. Selumetinib was located in DrugCluster 4.
+  choices:
+  - Four clusters; Selumetinib was in DrugCluster 2
+  - Six clusters; Selumetinib was in DrugCluster 4
+  - Eight clusters; Selumetinib was in DrugCluster 6
+  - Not in knowledgebase
+  correct_choice_index: 1
+  passage_indices: [28, 29]
+  difficulty: easy
+  question_type: factual
+- id: PMC9221468-10
+  pmcid: PMC9221468
+  author: claude-opus-4-6
+  question: What was the rationale for limiting drug candidates to FDA-approved, Phase II, and Phase III status compounds
+    in the analysis?
+  user_query: why did they only look at FDA approved or late-stage clinical trial drugs?
+  ideal: Limiting candidates to FDA-approved, Phase II, and Phase III drugs allows for more immediate translation to clinical
+    trials because the human safety and tolerability data are already defined. This approach accelerates bench-to-bedside
+    translation for an underserved disease population, though the method could also be used to test experimental drugs in
+    the future.
+  choices:
+  - Because experimental drugs are too expensive to test in the MIPE 4.0 library
+  - To ensure human safety and tolerability data are already available, enabling more immediate translation to clinical trials
+    for this underserved patient population
+  - Because only FDA-approved drugs were included in the MIPE 4.0 screening library
+  - Not in knowledgebase
+  correct_choice_index: 1
+  passage_indices: [29, 40]
+  difficulty: medium
+  question_type: methodological
+- id: PMC9221468-11
+  pmcid: PMC9221468
+  author: claude-opus-4-6
+  question: What is the lifetime risk of malignant transformation of plexiform neurofibromas, and what malignancy do they
+    transform into?
+  user_query: what % of PNs become malignant and what do they turn into?
+  ideal: Plexiform neurofibromas harbor a 15% lifetime risk of malignant transformation into malignant peripheral nerve sheath
+    tumors (MPNSTs).
+  choices:
+  - 5% risk of transformation into glioblastoma
+  - 15% risk of transformation into malignant peripheral nerve sheath tumor (MPNST)
+  - 25% risk of transformation into osteosarcoma
+  - Not in knowledgebase
+  correct_choice_index: 1
+  passage_indices: [1, 3]
+  difficulty: easy
+  question_type: factual
+- id: PMC9221468-12
+  pmcid: PMC9221468
+  author: claude-opus-4-6
+  question: What key advantage does the gene regulatory network-based methodology offer over traditional cell-culture-based
+    drug screening for predicting in vivo drug efficacy?
+  user_query: why is the network approach better than just using cell culture drug screens?
+  ideal: The methodology focuses only on transcriptionally conserved gene networks across both cultured cells and primary
+    PNs, thereby filtering out drugs whose effects are artifacts of the in vitro environment and less likely to be replicated
+    in vivo. This addresses the inherent limitation that cell culture isolates cancer cells from the tumor microenvironment,
+    trains them on non-biologic matrices, and can favor genetic drift, all of which can cause promising cell-culture results
+    to fail in clinical trials.
+  choices:
+  - It uses machine learning to predict drug toxicity more accurately
+  - It filters drug effects through conserved gene networks between cell lines and primary tumors, removing artifacts of in
+    vitro conditions unlikely to replicate in vivo
+  - It eliminates the need for any experimental validation
+  - Not in knowledgebase
+  correct_choice_index: 1
+  passage_indices: [4, 5, 35]
+  difficulty: hard
+  question_type: methodological
+- id: PMC9221468-13
+  pmcid: PMC9221468
+  author: claude-opus-4-6
+  question: Which JAK/STAT pathway inhibitors from the MIPE 4.0 library achieved an IDACombo score >1 alongside Selumetinib,
+    and what are their clinical development statuses?
+  user_query: what JAK inhibitors in the library had good combo scores with selumetinib?
+  ideal: 'The JAK/STAT inhibitors from the MIPE 4.0 library that achieved an IDACombo score >1 alongside Selumetinib were:
+    Cucurbitacin I (not FDA approved), TG-46 (not FDA approved), Degrasyn (Phase III clinical trial), and Tofacitinib (FDA
+    approved).'
+  choices:
+  - Ruxolitinib (FDA approved) and Baricitinib (FDA approved)
+  - Cucurbitacin I (not FDA approved), TG-46 (not FDA approved), Degrasyn (Phase III), and Tofacitinib (FDA approved)
+  - AZD-1480 (Phase II) and Fedratinib (FDA approved)
+  - Not in knowledgebase
+  correct_choice_index: 1
+  passage_indices: [39]
+  difficulty: hard
+  question_type: factual
+- id: PMC9221468-14
+  pmcid: PMC9221468
+  author: claude-opus-4-6
+  question: How does the IDAcombo algorithm predict drug combination efficacy, and what is the principle of independent drug
+    activation (IDA)?
+  user_query: how does IDAcombo work for predicting drug combos?
+  ideal: The IDAcombo algorithm predicts drug combination efficacy based on single drug dosage-response data. It relies on
+    the principle of independent drug activation (IDA), which assumes that the expected effect of a combination of non-interacting
+    drugs is best defined by the more efficacious drug in the combination. The predictions are concentration-dependent and
+    represent an average response across populations of cell lines.
+  choices:
+  - It assumes drugs always act synergistically and multiplies their individual effects
+  - It uses the principle that the expected combination effect equals the sum of individual drug effects
+  - It assumes the combination effect is defined by the more efficacious drug, with predictions being concentration-dependent
+    and averaged across cell line populations
+  - Not in knowledgebase
+  correct_choice_index: 2
+  passage_indices: [22, 32]
+  difficulty: medium
+  question_type: methodological

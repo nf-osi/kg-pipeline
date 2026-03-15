@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Question-Answer Schema",
+  "description": "Schema for evaluation questions based on PubTator3 data",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "description": "Globally unique question identifier: PMCID + zero-padded index",
+      "type": "string",
+      "pattern": "^PMC[0-9]+-[0-9]{2}$",
+      "examples": ["PMC7952412-01", "PMC7952412-02"]
+    },
+    "pmcid": {
+      "description": "PMCID of the content (represented in `id` of PubTator3 data)",
+      "type": "string",
+      "pattern": "^PMC[0-9]+$"
+    },
+    "author": {
+      "description": "Model or person that generated this QA item",
+      "type": "string"
+    },
+    "question": {
+       "description": "Precisely worded question to test scientific knowledge retrieval and understanding",
+       "type": "string",
+       "examples": ["Is the CML-C2 cell line considered radiosensitive?", "How would H1395 and H23 cells respond to ATM inhibitor in terms of cytotoxic effects?"]
+    },
+    "user_query": {
+       "description": "Colloquial, less precise rephrasing of the question resembling how a real user might ask it — may include abbreviations, typos, vague wording, or incomplete phrasing",
+       "type": "string",
+       "examples": ["is CML-C2 radiosensitive", "what happens if you give H1395 and H23 an ATM inhibtor"]
+    },
+    "ideal": {
+       "description": "Ideal free-response / short-answer answer for the question",
+       "type": "string",
+       "examples": ["No", "H1395 and H23 cells already have loss of ATM function so exposure to ATM inhibitor would not show increased cytotoxic effects"]
+    },
+    "choices": {
+       "description": "Multiple-choice options including the correct answer and plausible distractors",
+       "type": "array",
+       "items": { "type": "string" },
+       "minItems": 3
+    },
+    "correct_choice_index": {
+       "description": "Zero-based index of the correct answer within the choices array",
+       "type": "integer",
+       "minimum": 0
+    },
+    "passage_indices": {
+      "description": "Indices of passages in PubTator3 data providing evidence for this question-answer entry",
+      "type": "array",
+      "items": {
+        "type": "integer",
+        "minimum": 0
+      },
+      "minItems": 1
+    },
+    "difficulty": {
+      "description": "Difficulty level: easy = single-fact lookup, medium = synthesis within a passage, hard = inference or cross-passage reasoning",
+      "type": "string",
+      "enum": ["easy", "medium", "hard"]
+    },
+    "question_type": {
+      "description": "Question category for stratified evaluation: factual = single-fact lookup, causal = cause-effect reasoning, comparative = contrasting entities or findings, inferential = drawing conclusions beyond stated facts, methodological = study design, techniques, or limitations, hypothetical = counterfactual or speculative scenarios, other = does not fit the above categories",
+      "type": "string",
+      "enum": ["factual", "causal", "comparative", "inferential", "methodological", "hypothetical", "other"]
+    }
+  },
+  "required": [
+    "id",
+    "pmcid",
+    "author",
+    "question",
+    "user_query",
+    "ideal",
+    "choices",
+    "correct_choice_index",
+    "passage_indices",
+    "difficulty",
+    "question_type"
+  ]
+}
