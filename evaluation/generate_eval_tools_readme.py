@@ -18,48 +18,6 @@ def parse_yaml(yaml_path):
         return yaml.safe_load(f)
 
 
-def extract_legend_from_comments(yaml_path):
-    """Extract legend definitions from YAML header comments."""
-    legend = {
-        'level': {},
-        'facet_answerable': {},
-        'text_search_answerable': {}
-    }
-
-    with open(yaml_path, 'r') as f:
-        content = f.read()
-
-    # Extract level definitions
-    level_section = content.split('level:')[1].split('facet_answerable:')[0] if 'level:' in content else ''
-    for line in level_section.split('\n'):
-        if '"baseline"' in line.lower() and ' - ' in line:
-            legend['level']['baseline'] = line.split(' - ', 1)[1].strip()
-        elif '"advanced"' in line.lower() and ' - ' in line:
-            legend['level']['advanced'] = line.split(' - ', 1)[1].strip()
-
-    # Extract facet_answerable definitions
-    facet_section = content.split('facet_answerable:')[1].split('facet_note:')[0] if 'facet_answerable:' in content else ''
-    for line in facet_section.split('\n'):
-        if '"yes"' in line.lower() and ' - ' in line:
-            legend['facet_answerable']['yes'] = line.split(' - ', 1)[1].strip()
-        elif '"partial"' in line.lower() and ' - ' in line:
-            legend['facet_answerable']['partial'] = line.split(' - ', 1)[1].strip()
-        elif '"no"' in line.lower() and ' - ' in line:
-            legend['facet_answerable']['no'] = line.split(' - ', 1)[1].strip()
-
-    # Extract text_search_answerable definitions
-    text_section = content.split('text_search_answerable:')[1].split('text_search_note:')[0] if 'text_search_answerable:' in content else ''
-    for line in text_section.split('\n'):
-        if '"yes"' in line.lower() and ' - ' in line:
-            legend['text_search_answerable']['yes'] = line.split(' - ', 1)[1].strip()
-        elif '"partial"' in line.lower() and ' - ' in line:
-            legend['text_search_answerable']['partial'] = line.split(' - ', 1)[1].strip()
-        elif '"no"' in line.lower() and ' - ' in line:
-            legend['text_search_answerable']['no'] = line.split(' - ', 1)[1].strip()
-
-    return legend
-
-
 def load_ground_truth_files(script_dir):
     """Load ground truth files and return question ID sets."""
     ground_truth = {
@@ -216,7 +174,7 @@ def format_facet_ans(value):
     return str(value)
 
 
-def generate_readme(data, stats, legend):
+def generate_readme(data, stats):
     """Generate README content in markdown format (auto-generated section only)."""
     lines = []
 
@@ -234,42 +192,6 @@ def generate_readme(data, stats, legend):
             lines.append(f"Data archived at **{data_archive}**\n")
 
         lines.append("---\n")
-
-    # Legend (moved to top for easy reference)
-    lines.append("### Legend\n")
-    lines.append("- **Complexity**: Number of graph hops required (0-hop, 1-hop, 2-hop, 3-hop)")
-
-    # Level legend from YAML comments
-    if legend['level']:
-        lines.append("- **Level**: Difficulty/capability level of the question")
-        for level in ['baseline', 'advanced']:
-            if level in legend['level']:
-                lines.append(f"  - `{level}`: {legend['level'][level]}")
-    else:
-        lines.append("- **Level**: ")
-        lines.append("  - `baseline`: Baseline functionality established by current portal technologies")
-        lines.append("  - `advanced`: Harder questions that push the limits of existing technology")
-
-    # Facet answerable legend from YAML comments
-    if legend['facet_answerable']:
-        lines.append("- **Facet**: Whether answerable via portal UI facets alone")
-        for level in ['yes', 'partial', 'no']:
-            if level in legend['facet_answerable']:
-                lines.append(f"  - `{level.capitalize()}`: {legend['facet_answerable'][level]}")
-    else:
-        lines.append("- **Facet**: Whether answerable via portal UI facets alone")
-
-    # Text search answerable legend from YAML comments
-    if legend['text_search_answerable']:
-        lines.append("- **Text Search**: Whether answerable via MySQL text search today")
-        for level in ['yes', 'partial', 'no']:
-            if level in legend['text_search_answerable']:
-                lines.append(f"  - `{level.capitalize()}`: {legend['text_search_answerable'][level]}")
-    else:
-        lines.append("- **Text Search**: Whether answerable via MySQL text search today")
-
-    lines.append("")
-    lines.append("---\n")
 
     # Statistics Summary
     lines.append("### Dataset Statistics\n")
@@ -439,20 +361,104 @@ def update_readme_section(readme_path, new_content):
     return full_content
 
 
+def generate_qa_stats(qa_dir):
+    """Generate statistics from QA YAML files in qa/ directory."""
+    qa_files = sorted(Path(qa_dir).glob("qa_PMC*.yaml"))
+
+    stats = {
+        'total_papers': 0,
+        'total_questions': 0,
+        'by_difficulty': Counter(),
+        'by_question_type': Counter(),
+        'by_author': Counter(),
+        'papers': []
+    }
+
+    for qa_file in qa_files:
+        with open(qa_file) as f:
+            items = yaml.safe_load(f)
+
+        if not items:
+            continue
+
+        pmcid = qa_file.stem.replace('qa_', '')
+        stats['total_papers'] += 1
+        stats['total_questions'] += len(items)
+        stats['papers'].append({'pmcid': pmcid, 'count': len(items)})
+
+        for item in items:
+            stats['by_difficulty'][item.get('difficulty', 'unknown')] += 1
+            stats['by_question_type'][item.get('question_type', 'unknown')] += 1
+            stats['by_author'][item.get('author', 'unknown')] += 1
+
+    return stats
+
+
+def format_qa_stats_markdown(stats):
+    """Format QA stats as markdown."""
+    lines = []
+
+    lines.append("### Dataset Statistics")
+    lines.append("")
+    lines.append(f"- **Total Papers**: {stats['total_papers']}")
+    lines.append(f"- **Total Questions**: {stats['total_questions']}")
+    if stats['total_papers'] > 0:
+        lines.append(f"- **Average Questions/Paper**: {stats['total_questions']/stats['total_papers']:.1f}")
+    lines.append("")
+
+    if stats['by_difficulty']:
+        lines.append("#### By Difficulty")
+        for diff in ['easy', 'medium', 'hard']:
+            count = stats['by_difficulty'].get(diff, 0)
+            pct = 100 * count / stats['total_questions'] if stats['total_questions'] > 0 else 0
+            lines.append(f"- **{diff.title()}**: {count} ({pct:.1f}%)")
+        lines.append("")
+
+    if stats['by_question_type']:
+        lines.append("#### By Question Type")
+        for qtype, count in stats['by_question_type'].most_common():
+            pct = 100 * count / stats['total_questions'] if stats['total_questions'] > 0 else 0
+            lines.append(f"- **{qtype}**: {count} ({pct:.1f}%)")
+        lines.append("")
+
+    if stats['by_author']:
+        lines.append("#### By Author/Model")
+        for author, count in stats['by_author'].most_common():
+            pct = 100 * count / stats['total_questions'] if stats['total_questions'] > 0 else 0
+            lines.append(f"- **{author}**: {count} ({pct:.1f}%)")
+        lines.append("")
+
+    return '\n'.join(lines)
+
+
+def update_qa_stats_in_readme(readme_path, qa_stats_content):
+    """Update QA stats section in README."""
+    begin_marker = "<!-- BEGIN AUTO-GENERATED QA STATS -->"
+    end_marker = "<!-- END AUTO-GENERATED QA STATS -->"
+
+    with open(readme_path, 'r') as f:
+        content = f.read()
+
+    if begin_marker in content and end_marker in content:
+        before = content.split(begin_marker)[0]
+        after = content.split(end_marker)[1]
+        updated = f"{before}{begin_marker}\n\n{qa_stats_content}\n\n{end_marker}{after}"
+        return updated
+    else:
+        return content
+
+
 def main():
     """Main entry point."""
     # Paths (script now in evaluation/ directory)
     script_dir = Path(__file__).parent
     yaml_path = script_dir / 'main' / 'eval_tools.yaml'
+    qa_dir = script_dir / 'qa'
     readme_path = script_dir / 'README.md'
 
     # Parse YAML
     print(f"Reading {yaml_path}...")
     data = parse_yaml(yaml_path)
-
-    # Extract legend from YAML comments
-    print("Extracting legend definitions...")
-    legend = extract_legend_from_comments(yaml_path)
 
     # Load ground truth files
     print("Loading ground truth files...")
@@ -464,17 +470,29 @@ def main():
 
     # Generate README content (without header, it will be added by update_readme_section if needed)
     print("Generating README content...")
-    readme_content = generate_readme(data, stats, legend)
+    readme_content = generate_readme(data, stats)
 
     # Update README, preserving manual sections
     print(f"Updating {readme_path}...")
     final_content = update_readme_section(readme_path, readme_content)
 
+    # Generate and update QA stats
+    print("Generating QA statistics...")
+    qa_stats = generate_qa_stats(qa_dir)
+    if qa_stats['total_questions'] > 0:
+        qa_stats_md = format_qa_stats_markdown(qa_stats)
+        final_content = update_qa_stats_in_readme(readme_path, qa_stats_md)
+        print(f"  QA: {qa_stats['total_papers']} papers, {qa_stats['total_questions']} questions")
+    else:
+        print("  No QA files found, skipping QA stats")
+
     with open(readme_path, 'w') as f:
         f.write(final_content)
 
     print("✓ README updated successfully!")
-    print(f"  Total questions: {stats['total']} ({stats['complete']} complete, {stats['incomplete']} incomplete)")
+    print(f"  Main: {stats['total']} questions ({stats['complete']} complete, {stats['incomplete']} incomplete)")
+    if qa_stats['total_questions'] > 0:
+        print(f"  QA: {qa_stats['total_papers']} papers, {qa_stats['total_questions']} questions")
 
 
 if __name__ == '__main__':

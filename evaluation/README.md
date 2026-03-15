@@ -7,15 +7,17 @@ This directory contains two evaluation tracks:
 | **Research Tools Discovery** | [`main/`](main/) | Structured queries against the Research Tools Portal (facets, text search, graph hops) |
 | **Publication QA** | [`qa/`](qa/) | LLM-generated question-answer pairs grounded in PubTator3 full-text papers |
 
-For **reproducibility**, evaluation datasets are versioned and accompanied by data archives.
-Download the appropriate archive from linked Synapse ID and extract to `evaluation/data` as needed.
-
 ---
 
 ## Publication QA Evaluation
 
-Multiple-choice QA pairs generated from PubTator3 full-text papers in `pubs/pubtator3/`.
+To evaluate publication RAG, we primarily use multiple-choice QA pairs generated from PubTator3 full-text papers in `pubs/pubtator3/`. 
 Each paper yields 5-15 questions spanning different difficulty levels and question types.
+
+Important item characteristics:
+
+- **question_type**: `factual`, `causal`, `comparative`, `inferential`, `methodological`, `hypothetical`, `other` — weighted toward factual, comparative, and methodological
+- **difficulty**: `easy` (single-fact lookup), `medium` (within-passage synthesis), `hard` (cross-passage inference)
 
 ### Files
 
@@ -23,16 +25,12 @@ Each paper yields 5-15 questions spanning different difficulty levels and questi
 |------|-------------|
 | `qa/qa.schema.json` | JSON Schema for QA items |
 | `qa/generate_qa.py` | Generation script (prompt-only by default, `--generate` to call API) |
-| `qa/qa_{PMCID}.jsonl` | Generated QA pairs, one file per paper |
+| `qa/qa_{PMCID}.yaml` | Generated QA pairs, one file per paper |
 
-### Schema Fields
-
-Each QA item contains: `pmcid`, `question`, `ideal`, `distractors`, `passage_indices`, `difficulty`, `question_type`.
-
-- **difficulty**: `easy` (single-fact lookup), `medium` (within-passage synthesis), `hard` (cross-passage inference)
-- **question_type**: `factual`, `causal`, `comparative`, `inferential`, `methodological`, `hypothetical`, `other` — weighted toward factual, comparative, and methodological
 
 ### Usage
+
+Anthropic is used by default, but other providers can be specified. 
 
 ```bash
 # Preview prompt for a specific paper
@@ -44,6 +42,9 @@ python evaluation/qa/generate_qa.py --generate --pmcid PMC7952412
 # Generate for the default random-15 selection
 python evaluation/qa/generate_qa.py --generate
 
+# Generate QA pairs using the Google Gemini model
+python generate_qa.py --generate --provider google
+
 # Validate all generated output files
 python evaluation/qa/generate_qa.py --validate-only
 ```
@@ -52,25 +53,25 @@ python evaluation/qa/generate_qa.py --validate-only
 
 ### Dataset Statistics
 
-- **Total Papers**: 8
-- **Total Questions**: 100
-- **Average Questions/Paper**: 12.5
+- **Total Papers**: 13
+- **Total Questions**: 133
+- **Average Questions/Paper**: 10.2
 
 #### By Difficulty
-- **Easy**: 31 (31.0%)
-- **Medium**: 42 (42.0%)
-- **Hard**: 27 (27.0%)
+- **Easy**: 41 (30.8%)
+- **Medium**: 55 (41.4%)
+- **Hard**: 37 (27.8%)
 
 #### By Question Type
-- **factual**: 41 (41.0%)
-- **methodological**: 22 (22.0%)
-- **comparative**: 20 (20.0%)
-- **causal**: 10 (10.0%)
-- **inferential**: 7 (7.0%)
+- **factual**: 53 (39.8%)
+- **comparative**: 29 (21.8%)
+- **methodological**: 29 (21.8%)
+- **causal**: 13 (9.8%)
+- **inferential**: 9 (6.8%)
 
 #### By Author/Model
-- **claude-opus-4-6**: 92 (92.0%)
-- **gemini-3.1-pro-preview**: 8 (8.0%)
+- **claude-opus-4-6**: 92 (69.2%)
+- **gemini-3.1-pro-preview**: 41 (30.8%)
 
 
 <!-- END AUTO-GENERATED QA STATS -->
@@ -79,11 +80,26 @@ python evaluation/qa/generate_qa.py --validate-only
 
 ## Research Tools Discovery Evaluation
 
-**Personas** referenced in the evaluation datasets have descriptions [here](https://docs.google.com/spreadsheets/d/15KSQJn4F7nk8d3v2N9StILFhdyD5AiamTtnfr-QwusQ/edit?gid=0#gid=0).
+Benchmark suite for evaluating search/discovery queries across the Research Tools Portal entities using Synapse metadata. 
 
-Benchmark suite for evaluating queries across the Research Tools Portal entities.
+Important item characteristics:
 
-### Dataset Files
+- Each item represents a user **Persona**, which have descriptions [here](https://docs.google.com/spreadsheets/d/15KSQJn4F7nk8d3v2N9StILFhdyD5AiamTtnfr-QwusQ/edit?gid=0#gid=0)
+- **Complexity**: Number of graph hops required (0-hop, 1-hop, 2-hop, 3-hop)
+- **Level**: Difficulty/capability level of the question
+  - `baseline`: baseline functionality established by current portal technologies and configuration
+  - `advanced`: harder questions not handled by portal infra currently (e.g. missing materialization and aggregation, missing integration of additional semantics)
+- **Facet**: Whether answerable via portal UI facets alone
+  - `Yes`: fully answerable using available facets
+  - `Partial`: answerable but requires workarounds, manual filtering, or multiple steps
+  - `No`: cannot be answered via facets alone
+- **Text Search**: Whether answerable via MySQL text search today
+  - `Yes`: fully answerable using text search
+  - `Partial`: answerable but with limitations, missing results, or requires knowing exact terms
+  - `No`: cannot be answered via text search 
+
+
+### Files
 
 - **`main/eval_tools.yaml`**: Question definitions and metadata (stats below)
 - **`main/eval_tools_ground_auto.yaml`**: Automatically generated ground truth
@@ -113,23 +129,6 @@ There is only one question that returns a number (count) instead of uuid(s).
 **Dataset Version**: v1
 
 Data archived at **syn73695746**
-
----
-
-### Legend
-
-- **Complexity**: Number of graph hops required (0-hop, 1-hop, 2-hop, 3-hop)
-- **Level**: Difficulty/capability level of the question
-  - `baseline`: baseline functionality established by current portal technologies and configuration
-  - `advanced`: harder questions not handled by portal infra currently (e.g. missing materialization and aggregation, missing integration of additional semantics)
-- **Facet**: Whether answerable via portal UI facets alone
-  - `Yes`: fully answerable using available facets
-  - `Partial`: answerable but requires workarounds, manual filtering, or multiple steps
-  - `No`: cannot be answered via facets alone
-- **Text Search**: Whether answerable via MySQL text search today
-  - `Yes`: fully answerable using text search
-  - `Partial`: answerable but with limitations, missing results, or requires knowing exact terms
-  - `No`: cannot be answered via text search
 
 ---
 
