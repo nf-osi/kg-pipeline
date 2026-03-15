@@ -30,13 +30,15 @@ Important item characteristics:
 
 ### Usage
 
-Anthropic is used by default, but other providers can be specified. 
+PubTator3 full-text biocjson must be available locally as input for generation, i.e. in a `pubs` directory. 
+The Anthropic default has average cost of ~$0.40/paper; other providers and models can be specified. 
+Requires `ANTHROPIC_API_KEY` or `GOOGLE_API_KEY`.
 
 ```bash
 # Preview prompt for a specific paper
 python evaluation/qa/generate_qa.py --pmcid PMC7952412
 
-# Generate QA pairs (calls Anthropic API)
+# Generate QA pairs (calls Anthropic API by default)
 python evaluation/qa/generate_qa.py --generate --pmcid PMC7952412
 
 # Generate for the default random-15 selection

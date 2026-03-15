@@ -145,11 +145,13 @@ def build_prompt(pmcid: str, passages: list[dict], schema: dict) -> str:
     for p in passages:
         ann_str = ""
         if p["annotations"]:
-            ann_items = [
-                f"  - {a['text']} [{a['type']}:{a['identifier']}]"
-                for a in p["annotations"]
-            ]
-            ann_str = "\nAnnotated entities:\n" + "\n".join(ann_items)
+            # Deduplicate annotations by unique (text, type, identifier) tuple
+            unique_anns = {}
+            for a in p["annotations"]:
+                key = (a['text'], a['type'], a['identifier'])
+                if key not in unique_anns:
+                    unique_anns[key] = f"  - {a['text']} [{a['type']}:{a['identifier']}]"
+            ann_str = "\nAnnotated entities:\n" + "\n".join(unique_anns.values())
         passage_block += (
             f"\n--- Passage index {p['index']} [{p['section_type']}] ---\n"
             f"{p['text']}"
