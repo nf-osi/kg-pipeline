@@ -1,0 +1,102 @@
+- id: PMC8150846-01
+  pmcid: PMC8150846
+  author: gemini-3.1-pro-preview
+  question: What gene is mutated in Neurofibromatosis type 1 (NF1) and what protein does it encode?
+  user_query: nf1 mutation causes loss of what protein
+  ideal: Neurofibromatosis type 1 is caused by inactivating mutations in the NF1 gene, which encodes the protein neurofibromin
+    (Nfn).
+  choices:
+  - FAK gene; focal adhesion kinase
+  - MEK gene; MAPKK
+  - NF1 gene; neurofibromin
+  - Not in knowledgebase
+  correct_choice_index: 2
+  passage_indices: [6]
+  difficulty: easy
+  question_type: factual
+- id: PMC8150846-02
+  pmcid: PMC8150846
+  author: gemini-3.1-pro-preview
+  question: How does the phosphorylation of ERK1/2 in response to PDGF-BB stimulation differ between wild-type and Nf1-knockout
+    (Nf1-/-) mouse embryonic fibroblasts (MEFs)?
+  user_query: how does erk1/2 phosphorylation compare in wild type vs nf1-/- mefs with pdgf-bb
+  ideal: In Nf1-/- MEFs, PDGF-BB stimulation induces a faster, more prolonged, and higher level of ERK1/2 phosphorylation
+    compared to wild-type MEFs.
+  choices:
+  - It is slower, transient, and lower in Nf1-/- MEFs compared to wild-type MEFs.
+  - It is identical in both wild-type and Nf1-/- MEFs.
+  - It is faster, more prolonged, and higher in Nf1-/- MEFs compared to wild-type MEFs.
+  - Not in knowledgebase
+  correct_choice_index: 2
+  passage_indices: [31]
+  difficulty: medium
+  question_type: comparative
+- id: PMC8150846-03
+  pmcid: PMC8150846
+  author: gemini-3.1-pro-preview
+  question: In the context of Plexiform neurofibromas (Pnfs) models lacking neurofibromin, which combination of pharmacological
+    inhibitors was found to fully suppress 3D colony growth by targeting parallel oncogenic signaling pathways?
+  user_query: what drug combo stops nf1 tumor colony growth in 3d models
+  ideal: The combinatorial treatment with the MEK inhibitor Selumetinib (AZD6244) and the FAK inhibitor Defactinib (VS-6063)
+    fully suppressed the 3D colony growth of cells lacking neurofibromin.
+  choices:
+  - The MEK inhibitor Selumetinib and the Src inhibitor SU6656.
+  - The AKT inhibitor MK-2206 and the MEK inhibitor Selumetinib.
+  - Not in knowledgebase
+  - The MEK inhibitor Selumetinib and the FAK inhibitor Defactinib.
+  correct_choice_index: 3
+  passage_indices: [4, 12, 36, 47]
+  difficulty: hard
+  question_type: factual
+- id: PMC8150846-04
+  pmcid: PMC8150846
+  author: gemini-3.1-pro-preview
+  question: Which specific tyrosine residues on Focal Adhesion Kinase (FAK) were found to be constitutively phosphorylated
+    in neurofibromin-deficient cells even in the absence of activating stimuli?
+  user_query: fak phosphorylation sites in nfn deficient cells without stimulation
+  ideal: In neurofibromin-deficient cells, FAK is constitutively phosphorylated on tyrosine 397 (Y397) and tyrosine 925 (Y925)
+    in the absence of activating stimuli.
+  choices:
+  - Not in knowledgebase
+  - Y397 and Y925
+  - Y416 and Y527
+  - Y204 and Y187
+  correct_choice_index: 1
+  passage_indices: [41]
+  difficulty: medium
+  question_type: factual
+- id: PMC8150846-05
+  pmcid: PMC8150846
+  author: gemini-3.1-pro-preview
+  question: How did the 3D colony formation ability of Schwann cells isolated from NF1 patients (ipNF 04.4) compare to those
+    from healthy individuals (ipNF 97.4) when grown in Matrigel enriched with extracellular matrix proteins?
+  user_query: 3d growth of ipnf 04.4 vs ipnf 97.4 cells in ecm matrigel
+  ideal: The NF1 patient-derived ipNF 04.4 cells successfully formed colonies whose dimensions strongly increased with Matrigel
+    enrichment, whereas 3D growth was barely detectable in the healthy individual-derived ipNF 97.4 cells.
+  choices:
+  - ipNF 04.4 cells formed colonies that increased in size with ECM enrichment, while 3D growth was barely detectable in ipNF
+    97.4 cells.
+  - Both ipNF 04.4 and ipNF 97.4 cells formed identical large colonies in enriched Matrigel.
+  - ipNF 97.4 cells formed large colonies while ipNF 04.4 cells showed barely detectable growth.
+  - Not in knowledgebase
+  correct_choice_index: 0
+  passage_indices: [38, 39]
+  difficulty: hard
+  question_type: comparative
+- id: PMC8150846-06
+  pmcid: PMC8150846
+  author: gemini-3.1-pro-preview
+  question: To mimic the extracellular matrix (ECM) of plexiform neurofibromas in an in vitro 3D culture and induce integrin
+    clustering, which specific insoluble ECM proteins were primarily added to the Matrigel?
+  user_query: what proteins were added to matrigel to mimic plexiform neurofibroma ecm
+  ideal: Matrigel was enriched with a mixture of insoluble ECM proteins including Collagen (Collagen I) and Fibronectin (along
+    with Laminin) to induce integrin clustering and mimic the rigid, fibrotic ECM of plexiform neurofibromas.
+  choices:
+  - Hyaluronic acid and Elastin
+  - Keratin and Vimentin
+  - Not in knowledgebase
+  - Collagen and Fibronectin
+  correct_choice_index: 3
+  passage_indices: [33, 39]
+  difficulty: medium
+  question_type: methodological
