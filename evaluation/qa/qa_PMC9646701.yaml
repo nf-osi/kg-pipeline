@@ -126,10 +126,10 @@
 - id: PMC9646701-08
   pmcid: PMC9646701
   author: claude-opus-4-6
-  question: How does the study's finding about cerebellar-dependent learning in Nf1+/- mice relate to findings from other
+  question: There is some study finding about cerebellar-dependent learning in Nf1+/- mice; how does it relate to findings from other
     cerebellum-specific behavioral tasks in NF1 models, and what does this collectively suggest about the origin of NF1-related
     motor problems?
-  user_query: how do the eyeblink conditioning results fit with other cerebellar tasks in NF1 and what does it say about where
+  user_query: how do the eyeblink conditioning results in Nf1+/- mice fit with other cerebellar tasks in NF1 and what does it say about where
     motor problems come from
   ideal: The eyeblink conditioning results showing intact or improved cerebellar learning in Nf1+/- mice are consistent with
     prior studies showing normal performance on other cerebellum-specific tasks (VOR adaptation in mice, saccade and prism
@@ -149,7 +149,7 @@
 - id: PMC9646701-10
   pmcid: PMC9646701
   author: claude-opus-4-6
-  question: What is the genetic background of the Nf1+/- mice, and what is the approximate birth incidence of NF1 in humans?
+  question: What is the genetic background of the Nf1+/- mice in the eyeblink conditioning study, and what is the approximate birth incidence of NF1 in humans?
   user_query: what strain background were the NF1 mice and how common is NF1 in people
   ideal: The Nf1+/- mice had a hybrid background of 50% C57Bl/6 and 50% 129T2/SvEms. The birth incidence of NF1 in humans
     is approximately 1:2000.
@@ -186,7 +186,7 @@
 - id: PMC9646701-12
   pmcid: PMC9646701
   author: claude-opus-4-6
-  question: What key difference does the paper highlight between eyeblink conditioning and VOR adaptation in terms of Purkinje
+  question: What is a key difference between eyeblink conditioning and VOR adaptation in terms of Purkinje
     cell activity during learning?
   user_query: what's the difference between eyeblink conditioning and VOR in terms of purkinje cell activity
   ideal: Eyeblink conditioning depends on downbound olivocerebellar modules and requires mainly a decrease in Purkinje cell
