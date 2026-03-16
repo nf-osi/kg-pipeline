@@ -1,9 +1,9 @@
 - id: PMC9184558-01
   pmcid: PMC9184558
   author: claude-opus-4-6
-  question: How many well-characterized isogenic cell lines compose the final Cancer Pathway Knockout Panel?
-  user_query: how many cell lines in the final panel?
-  ideal: The final panel consists of 100 well-characterized isogenic cell lines covering 19 frequently lost cancer pathways.
+  question: How many well-characterized isogenic cell lines compose the Cancer Pathway Knockout Panel?
+  user_query: how many cell lines in the Cancer Pathway Knockout Panel?
+  ideal: The final Cancer Pathway Knockout Panel consists of 100 well-characterized isogenic cell lines covering 19 frequently lost cancer pathways.
   choices:
   - '152'
   - '100'
@@ -11,21 +11,6 @@
   - Not in knowledgebase
   correct_choice_index: 1
   passage_indices: [2, 30]
-  difficulty: easy
-  question_type: factual
-- id: PMC9184558-02
-  pmcid: PMC9184558
-  author: claude-opus-4-6
-  question: Which three normal human cell lines were used as parental backgrounds for creating the isogenic cell line panel?
-  user_query: what were the 3 parental cell lines used?
-  ideal: The three parental cell lines were RPE1 (retinal), MCF10A (breast), and RPTec (renal).
-  choices:
-  - RPE1, MCF10A, and HEK293
-  - RPE1, MCF10A, and RPTec
-  - MCF10A, RPTec, and HeLa
-  - Not in knowledgebase
-  correct_choice_index: 1
-  passage_indices: [21]
   difficulty: easy
   question_type: factual
 - id: PMC9184558-03
