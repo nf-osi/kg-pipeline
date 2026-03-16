@@ -202,23 +202,3 @@
   passage_indices: [6]
   difficulty: medium
   question_type: comparative
-- id: PMC9646701-13
-  pmcid: PMC9646701
-  author: claude-opus-4-6
-  question: What was the sample size calculation based on, and how many animals were actually included in the eyeblink conditioning
-    experiment?
-  user_query: sample size calculation for the eyeblink experiment - how many mice needed vs used
-  ideal: The sample size was calculated to require at least 17 animals per group, based on a normalized eye closure difference
-    of 0.2 between groups (~1 SD), power of 80%, and two-sided alpha of 0.05. Group sizes were increased to 23-24 animals
-    to account for possible data loss. After excluding 6 animals due to inferior data quality, 20 Nf1+/- mice and 21 wild-type
-    littermates were included in the eyeblink conditioning analysis.
-  choices:
-  - At least 10 per group were needed; 15 Nf1+/- and 16 WT were analyzed
-  - At least 17 per group were needed based on 0.2 NEC difference; 20 Nf1+/- and 21 WT were analyzed after exclusions from
-    initial groups of 23 and 24
-  - At least 25 per group were needed; all 23 Nf1+/- and 24 WT were analyzed
-  - Not in knowledgebase
-  correct_choice_index: 1
-  passage_indices: [10, 18]
-  difficulty: medium
-  question_type: methodological
