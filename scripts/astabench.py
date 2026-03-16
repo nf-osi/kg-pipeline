@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
-"""Prepare eval data and run astabench NF_RAG across models.
+"""Prepare eval data and run astabench evals across models.
 
-1. Discovers *_ground*.yaml files under evaluation/<dataset>/ and merges
-   them into astabench/astabench/evals/nf_rag/eval_data.yaml.
+Supports two eval tasks:
+  nf_rag       Research tools discovery (SPARQL, default)
+  nf_rag_pubs  Publication QA (SPARQL+Text, use --pubs)
+
+1. Prepares eval_data.yaml from ground-truth files.
 2. Runs ``inspect eval`` for each model in parallel.
 
 Required models (need ANTHROPIC_API_KEY):
@@ -16,10 +19,9 @@ model(s) instead of Anthropic models. Can be combined.
 
 Usage:
     python scripts/astabench.py
+    python scripts/astabench.py --pubs
     python scripts/astabench.py --dataset main --full
-    python scripts/astabench.py --google
-    python scripts/astabench.py --openai --google
-    python scripts/astabench.py --full --epochs 3
+    python scripts/astabench.py --pubs --full --epochs 3
 """
 
 from __future__ import annotations
@@ -36,9 +38,7 @@ from dotenv import load_dotenv
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 EVAL_DIR = REPO_ROOT / "evaluation"
-OUTPUT_PATH = (
-    REPO_ROOT / "astabench" / "astabench" / "evals" / "nf_rag" / "eval_data.yaml"
-)
+ASTABENCH_EVALS = REPO_ROOT / "astabench" / "astabench" / "evals"
 
 ANTHROPIC_MODELS = [
     "anthropic/claude-sonnet-4-5",
@@ -54,7 +54,7 @@ OPENAI_MODELS = ["openai/gpt-5.2"]
 # ---------------------------------------------------------------------------
 
 def prepare_data(dataset: str) -> int:
-    """Merge ground-truth YAML files into eval_data.yaml."""
+    """Merge ground-truth YAML files into eval_data.yaml for nf_rag."""
     dataset_dir = EVAL_DIR / dataset
     if not dataset_dir.is_dir():
         print(f"Error: dataset directory not found: {dataset_dir}", file=sys.stderr)
@@ -74,22 +74,37 @@ def prepare_data(dataset: str) -> int:
         print(f"  {path.name}: {len(entries)} entries")
 
     output = {"ground_truth": merged}
-    OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    with open(OUTPUT_PATH, "w") as f:
+    output_path = ASTABENCH_EVALS / "nf_rag" / "eval_data.yaml"
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(output_path, "w") as f:
         yaml.dump(output, f, default_flow_style=False, sort_keys=False, allow_unicode=True)
 
-    print(f"Wrote {len(merged)} entries to {OUTPUT_PATH}")
+    print(f"Wrote {len(merged)} entries to {output_path}")
     return 0
+
+
+def prepare_pubs_data() -> int:
+    """Build eval_data.yaml for nf_rag_pubs from qa_PMC*.yaml files."""
+    build_script = EVAL_DIR / "qa" / "build_eval_data.py"
+    if not build_script.exists():
+        print(f"Error: build script not found: {build_script}", file=sys.stderr)
+        return 1
+
+    result = subprocess.run(
+        [sys.executable, str(build_script)],
+        cwd=str(REPO_ROOT),
+    )
+    return result.returncode
 
 
 # ---------------------------------------------------------------------------
 # Eval execution
 # ---------------------------------------------------------------------------
 
-def run_eval(model: str, extra_args: list[str]) -> tuple[str, int]:
+def run_eval(model: str, task: str, extra_args: list[str]) -> tuple[str, int]:
     """Run inspect eval for a single model. Returns (model, returncode)."""
     cmd = [
-        "inspect", "eval", "astabench/nf_rag",
+        "inspect", "eval", f"astabench/{task}",
         "--solver", "basic_agent",
         "--model", model,
         *extra_args,
@@ -126,9 +141,14 @@ def main(argv: list[str] | None = None) -> int:
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument(
+        "--pubs",
+        action="store_true",
+        help="Run nf_rag_pubs (Publication QA) instead of nf_rag",
+    )
+    parser.add_argument(
         "--dataset",
         default="main",
-        help="Subdirectory under evaluation/ to read from (default: main)",
+        help="Subdirectory under evaluation/ for nf_rag data (default: main)",
     )
     parser.add_argument(
         "--full",
@@ -167,8 +187,14 @@ def main(argv: list[str] | None = None) -> int:
         return 1
 
     # Step 1: prepare data
-    print("=== Preparing eval data ===")
-    rc = prepare_data(args.dataset)
+    if args.pubs:
+        task = "nf_rag_pubs"
+        print("=== Preparing pubs eval data ===")
+        rc = prepare_pubs_data()
+    else:
+        task = "nf_rag"
+        print("=== Preparing eval data ===")
+        rc = prepare_data(args.dataset)
     if rc != 0:
         return rc
 
@@ -184,11 +210,11 @@ def main(argv: list[str] | None = None) -> int:
         if args.full:
             models.extend(GOOGLE_MODELS + OPENAI_MODELS)
 
-    print(f"\n=== Running evals for {len(models)} models ===")
+    print(f"\n=== Running {task} for {len(models)} models ===")
     failed = []
     with ProcessPoolExecutor(max_workers=len(models)) as pool:
         futures = {
-            pool.submit(run_eval, model, args.inspect_args): model
+            pool.submit(run_eval, model, task, args.inspect_args): model
             for model in models
         }
         for future in as_completed(futures):
