@@ -11,12 +11,14 @@ This directory contains two evaluation tracks:
 
 ## Publication QA Evaluation
 
-To evaluate publication RAG, we primarily use multiple-choice QA pairs generated from PubTator3 full-text papers in `pubs/pubtator3/`. 
-Each paper yields 5-15 questions spanning different difficulty levels and question types.
+To evaluate the overall RAG-based system for publications, we primarily use multiple-choice QA pairs, a similar format to the [PaperQA2](https://huggingface.co/datasets/futurehouse/lab-bench/viewer/LitQA2) and [Humanity's Last Exam](https://www.nature.com/articles/s41586-025-09962-4) benchmark datasets. 
+Items are first generated using current frontier models with PubTator3 full-text papers, then further curated and edited by the NF-OSI team. 
+Each paper has between 5 to 15 questions spanning different difficulty levels and question types. 
+How well the system performs is based on *both* the effectiveness/ergonomics of retrieval as well as the agent chosen for the system.
 
 Important item characteristics:
 
-- **question_type**: `factual`, `causal`, `comparative`, `inferential`, `methodological`, `hypothetical`, `other` — weighted toward factual, comparative, and methodological
+- **question_type**: `factual`, `causal`, `comparative`, `inferential`, `methodological`, `hypothetical`, `other` — weighted toward factual, comparative, and methodological by design
 - **difficulty**: `easy` (single-fact lookup), `medium` (within-passage synthesis), `hard` (cross-passage inference)
 
 ### Files
@@ -55,25 +57,26 @@ python evaluation/qa/generate_qa.py --validate-only
 
 ### Dataset Statistics
 
-- **Total Papers**: 13
-- **Total Questions**: 133
-- **Average Questions/Paper**: 10.2
+- **Total Papers**: 14
+- **Total Questions**: 140
+- **Average Questions/Paper**: 10.0
 
 #### By Difficulty
-- **Easy**: 41 (30.8%)
-- **Medium**: 55 (41.4%)
-- **Hard**: 37 (27.8%)
+- **Easy**: 42 (30.0%)
+- **Medium**: 59 (42.1%)
+- **Hard**: 39 (27.9%)
 
 #### By Question Type
-- **factual**: 53 (39.8%)
-- **comparative**: 29 (21.8%)
-- **methodological**: 29 (21.8%)
-- **causal**: 13 (9.8%)
-- **inferential**: 9 (6.8%)
+- **factual**: 54 (38.6%)
+- **methodological**: 33 (23.6%)
+- **comparative**: 30 (21.4%)
+- **causal**: 14 (10.0%)
+- **inferential**: 9 (6.4%)
 
 #### By Author/Model
-- **claude-opus-4-6**: 92 (69.2%)
-- **gemini-3.1-pro-preview**: 41 (30.8%)
+- **claude-opus-4-6**: 92 (65.7%)
+- **gemini-3.1-pro-preview**: 41 (29.3%)
+- **gpt-5.4**: 7 (5.0%)
 
 
 <!-- END AUTO-GENERATED QA STATS -->
