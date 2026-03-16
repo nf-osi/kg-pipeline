@@ -3,7 +3,7 @@
 
 Builds prompts for an LLM to produce QA pairs grounded in paper passages and
 entity annotations.  By default the script prints the prompt to stdout so you
-can inspect or pipe it.  Use --generate to call the Anthropic API.
+can inspect or pipe it.  Use --generate to call the selected provider API.
 
 Usage:
     # Show prompt for the random-15 selection (first paper only by default)
@@ -30,14 +30,17 @@ from __future__ import annotations
 import argparse
 import json
 import logging
+import os
 import random
 import sys
 import time
 from pathlib import Path
 
 import anthropic
-import google.generativeai as genai
 import jsonschema
+from google import genai
+from google.genai import types as google_types
+from openai import OpenAI
 import yaml
 from dotenv import load_dotenv
 
@@ -63,8 +66,9 @@ OUTPUT_DIR = Path(__file__).resolve().parent
 
 SEED = 42
 N_PAPERS = 15
-MODEL = "claude-opus-4-6"
+ANTHROPIC_MODEL = "claude-opus-4-6"
 GOOGLE_MODEL = "gemini-3.1-pro-preview"
+OPENAI_MODEL = "gpt-5.4"
 MAX_TOKENS = 8192
 MAX_RETRIES = 3
 RETRY_DELAY = 30  # seconds
@@ -208,12 +212,34 @@ def validate_qa_item(item: dict, schema: dict) -> list[str]:
     return errors
 
 
+def extract_anthropic_text(response: anthropic.types.Message) -> str:
+    """Collect visible text blocks from an Anthropic response."""
+    parts = [block.text for block in response.content if getattr(block, "type", None) == "text"]
+    return "\n".join(parts).strip()
+
+
+def extract_openai_text(response) -> str:
+    """Return text from an OpenAI Responses API payload."""
+    text = getattr(response, "output_text", None)
+    if text:
+        return text.strip()
+
+    parts = []
+    for item in getattr(response, "output", []):
+        if getattr(item, "type", None) != "message":
+            continue
+        for content in getattr(item, "content", []):
+            if getattr(content, "type", None) == "output_text":
+                parts.append(content.text)
+    return "\n".join(parts).strip()
+
+
 def generate_for_paper(
-    client: anthropic.Anthropic | genai.GenerativeModel,
+    client: anthropic.Anthropic | genai.Client | OpenAI,
     path: Path,
     schema: dict,
     provider: str = "anthropic",
-    model_name: str = MODEL,
+    model_name: str = ANTHROPIC_MODEL,
 ) -> list[dict]:
     """Generate QA pairs for one paper with retries."""
     doc = load_paper(path)
@@ -239,17 +265,30 @@ def generate_for_paper(
                 response = client.messages.create(
                     model=model_name,
                     max_tokens=MAX_TOKENS,
+                    thinking={"type": "enabled", "budget_tokens": min(4096, MAX_TOKENS)},
                     messages=[{"role": "user", "content": prompt}],
                 )
-                text = response.content[0].text.strip()
-            else:
-                response = client.generate_content(
-                    prompt,
-                    generation_config=genai.types.GenerationConfig(
+                text = extract_anthropic_text(response)
+            elif provider == "google":
+                response = client.models.generate_content(
+                    model=model_name,
+                    contents=prompt,
+                    config=google_types.GenerateContentConfig(
                         max_output_tokens=MAX_TOKENS,
+                        thinking_config=google_types.ThinkingConfig(
+                            thinking_level=google_types.ThinkingLevel.HIGH,
+                        ),
                     ),
                 )
                 text = response.text.strip()
+            else:
+                response = client.responses.create(
+                    model=model_name,
+                    input=prompt,
+                    max_output_tokens=MAX_TOKENS,
+                    reasoning={"effort": "high"},
+                )
+                text = extract_openai_text(response)
 
             # Strip markdown fences if present.
             if text.startswith("```"):
@@ -353,14 +392,15 @@ def main() -> None:
     )
     parser.add_argument(
         "--provider",
-        choices=["anthropic", "google"],
+        choices=["anthropic", "google", "openai"],
         default="anthropic",
         help="Model provider to use (default: anthropic).",
     )
     parser.add_argument(
         "--model",
         help="Specific model to use. If omitted, defaults to "
-        f"{MODEL} for anthropic or {GOOGLE_MODEL} for google.",
+        f"{ANTHROPIC_MODEL} for anthropic, {GOOGLE_MODEL} for google, "
+        f"or {OPENAI_MODEL} for openai.",
     )
     parser.add_argument(
         "--generate",
@@ -414,14 +454,19 @@ def main() -> None:
 
     model_name = args.model
     if not model_name:
-        model_name = GOOGLE_MODEL if args.provider == "google" else MODEL
+        if args.provider == "google":
+            model_name = GOOGLE_MODEL
+        elif args.provider == "openai":
+            model_name = OPENAI_MODEL
+        else:
+            model_name = ANTHROPIC_MODEL
 
     if args.provider == "anthropic":
         client = anthropic.Anthropic()
+    elif args.provider == "google":
+        client = genai.Client(api_key=os.environ.get("GOOGLE_API_KEY"))
     else:
-        import os
-        genai.configure(api_key=os.environ.get("GOOGLE_API_KEY"))
-        client = genai.GenerativeModel(model_name)
+        client = OpenAI()
 
     total_pairs = 0
     all_ok = True

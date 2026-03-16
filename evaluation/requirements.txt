@@ -1,5 +1,5 @@
 anthropic
-google-generativeai
+google-genai
 jsonschema
 PyYAML
 python-dotenv
