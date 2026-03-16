@@ -12,8 +12,13 @@
   - Not in knowledgebase
   correct_choice_index: 1
   passage_indices: [4]
-  difficulty: easy
+  difficulty: medium
   question_type: factual
+  editor_note: >-
+    Related to PMC9221468-01 which asks about FDA-approved pharmacotherapy for PNs (answer: selumetinib).
+    This question asks about treatment options broadly — the answer per this paper is surgery.
+    Note that "MEK inhibitor therapy" is a distractor here but the correct answer for the related question.
+    Upgraded from easy to medium given cross-paper disambiguation required.
 - id: PMC7305302-02
   pmcid: PMC7305302
   author: gpt-5.4

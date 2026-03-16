@@ -13,28 +13,18 @@
   - Not in knowledgebase
   correct_choice_index: 1
   passage_indices: [1, 3]
-  difficulty: easy
+  difficulty: medium
   question_type: factual
+  editor_note: >-
+    Related to PMC7305302-01 which asks about current treatment options for symptomatic PNs (answer: surgery).
+    The key distinction is "pharmacotherapy" — this question asks specifically about FDA-approved drugs,
+    while PMC7305302-01 asks about treatment options broadly. Both are valid but the agent must
+    retrieve the right paper's passages to distinguish drug therapy from surgical intervention.
 - id: PMC9221468-02
   pmcid: PMC9221468
   author: claude-opus-4-6
-  question: What is the incidence of Neurofibromatosis Type 1 (NF1) in the population?
-  user_query: how common is NF1?
-  ideal: NF1 affects up to 1 in 2500 individuals (or newborns).
-  choices:
-  - 1 in 10,000 individuals
-  - 1 in 2500 individuals
-  - 1 in 500 individuals
-  - Not in knowledgebase
-  correct_choice_index: 1
-  passage_indices: [1, 3]
-  difficulty: easy
-  question_type: factual
-- id: PMC9221468-03
-  pmcid: PMC9221468
-  author: claude-opus-4-6
-  question: What two genes were overexpressed to immortalize the PN cell lines used in the drug screening?
-  user_query: what genes did they use to immortalize the cell lines?
+  question: What two genes were overexpressed to immortalize the PN cell lines used in the drug screening study?
+  user_query: what genes did they use to immortalize the cell lines in drug screen study?
   ideal: The cell lines were immortalized through genetic overexpression of mouse CDK4 and human TERT genes.
   choices:
   - Mouse CDK4 and human TERT
@@ -45,7 +35,7 @@
   passage_indices: [21]
   difficulty: easy
   question_type: factual
-- id: PMC9221468-04
+- id: PMC9221468-03
   pmcid: PMC9221468
   author: claude-opus-4-6
   question: Which gene ontology term was highly associated with the blue preserved network module, and how does this relate
@@ -63,12 +53,12 @@
   passage_indices: [25, 26]
   difficulty: medium
   question_type: causal
-- id: PMC9221468-05
+- id: PMC9221468-04
   pmcid: PMC9221468
   author: claude-opus-4-6
   question: What biological features were enriched in the magenta preserved network module, and what is their significance
-    in PN biology?
-  user_query: what was special about the magenta module in the network analysis?
+    in plexiform neurofibroma biology?
+  user_query: what's special about the magenta module in the network analysis of PN?
   ideal: The magenta module was strongly enriched in terms describing development regulation of the peripheral nervous system
     and interactions between neurons and Schwann cells. It contained neural crest progenitor markers such as NES, SOX10, ERBB3,
     and NGFR, which are highly expressed markers of Schwann cell progenitors and signatures of stem-like tumor cells in NF1
@@ -83,7 +73,7 @@
   passage_indices: [25, 39]
   difficulty: medium
   question_type: factual
-- id: PMC9221468-06
+- id: PMC9221468-05
   pmcid: PMC9221468
   author: claude-opus-4-6
   question: How were the conserved gene regulation network modules constructed, and what criteria were used to determine module
@@ -103,14 +93,14 @@
   passage_indices: [14]
   difficulty: medium
   question_type: methodological
-- id: PMC9221468-07
+- id: PMC9221468-06
   pmcid: PMC9221468
   author: claude-opus-4-6
   question: What drug combination strategy uses the concept of 'drug fingerprints', and how do vertical and horizontal combination
     strategies differ?
-  user_query: how did they use drug fingerprints to pick drug combos, and what's the diff between vertical and horizontal
+  user_query: how can use drug fingerprints to pick drug combos, and what's the diff between vertical and horizontal
     strategies?
-  ideal: Drug fingerprints were defined by the pattern of correlation between drug responses and conserved network module
+  ideal: Drug fingerprints can be defined by the pattern of correlation between drug responses and conserved network module
     eigengenes. Vertical combinations combine drugs with similar fingerprint patterns (targeting the same biological process/pathway),
     which can minimize drug resistance. Horizontal combinations combine drugs with complementary fingerprint patterns that
     target different biological processes simultaneously. For example, Selumetinib in DrugCluster 4 has a complementary pattern
@@ -125,7 +115,7 @@
   passage_indices: [31, 33]
   difficulty: hard
   question_type: comparative
-- id: PMC9221468-08
+- id: PMC9221468-07
   pmcid: PMC9221468
   author: claude-opus-4-6
   question: Why would AZD-1480 combined with Selumetinib be a logical drug combination to investigate, and what are the known
@@ -147,23 +137,7 @@
   passage_indices: [36, 38, 39]
   difficulty: hard
   question_type: inferential
-- id: PMC9221468-09
-  pmcid: PMC9221468
-  author: claude-opus-4-6
-  question: How many drug clusters were identified through consensus clustering analysis, and in which cluster was Selumetinib
-    located?
-  user_query: how many drug clusters were there and which one had selumetinib?
-  ideal: Six drug clusters were identified through consensus clustering analysis. Selumetinib was located in DrugCluster 4.
-  choices:
-  - Four clusters; Selumetinib was in DrugCluster 2
-  - Six clusters; Selumetinib was in DrugCluster 4
-  - Eight clusters; Selumetinib was in DrugCluster 6
-  - Not in knowledgebase
-  correct_choice_index: 1
-  passage_indices: [28, 29]
-  difficulty: easy
-  question_type: factual
-- id: PMC9221468-10
+- id: PMC9221468-08
   pmcid: PMC9221468
   author: claude-opus-4-6
   question: What was the rationale for limiting drug candidates to FDA-approved, Phase II, and Phase III status compounds
@@ -183,7 +157,7 @@
   passage_indices: [29, 40]
   difficulty: medium
   question_type: methodological
-- id: PMC9221468-11
+- id: PMC9221468-09
   pmcid: PMC9221468
   author: claude-opus-4-6
   question: What is the lifetime risk of malignant transformation of plexiform neurofibromas, and what malignancy do they
@@ -200,7 +174,7 @@
   passage_indices: [1, 3]
   difficulty: easy
   question_type: factual
-- id: PMC9221468-12
+- id: PMC9221468-10
   pmcid: PMC9221468
   author: claude-opus-4-6
   question: What key advantage does the gene regulatory network-based methodology offer over traditional cell-culture-based
@@ -221,7 +195,7 @@
   passage_indices: [4, 5, 35]
   difficulty: hard
   question_type: methodological
-- id: PMC9221468-13
+- id: PMC9221468-11
   pmcid: PMC9221468
   author: claude-opus-4-6
   question: Which JAK/STAT pathway inhibitors from the MIPE 4.0 library achieved an IDACombo score >1 alongside Selumetinib,
@@ -239,7 +213,7 @@
   passage_indices: [39]
   difficulty: hard
   question_type: factual
-- id: PMC9221468-14
+- id: PMC9221468-12
   pmcid: PMC9221468
   author: claude-opus-4-6
   question: How does the IDAcombo algorithm predict drug combination efficacy, and what is the principle of independent drug
