@@ -69,12 +69,12 @@ pik3ca	0	0	2
 <https://www.ncbi.nlm.nih.gov/gene/5290>	1	0	2
 ```
 
-**docsfile.tsv** — one line per text record:
+**docsfile.tsv** — one line per text record with attribution prefix:
 ```
-record_id	passage_text
+record_id	[PMID{pmid}-{passage_num}-{section_type}] passage_text
 ```
 ```
-0	Mutations in PIK3CA are infrequent in neuroblastoma
+0	[PMID16822308-1-title] Mutations in PIK3CA are infrequent in neuroblastoma
 ```
 
 ## Companion RDF
@@ -191,6 +191,18 @@ QLever text queries use the `ql:` namespace. Every `ql:contains-entity` must
 be paired with a `ql:contains-word` in the same pattern (enforced by the query
 planner). When you only need entity matching, use `ql:contains-word "*"` as a
 wildcard that matches any word.
+
+Each passage in the docsfile includes attribution metadata prepended in the
+format `[PMID{pmid}-{passage_num}-{section_type}]`:
+
+```
+[PMID16822308-1-title] Mutations in PIK3CA are infrequent in neuroblastoma
+[PMID16822308-2-abstract] Background
+[PMID16822308-3-abstract] Neuroblastoma is a frequently lethal pediatric cancer...
+```
+
+This allows downstream systems to attribute retrieved text to specific papers
+and sections.
 
 **Word search** — find passages mentioning "neurofibromatosis":
 ```sparql
