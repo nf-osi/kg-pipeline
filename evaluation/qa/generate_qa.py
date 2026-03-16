@@ -163,13 +163,16 @@ def build_prompt(pmcid: str, passages: list[dict], schema: dict) -> str:
         )
 
     return f"""You are a scientific QA generation expert. Given the passages and entity
-annotations from a PubTator3 paper, generate evaluation question-answer pairs. 
+annotations from a paper, generate evaluation question-answer pairs. 
 The questions may be presented in free-response / short-answer format or in multiple-choice format,
-hence you will provide answers for both formats. And because questions are presented randomly across all papers
-to also test paper selection, have questions be self-contained and sufficiently suggestive 
-regarding the desired paper and subject entity (gene, protein, disease, organism, etc.); 
+hence you will provide answers for both formats. 
+IMPORTANT: Because questions are drawn and presented randomly from multiple papers
+to also test relevant paper selection, have questions be self-contained and sufficiently suggestive 
+regarding the desired material and subject entity (gene, protein, disease, organism, etc.); 
 don't use phrases like "in this study", "the authors", or "the results shown here" 
-that assume the reader already knows which paper is being discussed.
+that assume the reader already knows which paper is being discussed, 
+and don't reference entities too generically -- for example, 
+instead of "the cell line developed had which mutations", use "the HS-PSS cell line developed had which mutations".
 
 PAPER: {pmcid}
 
