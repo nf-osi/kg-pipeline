@@ -2,9 +2,9 @@
   pmcid: PMC7305302
   author: gpt-5.4
   question: For patients with neurofibromatosis type 1 (NF1) who have symptomatic plexiform neurofibromas, what treatment
-    option was described as currently available?
-  user_query: nf1 symptomatic pnf tx option? just surgery or something else
-  ideal: Surgery was described as the only current treatment option for patients with NF1 who have symptomatic plexiform neurofibromas.
+    option is described as currently available?
+  user_query: nf1 symptomatic pnf current tx option?
+  ideal: Surgery is described as the only current treatment option for patients with NF1 who have symptomatic plexiform neurofibromas.
   choices:
   - Radiation therapy
   - Surgery
@@ -17,25 +17,9 @@
 - id: PMC7305302-02
   pmcid: PMC7305302
   author: gpt-5.4
-  question: Through which public resources were the clinically annotated genomic and transcriptomic data from the Johns Hopkins
-    NF1 nerve sheath tumor repository released?
-  user_query: where can i get the jhu nf1 biobank data? portal/link?
-  ideal: The data were released through the NF Data Portal and at the Synapse project site http://synapse.org/jhubiobank.
-  choices:
-  - dbGaP and GEO
-  - TCGA Data Portal
-  - NF Data Portal and the Synapse project at http://synapse.org/jhubiobank
-  - Not in knowledgebase
-  correct_choice_index: 2
-  passage_indices: [1]
-  difficulty: easy
-  question_type: factual
-- id: PMC7305302-03
-  pmcid: PMC7305302
-  author: gpt-5.4
   question: How were patients with NF1 identified and enrolled for the Johns Hopkins biospecimen repository, and what clinical
     information was recorded after tumor collection?
-  user_query: how did they recruit the nf1 patients and what info did they save from charts
+  user_query: how did they recruit the nf1 patients for jhu biobank and what info did they save from charts
   ideal: Patients were identified when they were scheduled for a clinically indicated resection or biopsy of an NF1-associated
     tumor, based on surgical schedule review and communication from the clinical team. After eligibility review, written informed
     consent was obtained, and blood was collected from most patients on the day of surgery. After tumor collection, the medical
@@ -52,13 +36,13 @@
   passage_indices: [14, 15]
   difficulty: medium
   question_type: methodological
-- id: PMC7305302-04
+- id: PMC7305302-03
   pmcid: PMC7305302
   author: gpt-5.4
   question: In the Johns Hopkins NF1 biospecimen repository, what animals and implantation strategy were used to generate
     patient-derived xenografts (PDX), and what overall success rate was reported for attempted malignant peripheral nerve
     sheath tumor (MPNST) PDX generation?
-  user_query: what mice did they use for the nf1 pdx models and how often did mpnsts take
+  user_query: what mice did they use for the jhu nf1 pdx models and how well did mpnsts take
   ideal: PDX models were generated in adult NOD scid gamma mice. Tumor pieces about 2-3 mm were dipped in ice-cold Matrigel
     and implanted into the flank, pre-tibial space, or pre-sacral space. The reported overall success rate for attempted MPNST
     PDX generation was 50%.
@@ -72,12 +56,12 @@
   passage_indices: [24, 25]
   difficulty: medium
   question_type: methodological
-- id: PMC7305302-05
+- id: PMC7305302-04
   pmcid: PMC7305302
   author: gpt-5.4
   question: How were surgically resected NF1-associated tumors processed for preservation and quality control before banking
-    in the repository?
-  user_query: how did they store/qc the tumor pieces before banking
+    in the JHU repository?
+  user_query: how did they store/qc the jhu tumor pieces before banking
   ideal: After resection, specimens were sent immediately to surgical pathology for inspection to confirm adequate tumor tissue
     for diagnosis. Approved tissue was transported to the lab, cut into 5-10 mm aliquots under sterile conditions, and preserved
     in neutral buffered formalin, cell freezing medium, and/or by snap-freezing on dry ice. For pathologically heterogeneous
@@ -93,12 +77,12 @@
   passage_indices: [17, 18, 19]
   difficulty: medium
   question_type: methodological
-- id: PMC7305302-06
+- id: PMC7305302-05
   pmcid: PMC7305302
   author: gpt-5.4
-  question: What evidence was used to show that patient-derived cell lines and xenografts preserved the genomic features of
+  question: What evidence was used to show that JHU patient-derived cell lines and xenografts preserved the genomic features of
     the original NF1-associated tumors?
-  user_query: how did they prove the cell lines and pdxs still matched the original tumors genomically
+  user_query: what proof jhu cell lines and pdxs still matched the original tumors genomically
   ideal: They compared exome-seq mutational profiles of commonly mutated genes between the original tumor and the derived
     models, and they also compared copy-ratio alterations. In patient 2-031, the reduction in copy ratio near the NF1 locus
     on chromosome 17 seen in the tumor was preserved in the derived cell line and xenograft, supporting genetic fidelity.
@@ -112,12 +96,12 @@
   passage_indices: [44, 45, 46]
   difficulty: hard
   question_type: methodological
-- id: PMC7305302-07
+- id: PMC7305302-06
   pmcid: PMC7305302
   author: gpt-5.4
   question: What major research bottleneck in NF1 nerve sheath tumor therapy development was the Johns Hopkins biospecimen
     repository designed to overcome, and how was the repository structured to address it?
-  user_query: what problem was this nf1 biobank trying to fix, and what did they build to fix it
+  user_query: what problem was nf1 jhu biobank trying to fix, and what did they build to fix it
   ideal: The repository was designed to overcome the lack of access to primary human NF1 tumor tissue and the limited availability
     of relevant model systems, which had slowed development of new therapies, especially nonsurgical options for plexiform
     neurofibromas. To address this, it banked blood fractions and multiple NF1-associated tumor types, generated patient-derived
@@ -126,20 +110,19 @@
   choices:
   - A shortage of primary human NF1 tumor tissue and validated models; the repository banks multiple NF1 tumor and blood specimens,
     generates cell lines and xenografts, adds clinical/genomic/transcriptomic annotation, and shares data publicly
-  - A lack of bacterial culture methods for NF1 skin lesions; the repository therefore focused on microbial sequencing of
-    skin swabs only
-  - Poor MRI availability for NF1 patients; the repository therefore stored imaging files but no tissue or model systems
+  - A shortage of data to map genomic and epigenomic evolution in NF1 tumors, leading the repository to increase and share data available from single-cell and spatial technologies, especially for plexiform neurofibromas
+  - Poor public availability of histopathology and MRI data for NF1 patients; the repository hugely expands imaging modality data alongside genomic data and model systems and shares data publicly
   - Not in knowledgebase
   correct_choice_index: 0
   passage_indices: [1, 4, 5, 8, 9, 50]
-  difficulty: hard
+  difficulty: medium
   question_type: causal
-- id: PMC7305302-08
+- id: PMC7305302-07
   pmcid: PMC7305302
   author: gpt-5.4
   question: How did the scale of the initial public data release from the Johns Hopkins NF1 biospecimen repository compare
     with the RNA-seq dataset after quality control and with the planned second cohort?
-  user_query: how big was the first nf1 data release, how many rna-seq samples survived qc, and what was coming next
+  user_query: how big was the first jhu nf1 data release, how many rna-seq samples survived qc, and what's coming next
   ideal: The initial release contained genomic and transcriptomic data from 55 tumor samples derived from 23 individuals.
     After RNA-seq quality control, one highly duplicated sample was removed, leaving 28 RNA-seq samples. A second cohort was
     reported to be undergoing sequencing, with exome sequencing for 51 samples and RNA sequencing for 28 additional samples.
