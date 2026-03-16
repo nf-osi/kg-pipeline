@@ -126,8 +126,8 @@
 - id: PMC3484870-08
   pmcid: PMC3484870
   author: claude-opus-4-6
-  question: Why do the authors argue that zebrafish nf1a and nf1b have redundant functions, and what is the evidence from
-    both embryonic development and tumorigenesis?
+  question: What evidence supports functional redundancy between zebrafish nf1a and nf1b in both embryonic development and
+    tumorigenesis?
   user_query: evidence for nf1a nf1b redundancy in zebrafish development and cancer
   ideal: In embryonic development, homozygous loss of either nf1a or nf1b alone produces viable, fertile, phenotypically normal
     animals, whereas combined loss of both genes (nf1a-/-; nf1b-/-) results in larval lethality, OPC/Schwann cell hyperplasia,

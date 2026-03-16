@@ -106,8 +106,8 @@
 - id: PMC9221468-07
   pmcid: PMC9221468
   author: claude-opus-4-6
-  question: What drug combination strategy did the authors propose using the concept of 'drug fingerprints', and how do vertical
-    and horizontal combination strategies differ in this context?
+  question: What drug combination strategy uses the concept of 'drug fingerprints', and how do vertical and horizontal combination
+    strategies differ?
   user_query: how did they use drug fingerprints to pick drug combos, and what's the diff between vertical and horizontal
     strategies?
   ideal: Drug fingerprints were defined by the pattern of correlation between drug responses and conserved network module
@@ -128,8 +128,8 @@
 - id: PMC9221468-08
   pmcid: PMC9221468
   author: claude-opus-4-6
-  question: Why did the authors argue that AZD-1480 combined with Selumetinib would be a logical drug combination to investigate,
-    and what are the known limitations of AZD-1480 as a monotherapy?
+  question: Why would AZD-1480 combined with Selumetinib be a logical drug combination to investigate, and what are the known
+    limitations of AZD-1480 as a monotherapy?
   user_query: why is AZD-1480 + selumetinib interesting but AZD-1480 alone failed?
   ideal: AZD-1480 is an oral small molecule ATP-competitive JAK2/3 inhibitor. Its combination with Selumetinib is logical
     because JAK/STAT and RAS/MEK signaling are parallel and synonymous pathways in promoting cell mitosis. JAK2 signaling

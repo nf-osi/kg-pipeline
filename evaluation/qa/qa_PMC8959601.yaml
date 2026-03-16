@@ -216,12 +216,12 @@
 - id: PMC8959601-13
   pmcid: PMC8959601
   author: claude-opus-4-6
-  question: What limitation of the in vivo P2ry14 knockout study is acknowledged by the authors regarding the cell type specificity
-    of the observed effects?
-  user_query: what limitation did the authors mention about the P2ry14 knockout being global?
-  ideal: Because a global knockout was used (not a conditional knockout), the authors cannot exclude the possibility that
-    some of the observed in vivo effects are SCP-independent, since P2ry14 is also expressed in immune cells and in small
-    and larger diameter sensory neurons.
+  question: What limitation exists regarding the cell type specificity of the observed effects in the in vivo P2ry14 knockout
+    experiments?
+  user_query: what limitation about the P2ry14 knockout being global?
+  ideal: Because a global knockout was used (not a conditional knockout), it cannot be excluded that the observed changes
+    in microglial activation state could be due to indirect effects from P2ry14 loss in other cell types rather than direct
+    microglial effects.
   choices:
   - The knockout may cause embryonic lethality confounding results
   - Since a global knockout was used, some in vivo effects may be SCP-independent due to P2ry14 expression in immune cells

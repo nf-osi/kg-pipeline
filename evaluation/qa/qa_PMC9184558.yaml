@@ -191,11 +191,11 @@
 - id: PMC9184558-12
   pmcid: PMC9184558
   author: claude-opus-4-6
-  question: What are the stated limitations of the isogenic cell line panel study?
-  user_query: what limitations do the authors mention?
-  ideal: The study was performed in non-cancerous cell lines from tissues of origin that may not best reflect the biology
-    of the targeted cancer pathways. Additionally, not all targeted genes were represented by two or more knockouts in every
-    background, which may make results for these genes less reproducible than originally desired.
+  question: What are the key limitations of the isogenic cell line panel experiments?
+  user_query: what limitations of the cell line experiments?
+  ideal: The experiments were performed in non-cancerous cell lines from tissues of origin that may not best reflect tumor
+    biology. Additionally, the isogenic model relied on a single NF1 mutation (c.2041C>T) which may not represent the full
+    spectrum of NF1 patient mutations.
   choices:
   - The CRISPR system had off-target effects that could not be controlled
   - The study used non-cancerous cell lines that may not reflect cancer biology, and not all genes had two or more knockouts

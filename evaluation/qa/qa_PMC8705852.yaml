@@ -1,10 +1,10 @@
 - id: PMC8705852-01
   pmcid: PMC8705852
   author: gemini-3.1-pro-preview
-  question: What is the specific genetic variant in exon 13 of the NF1 gene that creates an intragenic cryptic splice site,
-    as modeled in this study?
+  question: What is the specific genetic variant in exon 13 of the NF1 gene that creates an intragenic cryptic splice site?
   user_query: which nf1 variant did they look at in exon 13?
-  ideal: The study modeled the recurrent pathogenic variant c.1466A>G (p.Y489C) in exon 13 of the NF1 gene.
+  ideal: The recurrent pathogenic variant c.1466A>G (p.Y489C) in exon 13 of the NF1 gene creates an intragenic cryptic splice
+    site, resulting in a 57 nt deletion that produces an in-frame deletion of 19 amino acids.
   choices:
   - c.288+2025T>G
   - Not in knowledgebase

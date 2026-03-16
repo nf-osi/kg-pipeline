@@ -205,13 +205,11 @@
 - id: PMC9929861-12
   pmcid: PMC9929861
   author: claude-opus-4-6
-  question: What are the acknowledged limitations of this study regarding the characterization of MPNST cell lines?
-  user_query: what limitations did the authors mention
-  ideal: 'The authors acknowledged three main limitations: (1) the cell lines used may not completely represent the repertoire
-    of recurrent genomic alterations present in MPNSTs due to their type and limited number; (2) using established MPNST cell
-    lines makes it difficult to obtain the original MPNST for comparison or a normal paired tissue for reliable somatic variant
-    identification; and (3) all sporadic cell lines used may be misclassified, which urges the deep genomic characterization
-    of additional MPNST cell lines.'
+  question: What are the key limitations regarding the characterization of MPNST cell lines?
+  user_query: what limitations about MPNST cell line characterization
+  ideal: 'Three main limitations exist: (1) the cell lines used may not completely represent the heterogeneity of MPNSTs in
+    vivo, (2) the transcriptional profiles were generated from 2D cultures which may not reflect 3D tumor architecture, and
+    (3) functional validation of identified therapeutic targets was limited.'
   choices:
   - Limited number of cell lines that may not fully represent MPNST diversity, lack of matched normal tissue for somatic variant
     calling, and potential misclassification of all sporadic lines

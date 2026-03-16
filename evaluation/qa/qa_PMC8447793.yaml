@@ -54,8 +54,8 @@
 - id: PMC8447793-04
   pmcid: PMC8447793
   author: gemini-3.1-pro-preview
-  question: What specific methodological approach was utilized to identify the phosphoproteome alterations distinctly regulated
-    by dominant negative R-Ras in MPNST cells?
+  question: What specific methodological approach was used to identify phosphoproteome alterations distinctly regulated by
+    dominant negative R-Ras in MPNST cells?
   user_query: how did they figure out which proteins R-ras changes the phosphorylation of?
   ideal: The researchers used SILAC (stable-isotopic labeling using amino acids in cell culture) to differentially label MPNST
     cells with (heavy isotope) or without (light isotope) doxycycline-induced DN R-Ras. They then enriched phosphoproteins
