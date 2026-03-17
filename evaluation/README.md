@@ -30,6 +30,7 @@ For example, it is known that the literature can report conflicting evidence: In
 - **Hallucinated content**: LLM-generated ideal answers sometimes include facts not present in the source paper (e.g. have found citation of a specific mutation variant that doesn't appear in the paper). These are corrected against the actual paper text.
 - **Vague study anchoring**: Questions like "What was the CS in the eyeblink conditioning experiments?" or "What are the limitations of the isogenic cell line experiments?" are too generic — the same methodology or finding may appear across multiple indexed papers. Questions are rewritten to better anchor to the specific study (e.g. "In the Nf1+/- mouse eyeblink conditioning study, what was used as the CS?", "What are the key limitations acknowledged in the Cancer Pathway Knockout Panel study?").
 - **Difficulty calibration**: Questions that appear simple in isolation but require cross-paper disambiguation are upgraded from `easy` to `medium`.
+- **Trivial or obvious questions**: Questions where the distractors are implausible or the answer is obvious without retrieval (e.g. asking which standard technique was used when the alternatives are absurd) are removed, as they do not meaningfully test the system.
 
 ### Files
 
@@ -68,25 +69,25 @@ python evaluation/qa/generate_qa.py --validate-only
 ### Dataset Statistics
 
 - **Total Papers**: 14
-- **Total Questions**: 133
-- **Average Questions/Paper**: 9.5
+- **Total Questions**: 130
+- **Average Questions/Paper**: 9.3
 
 #### By Difficulty
-- **Easy**: 34 (25.6%)
-- **Medium**: 61 (45.9%)
-- **Hard**: 38 (28.6%)
+- **Easy**: 31 (23.8%)
+- **Medium**: 61 (46.9%)
+- **Hard**: 38 (29.2%)
 
 #### By Question Type
-- **factual**: 49 (36.8%)
-- **methodological**: 32 (24.1%)
-- **comparative**: 29 (21.8%)
-- **causal**: 14 (10.5%)
-- **inferential**: 9 (6.8%)
+- **factual**: 47 (36.2%)
+- **methodological**: 31 (23.8%)
+- **comparative**: 29 (22.3%)
+- **causal**: 14 (10.8%)
+- **inferential**: 9 (6.9%)
 
 #### By Author/Model
-- **claude-opus-4-6**: 85 (63.9%)
-- **gemini-3.1-pro-preview**: 41 (30.8%)
-- **gpt-5.4**: 7 (5.3%)
+- **claude-opus-4-6**: 83 (63.8%)
+- **gemini-3.1-pro-preview**: 40 (30.8%)
+- **gpt-5.4**: 7 (5.4%)
 
 
 <!-- END AUTO-GENERATED QA STATS -->
