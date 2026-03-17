@@ -49,6 +49,9 @@ def main():
             print(f"Warning: {qa_file} has unexpected format, skipping", file=sys.stderr)
             continue
 
+        # Get pmid from file-level metadata
+        file_pmid = data.get("pmid", "") if isinstance(data, dict) else ""
+
         for q in questions:
             qid = q["id"]
             if qid in all_questions:
@@ -58,6 +61,7 @@ def main():
             all_questions[qid] = {
                 "question": q["question"],
                 "pmcid": q["pmcid"],
+                "pmid": str(file_pmid),
                 "passage_indices": q["passage_indices"],
                 "ideal": q["ideal"],
                 "choices": q["choices"],
