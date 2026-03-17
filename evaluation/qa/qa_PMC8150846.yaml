@@ -2,27 +2,9 @@ title: Neurofibromin Deficiency and Extracellular Matrix Cooperate to Increase T
   Potential through FAK-Dependent Signaling
 pmcid: PMC8150846
 pmid: '34066061'
-reviewer: null
+reviewer: https://orcid.org/0000-0003-1488-6730
 questions:
 - id: PMC8150846-01
-  pmcid: PMC8150846
-  author: gemini-3.1-pro-preview
-  question: What gene is mutated in Neurofibromatosis type 1 (NF1) and what protein
-    does it encode?
-  user_query: nf1 mutation causes loss of what protein
-  ideal: Neurofibromatosis type 1 is caused by inactivating mutations in the NF1 gene,
-    which encodes the protein neurofibromin (Nfn).
-  choices:
-  - FAK gene; focal adhesion kinase
-  - MEK gene; MAPKK
-  - NF1 gene; neurofibromin
-  - Not in knowledgebase
-  correct_choice_index: 2
-  passage_indices:
-  - 6
-  difficulty: easy
-  question_type: factual
-- id: PMC8150846-02
   pmcid: PMC8150846
   author: gemini-3.1-pro-preview
   question: How does the phosphorylation of ERK1/2 in response to PDGF-BB stimulation
