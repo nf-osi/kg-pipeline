@@ -2,14 +2,14 @@ title: 'MicroRNA Expression Profiles in Autism Spectrum Disorder: Role for miR-1
   in Immunomodulation'
 pmcid: PMC8469245
 pmid: '34575699'
-reviewer: null
+reviewer: https://orcid.org/0000-0003-1488-6730
 questions:
 - id: PMC8469245-01
   pmcid: PMC8469245
   author: gemini-3.1-pro-preview
-  question: What type of cell line was utilized to examine differential microRNA expression
-    in individuals with autism spectrum disorder?
-  user_query: cell lines used for mirna in autism study?
+  question: In the miR-181 immunomodulation study of autism spectrum disorder, what
+    type of cell line was used to examine differential microRNA expression?
+  user_query: what cell lines were used in the miR-181 ASD miRNA study?
   ideal: The study utilized lymphoblastoid cell lines (LCLs) derived from individuals
     with autism spectrum disorder, typically developing siblings, and unrelated controls.
   choices:
@@ -83,9 +83,9 @@ questions:
 - id: PMC8469245-05
   pmcid: PMC8469245
   author: gemini-3.1-pro-preview
-  question: In the bioinformatics analysis of the small RNAseq data, how was the normalization
+  question: In the ASD LCL small RNA-seq miRNA profiling study, how was the normalization
     of sequence counts achieved for each sample?
-  user_query: how did they normalize the rna seq counts in the asd mirna study?
+  user_query: how did they normalize counts in the ASD LCL small RNA-seq study?
   ideal: Normalization was achieved by dividing the sequence counts by a library size
     parameter for the corresponding sample, which is the median value of the ratio
     between the counts of a specific sample and a pseudo-reference sample.

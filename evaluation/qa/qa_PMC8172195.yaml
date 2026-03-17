@@ -2,7 +2,7 @@ title: 'A novel mutation in NF1 gene of patient with Neurofibromatosis type 1: A
   report and functional study'
 pmcid: PMC8172195
 pmid: '33764694'
-reviewer: null
+reviewer: https://orcid.org/0000-0003-1488-6730
 questions:
 - id: PMC8172195-01
   pmcid: PMC8172195
@@ -26,9 +26,9 @@ questions:
 - id: PMC8172195-02
   pmcid: PMC8172195
   author: gemini-3.1-pro-preview
-  question: Which cell line was used to perform the in vitro functional studies assessing
-    the effect of the novel NF1 mutation on Ras/Erk signaling?
-  user_query: what cells did they use to test NF1 mutation signaling?
+  question: In the functional study of the NF1 c.2064delGGATGCAGCGG mutation, which
+    cell line was used to assess the effect on Ras/Erk signaling?
+  user_query: what cells did they use to test the c.2064del NF1 mutation signaling?
   ideal: Human HEK293T cells were used for the transfection of wild-type and mutant
     NF1 plasmids to study Ras/Erk signaling.
   choices:
@@ -109,9 +109,10 @@ questions:
 - id: PMC8172195-06
   pmcid: PMC8172195
   author: gemini-3.1-pro-preview
-  question: What were the effects of knocking down NF1 using shRNAs in HEK293T cells
-    on the Ras and Erk signaling pathways?
-  user_query: what happened to ras and erk when they knocked down NF1?
+  question: In the NF1 c.2064delGGATGCAGCGG functional study, what were the effects
+    of knocking down NF1 using shRNAs in HEK293T cells on Ras and Erk signaling?
+  user_query: what happened to ras and erk when they knocked down NF1 in the c.2064del
+    study?
   ideal: Knocking down NF1 significantly activated the Ras-GTP and phospho-Erk1/2
     signaling pathways in HEK293T cells.
   choices:
@@ -127,9 +128,9 @@ questions:
 - id: PMC8172195-07
   pmcid: PMC8172195
   author: gemini-3.1-pro-preview
-  question: Which assay was utilized to determine the levels of GTP-bound Ras in HEK293T
-    cells following NF1 knockdown?
-  user_query: how did they measure active ras in the study?
+  question: In the NF1 c.2064delGGATGCAGCGG functional study, which assay was used
+    to determine the levels of GTP-bound Ras in HEK293T cells?
+  user_query: how did they measure active ras in the c.2064del NF1 mutation study?
   ideal: A Ras activation assay kit was used, where GTP-bound Ras levels were determined
     by incubating cell lysates with Raf-1 Ras-binding domain conjugated to agarose
     beads, followed by immunoblotting with an anti-pan-Ras antibody.
