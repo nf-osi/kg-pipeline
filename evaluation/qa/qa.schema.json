@@ -64,6 +64,10 @@
       "description": "Question category for stratified evaluation: factual = single-fact lookup, causal = cause-effect reasoning, comparative = contrasting entities or findings, inferential = drawing conclusions beyond stated facts, methodological = study design, techniques, or limitations, hypothetical = counterfactual or speculative scenarios, other = does not fit the above categories",
       "type": "string",
       "enum": ["factual", "causal", "comparative", "inferential", "methodological", "hypothetical", "other"]
+    },
+    "editor_note": {
+      "description": "Free-text note from the editor/curator, e.g. to flag cross-paper overlap or justify difficulty rating. Not used at eval time.",
+      "type": "string"
     }
   },
   "required": [

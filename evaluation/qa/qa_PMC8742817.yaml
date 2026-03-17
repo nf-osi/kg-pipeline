@@ -1,7 +1,13 @@
+title: Oligosarcomas, IDH-mutant are distinct and aggressive
+pmcid: PMC8742817
+pmid: '34967922'
+reviewer: null
+questions:
 - id: PMC8742817-01
   pmcid: PMC8742817
   author: claude-opus-4-6
-  question: How many oligosarcoma cases from how many patients were reported in this series?
+  question: How many oligosarcoma cases from how many patients were reported in this
+    series?
   user_query: how many oligosarcoma cases were in the study
   ideal: The study reported 24 IDH-mutant oligosarcomas from 23 patients.
   choices:
@@ -10,7 +16,9 @@
   - 12 oligosarcomas from 12 patients
   - Not in knowledgebase
   correct_choice_index: 0
-  passage_indices: [1, 7]
+  passage_indices:
+  - 1
+  - 7
   difficulty: easy
   question_type: factual
 - id: PMC8742817-02
@@ -18,225 +26,264 @@
   author: claude-opus-4-6
   question: What molecular features define oligodendroglioma according to the study?
   user_query: what defines oligodendroglioma molecularly
-  ideal: Oligodendrogliomas are defined at the molecular level by the presence of an IDH mutation and codeletion of chromosomal
-    arms 1p and 19q.
+  ideal: Oligodendrogliomas are defined at the molecular level by the presence of
+    an IDH mutation and codeletion of chromosomal arms 1p and 19q.
   choices:
   - IDH mutation and ATRX loss
   - IDH mutation and codeletion of chromosomal arms 1p and 19q
   - TERT promoter mutation and CDKN2A deletion
   - Not in knowledgebase
   correct_choice_index: 1
-  passage_indices: [1, 5]
+  passage_indices:
+  - 1
+  - 5
   difficulty: easy
   question_type: factual
 - id: PMC8742817-03
   pmcid: PMC8742817
   author: claude-opus-4-6
-  question: What was the underlying mechanism explaining the loss of 1p/19q codeletion in some oligosarcomas while it was
-    present in the primary lesions?
+  question: What was the underlying mechanism explaining the loss of 1p/19q codeletion
+    in some oligosarcomas while it was present in the primary lesions?
   user_query: why did some oligosarcomas lose 1p/19q codeletion?
-  ideal: Copy number neutral loss of heterozygosity (CN-LOH) was determined as the underlying mechanism. The retained chromosomal
-    arm was duplicated, resulting in allelic imbalance without deletion in log-R ratio.
+  ideal: Copy number neutral loss of heterozygosity (CN-LOH) was determined as the
+    underlying mechanism. The retained chromosomal arm was duplicated, resulting in
+    allelic imbalance without deletion in log-R ratio.
   choices:
   - Complete chromosomal arm deletion followed by re-duplication
   - Copy number neutral loss of heterozygosity (CN-LOH)
   - Chromothripsis of chromosomes 1 and 19
   - Not in knowledgebase
   correct_choice_index: 1
-  passage_indices: [1, 49]
+  passage_indices:
+  - 1
+  - 49
   difficulty: medium
   question_type: causal
 - id: PMC8742817-04
   pmcid: PMC8742817
   author: claude-opus-4-6
-  question: What was the frequency of homozygous CDKN2A/B deletions in oligosarcomas compared to their primary lesions, and
-    was the difference statistically significant?
+  question: What was the frequency of homozygous CDKN2A/B deletions in oligosarcomas
+    compared to their primary lesions, and was the difference statistically significant?
   user_query: CDKN2A deletion rate in oligosarcomas vs primary tumors
-  ideal: CDKN2A/B locus deletions were present in 83% (20/24) of oligosarcomas compared to 25% (3/12) of primary lesions,
-    a statistically significant increase (p = 0.000593, chi-square). Of the oligosarcoma deletions, 63% (15/24) were homozygous.
+  ideal: CDKN2A/B locus deletions were present in 83% (20/24) of oligosarcomas compared
+    to 25% (3/12) of primary lesions, a statistically significant increase (p = 0.000593,
+    chi-square). Of the oligosarcoma deletions, 63% (15/24) were homozygous.
   choices:
   - 83% in oligosarcomas vs 25% in primary lesions (p = 0.000593)
   - 63% in oligosarcomas vs 10% in primary lesions (p = 0.01)
   - 50% in oligosarcomas vs 25% in primary lesions (p = 0.05)
   - Not in knowledgebase
   correct_choice_index: 0
-  passage_indices: [52]
+  passage_indices:
+  - 52
   difficulty: medium
   question_type: comparative
 - id: PMC8742817-05
   pmcid: PMC8742817
   author: claude-opus-4-6
-  question: Which three of the top 10 upregulated proteins in oligosarcoma identified by proteomic profiling were muscle or
-    smooth muscle specific?
+  question: Which three of the top 10 upregulated proteins in oligosarcoma identified
+    by proteomic profiling were muscle or smooth muscle specific?
   user_query: top muscle proteins upregulated in oligosarcoma proteomics
-  ideal: The three muscle or smooth muscle specific proteins among the top 10 upregulated in oligosarcoma were TAGLN, AHNAK,
-    and DES.
+  ideal: The three muscle or smooth muscle specific proteins among the top 10 upregulated
+    in oligosarcoma were TAGLN, AHNAK, and DES.
   choices:
   - ACTA2, CALD1, and NF1
   - TAGLN, AHNAK, and DES
   - YAP1, STAG2, and OLIG2
   - Not in knowledgebase
   correct_choice_index: 1
-  passage_indices: [55]
+  passage_indices:
+  - 55
   difficulty: medium
   question_type: factual
 - id: PMC8742817-06
   pmcid: PMC8742817
   author: claude-opus-4-6
-  question: How did NF1 and YAP1 protein expression differ between oligosarcomas and conventional oligodendrogliomas as assessed
-    by immunohistochemistry?
+  question: How did NF1 and YAP1 protein expression differ between oligosarcomas and
+    conventional oligodendrogliomas as assessed by immunohistochemistry?
   user_query: NF1 and YAP1 expression oligosarcoma vs oligodendroglioma
-  ideal: In oligosarcomas, 7/11 (63.6%) showed tumor cell-specific loss of NF1 expression, while NF1 was retained in all primary
-    lesions (9/9) and in 20/20 reference oligodendrogliomas. YAP1 was strongly positive in 10/11 (91%) oligosarcomas, while
-    only 1/20 (5%) conventional oligodendrogliomas showed YAP1 staining with only a subset of cells positive.
+  ideal: In oligosarcomas, 7/11 (63.6%) showed tumor cell-specific loss of NF1 expression,
+    while NF1 was retained in all primary lesions (9/9) and in 20/20 reference oligodendrogliomas.
+    YAP1 was strongly positive in 10/11 (91%) oligosarcomas, while only 1/20 (5%)
+    conventional oligodendrogliomas showed YAP1 staining with only a subset of cells
+    positive.
   choices:
-  - NF1 was lost in ~64% of oligosarcomas but retained in all oligodendrogliomas; YAP1 was positive in ~91% of oligosarcomas
-    but only ~5% of oligodendrogliomas
+  - NF1 was lost in ~64% of oligosarcomas but retained in all oligodendrogliomas;
+    YAP1 was positive in ~91% of oligosarcomas but only ~5% of oligodendrogliomas
   - NF1 was upregulated in oligosarcomas; YAP1 was lost in oligosarcomas
   - Both NF1 and YAP1 were consistently lost in oligosarcomas compared to oligodendrogliomas
   - Not in knowledgebase
   correct_choice_index: 0
-  passage_indices: [58]
+  passage_indices:
+  - 58
   difficulty: medium
   question_type: comparative
 - id: PMC8742817-07
   pmcid: PMC8742817
   author: claude-opus-4-6
-  question: What was the median overall survival after occurrence of oligosarcoma, and how did survival of patients with oligosarcoma
-    as first recurrence compare to patients with grade 3 oligodendroglioma as first recurrence?
+  question: What was the median overall survival after occurrence of oligosarcoma,
+    and how did survival of patients with oligosarcoma as first recurrence compare
+    to patients with grade 3 oligodendroglioma as first recurrence?
   user_query: survival oligosarcoma patients vs grade 3 oligo recurrence
-  ideal: The median overall survival after occurrence of oligosarcoma was 2.5 years, and for patients with oligosarcoma as
-    first recurrence it was 1.8 years. Survival was highly significantly poorer for oligosarcoma as first recurrence compared
+  ideal: The median overall survival after occurrence of oligosarcoma was 2.5 years,
+    and for patients with oligosarcoma as first recurrence it was 1.8 years. Survival
+    was highly significantly poorer for oligosarcoma as first recurrence compared
     to conventional grade 3 oligodendroglioma as first recurrence (p = 0.0038).
   choices:
-  - Median OS after oligosarcoma was 2.5 years; oligosarcoma as first recurrence had significantly worse survival than grade
-    3 oligodendroglioma (p = 0.0038)
-  - Median OS after oligosarcoma was 5 years; no significant difference compared to grade 3 oligodendroglioma
-  - Median OS after oligosarcoma was 8.3 years; oligosarcoma showed better survival than grade 3 oligodendroglioma
+  - Median OS after oligosarcoma was 2.5 years; oligosarcoma as first recurrence had
+    significantly worse survival than grade 3 oligodendroglioma (p = 0.0038)
+  - Median OS after oligosarcoma was 5 years; no significant difference compared to
+    grade 3 oligodendroglioma
+  - Median OS after oligosarcoma was 8.3 years; oligosarcoma showed better survival
+    than grade 3 oligodendroglioma
   - Not in knowledgebase
   correct_choice_index: 0
-  passage_indices: [67]
+  passage_indices:
+  - 67
   difficulty: hard
   question_type: comparative
 - id: PMC8742817-08
   pmcid: PMC8742817
   author: claude-opus-4-6
-  question: What immunohistochemical changes distinguish oligosarcomas from their precursor oligodendrogliomas with respect
-    to p53, H3K27me3, and OLIG2?
+  question: What immunohistochemical changes distinguish oligosarcomas from their
+    precursor oligodendrogliomas with respect to p53, H3K27me3, and OLIG2?
   user_query: IHC differences oligosarcoma vs precursor - p53 H3K27me3 OLIG2
-  ideal: Oligosarcomas showed accumulation of p53 (11/12, 91.7%) which was absent in primary oligodendrogliomas; re-gain of
-    H3K27me3 expression (10/11, 90.9%) which was lost in primary oligodendrogliomas (0/4 positive); and loss of OLIG2 (13/14
+  ideal: Oligosarcomas showed accumulation of p53 (11/12, 91.7%) which was absent
+    in primary oligodendrogliomas; re-gain of H3K27me3 expression (10/11, 90.9%) which
+    was lost in primary oligodendrogliomas (0/4 positive); and loss of OLIG2 (13/14
     negative) whereas all primary tumors were OLIG2 positive.
   choices:
-  - Oligosarcomas gained p53 accumulation, regained H3K27me3, and lost OLIG2 compared to precursors
+  - Oligosarcomas gained p53 accumulation, regained H3K27me3, and lost OLIG2 compared
+    to precursors
   - Oligosarcomas lost p53, lost H3K27me3, and gained OLIG2 compared to precursors
   - Oligosarcomas showed no change in p53 but gained H3K27me3 and retained OLIG2
   - Not in knowledgebase
   correct_choice_index: 0
-  passage_indices: [1, 46]
+  passage_indices:
+  - 1
+  - 46
   difficulty: hard
   question_type: comparative
 - id: PMC8742817-09
   pmcid: PMC8742817
   author: claude-opus-4-6
-  question: What technique was used for deep proteomic profiling of oligosarcomas and conventional grade 3 oligodendrogliomas,
-    and how many samples of each were analyzed?
+  question: What technique was used for deep proteomic profiling of oligosarcomas
+    and conventional grade 3 oligodendrogliomas, and how many samples of each were
+    analyzed?
   user_query: what method did they use for proteomics and how many samples
-  ideal: Deep proteomic profiling was performed using liquid chromatography coupled mass spectrometry (LC/MS) on 9 oligosarcomas
-    and 10 conventional CNS WHO grade 3 oligodendrogliomas.
+  ideal: Deep proteomic profiling was performed using liquid chromatography coupled
+    mass spectrometry (LC/MS) on 9 oligosarcomas and 10 conventional CNS WHO grade
+    3 oligodendrogliomas.
   choices:
   - Western blotting on 12 oligosarcomas and 12 oligodendrogliomas
   - LC/MS on 9 oligosarcomas and 10 grade 3 oligodendrogliomas
   - ELISA on 24 oligosarcomas and 21 oligodendrogliomas
   - Not in knowledgebase
   correct_choice_index: 1
-  passage_indices: [55]
+  passage_indices:
+  - 55
   difficulty: easy
   question_type: methodological
 - id: PMC8742817-10
   pmcid: PMC8742817
   author: claude-opus-4-6
-  question: What DNA methylation array platforms were used for generating methylation profiles, and what parameters were employed
-    for the t-SNE analysis?
+  question: What DNA methylation array platforms were used for generating methylation
+    profiles, and what parameters were employed for the t-SNE analysis?
   user_query: what arrays and tSNE settings did they use for methylation analysis
-  ideal: DNA methylation profiles were generated using the Infinium HumanMethylation450 (450k) BeadChip or Infinium MethylationEPIC
-    (850k) BeadChip array. The t-SNE plot was computed using the R package Rtsne with the 25,000 most variable CpG sites,
+  ideal: DNA methylation profiles were generated using the Infinium HumanMethylation450
+    (450k) BeadChip or Infinium MethylationEPIC (850k) BeadChip array. The t-SNE plot
+    was computed using the R package Rtsne with the 25,000 most variable CpG sites,
     3000 iterations, and a perplexity value of 10.
   choices:
-  - 450k and 850k BeadChip arrays; t-SNE with 25,000 CpG sites, 3000 iterations, perplexity 10
+  - 450k and 850k BeadChip arrays; t-SNE with 25,000 CpG sites, 3000 iterations, perplexity
+    10
   - RRBS sequencing; t-SNE with 10,000 CpG sites, 1000 iterations, perplexity 30
   - Whole-genome bisulfite sequencing; PCA with 50,000 CpG sites
   - Not in knowledgebase
   correct_choice_index: 0
-  passage_indices: [14]
+  passage_indices:
+  - 14
   difficulty: medium
   question_type: methodological
 - id: PMC8742817-11
   pmcid: PMC8742817
   author: claude-opus-4-6
-  question: Based on the evidence presented, what diagnostic criteria can be used to establish a diagnosis of oligosarcoma?
+  question: Based on the evidence presented, what diagnostic criteria can be used
+    to establish a diagnosis of oligosarcoma?
   user_query: how do you diagnose oligosarcoma
-  ideal: The diagnosis can be based on the combined presence of (a) sarcomatous histology, (b) IDH mutation, and (c) TERT
-    promoter mutation and/or 1p/19q codeletion. In unresolved cases, the characteristic DNA methylation profile can be used
-    for diagnosis.
+  ideal: The diagnosis can be based on the combined presence of (a) sarcomatous histology,
+    (b) IDH mutation, and (c) TERT promoter mutation and/or 1p/19q codeletion. In
+    unresolved cases, the characteristic DNA methylation profile can be used for diagnosis.
   choices:
-  - Sarcomatous histology + IDH mutation + TERT promoter mutation and/or 1p/19q codeletion; or characteristic DNA methylation
-    profile
+  - Sarcomatous histology + IDH mutation + TERT promoter mutation and/or 1p/19q codeletion;
+    or characteristic DNA methylation profile
   - ATRX loss + IDH mutation + CDKN2A deletion
   - p53 accumulation + NF1 loss + YAP1 overexpression
   - Not in knowledgebase
   correct_choice_index: 0
-  passage_indices: [1, 81]
+  passage_indices:
+  - 1
+  - 81
   difficulty: hard
   question_type: factual
 - id: PMC8742817-12
   pmcid: PMC8742817
   author: claude-opus-4-6
-  question: How did the frequency of chromosome 6q loss differ between oligosarcomas and conventional oligodendrogliomas?
+  question: How did the frequency of chromosome 6q loss differ between oligosarcomas
+    and conventional oligodendrogliomas?
   user_query: chr 6q loss in oligosarcomas vs oligodendrogliomas
-  ideal: Chromosome 6q loss was present in 50% of oligosarcomas but was not detected in conventional oligodendrogliomas.
+  ideal: Chromosome 6q loss was present in 50% of oligosarcomas but was not detected
+    in conventional oligodendrogliomas.
   choices:
   - 6q loss occurred in 50% of oligosarcomas but was not detected in oligodendrogliomas
   - 6q loss was equally frequent in both groups at about 30%
   - 6q loss was more frequent in oligodendrogliomas than in oligosarcomas
   - Not in knowledgebase
   correct_choice_index: 0
-  passage_indices: [52]
+  passage_indices:
+  - 52
   difficulty: easy
   question_type: comparative
 - id: PMC8742817-13
   pmcid: PMC8742817
   author: claude-opus-4-6
-  question: Why might p53 accumulation in oligosarcomas not be fully explained by TP53 mutations, and what was the observed
-    frequency of each?
+  question: Why might p53 accumulation in oligosarcomas not be fully explained by
+    TP53 mutations, and what was the observed frequency of each?
   user_query: is p53 accumulation in oligosarcomas explained by TP53 mutations
-  ideal: Strong nuclear p53 expression was found in 11/12 (91.7%) oligosarcomas, but pathogenic TP53 mutations were detected
-    in only 2/12. Only one of the two mutations (K132N, G112S) was the type expected to cause nuclear accumulation, while
-    the other was a protein-truncating stop-gain mutation. Thus, the very high frequency of p53 accumulation is not sufficiently
-    explained by TP53 mutations alone.
+  ideal: Strong nuclear p53 expression was found in 11/12 (91.7%) oligosarcomas, but
+    pathogenic TP53 mutations were detected in only 2/12. Only one of the two mutations
+    (K132N, G112S) was the type expected to cause nuclear accumulation, while the
+    other was a protein-truncating stop-gain mutation. Thus, the very high frequency
+    of p53 accumulation is not sufficiently explained by TP53 mutations alone.
   choices:
-  - p53 accumulated in ~92% of oligosarcomas but TP53 mutations were found in only ~17%, indicating other mechanisms contribute
-  - p53 accumulation was present in 50% of cases and fully explained by TP53 mutations in all of them
+  - p53 accumulated in ~92% of oligosarcomas but TP53 mutations were found in only
+    ~17%, indicating other mechanisms contribute
+  - p53 accumulation was present in 50% of cases and fully explained by TP53 mutations
+    in all of them
   - TP53 mutations were found in all oligosarcomas explaining the p53 accumulation
   - Not in knowledgebase
   correct_choice_index: 0
-  passage_indices: [73]
+  passage_indices:
+  - 73
   difficulty: hard
   question_type: inferential
 - id: PMC8742817-14
   pmcid: PMC8742817
   author: claude-opus-4-6
-  question: What was the range of time between primary diagnosis of oligodendroglioma and manifestation of oligosarcoma, and
-    could oligosarcomas also occur de novo?
-  user_query: how long between initial oligo diagnosis and oligosarcoma, can it be de novo
-  ideal: The time span between primary diagnosis of oligodendroglioma and manifestation of oligosarcoma ranged from 1.2 to
-    32 years. Yes, for three patients the oligosarcoma was the first manifestation of a brain tumor, indicating de novo occurrence.
+  question: What was the range of time between primary diagnosis of oligodendroglioma
+    and manifestation of oligosarcoma, and could oligosarcomas also occur de novo?
+  user_query: how long between initial oligo diagnosis and oligosarcoma, can it be
+    de novo
+  ideal: The time span between primary diagnosis of oligodendroglioma and manifestation
+    of oligosarcoma ranged from 1.2 to 32 years. Yes, for three patients the oligosarcoma
+    was the first manifestation of a brain tumor, indicating de novo occurrence.
   choices:
   - 1.2 to 32 years; yes, three patients presented with de novo oligosarcoma
   - 5 to 10 years; no, all oligosarcomas arose from prior oligodendrogliomas
   - Less than 2 years in all cases; de novo occurrence was not observed
   - Not in knowledgebase
   correct_choice_index: 0
-  passage_indices: [66]
+  passage_indices:
+  - 66
   difficulty: medium
   question_type: factual

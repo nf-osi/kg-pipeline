@@ -376,7 +376,14 @@ def generate_qa_stats(qa_dir):
 
     for qa_file in qa_files:
         with open(qa_file) as f:
-            items = yaml.safe_load(f)
+            data = yaml.safe_load(f)
+
+        if isinstance(data, dict):
+            items = data.get("questions", [])
+        elif isinstance(data, list):
+            items = data
+        else:
+            continue
 
         if not items:
             continue

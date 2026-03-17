@@ -39,10 +39,14 @@ def main():
     all_questions = {}
     for qa_file in qa_files:
         with open(qa_file) as f:
-            questions = yaml.safe_load(f)
+            data = yaml.safe_load(f)
 
-        if not isinstance(questions, list):
-            print(f"Warning: {qa_file} is not a list, skipping", file=sys.stderr)
+        if isinstance(data, dict):
+            questions = data.get("questions", [])
+        elif isinstance(data, list):
+            questions = data
+        else:
+            print(f"Warning: {qa_file} has unexpected format, skipping", file=sys.stderr)
             continue
 
         for q in questions:

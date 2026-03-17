@@ -364,10 +364,14 @@ def validate_output_file(path: Path, schema: dict) -> bool:
         return False
 
     with open(path) as f:
-        items = yaml.safe_load(f)
+        data = yaml.safe_load(f)
 
-    if not isinstance(items, list):
-        logger.error("%s: expected a YAML list, got %s", path.name, type(items).__name__)
+    if isinstance(data, dict):
+        items = data.get("questions", [])
+    elif isinstance(data, list):
+        items = data
+    else:
+        logger.error("%s: expected a YAML dict or list, got %s", path.name, type(data).__name__)
         return False
 
     errors = 0
@@ -476,6 +480,7 @@ def main() -> None:
     for i, paper_path in enumerate(papers, 1):
         pmcid = paper_path.stem
         logger.info("=== Paper %d/%d: %s ===", i, len(papers), pmcid)
+        doc = load_paper(paper_path)
         pairs = generate_for_paper(client, paper_path, schema, provider=args.provider, model_name=model_name)
 
         # Order keys for readability; passage_indices as flow list.
@@ -487,6 +492,13 @@ def main() -> None:
             )}
             for item in pairs
         ]
+        output_data = {
+            "title": doc["passages"][0].get("text", ""),
+            "pmcid": pmcid,
+            "pmid": str(doc.get("pmid", "")),
+            "reviewer": None,
+            "questions": ordered_pairs,
+        }
         base = OUTPUT_DIR / f"qa_{pmcid}.yaml"
         if base.exists():
             v = 2
@@ -497,7 +509,7 @@ def main() -> None:
             out_path = base
         with open(out_path, "w") as f:
             yaml.dump(
-                ordered_pairs, f,
+                output_data, f,
                 default_flow_style=False, allow_unicode=True,
                 sort_keys=False, width=120,
             )

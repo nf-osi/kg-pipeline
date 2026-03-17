@@ -1,110 +1,150 @@
+title: Establishment and genomic characterization of a sporadic malignant peripheral
+  nerve sheath tumor cell line
+pmcid: PMC7952412
+pmid: '33707600'
+reviewer: null
+questions:
 - id: PMC7952412-01
   pmcid: PMC7952412
   author: gemini-3.1-pro-preview
-  question: What is the mutational and functional status of the NF1 gene in the sporadic malignant peripheral nerve sheath
-    tumor cell line 2XSB?
+  question: What is the mutational and functional status of the NF1 gene in the sporadic
+    malignant peripheral nerve sheath tumor cell line 2XSB?
   user_query: is NF1 mutated in 2XSB cells?
-  ideal: The 2XSB cell line has intact, functional NF1 alleles and expresses functional full-length neurofibromin protein,
-    distinguishing it from many NF1-associated MPNSTs.
+  ideal: The 2XSB cell line has intact, functional NF1 alleles and expresses functional
+    full-length neurofibromin protein, distinguishing it from many NF1-associated
+    MPNSTs.
   choices:
   - NF1 is homozygously deleted.
   - NF1 contains a pathogenic frameshift mutation.
   - NF1 is intact and encodes a functional full-length protein.
   - Not in knowledgebase.
   correct_choice_index: 2
-  passage_indices: [1, 37, 38]
+  passage_indices:
+  - 1
+  - 37
+  - 38
   difficulty: easy
   question_type: factual
 - id: PMC7952412-02
   pmcid: PMC7952412
   author: gemini-3.1-pro-preview
-  question: How does the presence of the C250T TERT promoter mutation affect TERT mRNA expression in the 2XSB cell line compared
-    to wild-type Schwann cells?
-  user_query: what's the TERT expression like in 2XSB with the C250T mutation compared to normal schwann cells
-  ideal: Despite the presence of the C250T TERT promoter mutation, TERT mRNA transcripts were very low and difficult to detect
-    in both 2XSB cells and the parent tumor, showing no significant increase in expression compared to wild-type Schwann cells.
+  question: How does the presence of the C250T TERT promoter mutation affect TERT
+    mRNA expression in the 2XSB cell line compared to wild-type Schwann cells?
+  user_query: what's the TERT expression like in 2XSB with the C250T mutation compared
+    to normal schwann cells
+  ideal: Despite the presence of the C250T TERT promoter mutation, TERT mRNA transcripts
+    were very low and difficult to detect in both 2XSB cells and the parent tumor,
+    showing no significant increase in expression compared to wild-type Schwann cells.
   choices:
-  - The mutation completely silences TERT mRNA expression, which is normally high in wild-type Schwann cells.
-  - TERT mRNA expression remains very low and difficult to detect, similar to wild-type Schwann cells.
-  - The mutation causes a massive overexpression of TERT mRNA compared to wild-type Schwann cells.
+  - The mutation completely silences TERT mRNA expression, which is normally high
+    in wild-type Schwann cells.
+  - TERT mRNA expression remains very low and difficult to detect, similar to wild-type
+    Schwann cells.
+  - The mutation causes a massive overexpression of TERT mRNA compared to wild-type
+    Schwann cells.
   - Not in knowledgebase.
   correct_choice_index: 1
-  passage_indices: [36, 46]
+  passage_indices:
+  - 36
+  - 46
   difficulty: medium
   question_type: comparative
 - id: PMC7952412-03
   pmcid: PMC7952412
   author: gemini-3.1-pro-preview
-  question: Based on the molecular and morphological characterization of the 2XSB cell line, what are two distinct cellular
-    subpopulations that may contribute to its growth and potential chemotherapy resistance, and what biological mechanisms
+  question: Based on the molecular and morphological characterization of the 2XSB
+    cell line, what are two distinct cellular subpopulations that may contribute to
+    its growth and potential chemotherapy resistance, and what biological mechanisms
     might generate them?
-  user_query: what subpopulations in 2xsb cells might make it resistant to chemo and where do they come from
-  ideal: The 2XSB line contains a subpopulation of Sox2-positive cells, which may represent cancer stem-like cells capable
-    of self-renewal, and a subpopulation of multinucleated giant polyploid cells. The multinucleated cells likely form through
-    endocycling, a process potentially driven by the pathogenic TP53 and CDKN2A mutations present in these cells.
+  user_query: what subpopulations in 2xsb cells might make it resistant to chemo and
+    where do they come from
+  ideal: The 2XSB line contains a subpopulation of Sox2-positive cells, which may
+    represent cancer stem-like cells capable of self-renewal, and a subpopulation
+    of multinucleated giant polyploid cells. The multinucleated cells likely form
+    through endocycling, a process potentially driven by the pathogenic TP53 and CDKN2A
+    mutations present in these cells.
   choices:
-  - Sox10-positive cells forming from neurofibroma fusion and nestin-positive multinucleated cells forming from unchecked
-    mitosis.
-  - Sox2-positive cells that act as cancer stem-like cells, and multinucleated polyploid cells that likely form through endocycling
-    driven by TP53 and CDKN2A mutations.
+  - Sox10-positive cells forming from neurofibroma fusion and nestin-positive multinucleated
+    cells forming from unchecked mitosis.
+  - Sox2-positive cells that act as cancer stem-like cells, and multinucleated polyploid
+    cells that likely form through endocycling driven by TP53 and CDKN2A mutations.
   - Not in knowledgebase.
-  - MART-1-positive melanocytes driven by BRAF V600E and PMEL-positive fibroblasts driven by NF1 deletion.
+  - MART-1-positive melanocytes driven by BRAF V600E and PMEL-positive fibroblasts
+    driven by NF1 deletion.
   correct_choice_index: 1
-  passage_indices: [11, 13, 41, 42]
+  passage_indices:
+  - 11
+  - 13
+  - 41
+  - 42
   difficulty: hard
   question_type: inferential
 - id: PMC7952412-04
   pmcid: PMC7952412
   author: gemini-3.1-pro-preview
-  question: Which strain of immunodeficient mice was used to establish in vivo xenografts of the 2XSB malignant peripheral
-    nerve sheath tumor cell line?
+  question: Which strain of immunodeficient mice was used to establish in vivo xenografts
+    of the 2XSB malignant peripheral nerve sheath tumor cell line?
   user_query: what mice were used for 2xsb xenografts?
-  ideal: NOD.Cg-PrkdcscidIl2rgtm1Wjl/Szj (NOD-Scidgamma) mice were used to establish subcutaneous xenografts of 2XSB cells.
+  ideal: NOD.Cg-PrkdcscidIl2rgtm1Wjl/Szj (NOD-Scidgamma) mice were used to establish
+    subcutaneous xenografts of 2XSB cells.
   choices:
   - C57BL/6 knockout mice.
   - BALB/c nude mice.
   - Not in knowledgebase.
   - NOD-Scidgamma (NOD.Cg-PrkdcscidIl2rgtm1Wjl/Szj) mice.
   correct_choice_index: 3
-  passage_indices: [24, 83]
+  passage_indices:
+  - 24
+  - 83
   difficulty: easy
   question_type: methodological
 - id: PMC7952412-05
   pmcid: PMC7952412
   author: gemini-3.1-pro-preview
-  question: Which previously unassociated genes were identified as having pathogenic or likely pathogenic mutations in the
-    sporadic MPNST cell line 2XSB?
-  user_query: what new mutated genes were found in 2xsb that weren't linked to mpnst before
-  ideal: Whole exome sequencing of 2XSB cells revealed pathogenic or likely pathogenic mutations in several genes not previously
-    associated with MPNST pathogenesis, including DNMT1, NUMA1, NTRK1, PDE11A, CSMD3, LRP5, and ACTL9.
+  question: Which previously unassociated genes were identified as having pathogenic
+    or likely pathogenic mutations in the sporadic MPNST cell line 2XSB?
+  user_query: what new mutated genes were found in 2xsb that weren't linked to mpnst
+    before
+  ideal: Whole exome sequencing of 2XSB cells revealed pathogenic or likely pathogenic
+    mutations in several genes not previously associated with MPNST pathogenesis,
+    including DNMT1, NUMA1, NTRK1, PDE11A, CSMD3, LRP5, and ACTL9.
   choices:
   - DNMT1, NUMA1, NTRK1, PDE11A, CSMD3, LRP5, and ACTL9.
   - SUZ12, EED, EZH1, and EZH2.
   - Not in knowledgebase.
   - BRD4, BIRC5, COX2, EGFR, and HIF1A.
   correct_choice_index: 0
-  passage_indices: [1, 35, 45]
+  passage_indices:
+  - 1
+  - 35
+  - 45
   difficulty: medium
   question_type: factual
 - id: PMC7952412-06
   pmcid: PMC7952412
   author: gemini-3.1-pro-preview
-  question: Why was the 2XSB parent tumor determined to be a sporadic MPNST rather than an NF1-associated MPNST or melanoma,
-    based on clinical and molecular markers?
-  user_query: why wasn't the 2xsb parent tumor diagnosed as melanoma or an nf1-associated mpnst
-  ideal: The tumor was determined not to be a melanoma because it lacked expression of MLANA and PMEL and had no melanosomes.
-    It was classified as a sporadic MPNST rather than NF1-associated because the patient had no clinical stigmata of NF1 (e.g.,
-    neurofibromas, cafe-au-lait macules), no family history of NF1, and genomic analysis later showed the tumor and cell line
-    had intact, functional NF1 alleles.
+  question: Why was the 2XSB parent tumor determined to be a sporadic MPNST rather
+    than an NF1-associated MPNST or melanoma, based on clinical and molecular markers?
+  user_query: why wasn't the 2xsb parent tumor diagnosed as melanoma or an nf1-associated
+    mpnst
+  ideal: The tumor was determined not to be a melanoma because it lacked expression
+    of MLANA and PMEL and had no melanosomes. It was classified as a sporadic MPNST
+    rather than NF1-associated because the patient had no clinical stigmata of NF1
+    (e.g., neurofibromas, cafe-au-lait macules), no family history of NF1, and genomic
+    analysis later showed the tumor and cell line had intact, functional NF1 alleles.
   choices:
-  - It strongly expressed MLANA but lacked PMEL, ruling out melanoma, and genomic analysis showed a full deletion of the NF1
-    gene.
-  - It had abundant melanosomes but no MLANA expression, and the patient had a strong family history of NF1 but intact NF1
-    alleles.
-  - It lacked MLANA and PMEL expression, ruling out melanoma, and the patient had no clinical signs of NF1, with genomic data
-    showing intact NF1 alleles, confirming it was sporadic.
+  - It strongly expressed MLANA but lacked PMEL, ruling out melanoma, and genomic
+    analysis showed a full deletion of the NF1 gene.
+  - It had abundant melanosomes but no MLANA expression, and the patient had a strong
+    family history of NF1 but intact NF1 alleles.
+  - It lacked MLANA and PMEL expression, ruling out melanoma, and the patient had
+    no clinical signs of NF1, with genomic data showing intact NF1 alleles, confirming
+    it was sporadic.
   - Not in knowledgebase.
   correct_choice_index: 2
-  passage_indices: [10, 11, 40]
+  passage_indices:
+  - 10
+  - 11
+  - 40
   difficulty: hard
   question_type: comparative

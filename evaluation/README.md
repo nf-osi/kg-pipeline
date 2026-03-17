@@ -12,14 +12,24 @@ This directory contains two evaluation tracks:
 ## Publication QA Evaluation
 
 To evaluate the overall RAG-based system for publications, we primarily use multiple-choice QA pairs, a similar format to the [PaperQA2](https://huggingface.co/datasets/futurehouse/lab-bench/viewer/LitQA2) and [Humanity's Last Exam](https://www.nature.com/articles/s41586-025-09962-4) benchmark datasets. 
-Items are first generated using current frontier models with PubTator3 full-text papers, then further curated and edited by the NF-OSI team. 
-Each paper has between 5 to 15 questions spanning different difficulty levels and question types. 
+Items are first generated using current frontier models with PubTator3 full-text papers, then further curated and edited by the NF-OSI team.
+Each paper has between 5 to 15 questions spanning different difficulty levels and question types.
 How well the system performs is based on *both* the effectiveness/ergonomics of retrieval as well as the agent chosen for the system.
 
 Important item characteristics:
 
 - **question_type**: `factual`, `causal`, `comparative`, `inferential`, `methodological`, `hypothetical`, `other` — weighted toward factual, comparative, and methodological by design
 - **difficulty**: `easy` (single-fact lookup), `medium` (within-passage synthesis), `hard` (cross-passage inference)
+
+#### Curation process
+
+After initial generation, items undergo manual review and editing to address several types of issues. 
+For example, it is known that the literature can report conflicting evidence: In Humanity’s Last Exam, [it was found](https://www.futurehouse.org/research-announcements/hle-exam) that 29 ± 3.7% (95% CI) of the text-only chemistry and biology questions had answers with directly conflicting evidence in peer reviewed literature.
+
+- **Cross-paper overlap and conflict**: When the same fact appears in multiple papers with potentially different reported values (e.g. 1:2000 vs 1:2500 for NF1 population incidence), overlapping questions are either removed, deduplicated, or made more specific (e.g. for "What is the current treatment for symptomatic PNs?" where one paper says surgery and another says selumetinib, to distinguish questions we can ask more specifically about "pharmacotherapy"). Remaining overlaps are documented with `editor_note` fields.
+- **Hallucinated content**: LLM-generated ideal answers sometimes include facts not present in the source paper (e.g. have found citation of a specific mutation variant that doesn't appear in the paper). These are corrected against the actual paper text.
+- **Vague study anchoring**: Questions like "What was the CS in the eyeblink conditioning experiments?" or "What are the limitations of the isogenic cell line experiments?" are too generic — the same methodology or finding may appear across multiple indexed papers. Questions are rewritten to better anchor to the specific study (e.g. "In the Nf1+/- mouse eyeblink conditioning study, what was used as the CS?", "What are the key limitations acknowledged in the Cancer Pathway Knockout Panel study?").
+- **Difficulty calibration**: Questions that appear simple in isolation but require cross-paper disambiguation are upgraded from `easy` to `medium`.
 
 ### Files
 
@@ -58,25 +68,25 @@ python evaluation/qa/generate_qa.py --validate-only
 ### Dataset Statistics
 
 - **Total Papers**: 14
-- **Total Questions**: 140
-- **Average Questions/Paper**: 10.0
+- **Total Questions**: 133
+- **Average Questions/Paper**: 9.5
 
 #### By Difficulty
-- **Easy**: 42 (30.0%)
-- **Medium**: 59 (42.1%)
-- **Hard**: 39 (27.9%)
+- **Easy**: 34 (25.6%)
+- **Medium**: 61 (45.9%)
+- **Hard**: 38 (28.6%)
 
 #### By Question Type
-- **factual**: 54 (38.6%)
-- **methodological**: 33 (23.6%)
-- **comparative**: 30 (21.4%)
-- **causal**: 14 (10.0%)
-- **inferential**: 9 (6.4%)
+- **factual**: 49 (36.8%)
+- **methodological**: 32 (24.1%)
+- **comparative**: 29 (21.8%)
+- **causal**: 14 (10.5%)
+- **inferential**: 9 (6.8%)
 
 #### By Author/Model
-- **claude-opus-4-6**: 92 (65.7%)
-- **gemini-3.1-pro-preview**: 41 (29.3%)
-- **gpt-5.4**: 7 (5.0%)
+- **claude-opus-4-6**: 85 (63.9%)
+- **gemini-3.1-pro-preview**: 41 (30.8%)
+- **gpt-5.4**: 7 (5.3%)
 
 
 <!-- END AUTO-GENERATED QA STATS -->

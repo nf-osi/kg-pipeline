@@ -1,132 +1,162 @@
+title: Restoration of Normal NF1 Function with Antisense Morpholino Treatment of Recurrent
+  Pathogenic Patient-Specific Variant c.1466A>G; p.Y489C
+pmcid: PMC8705852
+pmid: '34945792'
+reviewer: null
+questions:
 - id: PMC8705852-01
   pmcid: PMC8705852
   author: gemini-3.1-pro-preview
-  question: What is the specific genetic variant in exon 13 of the NF1 gene that creates an intragenic cryptic splice site?
+  question: What is the specific genetic variant in exon 13 of the NF1 gene that creates
+    an intragenic cryptic splice site?
   user_query: which nf1 variant did they look at in exon 13?
-  ideal: The recurrent pathogenic variant c.1466A>G (p.Y489C) in exon 13 of the NF1 gene creates an intragenic cryptic splice
-    site, resulting in a 57 nt deletion that produces an in-frame deletion of 19 amino acids.
+  ideal: The recurrent pathogenic variant c.1466A>G (p.Y489C) in exon 13 of the NF1
+    gene creates an intragenic cryptic splice site, resulting in a 57 nt deletion
+    that produces an in-frame deletion of 19 amino acids.
   choices:
   - c.288+2025T>G
   - Not in knowledgebase
   - R1809C
   - c.1466A>G (p.Y489C)
   correct_choice_index: 3
-  passage_indices: [1, 5]
+  passage_indices:
+  - 1
+  - 5
   difficulty: easy
   question_type: factual
 - id: PMC8705852-02
   pmcid: PMC8705852
   author: gemini-3.1-pro-preview
-  question: How did the efficacy of PMO M1 compare to PMO M2 in restoring normal splicing of the NF1 transcript in the mutant
-    cells?
+  question: How did the efficacy of PMO M1 compare to PMO M2 in restoring normal splicing
+    of the NF1 transcript in the mutant cells?
   user_query: did M1 or M2 work better for fixing splicing?
-  ideal: PMO M1 was significantly more effective than M2, restoring normal splicing to 67% of transcripts compared to only
-    36% for M2.
+  ideal: PMO M1 was significantly more effective than M2, restoring normal splicing
+    to 67% of transcripts compared to only 36% for M2.
   choices:
   - M2 was more effective, restoring normal splicing to 67% compared to 36% for M1.
   - M1 was more effective, restoring normal splicing to 67% compared to 36% for M2.
   - M1 and M2 were equally effective, both restoring normal splicing to ~50% of transcripts.
   - Not in knowledgebase
   correct_choice_index: 1
-  passage_indices: [27]
+  passage_indices:
+  - 27
   difficulty: medium
   question_type: comparative
 - id: PMC8705852-03
   pmcid: PMC8705852
   author: gemini-3.1-pro-preview
-  question: In the iPSC model harboring the NF1 Y489C variant, which specific downstream Ras signaling pathways were observed
-    to be elevated, and which remained unchanged compared to wild type?
+  question: In the iPSC model harboring the NF1 Y489C variant, which specific downstream
+    Ras signaling pathways were observed to be elevated, and which remained unchanged
+    compared to wild type?
   user_query: which ras pathways went up and which stayed the same in the y489c cells?
-  ideal: In the Y489C iPSCs, markers of downstream Ras signaling such as pERK/ERK and pS6/S6 ratios were significantly elevated,
-    whereas the pAKT/AKT ratios remained unchanged.
+  ideal: In the Y489C iPSCs, markers of downstream Ras signaling such as pERK/ERK
+    and pS6/S6 ratios were significantly elevated, whereas the pAKT/AKT ratios remained
+    unchanged.
   choices:
   - Not in knowledgebase
   - Elevated pAKT/AKT and pS6/S6, but unchanged pERK/ERK.
   - Elevated pERK/ERK and pAKT/AKT, but unchanged pS6/S6.
   - Elevated pERK/ERK and pS6/S6, but unchanged pAKT/AKT.
   correct_choice_index: 3
-  passage_indices: [26, 31]
+  passage_indices:
+  - 26
+  - 31
   difficulty: hard
   question_type: factual
 - id: PMC8705852-04
   pmcid: PMC8705852
   author: gemini-3.1-pro-preview
-  question: What background cell line was used to generate the mutant iPSCs harboring the Y489C variant via CRISPR/Cas9 editing?
+  question: What background cell line was used to generate the mutant iPSCs harboring
+    the Y489C variant via CRISPR/Cas9 editing?
   user_query: what cell line did they mutate with crispr?
-  ideal: The PGP1 parental background iPSC line was utilized to generate the knock-in pools of mutant cells.
+  ideal: The PGP1 parental background iPSC line was utilized to generate the knock-in
+    pools of mutant cells.
   choices:
   - PGP1
   - Not in knowledgebase
   - HeLa
   - HEK293
   correct_choice_index: 0
-  passage_indices: [10]
+  passage_indices:
+  - 10
   difficulty: medium
   question_type: methodological
 - id: PMC8705852-05
   pmcid: PMC8705852
   author: gemini-3.1-pro-preview
-  question: Despite PMO M1 restoring normal splicing to approximately 70% of total transcripts, what was the observed extent
-    of neurofibromin protein restoration?
+  question: Despite PMO M1 restoring normal splicing to approximately 70% of total
+    transcripts, what was the observed extent of neurofibromin protein restoration?
   user_query: how much protein came back after they fixed 70% of the RNA splicing?
-  ideal: Despite the restoration of normal splicing to about 70%, the cells only showed a restoration of approximately 30%
-    of normal neurofibromin protein levels compared to wild-type cells.
+  ideal: Despite the restoration of normal splicing to about 70%, the cells only showed
+    a restoration of approximately 30% of normal neurofibromin protein levels compared
+    to wild-type cells.
   choices:
   - Neurofibromin protein was restored to approximately 100% of wild-type levels.
   - Not in knowledgebase
   - Neurofibromin protein was restored to only approximately 30% of normal levels.
-  - Neurofibromin protein was restored to approximately 70%, matching the transcript levels.
+  - Neurofibromin protein was restored to approximately 70%, matching the transcript
+    levels.
   correct_choice_index: 2
-  passage_indices: [27, 29]
+  passage_indices:
+  - 27
+  - 29
   difficulty: hard
   question_type: comparative
 - id: PMC8705852-06
   pmcid: PMC8705852
   author: gemini-3.1-pro-preview
-  question: What consequence does the creation of a new splice donor site by the c.1466A>G variant have on the encoded protein
-    sequence, according to historical RT-PCR identification?
+  question: What consequence does the creation of a new splice donor site by the c.1466A>G
+    variant have on the encoded protein sequence, according to historical RT-PCR identification?
   user_query: what does the cryptic splice site actually do to the protein sequence?
-  ideal: The creation of a new splice donor site by the c.1466A>G variant generates a frameshift that leads to the formation
-    of a stop codon at amino acid 489.
+  ideal: The creation of a new splice donor site by the c.1466A>G variant generates
+    a frameshift that leads to the formation of a stop codon at amino acid 489.
   choices:
-  - It changes a single amino acid from tyrosine to cysteine without affecting the reading frame.
+  - It changes a single amino acid from tyrosine to cysteine without affecting the
+    reading frame.
   - It causes a large in-frame deletion of 62 amino acids.
-  - It generates a frameshift that leads to the formation of a stop codon at amino acid 489.
+  - It generates a frameshift that leads to the formation of a stop codon at amino
+    acid 489.
   - Not in knowledgebase
   correct_choice_index: 2
-  passage_indices: [5]
+  passage_indices:
+  - 5
   difficulty: medium
   question_type: factual
 - id: PMC8705852-07
   pmcid: PMC8705852
   author: gemini-3.1-pro-preview
-  question: What is the normal physiological function of the neurofibromin protein encoded by the NF1 gene?
+  question: What is the normal physiological function of the neurofibromin protein
+    encoded by the NF1 gene?
   user_query: what does normal nf1 protein do?
-  ideal: Neurofibromin functions as a tumor suppressor by deactivating Ras through the enhancement of its intrinsic GTPase
-    activity.
+  ideal: Neurofibromin functions as a tumor suppressor by deactivating Ras through
+    the enhancement of its intrinsic GTPase activity.
   choices:
   - It acts as an oncogene by continuously activating the AKT pathway.
   - Not in knowledgebase
   - It functions as a transcription factor to promote cell cycle progression.
-  - It acts as a tumor suppressor by deactivating Ras through enhancement of its intrinsic GTPase activity.
+  - It acts as a tumor suppressor by deactivating Ras through enhancement of its intrinsic
+    GTPase activity.
   correct_choice_index: 3
-  passage_indices: [3]
+  passage_indices:
+  - 3
   difficulty: easy
   question_type: factual
 - id: PMC8705852-08
   pmcid: PMC8705852
   author: gemini-3.1-pro-preview
-  question: What assay was used to evaluate basal GTP-Ras levels, and what effect did treatment with PMO M1 have on these
-    levels in the Y489C mutant cells?
+  question: What assay was used to evaluate basal GTP-Ras levels, and what effect
+    did treatment with PMO M1 have on these levels in the Y489C mutant cells?
   user_query: how did they measure GTP-Ras and did M1 lower it?
-  ideal: The RAS-G-LISA assay was used to evaluate GTP-Ras levels. Treatment with PMO M1 successfully repressed (decreased)
-    GTP-Ras levels in the mutant cells.
+  ideal: The RAS-G-LISA assay was used to evaluate GTP-Ras levels. Treatment with
+    PMO M1 successfully repressed (decreased) GTP-Ras levels in the mutant cells.
   choices:
   - Western blot; PMO M1 increased GTP-Ras levels.
   - RAS-G-LISA assay; PMO M1 decreased GTP-Ras levels.
   - Not in knowledgebase
   - RT-PCR; PMO M1 had no effect on GTP-Ras levels.
   correct_choice_index: 1
-  passage_indices: [16, 27]
+  passage_indices:
+  - 16
+  - 27
   difficulty: hard
   question_type: methodological
