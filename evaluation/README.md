@@ -30,7 +30,7 @@ For example, it is known that the literature can report conflicting evidence: In
 - **Hallucinated content**: LLM-generated ideal answers sometimes include facts not present in the source paper (e.g. have found citation of a specific mutation variant that doesn't appear in the paper). These are corrected against the actual paper text.
 - **Vague study anchoring**: Questions like "What was the CS in the eyeblink conditioning experiments?" or "What are the limitations of the isogenic cell line experiments?" are too generic — the same methodology or finding may appear across multiple indexed papers. Questions are rewritten to better anchor to the specific study (e.g. "In the Nf1+/- mouse eyeblink conditioning study, what was used as the CS?", "What are the key limitations acknowledged in the Cancer Pathway Knockout Panel study?").
 - **Difficulty calibration**: Questions that appear simple in isolation but require cross-paper disambiguation are upgraded from `easy` to `medium`.
-- **Trivial or obvious questions**: Questions where the distractors are implausible or the answer is obvious without retrieval (e.g. asking which standard technique was used when the alternatives are absurd) are removed, as they do not meaningfully test the system.
+- **Trivial or obvious questions**: Questions where the answer is obvious without retrieval (e.g. what protein does the NF1 mutation affect) or the distractors are implausible/absurd (e.g. which standard technique was used for proteomics analysis and no distractors are even proteomics assays) are removed, as they do not meaningfully test the system.
 
 ### Files
 
