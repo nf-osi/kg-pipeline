@@ -25,13 +25,14 @@ questions:
   - 31
   difficulty: medium
   question_type: comparative
-- id: PMC8150846-03
+- id: PMC8150846-02
   pmcid: PMC8150846
   author: gemini-3.1-pro-preview
-  question: In the context of Plexiform neurofibromas (Pnfs) models lacking neurofibromin,
-    which combination of pharmacological inhibitors was found to fully suppress 3D
-    colony growth by targeting parallel oncogenic signaling pathways?
-  user_query: what drug combo stops nf1 tumor colony growth in 3d models
+  question: In the neurofibromin/FAK/ECM 3D colony study, which combination of pharmacological
+    inhibitors fully suppressed colony growth of neurofibromin-deficient cells by targeting
+    parallel oncogenic signaling pathways?
+  user_query: what drug combo stopped colony growth in the FAK/ECM neurofibroma 3D
+    study
   ideal: The combinatorial treatment with the MEK inhibitor Selumetinib (AZD6244)
     and the FAK inhibitor Defactinib (VS-6063) fully suppressed the 3D colony growth
     of cells lacking neurofibromin.
@@ -48,7 +49,7 @@ questions:
   - 47
   difficulty: hard
   question_type: factual
-- id: PMC8150846-04
+- id: PMC8150846-03
   pmcid: PMC8150846
   author: gemini-3.1-pro-preview
   question: Which specific tyrosine residues on Focal Adhesion Kinase (FAK) were found
@@ -67,7 +68,7 @@ questions:
   - 41
   difficulty: medium
   question_type: factual
-- id: PMC8150846-05
+- id: PMC8150846-04
   pmcid: PMC8150846
   author: gemini-3.1-pro-preview
   question: How did the 3D colony formation ability of Schwann cells isolated from
@@ -91,7 +92,7 @@ questions:
   - 39
   difficulty: hard
   question_type: comparative
-- id: PMC8150846-06
+- id: PMC8150846-05
   pmcid: PMC8150846
   author: gemini-3.1-pro-preview
   question: To mimic the extracellular matrix (ECM) of plexiform neurofibromas in
