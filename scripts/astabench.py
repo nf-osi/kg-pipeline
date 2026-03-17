@@ -101,12 +101,18 @@ def prepare_pubs_data() -> int:
 # Eval execution
 # ---------------------------------------------------------------------------
 
-def run_eval(model: str, task: str, extra_args: list[str]) -> tuple[str, int]:
+def run_eval(
+    model: str,
+    task: str,
+    extra_args: list[str],
+    task_args: list[str] | None = None,
+) -> tuple[str, int]:
     """Run inspect eval for a single model. Returns (model, returncode)."""
     cmd = [
         "inspect", "eval", f"astabench/{task}",
         "--solver", "basic_agent",
         "--model", model,
+        *(task_args or []),
         *extra_args,
     ]
     print(f"[{model}] Starting: {' '.join(cmd)}")
@@ -210,22 +216,33 @@ def main(argv: list[str] | None = None) -> int:
         if args.full:
             models.extend(GOOGLE_MODELS + OPENAI_MODELS)
 
-    print(f"\n=== Running {task} for {len(models)} models ===")
+    # Build list of (label, task_args) variants to run
+    if args.pubs:
+        variants = [
+            ("precise", ["-T", "question_style=precise"]),
+            ("user_query", ["-T", "question_style=user_query"]),
+        ]
+    else:
+        variants = [("default", [])]
+
     failed = []
-    with ProcessPoolExecutor(max_workers=len(models)) as pool:
-        futures = {
-            pool.submit(run_eval, model, task, args.inspect_args): model
-            for model in models
-        }
-        for future in as_completed(futures):
-            model, rc = future.result()
-            status = "OK" if rc == 0 else f"FAILED (exit {rc})"
-            print(f"[{model}] {status}")
-            if rc != 0:
-                failed.append(model)
+    for variant_label, task_args in variants:
+        suffix = f" ({variant_label})" if len(variants) > 1 else ""
+        print(f"\n=== Running {task}{suffix} for {len(models)} models ===")
+        with ProcessPoolExecutor(max_workers=len(models)) as pool:
+            futures = {
+                pool.submit(run_eval, model, task, args.inspect_args, task_args): model
+                for model in models
+            }
+            for future in as_completed(futures):
+                model, rc = future.result()
+                status = "OK" if rc == 0 else f"FAILED (exit {rc})"
+                print(f"[{model}]{suffix} {status}")
+                if rc != 0:
+                    failed.append(f"{model}{suffix}")
 
     if failed:
-        print(f"\n{len(failed)} model(s) failed: {', '.join(failed)}", file=sys.stderr)
+        print(f"\n{len(failed)} run(s) failed: {', '.join(failed)}", file=sys.stderr)
         return 1
 
     print("\nAll evals completed successfully.")
