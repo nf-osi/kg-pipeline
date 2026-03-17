@@ -2,14 +2,14 @@ title: Restoration of Normal NF1 Function with Antisense Morpholino Treatment of
   Pathogenic Patient-Specific Variant c.1466A>G; p.Y489C
 pmcid: PMC8705852
 pmid: '34945792'
-reviewer: null
+reviewer: https://orcid.org/0000-0003-1488-6730
 questions:
 - id: PMC8705852-01
   pmcid: PMC8705852
   author: gemini-3.1-pro-preview
   question: What is the specific genetic variant in exon 13 of the NF1 gene that creates
-    an intragenic cryptic splice site?
-  user_query: which nf1 variant did they look at in exon 13?
+    an intragenic cryptic splice site potentially addressable with morpholino therapy?
+  user_query: which nf1 variant in exon 13 for morpholino?
   ideal: The recurrent pathogenic variant c.1466A>G (p.Y489C) in exon 13 of the NF1
     gene creates an intragenic cryptic splice site, resulting in a 57 nt deletion
     that produces an in-frame deletion of 19 amino acids.
@@ -66,9 +66,9 @@ questions:
 - id: PMC8705852-04
   pmcid: PMC8705852
   author: gemini-3.1-pro-preview
-  question: What background cell line was used to generate the mutant iPSCs harboring
+  question: In the morpholino study, what background cell line was used to generate the mutant iPSCs harboring
     the Y489C variant via CRISPR/Cas9 editing?
-  user_query: what cell line did they mutate with crispr?
+  user_query: in morpholino study, what cell line did they mutate with crispr?
   ideal: The PGP1 parental background iPSC line was utilized to generate the knock-in
     pools of mutant cells.
   choices:
@@ -107,7 +107,7 @@ questions:
   author: gemini-3.1-pro-preview
   question: What consequence does the creation of a new splice donor site by the c.1466A>G
     variant have on the encoded protein sequence, according to historical RT-PCR identification?
-  user_query: what does the cryptic splice site actually do to the protein sequence?
+  user_query: what does the c.1466A>G cryptic splice site actually do to the protein sequence?
   ideal: The creation of a new splice donor site by the c.1466A>G variant generates
     a frameshift that leads to the formation of a stop codon at amino acid 489.
   choices:
@@ -144,9 +144,9 @@ questions:
 - id: PMC8705852-08
   pmcid: PMC8705852
   author: gemini-3.1-pro-preview
-  question: What assay was used to evaluate basal GTP-Ras levels, and what effect
+  question: In the morpholino study, What assay was used to evaluate basal GTP-Ras levels, and what effect
     did treatment with PMO M1 have on these levels in the Y489C mutant cells?
-  user_query: how did they measure GTP-Ras and did M1 lower it?
+  user_query: in morpholino study, how did they measure GTP-Ras and did M1 lower it?
   ideal: The RAS-G-LISA assay was used to evaluate GTP-Ras levels. Treatment with
     PMO M1 successfully repressed (decreased) GTP-Ras levels in the mutant cells.
   choices:

@@ -1,13 +1,13 @@
 title: Oligosarcomas, IDH-mutant are distinct and aggressive
 pmcid: PMC8742817
 pmid: '34967922'
-reviewer: null
+reviewer: https://orcid.org/0000-0003-1488-6730
 questions:
 - id: PMC8742817-01
   pmcid: PMC8742817
   author: claude-opus-4-6
-  question: How many oligosarcoma cases from how many patients were reported in this
-    series?
+  question: How many oligosarcoma cases from how many patients were reported in the
+    oligosarcoma study?
   user_query: how many oligosarcoma cases were in the study
   ideal: The study reported 24 IDH-mutant oligosarcomas from 23 patients.
   choices:
@@ -24,7 +24,8 @@ questions:
 - id: PMC8742817-02
   pmcid: PMC8742817
   author: claude-opus-4-6
-  question: What molecular features define oligodendroglioma according to the study?
+  question: What molecular features define oligodendroglioma according to the oligosarcoma
+    paper?
   user_query: what defines oligodendroglioma molecularly
   ideal: Oligodendrogliomas are defined at the molecular level by the presence of
     an IDH mutation and codeletion of chromosomal arms 1p and 19q.
@@ -167,26 +168,6 @@ questions:
 - id: PMC8742817-09
   pmcid: PMC8742817
   author: claude-opus-4-6
-  question: What technique was used for deep proteomic profiling of oligosarcomas
-    and conventional grade 3 oligodendrogliomas, and how many samples of each were
-    analyzed?
-  user_query: what method did they use for proteomics and how many samples
-  ideal: Deep proteomic profiling was performed using liquid chromatography coupled
-    mass spectrometry (LC/MS) on 9 oligosarcomas and 10 conventional CNS WHO grade
-    3 oligodendrogliomas.
-  choices:
-  - Western blotting on 12 oligosarcomas and 12 oligodendrogliomas
-  - LC/MS on 9 oligosarcomas and 10 grade 3 oligodendrogliomas
-  - ELISA on 24 oligosarcomas and 21 oligodendrogliomas
-  - Not in knowledgebase
-  correct_choice_index: 1
-  passage_indices:
-  - 55
-  difficulty: easy
-  question_type: methodological
-- id: PMC8742817-10
-  pmcid: PMC8742817
-  author: claude-opus-4-6
   question: What DNA methylation array platforms were used for generating methylation
     profiles, and what parameters were employed for the t-SNE analysis?
   user_query: what arrays and tSNE settings did they use for methylation analysis
@@ -205,7 +186,7 @@ questions:
   - 14
   difficulty: medium
   question_type: methodological
-- id: PMC8742817-11
+- id: PMC8742817-10
   pmcid: PMC8742817
   author: claude-opus-4-6
   question: Based on the evidence presented, what diagnostic criteria can be used
@@ -226,7 +207,7 @@ questions:
   - 81
   difficulty: hard
   question_type: factual
-- id: PMC8742817-12
+- id: PMC8742817-11
   pmcid: PMC8742817
   author: claude-opus-4-6
   question: How did the frequency of chromosome 6q loss differ between oligosarcomas
@@ -244,7 +225,7 @@ questions:
   - 52
   difficulty: easy
   question_type: comparative
-- id: PMC8742817-13
+- id: PMC8742817-12
   pmcid: PMC8742817
   author: claude-opus-4-6
   question: Why might p53 accumulation in oligosarcomas not be fully explained by
@@ -267,7 +248,7 @@ questions:
   - 73
   difficulty: hard
   question_type: inferential
-- id: PMC8742817-14
+- id: PMC8742817-13
   pmcid: PMC8742817
   author: claude-opus-4-6
   question: What was the range of time between primary diagnosis of oligodendroglioma
