@@ -1,249 +1,295 @@
+title: P2RY14 cAMP signaling regulates Schwann cell precursor self-renewal, proliferation,
+  and nerve tumor initiation in a mouse model of neurofibromatosis
+pmcid: PMC8959601
+pmid: '35311647'
+reviewer: https://orcid.org/0000-0003-1488-6730
+questions:
 - id: PMC8959601-01
   pmcid: PMC8959601
   author: claude-opus-4-6
-  question: What is the optimal concentration of the P2ry14 inhibitor PPTN that was determined through dose-response analysis
-    in mouse Schwann cell precursor sphere assays?
-  user_query: what was the best PPTN concentration for the SCP sphere assay?
-  ideal: The optimal concentration of the P2ry14 inhibitor PPTN was 300 nM. Concentrations of 500 nM were found to be toxic
-    to the cells.
+  question: In the P2RY14 study, what is the optimal concentration of the P2ry14 inhibitor PPTN that was
+    determined through dose-response analysis in mouse Schwann cell precursor sphere
+    assays?
+  user_query: what was the best PPTN concentration for the SCP sphere assay in the P2RY14 study?
+  ideal: The optimal concentration of the P2ry14 inhibitor PPTN was 300 nM. Concentrations
+    of 500 nM were found to be toxic to the cells.
   choices:
   - 100 nM
   - 300 nM
   - 500 nM
   - Not in knowledgebase
   correct_choice_index: 1
-  passage_indices: [15]
+  passage_indices:
+  - 15
   difficulty: easy
   question_type: factual
 - id: PMC8959601-02
   pmcid: PMC8959601
   author: claude-opus-4-6
-  question: Through which G-protein subunit does P2ry14 signal to modulate adenylate cyclase activity and intracellular cAMP
-    levels?
+  question: Through which G-protein subunit does P2ry14 signal to modulate adenylate
+    cyclase activity and intracellular cAMP levels?
   user_query: what g protein does P2ry14 signal through?
-  ideal: P2ry14 signals through Gi (inhibitory G protein) to inhibit adenylate cyclase, thereby decreasing intracellular cAMP
-    levels.
+  ideal: P2ry14 signals through Gi (inhibitory G protein) to inhibit adenylate cyclase,
+    thereby decreasing intracellular cAMP levels.
   choices:
   - Gs
   - Gi
   - Gq
   - Not in knowledgebase
   correct_choice_index: 1
-  passage_indices: [1, 8]
+  passage_indices:
+  - 1
+  - 8
   difficulty: easy
   question_type: factual
 - id: PMC8959601-03
   pmcid: PMC8959601
   author: claude-opus-4-6
-  question: What percentage of p75+/EGFR+/P2ry14+ cells formed spheres compared to p75+/EGFR+/P2ry14- cells in human neurofibroma
-    FACS sorting experiments?
-  user_query: how many P2ry14 positive vs negative cells formed spheres from human neurofibromas?
-  ideal: On average, 64.8% of p75+/EGFR+/P2ry14+ cells formed spheres, while only 23.4% of p75+/EGFR+/P2ry14- cells formed
-    spheres.
+  question: What percentage of p75+/EGFR+/P2ry14+ cells formed spheres compared to
+    p75+/EGFR+/P2ry14- cells in human neurofibroma FACS sorting experiments?
+  user_query: how many P2ry14 positive vs negative cells formed spheres from human
+    neurofibromas?
+  ideal: On average, 64.8% of p75+/EGFR+/P2ry14+ cells formed spheres, while only
+    23.4% of p75+/EGFR+/P2ry14- cells formed spheres.
   choices:
   - 64.8% of P2ry14+ versus 23.4% of P2ry14- cells
   - 23.4% of P2ry14+ versus 64.8% of P2ry14- cells
   - 50% of P2ry14+ versus 10% of P2ry14- cells
   - Not in knowledgebase
   correct_choice_index: 0
-  passage_indices: [11]
+  passage_indices:
+  - 11
   difficulty: medium
   question_type: comparative
 - id: PMC8959601-04
   pmcid: PMC8959601
   author: claude-opus-4-6
-  question: How was the P2ry14 inhibitor PPTN delivered to neurofibroma-bearing mice in the in vivo pharmacological study,
-    and what was the daily dose and duration of treatment?
-  user_query: how did they give PPTN to the mice in vivo and for how long?
-  ideal: Due to poor oral bioavailability, PPTN was delivered via subcutaneously implanted osmotic minipumps that released
-    a daily dose of 4.55 mg/kg for 14 days.
+  question: How was the P2ry14 inhibitor PPTN delivered to neurofibroma-bearing mice
+    in the in vivo pharmacological study, and what was the daily dose and duration
+    of treatment?
+  user_query: in P2RY14 study, how did they give PPTN to the mice in vivo and for how long?
+  ideal: Due to poor oral bioavailability, PPTN was delivered via subcutaneously implanted
+    osmotic minipumps that released a daily dose of 4.55 mg/kg for 14 days.
   choices:
   - Oral gavage at 10 mg/kg for 30 days
   - Subcutaneous osmotic minipumps releasing 4.55 mg/kg daily for 14 days
   - Intraperitoneal injection at 5 mg/kg daily for 21 days
   - Not in knowledgebase
   correct_choice_index: 1
-  passage_indices: [45, 82]
+  passage_indices:
+  - 45
+  - 82
   difficulty: medium
   question_type: methodological
 - id: PMC8959601-05
   pmcid: PMC8959601
   author: claude-opus-4-6
-  question: What was the effect of P2ry14 knockout on Remak bundle morphology in the Nf1fl/fl;DhhCre neurofibroma mouse model
-    at 4 and 7 months of age?
+  question: What was the effect of P2ry14 knockout on Remak bundle morphology in the
+    Nf1fl/fl;DhhCre neurofibroma mouse model at 4 and 7 months of age?
   user_query: did P2ry14 knockout fix the Remak bundle problems in NF1 mice?
-  ideal: At 4 months, Nf1fl/fl;DhhCre nerves showed disrupted Remak bundles with reduced numbers of axons ensheathed by individual
-    Schwann cells, and this phenotype was rescued in P2ry14-/-;Nf1fl/fl;DhhCre mice. By 7 months, the disruption was more
-    severe in Nf1fl/fl;DhhCre nerves but was rescued to near wild-type levels by P2ry14 loss.
+  ideal: At 4 months, Nf1fl/fl;DhhCre nerves showed disrupted Remak bundles with reduced
+    numbers of axons ensheathed by individual Schwann cells, and this phenotype was
+    rescued in P2ry14-/-;Nf1fl/fl;DhhCre mice. By 7 months, the disruption was more
+    severe in Nf1fl/fl;DhhCre nerves but was rescued to near wild-type levels by P2ry14
+    loss.
   choices:
   - P2ry14 knockout worsened Remak bundle disruption at both time points
-  - P2ry14 knockout rescued the disrupted Remak bundle phenotype to near WT levels at both 4 and 7 months
+  - P2ry14 knockout rescued the disrupted Remak bundle phenotype to near WT levels
+    at both 4 and 7 months
   - P2ry14 knockout had no effect on Remak bundle morphology
   - Not in knowledgebase
   correct_choice_index: 1
-  passage_indices: [38, 40]
+  passage_indices:
+  - 38
+  - 40
   difficulty: medium
   question_type: factual
 - id: PMC8959601-06
   pmcid: PMC8959601
   author: claude-opus-4-6
-  question: How does the study use p-PKA substrate phosphorylation as a readout, and what was the effect of P2ry14 deletion
-    on p-PKA substrate phosphorylation in Nf1 mutant nerves in vivo?
-  user_query: what happened to pPKA staining when P2ry14 was knocked out in NF1 mice nerves?
-  ideal: p-PKA substrate phosphorylation was used as an indirect readout of cAMP levels. Nf1fl/fl;DhhCre nerves showed decreased
-    p-PKA substrate phosphorylation versus wild-type mice, but this decrease was reversed (rescued) in P2ry14-/-;Nf1fl/fl;DhhCre
+  question: How does the P2RY14 study use p-PKA substrate phosphorylation as a readout, and
+    what was the effect of P2ry14 deletion on p-PKA substrate phosphorylation in Nf1
+    mutant nerves in vivo?
+  user_query: what happened to pPKA staining when P2ry14 was knocked out in NF1 mice
+    nerves?
+  ideal: p-PKA substrate phosphorylation was used as an indirect readout of cAMP levels.
+    Nf1fl/fl;DhhCre nerves showed decreased p-PKA substrate phosphorylation versus
+    wild-type mice, but this decrease was reversed (rescued) in P2ry14-/-;Nf1fl/fl;DhhCre
     nerves, and the pPKA labeling co-localized with the Schwann cell marker CNPase.
   choices:
-  - p-PKA phosphorylation was decreased in Nf1 mutant nerves and further decreased by P2ry14 deletion
-  - p-PKA phosphorylation was decreased in Nf1 mutant nerves and this decrease was reversed by P2ry14 deletion
-  - p-PKA phosphorylation was unchanged between wild-type and Nf1 mutant nerves regardless of P2ry14 status
+  - p-PKA phosphorylation was decreased in Nf1 mutant nerves and further decreased
+    by P2ry14 deletion
+  - p-PKA phosphorylation was decreased in Nf1 mutant nerves and this decrease was
+    reversed by P2ry14 deletion
+  - p-PKA phosphorylation was unchanged between wild-type and Nf1 mutant nerves regardless
+    of P2ry14 status
   - Not in knowledgebase
   correct_choice_index: 1
-  passage_indices: [37, 24]
+  passage_indices:
+  - 37
+  - 24
   difficulty: hard
   question_type: causal
 - id: PMC8959601-07
   pmcid: PMC8959601
   author: claude-opus-4-6
-  question: In the Nf1fl/fl;DhhCre neurofibroma mouse model, at what age are plexiform neurofibromas first detectable, and
-    what was the Cre recombinase driver used to achieve Nf1 loss in Schwann cell precursors?
-  user_query: when do tumors first appear in the NF1 mouse model and what Cre was used?
-  ideal: Plexiform neurofibromas are first detectable at 4 months of age. Cre recombinase is expressed from Desert Hedgehog
-    (Dhh) regulatory sequences (DhhCre), causing recombination of the Nf1 floxed allele in developing SCPs at E12.5.
+  question: In the Nf1fl/fl;DhhCre neurofibroma mouse model, at what age are plexiform
+    neurofibromas first detectable, and what was the Cre recombinase driver used to
+    achieve Nf1 loss in Schwann cell precursors?
+  user_query: when do tumors first appear in the NF1 mouse model and what Cre was
+    used?
+  ideal: Plexiform neurofibromas are first detectable at 4 months of age. Cre recombinase
+    is expressed from Desert Hedgehog (Dhh) regulatory sequences (DhhCre), causing
+    recombination of the Nf1 floxed allele in developing SCPs at E12.5.
   choices:
   - 2 months of age; driven by P0-Cre
   - 4 months of age; driven by DhhCre (Desert Hedgehog)
   - 6 months of age; driven by Wnt1-Cre
   - Not in knowledgebase
   correct_choice_index: 1
-  passage_indices: [27, 32]
+  passage_indices:
+  - 27
+  - 32
   difficulty: medium
   question_type: factual
 - id: PMC8959601-08
   pmcid: PMC8959601
   author: claude-opus-4-6
-  question: What natural ligands activate the P2ry14 receptor, and why might NF1 mutant cells activate P2ry14 signaling even
-    in the absence of exogenously added ligands?
-  user_query: what activates P2ry14 and why does it seem to be active even without adding ligands to NF1 cells?
-  ideal: P2ry14 is activated by extracellular UDP and UDP-sugars including UDP-glucose, UDP-galactose, UDP-glucuronic acid,
-    and UDP-N-acetylglucosamine. NF1 mutant cells may release one or more of these ligands endogenously, as SCP self-renewal
-    in serum-free medium was reduced by P2ry14 inhibition without added UDP or UDP-sugars. Additionally, the small increase
-    in P2ry14 protein in mutant cells may contribute to increased signaling, and Nf1 deficient cells may release more UDP-sugars
-    than WT cells.
+  question: What natural ligands activate the P2ry14 receptor, and why might NF1 mutant
+    cells activate P2ry14 signaling even in the absence of exogenously added ligands?
+  user_query: what activates P2ry14 and why does it seem to be active even without
+    adding ligands to NF1 cells?
+  ideal: P2ry14 is activated by extracellular UDP and UDP-sugars including UDP-glucose,
+    UDP-galactose, UDP-glucuronic acid, and UDP-N-acetylglucosamine. NF1 mutant cells
+    may release one or more of these ligands endogenously, as SCP self-renewal in
+    serum-free medium was reduced by P2ry14 inhibition without added UDP or UDP-sugars.
+    Additionally, the small increase in P2ry14 protein in mutant cells may contribute
+    to increased signaling, and Nf1 deficient cells may release more UDP-sugars than
+    WT cells.
   choices:
   - P2ry14 is activated by ATP and ADP; NF1 cells produce excessive ATP
-  - P2ry14 is activated by UDP and UDP-sugars; NF1 mutant cells may endogenously release these ligands and/or have increased
-    P2ry14 expression
+  - P2ry14 is activated by UDP and UDP-sugars; NF1 mutant cells may endogenously release
+    these ligands and/or have increased P2ry14 expression
   - P2ry14 is constitutively active and requires no ligand in NF1 mutant cells
   - Not in knowledgebase
   correct_choice_index: 1
-  passage_indices: [8, 49]
+  passage_indices:
+  - 8
+  - 49
   difficulty: hard
   question_type: causal
 - id: PMC8959601-09
   pmcid: PMC8959601
   author: claude-opus-4-6
-  question: What was the effect of P2ry14 deletion on survival of neurofibroma-bearing mice in the Kaplan-Meier analysis,
-    and how did P2ry14-/-;Nf1fl/fl;DhhCre mice compare to non-neurofibroma bearing controls?
-  user_query: did P2ry14 KO mice survive longer? how did they compare to controls without tumors?
-  ideal: P2ry14-/-;Nf1fl/fl;DhhCre mice had a significant survival advantage compared to Nf1fl/fl;DhhCre neurofibroma-bearing
-    mice (p = 0.0256). Remarkably, P2ry14-/-;Nf1fl/fl;DhhCre mice did not differ significantly from non-neurofibroma bearing
-    Nf1fl/+ control littermates (p = 0.1367).
+  question: What was the effect of P2ry14 deletion on survival of neurofibroma-bearing
+    mice in the Kaplan-Meier analysis, and how did P2ry14-/-;Nf1fl/fl;DhhCre mice
+    compare to non-neurofibroma bearing controls?
+  user_query: did P2ry14 KO mice survive longer? how did they compare to controls
+    without tumors?
+  ideal: P2ry14-/-;Nf1fl/fl;DhhCre mice had a significant survival advantage compared
+    to Nf1fl/fl;DhhCre neurofibroma-bearing mice (p = 0.0256). Remarkably, P2ry14-/-;Nf1fl/fl;DhhCre
+    mice did not differ significantly from non-neurofibroma bearing Nf1fl/+ control
+    littermates (p = 0.1367).
   choices:
-  - P2ry14-/- neurofibroma mice survived significantly longer than Nf1fl/fl;DhhCre mice and did not differ significantly from
-    non-tumor controls
+  - P2ry14-/- neurofibroma mice survived significantly longer than Nf1fl/fl;DhhCre
+    mice and did not differ significantly from non-tumor controls
   - P2ry14-/- neurofibroma mice had shorter survival than Nf1fl/fl;DhhCre mice
   - P2ry14 deletion had no effect on survival in any genotype
   - Not in knowledgebase
   correct_choice_index: 0
-  passage_indices: [32, 36]
+  passage_indices:
+  - 32
+  - 36
   difficulty: medium
   question_type: comparative
 - id: PMC8959601-10
   pmcid: PMC8959601
   author: claude-opus-4-6
-  question: What approaches were used to silence P2ry14 in mouse SCPs in vitro, and how many different shRNAs were tested?
-  user_query: how did they knock down P2ry14 in vitro and how many shRNAs did they use?
-  ideal: 'P2ry14 was silenced using short-hairpin RNAs (shRNAs) delivered via lentiviral particles. Three different shRNAs
-    targeting P2ry14 were used: shP2ry14(09), shP2ry14(84), and shP2ry14(64), each tested in three biological replicates with
-    similar results.'
+  question: In the P2RY14 study, what approaches were used to silence P2ry14 in mouse SCPs in vitro, and
+    how many different shRNAs were tested?
+  user_query: in P2RY14 study, how did they knock down P2ry14 in vitro and how many shRNAs did they
+    use?
+  ideal: 'P2ry14 was silenced using short-hairpin RNAs (shRNAs) delivered via lentiviral
+    particles. Three different shRNAs targeting P2ry14 were used: shP2ry14(09), shP2ry14(84),
+    and shP2ry14(64), each tested in three biological replicates with similar results.'
   choices:
   - Two shRNAs delivered via lipofection
   - 'Three different lentiviral shRNAs: shP2ry14(09), shP2ry14(84), and shP2ry14(64)'
   - A single siRNA pool delivered by electroporation
   - Not in knowledgebase
   correct_choice_index: 1
-  passage_indices: [24, 70]
+  passage_indices:
+  - 24
+  - 70
   difficulty: medium
   question_type: methodological
 - id: PMC8959601-11
   pmcid: PMC8959601
   author: claude-opus-4-6
-  question: How was the expression of P2ry14 in Schwann cells and Schwann cell precursors confirmed in vivo using the P2ry14-/-
-    mouse line, and what reporter was used?
-  user_query: how did they show P2ry14 is expressed in SCs in vivo using the knockout mouse?
-  ideal: In P2ry14-/- mice, most of the coding region of P2RY14 is replaced by a beta-galactosidase cassette, serving as a
-    reporter. Beta-galactosidase expression was visualized in SOX-10 positive SCPs in the spinal cord dorsal and ventral roots
-    and DRG of E12.5 embryos, and in SCs of 7-month-old mice. CNPase (a SC marker) co-localized with beta-galactosidase staining
-    in sciatic nerve, confirming P2ry14 expression in SCs.
+  question: How was the expression of P2ry14 in Schwann cells and Schwann cell precursors
+    confirmed in vivo using the P2ry14-/- mouse line, and what reporter was used?
+  user_query: how did they show P2ry14 is expressed in SCs in vivo using the knockout
+    mouse?
+  ideal: In P2ry14-/- mice, most of the coding region of P2RY14 is replaced by a beta-galactosidase
+    cassette, serving as a reporter. Beta-galactosidase expression was visualized
+    in SOX-10 positive SCPs in the spinal cord dorsal and ventral roots and DRG of
+    E12.5 embryos, and in SCs of 7-month-old mice. CNPase (a SC marker) co-localized
+    with beta-galactosidase staining in sciatic nerve, confirming P2ry14 expression
+    in SCs.
   choices:
   - A GFP reporter cassette that co-localized with S100 in sciatic nerve
-  - A beta-galactosidase reporter that co-localized with SOX-10 in embryonic SCPs and with CNPase in adult SCs
-  - An mCherry reporter inserted into the P2ry14 locus that was detected by fluorescence microscopy alone
+  - A beta-galactosidase reporter that co-localized with SOX-10 in embryonic SCPs
+    and with CNPase in adult SCs
+  - An mCherry reporter inserted into the P2ry14 locus that was detected by fluorescence
+    microscopy alone
   - Not in knowledgebase
   correct_choice_index: 1
-  passage_indices: [28, 30]
+  passage_indices:
+  - 28
+  - 30
   difficulty: hard
   question_type: methodological
 - id: PMC8959601-12
   pmcid: PMC8959601
   author: claude-opus-4-6
-  question: What is the combined effect of rolipram and PPTN treatment on Nf1-/- SCP self-renewal in vitro, and what does
-    this suggest about the P2ry14-cAMP signaling axis?
-  user_query: what happened when they combined rolipram and PPTN on NF1 null SCPs?
-  ideal: Treatment with 1 µM rolipram or 300 nM PPTN individually decreased Nf1-/- SCP self-renewal. The combination showed
-    additional effect, largely at early passage. These results support the idea that elevated self-renewal in Nf1-/- SCPs
-    is due at least in part to P2ry14 Gi-mediated changes in cAMP.
+  question: In the P2RY14 study, what is the combined effect of rolipram and PPTN treatment on Nf1-/- SCP
+    self-renewal in vitro, and what does this suggest about the P2ry14-cAMP signaling
+    axis?
+  user_query: what happened when they combined rolipram and PPTN on NF1 null SCPs in the P2RY14 study?
+  ideal: Treatment with 1 µM rolipram or 300 nM PPTN individually decreased Nf1-/-
+    SCP self-renewal. The combination showed additional effect, largely at early passage.
+    These results support the idea that elevated self-renewal in Nf1-/- SCPs is due
+    at least in part to P2ry14 Gi-mediated changes in cAMP.
   choices:
-  - The combination had no additional effect beyond either drug alone, suggesting independent pathways
-  - The combination showed additional effect, largely at early passage, supporting P2ry14-cAMP-mediated regulation of self-renewal
+  - The combination had no additional effect beyond either drug alone, suggesting
+    independent pathways
+  - The combination showed additional effect, largely at early passage, supporting
+    P2ry14-cAMP-mediated regulation of self-renewal
   - Rolipram reversed the effects of PPTN, indicating opposing mechanisms
   - Not in knowledgebase
   correct_choice_index: 1
-  passage_indices: [25]
+  passage_indices:
+  - 25
   difficulty: hard
   question_type: comparative
 - id: PMC8959601-13
   pmcid: PMC8959601
   author: claude-opus-4-6
-  question: What limitation exists regarding the cell type specificity of the observed effects in the in vivo P2ry14 knockout
-    experiments?
-  user_query: what limitation about the P2ry14 knockout being global?
-  ideal: Because a global knockout was used (not a conditional knockout), it cannot be excluded that the observed changes
-    in microglial activation state could be due to indirect effects from P2ry14 loss in other cell types rather than direct
+  question: What limitation exists regarding the cell type specificity of the observed
+    effects in the in vivo P2ry14 knockout experiments in the P2RY14 study?
+  user_query: what limitation about the P2ry14 knockout being global in P2RY14 study?
+  ideal: Because a global knockout was used (not a conditional knockout), it cannot
+    be excluded that the observed changes in microglial activation state could be
+    due to indirect effects from P2ry14 loss in other cell types rather than direct
     microglial effects.
   choices:
   - The knockout may cause embryonic lethality confounding results
-  - Since a global knockout was used, some in vivo effects may be SCP-independent due to P2ry14 expression in immune cells
-    and sensory neurons
+  - Since a global knockout was used, some in vivo effects may be SCP-independent
+    due to P2ry14 expression in immune cells and sensory neurons
   - The knockout efficiency was too low to draw definitive conclusions
   - Not in knowledgebase
   correct_choice_index: 1
-  passage_indices: [50]
+  passage_indices:
+  - 50
   difficulty: medium
   question_type: methodological
-- id: PMC8959601-14
-  pmcid: PMC8959601
-  author: claude-opus-4-6
-  question: What is the prevalence of Neurofibromatosis type 1, and what proportion of NF1 children develop plexiform neurofibromas?
-  user_query: how common is NF1 and how many kids get plexiform neurofibromas
-  ideal: NF1 affects up to 1 in 2000 individuals worldwide. At least half of children with NF1 develop plexiform neurofibromas.
-  choices:
-  - 1:5000 individuals; about 25% of children develop plexiform neurofibromas
-  - 1:2000 individuals; at least half of children develop plexiform neurofibromas
-  - 1:1000 individuals; nearly all children develop plexiform neurofibromas
-  - Not in knowledgebase
-  correct_choice_index: 1
-  passage_indices: [3]
-  difficulty: easy
-  question_type: factual
