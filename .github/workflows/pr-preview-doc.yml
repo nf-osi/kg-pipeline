@@ -43,6 +43,7 @@ jobs:
         run: |
           python scripts/build_site.py evaluation/runs.json --out _site
           python scripts/build_site.py evaluation/pubs_runs.json --pubs --out _site
+          touch _site/.nojekyll
 
       - name: Copy docs for preview
         if: github.event.action != 'closed'
