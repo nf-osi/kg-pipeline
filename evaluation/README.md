@@ -24,9 +24,9 @@ Important item characteristics:
 #### Curation process
 
 After initial generation, items undergo manual review and editing to address several types of issues that have well-known precedents. 
-For example, in an earlier version of Humanity’s Last Exam, 30% of the text-only chemistry and biology questions had answers with directly conflicting evidence in peer reviewed literature ([source](https://www.futurehouse.org/research-announcements/hle-exam)).
+For example, in an earlier version of Humanity’s Last Exam, ~30% of the text-only chemistry and biology questions had answers with directly conflicting evidence in peer reviewed literature, requiring additional rounds of removal and editing ([ref](https://www.futurehouse.org/research-announcements/hle-exam)).
 
-- **Cross-paper overlap and conflict**: When the same fact appears in multiple papers with potentially different answers, overlapping questions are either removed, deduplicated, or made more specific. An example of a question removed was one with slightly different reported values for NF1 population incidence -- 1:2000 vs 1:2500. An example for a question that was made more specific: For "What is the current treatment for symptomatic PNs?", where one paper says surgery and another says selumetinib, to distinguish questions we can use the keyword "pharmacotherapy". Potential remaining overlaps are documented with `editor_note` fields. 
+- **Cross-paper overlap and conflict**: When the same fact appears in multiple papers with potentially different answers, overlapping questions are either removed, deduplicated, or made more specific. An example of a question removed was one with slightly different reported values for NF1 population incidence -- 1:2000 vs 1:2500. An example for a question that was made more specific: For "What is the current treatment for symptomatic PNs?", where one paper says surgery and another says selumetinib, to distinguish questions we can use the keyword "pharmacotherapy". Potential overlaps are noted in `editor_note` field. 
 - **Hallucinated content**: LLM-generated ideal answers sometimes include facts not present in the source paper (e.g. have found citation of a specific mutation variant that doesn't appear in the paper). These are corrected against the actual paper text.
 - **Vague study anchoring**: Questions like "What was the CS in the eyeblink conditioning experiments?" or "What are the limitations of the isogenic cell line experiments?" are too generic — the same methodology or finding may appear across multiple indexed papers. Questions are rewritten to better anchor to the specific study (e.g. "In the Nf1+/- mouse eyeblink conditioning study, what was used as the CS?", "What are the key limitations acknowledged in the Cancer Pathway Knockout Panel study?"). **This is important because questions are presented in the eval without explicit info on which paper to reference, in order to implicitly test paper selection as well, and during eval the models cannot ask for clarification.** 
 - **Difficulty calibration**: Questions that appear simple in isolation but require cross-paper disambiguation are upgraded from `easy` to `medium`.
@@ -34,8 +34,8 @@ For example, in an earlier version of Humanity’s Last Exam, 30% of the text-on
 
 #### Limitations
 
-- The dataset so far has undergone only one round of review -- potentially, we may add additional rounds of review to yield a more ideal, tighter final version. 
-- Questions currently **do not** ask to draw conclusions across papers; this is considered advanced, potentially for sequel dataset development rather than the base version.
+- The dataset so far has undergone only one round of review -- potentially, we may add additional rounds of review to yield a more ideal and tighter final version. 
+- Questions may ask to provide answers by drawing conclusions *across passages in the same paper*, but currently *not across papers*; this would be considered a new *very hard* level, potentially for a dataset sequel.
 - Ground truth for the exact attribution passage list can be especially hard to finalize.  
 - While designed for multiple-choice eval format first and foremost, the dataset should be usable for short-answer eval format as well, though any tweaks needed have not been comprehensively evaluated.
 - *question_type* classification is probably still somewhat fudgy.
