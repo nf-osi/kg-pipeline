@@ -53,12 +53,28 @@ OPENAI_MODELS = ["openai/gpt-5.4"]
 # Data preparation
 # ---------------------------------------------------------------------------
 
+def get_dataset_version(attributes_file: Path) -> str:
+    """Load dataset version from dataset_attributes.yaml, defaulting to 'draft'."""
+    if not attributes_file.exists():
+        return 'draft'
+    try:
+        with open(attributes_file) as f:
+            config = yaml.safe_load(f)
+            return config.get('metadata', {}).get('version', 'draft')
+    except Exception:
+        return 'draft'
+
+
 def prepare_data(dataset: str) -> int:
     """Merge ground-truth YAML files into eval_data.yaml for nf_rag."""
     dataset_dir = EVAL_DIR / dataset
     if not dataset_dir.is_dir():
         print(f"Error: dataset directory not found: {dataset_dir}", file=sys.stderr)
         return 1
+
+    # Load dataset version
+    attributes_file = dataset_dir / "dataset_attributes.yaml"
+    dataset_version = get_dataset_version(attributes_file)
 
     ground_files = sorted(dataset_dir.glob("*_ground*.yaml"))
     if not ground_files:
@@ -73,13 +89,19 @@ def prepare_data(dataset: str) -> int:
         merged.update(entries)
         print(f"  {path.name}: {len(entries)} entries")
 
-    output = {"ground_truth": merged}
+    output = {
+        "metadata": {
+            "version": dataset_version,
+            "total_questions": len(merged)
+        },
+        "ground_truth": merged
+    }
     output_path = ASTABENCH_EVALS / "nf_rag" / "eval_data.yaml"
     output_path.parent.mkdir(parents=True, exist_ok=True)
     with open(output_path, "w") as f:
         yaml.dump(output, f, default_flow_style=False, sort_keys=False, allow_unicode=True)
 
-    print(f"Wrote {len(merged)} entries to {output_path}")
+    print(f"Wrote {len(merged)} entries to {output_path} (version: {dataset_version})")
     return 0
 
 

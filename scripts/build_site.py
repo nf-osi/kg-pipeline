@@ -29,6 +29,7 @@ class RunSummary:
     total_samples: int | None = None
     git_commit: str | None = None
     task_name: str | None = None
+    task_version: str | None = None
     score_stderr: float | None = None
     min_sample_time: float | None = None
     max_sample_time: float | None = None
@@ -51,7 +52,7 @@ QuestionMeta = dict[str, dict[str, str]]
 
 
 def load_question_metadata(yaml_path: Path) -> QuestionMeta:
-    """Load question difficulty metadata from eval_tools.yaml."""
+    """Load question difficulty metadata from dataset_attributes.yaml."""
     if yaml is None:
         return {}
     if not yaml_path.exists():
@@ -91,6 +92,7 @@ def load_runs_from_json(json_path: Path) -> list[RunSummary]:
                 total_samples=r.get("total_samples"),
                 git_commit=r.get("git_commit"),
                 task_name=r.get("task_name"),
+                task_version=r.get("task_version"),
                 score_stderr=r.get("score_stderr"),
                 min_sample_time=r.get("min_sample_time"),
                 max_sample_time=r.get("max_sample_time"),
@@ -143,6 +145,16 @@ def _format_score(value: float | None) -> str:
 
 def _esc(value: str | None) -> str:
     return html.escape(value) if value else ""
+
+
+def _format_version(version: str | None) -> str:
+    """Format version string, prepending 'v' if not already present."""
+    if not version:
+        return ""
+    version = str(version)
+    if not version.startswith("v"):
+        return f"v{version}"
+    return version
 
 
 def _duration_seconds(start: str | None, end: str | None) -> float | None:
@@ -308,7 +320,8 @@ def render_table(
             f"<td>{_format_duration(run.avg_sample_time)}</td>"
             f"<td>{_format_duration(run.min_sample_time)}</td>"
             f"<td>{_format_duration(run.max_sample_time)}</td>"
-            f"<td><code>{_esc(run.git_commit)}</code></td></tr>"
+            f"<td><code>{_esc(run.git_commit)}</code></td>"
+            f"<td>{_format_version(run.task_version)}</td></tr>"
         )
         for run in runs
     )
@@ -333,7 +346,8 @@ def render_table(
       <th class="time">Avg Time / Sample</th>
       <th class="time">Shortest Sample</th>
       <th class="time">Longest Sample</th>
-      <th class="meta">Commit</th>
+      <th class="meta">Task Harness Version</th>
+      <th class="meta">Task Dataset Version</th>
     </tr>
   </thead>
   <tbody>
@@ -1054,6 +1068,7 @@ def write_pubs_site(pubs_data: list[dict], destination: Path) -> None:
         f1 = run.get("citation_f1") or run.get("passage_f1")
         f1_se = run.get("citation_f1_stderr") or run.get("passage_f1_stderr")
         started = _format_date(run.get("started_at"))
+        task_version = run.get("task_version", "")
         total_secs = _duration_seconds(run.get("started_at"), run.get("completed_at"))
         cost = run.get("cost")
         input_tok = run.get("input_tokens", 0)
@@ -1089,7 +1104,8 @@ def write_pubs_site(pubs_data: list[dict], destination: Path) -> None:
             f"<td>{_format_duration(avg_t)}</td>"
             f"<td>{_format_duration(min_t)}</td>"
             f"<td>{_format_duration(max_t)}</td>"
-            f"<td>{started}</td></tr>"
+            f"<td>{started}</td>"
+            f"<td>{_format_version(task_version)}</td></tr>"
         )
     rows_html = "\n".join(rows)
 
@@ -1218,6 +1234,7 @@ def write_pubs_site(pubs_data: list[dict], destination: Path) -> None:
         <th class="time">Shortest</th>
         <th class="time">Longest</th>
         <th class="meta">Date</th>
+        <th class="meta">Task Dataset Version</th>
       </tr>
     </thead>
     <tbody>
@@ -1698,8 +1715,8 @@ def main() -> None:
     parser.add_argument(
         "--eval-metadata",
         type=Path,
-        default=Path("evaluation/main/eval_tools.yaml"),
-        help="Path to eval_tools.yaml for question metadata (for sweet spot table)",
+        default=Path("evaluation/main/dataset_attributes.yaml"),
+        help="Path to dataset_attributes.yaml for question metadata (for sweet spot table)",
     )
     args = parser.parse_args()
 

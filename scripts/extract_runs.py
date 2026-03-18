@@ -28,6 +28,7 @@ class RunSummary:
     total_samples: int | None = None
     git_commit: str | None = None
     task_name: str | None = None
+    task_version: str | None = None
     score_stderr: float | None = None
     min_sample_time: float | None = None
     max_sample_time: float | None = None
@@ -50,7 +51,7 @@ QuestionMeta = dict[str, dict[str, str]]  # id -> {level, complexity, user_frust
 
 
 def load_question_metadata(yaml_path: Path) -> QuestionMeta:
-    """Load question difficulty metadata from eval_tools.yaml."""
+    """Load question difficulty metadata from dataset_attributes.yaml."""
     if yaml is None:
         print("PyYAML not installed; skipping difficulty breakdown", file=sys.stderr)
         return {}
@@ -103,7 +104,7 @@ def _compute_sample_breakdowns(
                 break
         if score_val is None:
             continue
-        # Difficulty + frustration breakdown (from eval_tools.yaml metadata)
+        # Difficulty + frustration breakdown (from dataset_attributes.yaml metadata)
         meta = question_meta.get(sid)
         if meta:
             level = meta.get("level", "")
@@ -193,6 +194,7 @@ def load_runs(
         total_samples = None
         git_commit = None
         task_name = None
+        task_version = None
         header_file = run_dir / "header.json"
         if header_file.exists():
             try:
@@ -204,6 +206,7 @@ def load_runs(
                 total_samples = results.get("total_samples")
                 eval_info = header.get("eval", {})
                 task_name = eval_info.get("task")
+                task_version = str(eval_info.get("task_version", "")) if eval_info.get("task_version") is not None else None
                 revision = eval_info.get("revision", {})
                 git_commit = revision.get("commit")
             except json.JSONDecodeError:
@@ -278,6 +281,7 @@ def load_runs(
                 total_samples=total_samples,
                 git_commit=git_commit,
                 task_name=task_name,
+                task_version=task_version,
                 score_stderr=overall.get("score_stderr"),
                 min_sample_time=min_sample_time,
                 max_sample_time=max_sample_time,
@@ -308,6 +312,7 @@ def run_to_dict(run: RunSummary) -> dict:
         "score": run.overall_score,
         "cost": run.overall_cost,
         "task_name": run.task_name,
+        "task_version": run.task_version,
         "total_samples": run.total_samples,
         "started_at": run.started_at,
         "completed_at": run.completed_at,
@@ -424,6 +429,11 @@ def load_pubs_runs(log_dir: Path) -> list[dict]:
         n_samples = len(log.samples) if log.samples else 0
         status = log.status
 
+        # Extract task_version
+        task_version = None
+        if hasattr(log.eval, "task_version") and log.eval.task_version is not None:
+            task_version = str(log.eval.task_version)
+
         entry: dict = {
             "log_file": eval_file.name,
             "model": model,
@@ -431,6 +441,7 @@ def load_pubs_runs(log_dir: Path) -> list[dict]:
             "status": status,
             "samples": n_samples,
             "total_samples": 130,
+            "task_version": task_version,
         }
 
         # Extract timestamps
@@ -561,8 +572,8 @@ def main() -> None:
     parser.add_argument(
         "--eval-metadata",
         type=Path,
-        default=Path("evaluation/main/eval_tools.yaml"),
-        help="Path to eval_tools.yaml for difficulty metadata",
+        default=Path("evaluation/main/dataset_attributes.yaml"),
+        help="Path to dataset_attributes.yaml for difficulty metadata",
     )
     parser.add_argument(
         "--output",

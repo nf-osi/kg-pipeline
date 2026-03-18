@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Generate a summary README from eval_tools.yaml
+Generate a summary README from dataset_attributes.yaml
 
 Parses the Research Tools Discovery Evaluation Dataset and creates
 a formatted README with statistics, summaries, and organized question lists.
@@ -352,7 +352,7 @@ def update_readme_section(readme_path, new_content):
     # Title is H1, auto-generated sections start at H3
     full_content = (
         f"# Research Tools Discovery Evaluation Dataset\n\n"
-        f"*Auto-generated from `eval_tools.yaml`*\n\n"
+        f"*Auto-generated from `dataset_attributes.yaml`*\n\n"
         f"{begin_marker}\n\n"
         f"{new_content}\n\n"
         f"{end_marker}\n"
@@ -459,7 +459,7 @@ def main():
     """Main entry point."""
     # Paths (script now in evaluation/ directory)
     script_dir = Path(__file__).parent
-    yaml_path = script_dir / 'main' / 'eval_tools.yaml'
+    yaml_path = script_dir / 'main' / 'dataset_attributes.yaml'
     qa_dir = script_dir / 'qa'
     readme_path = script_dir / 'README.md'
 

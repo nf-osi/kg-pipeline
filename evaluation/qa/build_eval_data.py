@@ -23,9 +23,25 @@ from pathlib import Path
 import yaml
 
 
+def get_dataset_version(attributes_file):
+    """Load dataset version from dataset_attributes.yaml, defaulting to 'draft'."""
+    if not attributes_file.exists():
+        return 'draft'
+    try:
+        with open(attributes_file) as f:
+            config = yaml.safe_load(f)
+            return config.get('metadata', {}).get('version', 'draft')
+    except Exception:
+        return 'draft'
+
+
 def main():
     qa_dir = Path(__file__).parent
     output_path = qa_dir.parent.parent / "astabench/astabench/evals/nf_rag_pubs/eval_data.yaml"
+    attributes_file = qa_dir / "dataset_attributes.yaml"
+
+    # Load dataset version
+    dataset_version = get_dataset_version(attributes_file)
 
     # Find all qa_PMC*.yaml files
     qa_files = sorted(qa_dir.glob("qa_PMC*.yaml"))
@@ -83,7 +99,15 @@ def main():
         f.write(f"# Questions: {len(all_questions)}\n")
         f.write(f"# Papers: {len(set(q['pmcid'] for q in all_questions.values()))}\n")
         f.write("\n")
-        yaml.dump({"ground_truth": all_questions}, f, default_flow_style=False, sort_keys=False)
+        output_data = {
+            "metadata": {
+                "version": dataset_version,
+                "total_questions": len(all_questions),
+                "total_papers": len(set(q['pmcid'] for q in all_questions.values()))
+            },
+            "ground_truth": all_questions
+        }
+        yaml.dump(output_data, f, default_flow_style=False, sort_keys=False)
 
     print(f"Wrote {len(all_questions)} questions to {output_path}")
 
