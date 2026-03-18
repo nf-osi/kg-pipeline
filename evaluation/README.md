@@ -11,10 +11,10 @@ This directory contains two evaluation tracks:
 
 ## Publication QA Evaluation
 
-To evaluate the overall RAG-based system for publications, we primarily use multiple-choice QA pairs, a similar format to the [PaperQA2](https://huggingface.co/datasets/futurehouse/lab-bench/viewer/LitQA2) and [Humanity's Last Exam](https://www.nature.com/articles/s41586-025-09962-4) benchmark datasets. 
+To evaluate the overall RAG-based system for publications, we primarily use multiple-choice QA pairs, a similar format to [PaperQA2](https://huggingface.co/datasets/futurehouse/lab-bench/viewer/LitQA2) and [Humanity's Last Exam](https://www.nature.com/articles/s41586-025-09962-4). 
 Items are first generated using current frontier models with PubTator3 full-text papers, then further curated and edited by the NF-OSI team.
 Each paper has between 5 to 15 questions spanning different difficulty levels and question types.
-How well the system performs is based on *both* the effectiveness/ergonomics of retrieval as well as the agent chosen for the system.
+How well the system performs is based on *both* the ergonomics of retrieval (influenced by what and how things are indexed) as well as the agent chosen for the system.
 
 Important item characteristics:
 
@@ -23,14 +23,22 @@ Important item characteristics:
 
 #### Curation process
 
-After initial generation, items undergo manual review and editing to address several types of issues. 
-For example, it is known that the literature can report conflicting evidence: In Humanity’s Last Exam, [it was found](https://www.futurehouse.org/research-announcements/hle-exam) that 29 ± 3.7% (95% CI) of the text-only chemistry and biology questions had answers with directly conflicting evidence in peer reviewed literature.
+After initial generation, items undergo manual review and editing to address several types of issues that have well-known precedents. 
+For example, in an earlier version of Humanity’s Last Exam, 30% of the text-only chemistry and biology questions had answers with directly conflicting evidence in peer reviewed literature ([source](https://www.futurehouse.org/research-announcements/hle-exam)).
 
-- **Cross-paper overlap and conflict**: When the same fact appears in multiple papers with potentially different reported values (e.g. 1:2000 vs 1:2500 for NF1 population incidence), overlapping questions are either removed, deduplicated, or made more specific (e.g. for "What is the current treatment for symptomatic PNs?" where one paper says surgery and another says selumetinib, to distinguish questions we can ask more specifically about "pharmacotherapy"). Remaining overlaps are documented with `editor_note` fields.
+- **Cross-paper overlap and conflict**: When the same fact appears in multiple papers with potentially different answers, overlapping questions are either removed, deduplicated, or made more specific. An example of a question removed was one with slightly different reported values for NF1 population incidence -- 1:2000 vs 1:2500. An example for a question that was made more specific: For "What is the current treatment for symptomatic PNs?", where one paper says surgery and another says selumetinib, to distinguish questions we can use the keyword "pharmacotherapy". Potential remaining overlaps are documented with `editor_note` fields. 
 - **Hallucinated content**: LLM-generated ideal answers sometimes include facts not present in the source paper (e.g. have found citation of a specific mutation variant that doesn't appear in the paper). These are corrected against the actual paper text.
-- **Vague study anchoring**: Questions like "What was the CS in the eyeblink conditioning experiments?" or "What are the limitations of the isogenic cell line experiments?" are too generic — the same methodology or finding may appear across multiple indexed papers. Questions are rewritten to better anchor to the specific study (e.g. "In the Nf1+/- mouse eyeblink conditioning study, what was used as the CS?", "What are the key limitations acknowledged in the Cancer Pathway Knockout Panel study?").
+- **Vague study anchoring**: Questions like "What was the CS in the eyeblink conditioning experiments?" or "What are the limitations of the isogenic cell line experiments?" are too generic — the same methodology or finding may appear across multiple indexed papers. Questions are rewritten to better anchor to the specific study (e.g. "In the Nf1+/- mouse eyeblink conditioning study, what was used as the CS?", "What are the key limitations acknowledged in the Cancer Pathway Knockout Panel study?"). **This is important because questions are presented in the eval without explicit info on which paper to reference, in order to implicitly test paper selection as well, and during eval the models cannot ask for clarification.** 
 - **Difficulty calibration**: Questions that appear simple in isolation but require cross-paper disambiguation are upgraded from `easy` to `medium`.
-- **Trivial or obvious questions**: Questions where the answer is obvious without retrieval (e.g. what protein does the NF1 mutation affect) or the distractors are implausible/absurd (e.g. which standard technique was used for proteomics analysis and no distractors are even proteomics assays) are removed, as they do not meaningfully test the system.
+- **Trivial or obvious questions**: Removal of questions where the answer is obvious without retrieval (e.g. what protein does the NF1 mutation affect) or the distractors are implausible/absurd (e.g. which standard technique was used for proteomics analysis and no distractors are even proteomics assays), as these don't meaningfully test the system or are unlikely to be asked by a real researcher.
+
+#### Limitations
+
+- The dataset so far has undergone only one round of review -- potentially, we may add additional rounds of review to yield a more ideal, tighter final version. 
+- Questions currently **do not** ask to draw conclusions across papers; this is considered advanced, potentially for sequel dataset development rather than the base version.
+- Ground truth for the exact attribution passage list can be especially hard to finalize.  
+- While designed for multiple-choice eval format first and foremost, the dataset should be usable for short-answer eval format as well, though any tweaks needed have not been comprehensively evaluated.
+- *question_type* classification is probably still somewhat fudgy.
 
 ### Files
 
