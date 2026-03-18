@@ -32,6 +32,11 @@ class RunSummary:
     min_sample_time: float | None = None
     max_sample_time: float | None = None
     avg_sample_time: float | None = None
+    input_tokens: int | None = None
+    output_tokens: int | None = None
+    cache_write_tokens: int | None = None
+    cache_read_tokens: int | None = None
+    total_tokens: int | None = None
     difficulty_scores: dict[str, float] = field(default_factory=dict)
     category_scores: dict[str, float] = field(default_factory=dict)
     frustration_scores: dict[str, float] = field(default_factory=dict)
@@ -153,6 +158,8 @@ def load_runs(
     log_root: Path,
     question_meta: QuestionMeta,
 ) -> list[RunSummary]:
+    from inspect_ai.log import read_eval_log
+
     runs: list[RunSummary] = []
     for run_dir in sorted(log_root.iterdir()):
         if not run_dir.is_dir():
@@ -202,6 +209,32 @@ def load_runs(
             except json.JSONDecodeError:
                 pass  # header.json is optional enrichment
 
+        # Try to compute cost and extract token counts from .eval file
+        cost = overall.get("cost")  # fallback to inspect_ai's calculation
+        input_tokens = None
+        output_tokens = None
+        cache_write_tokens = None
+        cache_read_tokens = None
+        total_tokens = None
+        eval_files = list(run_dir.glob("*.eval"))
+        if eval_files:
+            try:
+                log = read_eval_log(str(eval_files[0]))
+                if log.stats and log.stats.model_usage:
+                    model = (eval_spec or {}).get("model")
+                    if model and model in log.stats.model_usage:
+                        usage = log.stats.model_usage[model]
+                        input_tokens = usage.input_tokens or 0
+                        output_tokens = usage.output_tokens or 0
+                        cache_write_tokens = usage.input_tokens_cache_write or 0
+                        cache_read_tokens = usage.input_tokens_cache_read or 0
+                        total_tokens = usage.total_tokens or 0
+                        computed_cost = _compute_cost(model, usage)
+                        if computed_cost is not None:
+                            cost = computed_cost
+            except Exception:
+                pass  # keep fallback cost
+
         # Read summaries.json for per-sample timing and difficulty breakdown
         min_sample_time = None
         max_sample_time = None
@@ -238,7 +271,7 @@ def load_runs(
                 model=(eval_spec or {}).get("model"),
                 solver=(eval_spec or {}).get("solver"),
                 overall_score=overall.get("score"),
-                overall_cost=overall.get("cost"),
+                overall_cost=cost,
                 summary_path=summary_file,
                 started_at=started_at,
                 completed_at=completed_at,
@@ -249,6 +282,11 @@ def load_runs(
                 min_sample_time=min_sample_time,
                 max_sample_time=max_sample_time,
                 avg_sample_time=avg_sample_time,
+                input_tokens=input_tokens,
+                output_tokens=output_tokens,
+                cache_write_tokens=cache_write_tokens,
+                cache_read_tokens=cache_read_tokens,
+                total_tokens=total_tokens,
                 difficulty_scores=difficulty_scores,
                 category_scores=category_scores,
                 frustration_scores=frustration_scores,
@@ -278,6 +316,11 @@ def run_to_dict(run: RunSummary) -> dict:
         "min_sample_time": run.min_sample_time,
         "max_sample_time": run.max_sample_time,
         "avg_sample_time": run.avg_sample_time,
+        "input_tokens": run.input_tokens,
+        "output_tokens": run.output_tokens,
+        "cache_write_tokens": run.cache_write_tokens,
+        "cache_read_tokens": run.cache_read_tokens,
+        "total_tokens": run.total_tokens,
         "difficulty_scores": run.difficulty_scores,
         "category_scores": run.category_scores,
         "frustration_scores": run.frustration_scores,
@@ -409,6 +452,7 @@ def load_pubs_runs(log_dir: Path) -> list[dict]:
                 entry["output_tokens"] = usage.output_tokens or 0
                 entry["input_tokens_cache_write"] = usage.input_tokens_cache_write or 0
                 entry["input_tokens_cache_read"] = usage.input_tokens_cache_read or 0
+                entry["total_tokens"] = usage.total_tokens or 0
                 cost = _compute_cost(model, usage)
                 if cost is not None:
                     entry["cost"] = cost
