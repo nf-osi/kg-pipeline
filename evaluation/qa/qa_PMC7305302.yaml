@@ -7,10 +7,11 @@ questions:
   pmcid: PMC7305302
   author: gpt-5.4
   question: For patients with neurofibromatosis type 1 (NF1) who have symptomatic
-    plexiform neurofibromas, what treatment option is described as currently available?
-  user_query: nf1 symptomatic pnf current tx option?
-  ideal: Surgery is described as the only current treatment option for patients with
-    NF1 who have symptomatic plexiform neurofibromas.
+    plexiform neurofibromas, what was the first available treatment option?
+  user_query: nf1 symptomatic pnf first tx option?
+  ideal: PMID32561749 mentions a state where surgery was the only treatment option for patients with
+    NF1 who have symptomatic plexiform neurofibromas, without yet nonsurgical (pharmacological) therapy, 
+    therefore surgery must have been the first treatment option.
   choices:
   - Radiation therapy
   - Surgery
@@ -20,12 +21,12 @@ questions:
   passage_indices:
   - 4
   difficulty: medium
-  question_type: factual
-  editor_note: 'Related to PMC9221468-01 which asks about FDA-approved pharmacotherapy
-    for PNs (answer: selumetinib). This question asks about treatment options broadly
-    — the answer per this paper is surgery. Note that "MEK inhibitor therapy" is a
-    distractor here but the correct answer for the related question. Upgraded from
-    easy to medium given cross-paper disambiguation required.'
+  question_type: inferential
+  editor_note: 'We also have question PMC9221468-01 which asks about FDA-approved pharmacotherapy
+    for PNs (answer: selumetinib). This question asks about *first* treatment option
+    — the answer per this paper is surgery. "MEK inhibitor therapy" is a
+    distractor here bc technically it is a valid treatment option, but not the first. Upgraded from
+    easy to medium given close question interpretation and cross-paper disambiguation required.'
 - id: PMC7305302-02
   pmcid: PMC7305302
   author: gpt-5.4

@@ -12,7 +12,7 @@ questions:
   ideal: Selumetinib, a MEK inhibitor, is the only currently FDA-approved pharmacotherapy
     for symptomatic and inoperable plexiform neurofibromas in pediatric NF1 patients.
   choices:
-  - Everolimus
+  - Mirdametinib
   - Selumetinib
   - Tofacitinib
   - Not in knowledgebase
@@ -22,11 +22,15 @@ questions:
   - 3
   difficulty: medium
   question_type: factual
-  editor_note: 'Related to PMC7305302-01 which asks about current treatment options
-    for symptomatic PNs (answer: surgery). The key distinction is "pharmacotherapy"
+  editor_note: > 
+    On the surface, this seems like an easy factual question but is designed to be a bit trickier. 
+    It's related to PMC7305302-01, which asks about treatment options
+    for symptomatic PNs (but answer there is: surgery). The key distinction here is "pharmacotherapy"
     — this question asks specifically about FDA-approved drugs, while PMC7305302-01
-    asks about treatment options broadly. Both are valid but the agent must retrieve
-    the right paper''s passages to distinguish drug therapy from surgical intervention.'
+    asks about treatment options broadly. 
+    What's tricky here is throwing in Mirdametinib as first choice, which was approved in 2025 and is technically correct,
+    **but that fact is *not* in our set of indexed papers** so it functions as a good test of how well-grounded/by-the-books the agent is vs 
+    immediately going with its embedded memory.'
 - id: PMC9221468-02
   pmcid: PMC9221468
   author: claude-opus-4-6
