@@ -1,0 +1,6734 @@
+[
+  {
+    "log_file": "2026-03-17T10-39-35-07-00_nf-rag-pubs_MVqL8hta5UaGQ9EsC4LA6Q.eval",
+    "model": "anthropic/claude-sonnet-4-5",
+    "question_style": "precise",
+    "status": "success",
+    "samples": 130,
+    "total_samples": 130,
+    "task_version": "0",
+    "started_at": "2026-03-17T10:39:35-07:00",
+    "completed_at": "2026-03-17T10:46:58-07:00",
+    "input_tokens": 4423,
+    "output_tokens": 141022,
+    "input_tokens_cache_write": 3279840,
+    "input_tokens_cache_read": 13990883,
+    "total_tokens": 17416168,
+    "cost": 18.63,
+    "min_sample_time": 8.0,
+    "max_sample_time": 83.8,
+    "avg_sample_time": 30.8,
+    "accuracy": 0.9923,
+    "accuracy_stderr": 0.0077,
+    "citation_f1": 0.7717,
+    "citation_f1_stderr": 0.0208,
+    "difficulty_accuracy": {
+      "easy": 1.0,
+      "medium": 1.0,
+      "hard": 0.9737
+    },
+    "difficulty_f1": {
+      "easy": 0.6953,
+      "medium": 0.8375,
+      "hard": 0.7284
+    },
+    "question_type_accuracy": {
+      "factual": 1.0,
+      "comparative": 1.0,
+      "causal": 1.0,
+      "inferential": 1.0,
+      "methodological": 0.9677
+    },
+    "question_type_f1": {
+      "factual": 0.7797,
+      "comparative": 0.8188,
+      "causal": 0.7176,
+      "inferential": 0.6765,
+      "methodological": 0.7677
+    },
+    "paper_accuracy": {
+      "PMC3484870": 1.0,
+      "PMC7305302": 1.0,
+      "PMC7952412": 1.0,
+      "PMC8150846": 1.0,
+      "PMC8172195": 1.0,
+      "PMC8447793": 1.0,
+      "PMC8469245": 1.0,
+      "PMC8705852": 1.0,
+      "PMC8742817": 1.0,
+      "PMC8959601": 1.0,
+      "PMC9184558": 0.9091,
+      "PMC9221468": 1.0,
+      "PMC9646701": 1.0,
+      "PMC9929861": 1.0
+    },
+    "paper_f1": {
+      "PMC3484870": 0.7005,
+      "PMC7305302": 0.9357,
+      "PMC7952412": 0.6971,
+      "PMC8150846": 0.6514,
+      "PMC8172195": 0.7131,
+      "PMC8447793": 0.6082,
+      "PMC8469245": 0.7083,
+      "PMC8705852": 0.75,
+      "PMC8742817": 0.9077,
+      "PMC8959601": 0.8923,
+      "PMC9184558": 0.7131,
+      "PMC9221468": 0.7583,
+      "PMC9646701": 0.9113,
+      "PMC9929861": 0.6731
+    },
+    "per_sample": [
+      {
+        "id": "PMC3484870-01",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC3484870"
+      },
+      {
+        "id": "PMC3484870-02",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC3484870"
+      },
+      {
+        "id": "PMC3484870-03",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC3484870"
+      },
+      {
+        "id": "PMC3484870-04",
+        "accuracy": 1.0,
+        "f1": 0.8,
+        "difficulty": "medium",
+        "question_type": "causal",
+        "paper": "PMC3484870"
+      },
+      {
+        "id": "PMC3484870-05",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC3484870"
+      },
+      {
+        "id": "PMC3484870-06",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "hard",
+        "question_type": "inferential",
+        "paper": "PMC3484870"
+      },
+      {
+        "id": "PMC3484870-07",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC3484870"
+      },
+      {
+        "id": "PMC3484870-08",
+        "accuracy": 1.0,
+        "f1": 0.8,
+        "difficulty": "hard",
+        "question_type": "inferential",
+        "paper": "PMC3484870"
+      },
+      {
+        "id": "PMC3484870-09",
+        "accuracy": 1.0,
+        "f1": 0.5714,
+        "difficulty": "hard",
+        "question_type": "causal",
+        "paper": "PMC3484870"
+      },
+      {
+        "id": "PMC3484870-10",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC3484870"
+      },
+      {
+        "id": "PMC7305302-01",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC7305302"
+      },
+      {
+        "id": "PMC7305302-02",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC7305302"
+      },
+      {
+        "id": "PMC7305302-03",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC7305302"
+      },
+      {
+        "id": "PMC7305302-04",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC7305302"
+      },
+      {
+        "id": "PMC7305302-05",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "hard",
+        "question_type": "methodological",
+        "paper": "PMC7305302"
+      },
+      {
+        "id": "PMC7305302-06",
+        "accuracy": 1.0,
+        "f1": 0.8,
+        "difficulty": "medium",
+        "question_type": "causal",
+        "paper": "PMC7305302"
+      },
+      {
+        "id": "PMC7305302-07",
+        "accuracy": 1.0,
+        "f1": 0.75,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC7305302"
+      },
+      {
+        "id": "PMC7952412-01",
+        "accuracy": 1.0,
+        "f1": 0.4444,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC7952412"
+      },
+      {
+        "id": "PMC7952412-02",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC7952412"
+      },
+      {
+        "id": "PMC7952412-03",
+        "accuracy": 1.0,
+        "f1": 0.5714,
+        "difficulty": "hard",
+        "question_type": "inferential",
+        "paper": "PMC7952412"
+      },
+      {
+        "id": "PMC7952412-04",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "easy",
+        "question_type": "methodological",
+        "paper": "PMC7952412"
+      },
+      {
+        "id": "PMC7952412-05",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC7952412"
+      },
+      {
+        "id": "PMC7952412-06",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC7952412"
+      },
+      {
+        "id": "PMC8150846-01",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC8150846"
+      },
+      {
+        "id": "PMC8150846-02",
+        "accuracy": 1.0,
+        "f1": 0.8571,
+        "difficulty": "hard",
+        "question_type": "factual",
+        "paper": "PMC8150846"
+      },
+      {
+        "id": "PMC8150846-03",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC8150846"
+      },
+      {
+        "id": "PMC8150846-04",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC8150846"
+      },
+      {
+        "id": "PMC8150846-05",
+        "accuracy": 1.0,
+        "f1": 0.4,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC8150846"
+      },
+      {
+        "id": "PMC8172195-01",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC8172195"
+      },
+      {
+        "id": "PMC8172195-02",
+        "accuracy": 1.0,
+        "f1": 0.3333,
+        "difficulty": "easy",
+        "question_type": "methodological",
+        "paper": "PMC8172195"
+      },
+      {
+        "id": "PMC8172195-03",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC8172195"
+      },
+      {
+        "id": "PMC8172195-04",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC8172195"
+      },
+      {
+        "id": "PMC8172195-05",
+        "accuracy": 1.0,
+        "f1": 0.8,
+        "difficulty": "hard",
+        "question_type": "causal",
+        "paper": "PMC8172195"
+      },
+      {
+        "id": "PMC8172195-06",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "medium",
+        "question_type": "causal",
+        "paper": "PMC8172195"
+      },
+      {
+        "id": "PMC8172195-07",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "easy",
+        "question_type": "methodological",
+        "paper": "PMC8172195"
+      },
+      {
+        "id": "PMC8172195-08",
+        "accuracy": 1.0,
+        "f1": 0.5714,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC8172195"
+      },
+      {
+        "id": "PMC8447793-01",
+        "accuracy": 1.0,
+        "f1": 0.75,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC8447793"
+      },
+      {
+        "id": "PMC8447793-02",
+        "accuracy": 1.0,
+        "f1": 0.4,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC8447793"
+      },
+      {
+        "id": "PMC8447793-03",
+        "accuracy": 1.0,
+        "f1": 0.3077,
+        "difficulty": "hard",
+        "question_type": "causal",
+        "paper": "PMC8447793"
+      },
+      {
+        "id": "PMC8447793-04",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC8447793"
+      },
+      {
+        "id": "PMC8447793-05",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC8447793"
+      },
+      {
+        "id": "PMC8447793-06",
+        "accuracy": 1.0,
+        "f1": 0.8,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC8447793"
+      },
+      {
+        "id": "PMC8447793-07",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC8447793"
+      },
+      {
+        "id": "PMC8469245-01",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC8469245"
+      },
+      {
+        "id": "PMC8469245-02",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC8469245"
+      },
+      {
+        "id": "PMC8469245-03",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC8469245"
+      },
+      {
+        "id": "PMC8469245-04",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC8469245"
+      },
+      {
+        "id": "PMC8469245-05",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "hard",
+        "question_type": "methodological",
+        "paper": "PMC8469245"
+      },
+      {
+        "id": "PMC8469245-06",
+        "accuracy": 1.0,
+        "f1": 0.75,
+        "difficulty": "hard",
+        "question_type": "inferential",
+        "paper": "PMC8469245"
+      },
+      {
+        "id": "PMC8705852-01",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC8705852"
+      },
+      {
+        "id": "PMC8705852-02",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC8705852"
+      },
+      {
+        "id": "PMC8705852-03",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "hard",
+        "question_type": "factual",
+        "paper": "PMC8705852"
+      },
+      {
+        "id": "PMC8705852-04",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC8705852"
+      },
+      {
+        "id": "PMC8705852-05",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC8705852"
+      },
+      {
+        "id": "PMC8705852-06",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC8705852"
+      },
+      {
+        "id": "PMC8705852-07",
+        "accuracy": 1.0,
+        "f1": 0.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC8705852"
+      },
+      {
+        "id": "PMC8705852-08",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "hard",
+        "question_type": "methodological",
+        "paper": "PMC8705852"
+      },
+      {
+        "id": "PMC8742817-01",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-02",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-03",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "causal",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-04",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-05",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-06",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-07",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-08",
+        "accuracy": 1.0,
+        "f1": 0.8,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-09",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-10",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "hard",
+        "question_type": "factual",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-11",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "easy",
+        "question_type": "comparative",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-12",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "hard",
+        "question_type": "inferential",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-13",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8959601-01",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-02",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-03",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-04",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-05",
+        "accuracy": 1.0,
+        "f1": 0.8,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-06",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "hard",
+        "question_type": "causal",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-07",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-08",
+        "accuracy": 1.0,
+        "f1": 0.8,
+        "difficulty": "hard",
+        "question_type": "causal",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-09",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-10",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-11",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "hard",
+        "question_type": "methodological",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-12",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-13",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC9184558-01",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC9184558"
+      },
+      {
+        "id": "PMC9184558-02",
+        "accuracy": 1.0,
+        "f1": 0.4444,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC9184558"
+      },
+      {
+        "id": "PMC9184558-03",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC9184558"
+      },
+      {
+        "id": "PMC9184558-04",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC9184558"
+      },
+      {
+        "id": "PMC9184558-05",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "causal",
+        "paper": "PMC9184558"
+      },
+      {
+        "id": "PMC9184558-06",
+        "accuracy": 1.0,
+        "f1": 0.4,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC9184558"
+      },
+      {
+        "id": "PMC9184558-07",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC9184558"
+      },
+      {
+        "id": "PMC9184558-08",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC9184558"
+      },
+      {
+        "id": "PMC9184558-09",
+        "accuracy": 0.0,
+        "f1": 0.0,
+        "difficulty": "hard",
+        "question_type": "methodological",
+        "paper": "PMC9184558"
+      },
+      {
+        "id": "PMC9184558-10",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC9184558"
+      },
+      {
+        "id": "PMC9184558-11",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "causal",
+        "paper": "PMC9184558"
+      },
+      {
+        "id": "PMC9221468-01",
+        "accuracy": 1.0,
+        "f1": 0.8,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9221468-02",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9221468-03",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "medium",
+        "question_type": "causal",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9221468-04",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9221468-05",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9221468-06",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9221468-07",
+        "accuracy": 1.0,
+        "f1": 0.8,
+        "difficulty": "hard",
+        "question_type": "inferential",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9221468-08",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9221468-09",
+        "accuracy": 1.0,
+        "f1": 0.3333,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9221468-10",
+        "accuracy": 1.0,
+        "f1": 0.3333,
+        "difficulty": "hard",
+        "question_type": "methodological",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9221468-11",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "hard",
+        "question_type": "factual",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9221468-12",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9646701-01",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC9646701"
+      },
+      {
+        "id": "PMC9646701-02",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "easy",
+        "question_type": "methodological",
+        "paper": "PMC9646701"
+      },
+      {
+        "id": "PMC9646701-03",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC9646701"
+      },
+      {
+        "id": "PMC9646701-04",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC9646701"
+      },
+      {
+        "id": "PMC9646701-05",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC9646701"
+      },
+      {
+        "id": "PMC9646701-06",
+        "accuracy": 1.0,
+        "f1": 0.8571,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC9646701"
+      },
+      {
+        "id": "PMC9646701-07",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "hard",
+        "question_type": "causal",
+        "paper": "PMC9646701"
+      },
+      {
+        "id": "PMC9646701-08",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "hard",
+        "question_type": "inferential",
+        "paper": "PMC9646701"
+      },
+      {
+        "id": "PMC9646701-09",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC9646701"
+      },
+      {
+        "id": "PMC9646701-10",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "hard",
+        "question_type": "methodological",
+        "paper": "PMC9646701"
+      },
+      {
+        "id": "PMC9646701-11",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC9646701"
+      },
+      {
+        "id": "PMC9929861-01",
+        "accuracy": 1.0,
+        "f1": 0.75,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-02",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-03",
+        "accuracy": 1.0,
+        "f1": 0.3333,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-04",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-05",
+        "accuracy": 1.0,
+        "f1": 0.8,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-06",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "hard",
+        "question_type": "inferential",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-07",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-08",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-09",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-10",
+        "accuracy": 1.0,
+        "f1": 0.8,
+        "difficulty": "medium",
+        "question_type": "causal",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-11",
+        "accuracy": 1.0,
+        "f1": 0.4,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-12",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "easy",
+        "question_type": "methodological",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-13",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "hard",
+        "question_type": "inferential",
+        "paper": "PMC9929861"
+      }
+    ]
+  },
+  {
+    "log_file": "2026-03-17T10-39-35-07-00_nf-rag-pubs_eLwFyoZAF5X9USn92E3p2d.eval",
+    "model": "anthropic/claude-haiku-4-5",
+    "question_style": "precise",
+    "status": "success",
+    "samples": 130,
+    "total_samples": 130,
+    "task_version": "0",
+    "started_at": "2026-03-17T10:39:35-07:00",
+    "completed_at": "2026-03-17T10:42:41-07:00",
+    "input_tokens": 428108,
+    "output_tokens": 125762,
+    "input_tokens_cache_write": 2378880,
+    "input_tokens_cache_read": 6615404,
+    "total_tokens": 9548154,
+    "cost": 4.69,
+    "min_sample_time": 3.6,
+    "max_sample_time": 75.4,
+    "avg_sample_time": 12.7,
+    "accuracy": 0.9615,
+    "accuracy_stderr": 0.0169,
+    "citation_f1": 0.6888,
+    "citation_f1_stderr": 0.0288,
+    "difficulty_accuracy": {
+      "easy": 1.0,
+      "medium": 0.9344,
+      "hard": 0.9737
+    },
+    "difficulty_f1": {
+      "easy": 0.6034,
+      "medium": 0.7408,
+      "hard": 0.675
+    },
+    "question_type_accuracy": {
+      "factual": 0.9574,
+      "comparative": 0.9655,
+      "causal": 1.0,
+      "inferential": 1.0,
+      "methodological": 0.9355
+    },
+    "question_type_f1": {
+      "factual": 0.6893,
+      "comparative": 0.7424,
+      "causal": 0.6107,
+      "inferential": 0.619,
+      "methodological": 0.6935
+    },
+    "paper_accuracy": {
+      "PMC3484870": 1.0,
+      "PMC7305302": 0.7143,
+      "PMC7952412": 1.0,
+      "PMC8150846": 1.0,
+      "PMC8172195": 1.0,
+      "PMC8447793": 0.8571,
+      "PMC8469245": 1.0,
+      "PMC8705852": 1.0,
+      "PMC8742817": 1.0,
+      "PMC8959601": 1.0,
+      "PMC9184558": 1.0,
+      "PMC9221468": 0.9167,
+      "PMC9646701": 1.0,
+      "PMC9929861": 0.9231
+    },
+    "paper_f1": {
+      "PMC3484870": 0.6738,
+      "PMC7305302": 0.4286,
+      "PMC7952412": 0.6167,
+      "PMC8150846": 0.7181,
+      "PMC8172195": 0.5208,
+      "PMC8447793": 0.4167,
+      "PMC8469245": 0.8444,
+      "PMC8705852": 0.725,
+      "PMC8742817": 0.8821,
+      "PMC8959601": 0.8333,
+      "PMC9184558": 0.7792,
+      "PMC9221468": 0.6611,
+      "PMC9646701": 0.8446,
+      "PMC9929861": 0.4978
+    },
+    "per_sample": [
+      {
+        "id": "PMC3484870-01",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC3484870"
+      },
+      {
+        "id": "PMC3484870-02",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC3484870"
+      },
+      {
+        "id": "PMC3484870-03",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC3484870"
+      },
+      {
+        "id": "PMC3484870-04",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "causal",
+        "paper": "PMC3484870"
+      },
+      {
+        "id": "PMC3484870-05",
+        "accuracy": 1.0,
+        "f1": 0.0,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC3484870"
+      },
+      {
+        "id": "PMC3484870-06",
+        "accuracy": 1.0,
+        "f1": 0.5714,
+        "difficulty": "hard",
+        "question_type": "inferential",
+        "paper": "PMC3484870"
+      },
+      {
+        "id": "PMC3484870-07",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC3484870"
+      },
+      {
+        "id": "PMC3484870-08",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "hard",
+        "question_type": "inferential",
+        "paper": "PMC3484870"
+      },
+      {
+        "id": "PMC3484870-09",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "hard",
+        "question_type": "causal",
+        "paper": "PMC3484870"
+      },
+      {
+        "id": "PMC3484870-10",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC3484870"
+      },
+      {
+        "id": "PMC7305302-01",
+        "accuracy": 0.0,
+        "f1": 0.0,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC7305302"
+      },
+      {
+        "id": "PMC7305302-02",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC7305302"
+      },
+      {
+        "id": "PMC7305302-03",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC7305302"
+      },
+      {
+        "id": "PMC7305302-04",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC7305302"
+      },
+      {
+        "id": "PMC7305302-05",
+        "accuracy": 1.0,
+        "f1": 0.0,
+        "difficulty": "hard",
+        "question_type": "methodological",
+        "paper": "PMC7305302"
+      },
+      {
+        "id": "PMC7305302-06",
+        "accuracy": 1.0,
+        "f1": 0.0,
+        "difficulty": "medium",
+        "question_type": "causal",
+        "paper": "PMC7305302"
+      },
+      {
+        "id": "PMC7305302-07",
+        "accuracy": 0.0,
+        "f1": 0.0,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC7305302"
+      },
+      {
+        "id": "PMC7952412-01",
+        "accuracy": 1.0,
+        "f1": 0.4,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC7952412"
+      },
+      {
+        "id": "PMC7952412-02",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC7952412"
+      },
+      {
+        "id": "PMC7952412-03",
+        "accuracy": 1.0,
+        "f1": 0.3333,
+        "difficulty": "hard",
+        "question_type": "inferential",
+        "paper": "PMC7952412"
+      },
+      {
+        "id": "PMC7952412-04",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "easy",
+        "question_type": "methodological",
+        "paper": "PMC7952412"
+      },
+      {
+        "id": "PMC7952412-05",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC7952412"
+      },
+      {
+        "id": "PMC7952412-06",
+        "accuracy": 1.0,
+        "f1": 0.8,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC7952412"
+      },
+      {
+        "id": "PMC8150846-01",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC8150846"
+      },
+      {
+        "id": "PMC8150846-02",
+        "accuracy": 1.0,
+        "f1": 0.8571,
+        "difficulty": "hard",
+        "question_type": "factual",
+        "paper": "PMC8150846"
+      },
+      {
+        "id": "PMC8150846-03",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC8150846"
+      },
+      {
+        "id": "PMC8150846-04",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC8150846"
+      },
+      {
+        "id": "PMC8150846-05",
+        "accuracy": 1.0,
+        "f1": 0.4,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC8150846"
+      },
+      {
+        "id": "PMC8172195-01",
+        "accuracy": 1.0,
+        "f1": 0.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC8172195"
+      },
+      {
+        "id": "PMC8172195-02",
+        "accuracy": 1.0,
+        "f1": 0.0,
+        "difficulty": "easy",
+        "question_type": "methodological",
+        "paper": "PMC8172195"
+      },
+      {
+        "id": "PMC8172195-03",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC8172195"
+      },
+      {
+        "id": "PMC8172195-04",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC8172195"
+      },
+      {
+        "id": "PMC8172195-05",
+        "accuracy": 1.0,
+        "f1": 0.0,
+        "difficulty": "hard",
+        "question_type": "causal",
+        "paper": "PMC8172195"
+      },
+      {
+        "id": "PMC8172195-06",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "causal",
+        "paper": "PMC8172195"
+      },
+      {
+        "id": "PMC8172195-07",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "easy",
+        "question_type": "methodological",
+        "paper": "PMC8172195"
+      },
+      {
+        "id": "PMC8172195-08",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC8172195"
+      },
+      {
+        "id": "PMC8447793-01",
+        "accuracy": 1.0,
+        "f1": 0.3333,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC8447793"
+      },
+      {
+        "id": "PMC8447793-02",
+        "accuracy": 1.0,
+        "f1": 0.3333,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC8447793"
+      },
+      {
+        "id": "PMC8447793-03",
+        "accuracy": 1.0,
+        "f1": 0.25,
+        "difficulty": "hard",
+        "question_type": "causal",
+        "paper": "PMC8447793"
+      },
+      {
+        "id": "PMC8447793-04",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC8447793"
+      },
+      {
+        "id": "PMC8447793-05",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC8447793"
+      },
+      {
+        "id": "PMC8447793-06",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC8447793"
+      },
+      {
+        "id": "PMC8447793-07",
+        "accuracy": 0.0,
+        "f1": 0.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC8447793"
+      },
+      {
+        "id": "PMC8469245-01",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC8469245"
+      },
+      {
+        "id": "PMC8469245-02",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC8469245"
+      },
+      {
+        "id": "PMC8469245-03",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC8469245"
+      },
+      {
+        "id": "PMC8469245-04",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC8469245"
+      },
+      {
+        "id": "PMC8469245-05",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "hard",
+        "question_type": "methodological",
+        "paper": "PMC8469245"
+      },
+      {
+        "id": "PMC8469245-06",
+        "accuracy": 1.0,
+        "f1": 0.4,
+        "difficulty": "hard",
+        "question_type": "inferential",
+        "paper": "PMC8469245"
+      },
+      {
+        "id": "PMC8705852-01",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC8705852"
+      },
+      {
+        "id": "PMC8705852-02",
+        "accuracy": 1.0,
+        "f1": 0.0,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC8705852"
+      },
+      {
+        "id": "PMC8705852-03",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "hard",
+        "question_type": "factual",
+        "paper": "PMC8705852"
+      },
+      {
+        "id": "PMC8705852-04",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC8705852"
+      },
+      {
+        "id": "PMC8705852-05",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC8705852"
+      },
+      {
+        "id": "PMC8705852-06",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC8705852"
+      },
+      {
+        "id": "PMC8705852-07",
+        "accuracy": 1.0,
+        "f1": 0.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC8705852"
+      },
+      {
+        "id": "PMC8705852-08",
+        "accuracy": 1.0,
+        "f1": 0.8,
+        "difficulty": "hard",
+        "question_type": "methodological",
+        "paper": "PMC8705852"
+      },
+      {
+        "id": "PMC8742817-01",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-02",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-03",
+        "accuracy": 1.0,
+        "f1": 0.8,
+        "difficulty": "medium",
+        "question_type": "causal",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-04",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-05",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-06",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-07",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-08",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-09",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-10",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "hard",
+        "question_type": "factual",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-11",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "easy",
+        "question_type": "comparative",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-12",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "hard",
+        "question_type": "inferential",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-13",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8959601-01",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-02",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-03",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-04",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-05",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-06",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "hard",
+        "question_type": "causal",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-07",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-08",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "hard",
+        "question_type": "causal",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-09",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-10",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-11",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "hard",
+        "question_type": "methodological",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-12",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-13",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC9184558-01",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC9184558"
+      },
+      {
+        "id": "PMC9184558-02",
+        "accuracy": 1.0,
+        "f1": 0.5714,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC9184558"
+      },
+      {
+        "id": "PMC9184558-03",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC9184558"
+      },
+      {
+        "id": "PMC9184558-04",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC9184558"
+      },
+      {
+        "id": "PMC9184558-05",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "causal",
+        "paper": "PMC9184558"
+      },
+      {
+        "id": "PMC9184558-06",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC9184558"
+      },
+      {
+        "id": "PMC9184558-07",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC9184558"
+      },
+      {
+        "id": "PMC9184558-08",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC9184558"
+      },
+      {
+        "id": "PMC9184558-09",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "hard",
+        "question_type": "methodological",
+        "paper": "PMC9184558"
+      },
+      {
+        "id": "PMC9184558-10",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC9184558"
+      },
+      {
+        "id": "PMC9184558-11",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "causal",
+        "paper": "PMC9184558"
+      },
+      {
+        "id": "PMC9221468-01",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9221468-02",
+        "accuracy": 1.0,
+        "f1": 0.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9221468-03",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "causal",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9221468-04",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9221468-05",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9221468-06",
+        "accuracy": 1.0,
+        "f1": 0.8,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9221468-07",
+        "accuracy": 1.0,
+        "f1": 0.8,
+        "difficulty": "hard",
+        "question_type": "inferential",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9221468-08",
+        "accuracy": 0.0,
+        "f1": 0.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9221468-09",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9221468-10",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "hard",
+        "question_type": "methodological",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9221468-11",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "hard",
+        "question_type": "factual",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9221468-12",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9646701-01",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC9646701"
+      },
+      {
+        "id": "PMC9646701-02",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "easy",
+        "question_type": "methodological",
+        "paper": "PMC9646701"
+      },
+      {
+        "id": "PMC9646701-03",
+        "accuracy": 1.0,
+        "f1": 0.8,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC9646701"
+      },
+      {
+        "id": "PMC9646701-04",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC9646701"
+      },
+      {
+        "id": "PMC9646701-05",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC9646701"
+      },
+      {
+        "id": "PMC9646701-06",
+        "accuracy": 1.0,
+        "f1": 0.8571,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC9646701"
+      },
+      {
+        "id": "PMC9646701-07",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "hard",
+        "question_type": "causal",
+        "paper": "PMC9646701"
+      },
+      {
+        "id": "PMC9646701-08",
+        "accuracy": 1.0,
+        "f1": 0.8,
+        "difficulty": "hard",
+        "question_type": "inferential",
+        "paper": "PMC9646701"
+      },
+      {
+        "id": "PMC9646701-09",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC9646701"
+      },
+      {
+        "id": "PMC9646701-10",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "hard",
+        "question_type": "methodological",
+        "paper": "PMC9646701"
+      },
+      {
+        "id": "PMC9646701-11",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC9646701"
+      },
+      {
+        "id": "PMC9929861-01",
+        "accuracy": 1.0,
+        "f1": 0.4,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-02",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-03",
+        "accuracy": 1.0,
+        "f1": 0.5714,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-04",
+        "accuracy": 1.0,
+        "f1": 0.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-05",
+        "accuracy": 0.0,
+        "f1": 0.0,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-06",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "hard",
+        "question_type": "inferential",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-07",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-08",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-09",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-10",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "causal",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-11",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-12",
+        "accuracy": 1.0,
+        "f1": 0.0,
+        "difficulty": "easy",
+        "question_type": "methodological",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-13",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "hard",
+        "question_type": "inferential",
+        "paper": "PMC9929861"
+      }
+    ]
+  },
+  {
+    "log_file": "2026-03-17T10-56-12-07-00_nf-rag-pubs_ewdUFPx9dgHe4tDGwBrTqS.eval",
+    "model": "anthropic/claude-haiku-4-5",
+    "question_style": "user_query",
+    "status": "success",
+    "samples": 130,
+    "total_samples": 130,
+    "task_version": "0",
+    "started_at": "2026-03-17T10:56:12-07:00",
+    "completed_at": "2026-03-17T10:59:06-07:00",
+    "input_tokens": 373712,
+    "output_tokens": 133684,
+    "input_tokens_cache_write": 2546536,
+    "input_tokens_cache_read": 7064397,
+    "total_tokens": 10118329,
+    "cost": 4.93,
+    "min_sample_time": 3.1,
+    "max_sample_time": 91.5,
+    "avg_sample_time": 12.3,
+    "accuracy": 0.9692,
+    "accuracy_stderr": 0.0152,
+    "citation_f1": 0.6383,
+    "citation_f1_stderr": 0.032,
+    "difficulty_accuracy": {
+      "easy": 0.9355,
+      "medium": 0.9672,
+      "hard": 1.0
+    },
+    "difficulty_f1": {
+      "easy": 0.4018,
+      "medium": 0.7086,
+      "hard": 0.7183
+    },
+    "question_type_accuracy": {
+      "factual": 0.9574,
+      "comparative": 0.9655,
+      "causal": 1.0,
+      "inferential": 1.0,
+      "methodological": 0.9677
+    },
+    "question_type_f1": {
+      "factual": 0.5134,
+      "comparative": 0.7338,
+      "causal": 0.5857,
+      "inferential": 0.6963,
+      "methodological": 0.7452
+    },
+    "paper_accuracy": {
+      "PMC3484870": 0.9,
+      "PMC7305302": 0.8571,
+      "PMC7952412": 1.0,
+      "PMC8150846": 1.0,
+      "PMC8172195": 0.875,
+      "PMC8447793": 1.0,
+      "PMC8469245": 0.8333,
+      "PMC8705852": 1.0,
+      "PMC8742817": 1.0,
+      "PMC8959601": 1.0,
+      "PMC9184558": 1.0,
+      "PMC9221468": 1.0,
+      "PMC9646701": 1.0,
+      "PMC9929861": 1.0
+    },
+    "paper_f1": {
+      "PMC3484870": 0.6583,
+      "PMC7305302": 0.7605,
+      "PMC7952412": 0.6167,
+      "PMC8150846": 0.5476,
+      "PMC8172195": 0.2583,
+      "PMC8447793": 0.5905,
+      "PMC8469245": 0.5917,
+      "PMC8705852": 0.7292,
+      "PMC8742817": 0.5872,
+      "PMC8959601": 0.8051,
+      "PMC9184558": 0.7264,
+      "PMC9221468": 0.6111,
+      "PMC9646701": 0.7082,
+      "PMC9929861": 0.6026
+    },
+    "per_sample": [
+      {
+        "id": "PMC3484870-01",
+        "accuracy": 1.0,
+        "f1": 0.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC3484870"
+      },
+      {
+        "id": "PMC3484870-02",
+        "accuracy": 0.0,
+        "f1": 0.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC3484870"
+      },
+      {
+        "id": "PMC3484870-03",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC3484870"
+      },
+      {
+        "id": "PMC3484870-04",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "medium",
+        "question_type": "causal",
+        "paper": "PMC3484870"
+      },
+      {
+        "id": "PMC3484870-05",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC3484870"
+      },
+      {
+        "id": "PMC3484870-06",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "hard",
+        "question_type": "inferential",
+        "paper": "PMC3484870"
+      },
+      {
+        "id": "PMC3484870-07",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC3484870"
+      },
+      {
+        "id": "PMC3484870-08",
+        "accuracy": 1.0,
+        "f1": 0.75,
+        "difficulty": "hard",
+        "question_type": "inferential",
+        "paper": "PMC3484870"
+      },
+      {
+        "id": "PMC3484870-09",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "hard",
+        "question_type": "causal",
+        "paper": "PMC3484870"
+      },
+      {
+        "id": "PMC3484870-10",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC3484870"
+      },
+      {
+        "id": "PMC7305302-01",
+        "accuracy": 0.0,
+        "f1": 0.0,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC7305302"
+      },
+      {
+        "id": "PMC7305302-02",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC7305302"
+      },
+      {
+        "id": "PMC7305302-03",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC7305302"
+      },
+      {
+        "id": "PMC7305302-04",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC7305302"
+      },
+      {
+        "id": "PMC7305302-05",
+        "accuracy": 1.0,
+        "f1": 0.8,
+        "difficulty": "hard",
+        "question_type": "methodological",
+        "paper": "PMC7305302"
+      },
+      {
+        "id": "PMC7305302-06",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "causal",
+        "paper": "PMC7305302"
+      },
+      {
+        "id": "PMC7305302-07",
+        "accuracy": 1.0,
+        "f1": 0.8571,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC7305302"
+      },
+      {
+        "id": "PMC7952412-01",
+        "accuracy": 1.0,
+        "f1": 0.4,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC7952412"
+      },
+      {
+        "id": "PMC7952412-02",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC7952412"
+      },
+      {
+        "id": "PMC7952412-03",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "hard",
+        "question_type": "inferential",
+        "paper": "PMC7952412"
+      },
+      {
+        "id": "PMC7952412-04",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "easy",
+        "question_type": "methodological",
+        "paper": "PMC7952412"
+      },
+      {
+        "id": "PMC7952412-05",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC7952412"
+      },
+      {
+        "id": "PMC7952412-06",
+        "accuracy": 1.0,
+        "f1": 0.8,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC7952412"
+      },
+      {
+        "id": "PMC8150846-01",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC8150846"
+      },
+      {
+        "id": "PMC8150846-02",
+        "accuracy": 1.0,
+        "f1": 0.5714,
+        "difficulty": "hard",
+        "question_type": "factual",
+        "paper": "PMC8150846"
+      },
+      {
+        "id": "PMC8150846-03",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC8150846"
+      },
+      {
+        "id": "PMC8150846-04",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC8150846"
+      },
+      {
+        "id": "PMC8150846-05",
+        "accuracy": 1.0,
+        "f1": 0.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC8150846"
+      },
+      {
+        "id": "PMC8172195-01",
+        "accuracy": 1.0,
+        "f1": 0.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC8172195"
+      },
+      {
+        "id": "PMC8172195-02",
+        "accuracy": 0.0,
+        "f1": 0.0,
+        "difficulty": "easy",
+        "question_type": "methodological",
+        "paper": "PMC8172195"
+      },
+      {
+        "id": "PMC8172195-03",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC8172195"
+      },
+      {
+        "id": "PMC8172195-04",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC8172195"
+      },
+      {
+        "id": "PMC8172195-05",
+        "accuracy": 1.0,
+        "f1": 0.4,
+        "difficulty": "hard",
+        "question_type": "causal",
+        "paper": "PMC8172195"
+      },
+      {
+        "id": "PMC8172195-06",
+        "accuracy": 1.0,
+        "f1": 0.0,
+        "difficulty": "medium",
+        "question_type": "causal",
+        "paper": "PMC8172195"
+      },
+      {
+        "id": "PMC8172195-07",
+        "accuracy": 1.0,
+        "f1": 0.0,
+        "difficulty": "easy",
+        "question_type": "methodological",
+        "paper": "PMC8172195"
+      },
+      {
+        "id": "PMC8172195-08",
+        "accuracy": 1.0,
+        "f1": 0.0,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC8172195"
+      },
+      {
+        "id": "PMC8447793-01",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC8447793"
+      },
+      {
+        "id": "PMC8447793-02",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC8447793"
+      },
+      {
+        "id": "PMC8447793-03",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "hard",
+        "question_type": "causal",
+        "paper": "PMC8447793"
+      },
+      {
+        "id": "PMC8447793-04",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC8447793"
+      },
+      {
+        "id": "PMC8447793-05",
+        "accuracy": 1.0,
+        "f1": 0.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC8447793"
+      },
+      {
+        "id": "PMC8447793-06",
+        "accuracy": 1.0,
+        "f1": 0.8,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC8447793"
+      },
+      {
+        "id": "PMC8447793-07",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC8447793"
+      },
+      {
+        "id": "PMC8469245-01",
+        "accuracy": 1.0,
+        "f1": 0.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC8469245"
+      },
+      {
+        "id": "PMC8469245-02",
+        "accuracy": 1.0,
+        "f1": 0.8,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC8469245"
+      },
+      {
+        "id": "PMC8469245-03",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC8469245"
+      },
+      {
+        "id": "PMC8469245-04",
+        "accuracy": 0.0,
+        "f1": 0.0,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC8469245"
+      },
+      {
+        "id": "PMC8469245-05",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "hard",
+        "question_type": "methodological",
+        "paper": "PMC8469245"
+      },
+      {
+        "id": "PMC8469245-06",
+        "accuracy": 1.0,
+        "f1": 0.75,
+        "difficulty": "hard",
+        "question_type": "inferential",
+        "paper": "PMC8469245"
+      },
+      {
+        "id": "PMC8705852-01",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC8705852"
+      },
+      {
+        "id": "PMC8705852-02",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC8705852"
+      },
+      {
+        "id": "PMC8705852-03",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "hard",
+        "question_type": "factual",
+        "paper": "PMC8705852"
+      },
+      {
+        "id": "PMC8705852-04",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC8705852"
+      },
+      {
+        "id": "PMC8705852-05",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC8705852"
+      },
+      {
+        "id": "PMC8705852-06",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC8705852"
+      },
+      {
+        "id": "PMC8705852-07",
+        "accuracy": 1.0,
+        "f1": 0.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC8705852"
+      },
+      {
+        "id": "PMC8705852-08",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "hard",
+        "question_type": "methodological",
+        "paper": "PMC8705852"
+      },
+      {
+        "id": "PMC8742817-01",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-02",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-03",
+        "accuracy": 1.0,
+        "f1": 0.8,
+        "difficulty": "medium",
+        "question_type": "causal",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-04",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-05",
+        "accuracy": 1.0,
+        "f1": 0.0,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-06",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-07",
+        "accuracy": 1.0,
+        "f1": 0.0,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-08",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-09",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-10",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "hard",
+        "question_type": "factual",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-11",
+        "accuracy": 1.0,
+        "f1": 0.0,
+        "difficulty": "easy",
+        "question_type": "comparative",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-12",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "hard",
+        "question_type": "inferential",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-13",
+        "accuracy": 1.0,
+        "f1": 0.0,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8959601-01",
+        "accuracy": 1.0,
+        "f1": 0.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-02",
+        "accuracy": 1.0,
+        "f1": 0.8,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-03",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-04",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-05",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-06",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "hard",
+        "question_type": "causal",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-07",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-08",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "hard",
+        "question_type": "causal",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-09",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-10",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-11",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "hard",
+        "question_type": "methodological",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-12",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-13",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC9184558-01",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC9184558"
+      },
+      {
+        "id": "PMC9184558-02",
+        "accuracy": 1.0,
+        "f1": 0.8571,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC9184558"
+      },
+      {
+        "id": "PMC9184558-03",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC9184558"
+      },
+      {
+        "id": "PMC9184558-04",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC9184558"
+      },
+      {
+        "id": "PMC9184558-05",
+        "accuracy": 1.0,
+        "f1": 0.0,
+        "difficulty": "medium",
+        "question_type": "causal",
+        "paper": "PMC9184558"
+      },
+      {
+        "id": "PMC9184558-06",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC9184558"
+      },
+      {
+        "id": "PMC9184558-07",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC9184558"
+      },
+      {
+        "id": "PMC9184558-08",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC9184558"
+      },
+      {
+        "id": "PMC9184558-09",
+        "accuracy": 1.0,
+        "f1": 0.8,
+        "difficulty": "hard",
+        "question_type": "methodological",
+        "paper": "PMC9184558"
+      },
+      {
+        "id": "PMC9184558-10",
+        "accuracy": 1.0,
+        "f1": 0.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC9184558"
+      },
+      {
+        "id": "PMC9184558-11",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "causal",
+        "paper": "PMC9184558"
+      },
+      {
+        "id": "PMC9221468-01",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9221468-02",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9221468-03",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "causal",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9221468-04",
+        "accuracy": 1.0,
+        "f1": 0.0,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9221468-05",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9221468-06",
+        "accuracy": 1.0,
+        "f1": 0.8,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9221468-07",
+        "accuracy": 1.0,
+        "f1": 0.8,
+        "difficulty": "hard",
+        "question_type": "inferential",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9221468-08",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9221468-09",
+        "accuracy": 1.0,
+        "f1": 0.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9221468-10",
+        "accuracy": 1.0,
+        "f1": 0.4,
+        "difficulty": "hard",
+        "question_type": "methodological",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9221468-11",
+        "accuracy": 1.0,
+        "f1": 0.0,
+        "difficulty": "hard",
+        "question_type": "factual",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9221468-12",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9646701-01",
+        "accuracy": 1.0,
+        "f1": 0.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC9646701"
+      },
+      {
+        "id": "PMC9646701-02",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "easy",
+        "question_type": "methodological",
+        "paper": "PMC9646701"
+      },
+      {
+        "id": "PMC9646701-03",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC9646701"
+      },
+      {
+        "id": "PMC9646701-04",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC9646701"
+      },
+      {
+        "id": "PMC9646701-05",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC9646701"
+      },
+      {
+        "id": "PMC9646701-06",
+        "accuracy": 1.0,
+        "f1": 0.8571,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC9646701"
+      },
+      {
+        "id": "PMC9646701-07",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "hard",
+        "question_type": "causal",
+        "paper": "PMC9646701"
+      },
+      {
+        "id": "PMC9646701-08",
+        "accuracy": 1.0,
+        "f1": 0.8,
+        "difficulty": "hard",
+        "question_type": "inferential",
+        "paper": "PMC9646701"
+      },
+      {
+        "id": "PMC9646701-09",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC9646701"
+      },
+      {
+        "id": "PMC9646701-10",
+        "accuracy": 1.0,
+        "f1": 0.8,
+        "difficulty": "hard",
+        "question_type": "methodological",
+        "paper": "PMC9646701"
+      },
+      {
+        "id": "PMC9646701-11",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC9646701"
+      },
+      {
+        "id": "PMC9929861-01",
+        "accuracy": 1.0,
+        "f1": 0.4,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-02",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-03",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-04",
+        "accuracy": 1.0,
+        "f1": 0.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-05",
+        "accuracy": 1.0,
+        "f1": 0.8,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-06",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "hard",
+        "question_type": "inferential",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-07",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-08",
+        "accuracy": 1.0,
+        "f1": 0.8,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-09",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-10",
+        "accuracy": 1.0,
+        "f1": 0.0,
+        "difficulty": "medium",
+        "question_type": "causal",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-11",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-12",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "easy",
+        "question_type": "methodological",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-13",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "hard",
+        "question_type": "inferential",
+        "paper": "PMC9929861"
+      }
+    ]
+  },
+  {
+    "log_file": "2026-03-17T10-56-12-07-00_nf-rag-pubs_kopiHS2NdA2F6PVmY2UUrj.eval",
+    "model": "anthropic/claude-sonnet-4-5",
+    "question_style": "user_query",
+    "status": "success",
+    "samples": 130,
+    "total_samples": 130,
+    "task_version": "0",
+    "started_at": "2026-03-17T10:56:12-07:00",
+    "completed_at": "2026-03-17T11:03:47-07:00",
+    "input_tokens": 4505,
+    "output_tokens": 142830,
+    "input_tokens_cache_write": 3384474,
+    "input_tokens_cache_read": 14939587,
+    "total_tokens": 18471396,
+    "cost": 19.33,
+    "min_sample_time": 8.6,
+    "max_sample_time": 103.9,
+    "avg_sample_time": 32.3,
+    "accuracy": 0.9846,
+    "accuracy_stderr": 0.0108,
+    "citation_f1": 0.7403,
+    "citation_f1_stderr": 0.0232,
+    "difficulty_accuracy": {
+      "easy": 0.9677,
+      "medium": 0.9836,
+      "hard": 1.0
+    },
+    "difficulty_f1": {
+      "easy": 0.6573,
+      "medium": 0.7899,
+      "hard": 0.7285
+    },
+    "question_type_accuracy": {
+      "factual": 0.9787,
+      "comparative": 1.0,
+      "causal": 1.0,
+      "inferential": 1.0,
+      "methodological": 0.9677
+    },
+    "question_type_f1": {
+      "factual": 0.6966,
+      "comparative": 0.7788,
+      "causal": 0.6212,
+      "inferential": 0.7062,
+      "methodological": 0.8343
+    },
+    "paper_accuracy": {
+      "PMC3484870": 1.0,
+      "PMC7305302": 0.8571,
+      "PMC7952412": 1.0,
+      "PMC8150846": 1.0,
+      "PMC8172195": 0.875,
+      "PMC8447793": 1.0,
+      "PMC8469245": 1.0,
+      "PMC8705852": 1.0,
+      "PMC8742817": 1.0,
+      "PMC8959601": 1.0,
+      "PMC9184558": 1.0,
+      "PMC9221468": 1.0,
+      "PMC9646701": 1.0,
+      "PMC9929861": 1.0
+    },
+    "paper_f1": {
+      "PMC3484870": 0.7172,
+      "PMC7305302": 0.8146,
+      "PMC7952412": 0.6984,
+      "PMC8150846": 0.6143,
+      "PMC8172195": 0.5271,
+      "PMC8447793": 0.5472,
+      "PMC8469245": 0.7722,
+      "PMC8705852": 0.7042,
+      "PMC8742817": 0.8692,
+      "PMC8959601": 0.8385,
+      "PMC9184558": 0.8022,
+      "PMC9221468": 0.7685,
+      "PMC9646701": 0.7506,
+      "PMC9929861": 0.7143
+    },
+    "per_sample": [
+      {
+        "id": "PMC3484870-01",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC3484870"
+      },
+      {
+        "id": "PMC3484870-02",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC3484870"
+      },
+      {
+        "id": "PMC3484870-03",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC3484870"
+      },
+      {
+        "id": "PMC3484870-04",
+        "accuracy": 1.0,
+        "f1": 0.8,
+        "difficulty": "medium",
+        "question_type": "causal",
+        "paper": "PMC3484870"
+      },
+      {
+        "id": "PMC3484870-05",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC3484870"
+      },
+      {
+        "id": "PMC3484870-06",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "hard",
+        "question_type": "inferential",
+        "paper": "PMC3484870"
+      },
+      {
+        "id": "PMC3484870-07",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC3484870"
+      },
+      {
+        "id": "PMC3484870-08",
+        "accuracy": 1.0,
+        "f1": 0.8889,
+        "difficulty": "hard",
+        "question_type": "inferential",
+        "paper": "PMC3484870"
+      },
+      {
+        "id": "PMC3484870-09",
+        "accuracy": 1.0,
+        "f1": 0.75,
+        "difficulty": "hard",
+        "question_type": "causal",
+        "paper": "PMC3484870"
+      },
+      {
+        "id": "PMC3484870-10",
+        "accuracy": 1.0,
+        "f1": 0.4,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC3484870"
+      },
+      {
+        "id": "PMC7305302-01",
+        "accuracy": 0.0,
+        "f1": 0.2857,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC7305302"
+      },
+      {
+        "id": "PMC7305302-02",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC7305302"
+      },
+      {
+        "id": "PMC7305302-03",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC7305302"
+      },
+      {
+        "id": "PMC7305302-04",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC7305302"
+      },
+      {
+        "id": "PMC7305302-05",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "hard",
+        "question_type": "methodological",
+        "paper": "PMC7305302"
+      },
+      {
+        "id": "PMC7305302-06",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "causal",
+        "paper": "PMC7305302"
+      },
+      {
+        "id": "PMC7305302-07",
+        "accuracy": 1.0,
+        "f1": 0.75,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC7305302"
+      },
+      {
+        "id": "PMC7952412-01",
+        "accuracy": 1.0,
+        "f1": 0.8571,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC7952412"
+      },
+      {
+        "id": "PMC7952412-02",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC7952412"
+      },
+      {
+        "id": "PMC7952412-03",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "hard",
+        "question_type": "inferential",
+        "paper": "PMC7952412"
+      },
+      {
+        "id": "PMC7952412-04",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "easy",
+        "question_type": "methodological",
+        "paper": "PMC7952412"
+      },
+      {
+        "id": "PMC7952412-05",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC7952412"
+      },
+      {
+        "id": "PMC7952412-06",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC7952412"
+      },
+      {
+        "id": "PMC8150846-01",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC8150846"
+      },
+      {
+        "id": "PMC8150846-02",
+        "accuracy": 1.0,
+        "f1": 0.5714,
+        "difficulty": "hard",
+        "question_type": "factual",
+        "paper": "PMC8150846"
+      },
+      {
+        "id": "PMC8150846-03",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC8150846"
+      },
+      {
+        "id": "PMC8150846-04",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC8150846"
+      },
+      {
+        "id": "PMC8150846-05",
+        "accuracy": 1.0,
+        "f1": 0.3333,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC8150846"
+      },
+      {
+        "id": "PMC8172195-01",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC8172195"
+      },
+      {
+        "id": "PMC8172195-02",
+        "accuracy": 1.0,
+        "f1": 0.8,
+        "difficulty": "easy",
+        "question_type": "methodological",
+        "paper": "PMC8172195"
+      },
+      {
+        "id": "PMC8172195-03",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC8172195"
+      },
+      {
+        "id": "PMC8172195-04",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC8172195"
+      },
+      {
+        "id": "PMC8172195-05",
+        "accuracy": 1.0,
+        "f1": 0.25,
+        "difficulty": "hard",
+        "question_type": "causal",
+        "paper": "PMC8172195"
+      },
+      {
+        "id": "PMC8172195-06",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "medium",
+        "question_type": "causal",
+        "paper": "PMC8172195"
+      },
+      {
+        "id": "PMC8172195-07",
+        "accuracy": 0.0,
+        "f1": 0.0,
+        "difficulty": "easy",
+        "question_type": "methodological",
+        "paper": "PMC8172195"
+      },
+      {
+        "id": "PMC8172195-08",
+        "accuracy": 1.0,
+        "f1": 0.0,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC8172195"
+      },
+      {
+        "id": "PMC8447793-01",
+        "accuracy": 1.0,
+        "f1": 0.6,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC8447793"
+      },
+      {
+        "id": "PMC8447793-02",
+        "accuracy": 1.0,
+        "f1": 0.8,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC8447793"
+      },
+      {
+        "id": "PMC8447793-03",
+        "accuracy": 1.0,
+        "f1": 0.3636,
+        "difficulty": "hard",
+        "question_type": "causal",
+        "paper": "PMC8447793"
+      },
+      {
+        "id": "PMC8447793-04",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC8447793"
+      },
+      {
+        "id": "PMC8447793-05",
+        "accuracy": 1.0,
+        "f1": 0.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC8447793"
+      },
+      {
+        "id": "PMC8447793-06",
+        "accuracy": 1.0,
+        "f1": 0.4,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC8447793"
+      },
+      {
+        "id": "PMC8447793-07",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC8447793"
+      },
+      {
+        "id": "PMC8469245-01",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC8469245"
+      },
+      {
+        "id": "PMC8469245-02",
+        "accuracy": 1.0,
+        "f1": 0.8,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC8469245"
+      },
+      {
+        "id": "PMC8469245-03",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC8469245"
+      },
+      {
+        "id": "PMC8469245-04",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC8469245"
+      },
+      {
+        "id": "PMC8469245-05",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "hard",
+        "question_type": "methodological",
+        "paper": "PMC8469245"
+      },
+      {
+        "id": "PMC8469245-06",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "hard",
+        "question_type": "inferential",
+        "paper": "PMC8469245"
+      },
+      {
+        "id": "PMC8705852-01",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC8705852"
+      },
+      {
+        "id": "PMC8705852-02",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC8705852"
+      },
+      {
+        "id": "PMC8705852-03",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "hard",
+        "question_type": "factual",
+        "paper": "PMC8705852"
+      },
+      {
+        "id": "PMC8705852-04",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC8705852"
+      },
+      {
+        "id": "PMC8705852-05",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC8705852"
+      },
+      {
+        "id": "PMC8705852-06",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC8705852"
+      },
+      {
+        "id": "PMC8705852-07",
+        "accuracy": 1.0,
+        "f1": 0.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC8705852"
+      },
+      {
+        "id": "PMC8705852-08",
+        "accuracy": 1.0,
+        "f1": 0.8,
+        "difficulty": "hard",
+        "question_type": "methodological",
+        "paper": "PMC8705852"
+      },
+      {
+        "id": "PMC8742817-01",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-02",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-03",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "causal",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-04",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-05",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-06",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-07",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-08",
+        "accuracy": 1.0,
+        "f1": 0.8,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-09",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-10",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "hard",
+        "question_type": "factual",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-11",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "easy",
+        "question_type": "comparative",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-12",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "hard",
+        "question_type": "inferential",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-13",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8959601-01",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-02",
+        "accuracy": 1.0,
+        "f1": 0.8,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-03",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-04",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-05",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-06",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "hard",
+        "question_type": "causal",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-07",
+        "accuracy": 1.0,
+        "f1": 0.8,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-08",
+        "accuracy": 1.0,
+        "f1": 0.8,
+        "difficulty": "hard",
+        "question_type": "causal",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-09",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-10",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-11",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "hard",
+        "question_type": "methodological",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-12",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-13",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC9184558-01",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC9184558"
+      },
+      {
+        "id": "PMC9184558-02",
+        "accuracy": 1.0,
+        "f1": 0.8,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC9184558"
+      },
+      {
+        "id": "PMC9184558-03",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC9184558"
+      },
+      {
+        "id": "PMC9184558-04",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC9184558"
+      },
+      {
+        "id": "PMC9184558-05",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "causal",
+        "paper": "PMC9184558"
+      },
+      {
+        "id": "PMC9184558-06",
+        "accuracy": 1.0,
+        "f1": 0.3333,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC9184558"
+      },
+      {
+        "id": "PMC9184558-07",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC9184558"
+      },
+      {
+        "id": "PMC9184558-08",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC9184558"
+      },
+      {
+        "id": "PMC9184558-09",
+        "accuracy": 1.0,
+        "f1": 0.8571,
+        "difficulty": "hard",
+        "question_type": "methodological",
+        "paper": "PMC9184558"
+      },
+      {
+        "id": "PMC9184558-10",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC9184558"
+      },
+      {
+        "id": "PMC9184558-11",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "causal",
+        "paper": "PMC9184558"
+      },
+      {
+        "id": "PMC9221468-01",
+        "accuracy": 1.0,
+        "f1": 0.8,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9221468-02",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9221468-03",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "causal",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9221468-04",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9221468-05",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9221468-06",
+        "accuracy": 1.0,
+        "f1": 0.8,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9221468-07",
+        "accuracy": 1.0,
+        "f1": 0.8,
+        "difficulty": "hard",
+        "question_type": "inferential",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9221468-08",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9221468-09",
+        "accuracy": 1.0,
+        "f1": 0.25,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9221468-10",
+        "accuracy": 1.0,
+        "f1": 0.5714,
+        "difficulty": "hard",
+        "question_type": "methodological",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9221468-11",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "hard",
+        "question_type": "factual",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9221468-12",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9646701-01",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC9646701"
+      },
+      {
+        "id": "PMC9646701-02",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "easy",
+        "question_type": "methodological",
+        "paper": "PMC9646701"
+      },
+      {
+        "id": "PMC9646701-03",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC9646701"
+      },
+      {
+        "id": "PMC9646701-04",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC9646701"
+      },
+      {
+        "id": "PMC9646701-05",
+        "accuracy": 1.0,
+        "f1": 0.0,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC9646701"
+      },
+      {
+        "id": "PMC9646701-06",
+        "accuracy": 1.0,
+        "f1": 0.8571,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC9646701"
+      },
+      {
+        "id": "PMC9646701-07",
+        "accuracy": 1.0,
+        "f1": 0.4,
+        "difficulty": "hard",
+        "question_type": "causal",
+        "paper": "PMC9646701"
+      },
+      {
+        "id": "PMC9646701-08",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "hard",
+        "question_type": "inferential",
+        "paper": "PMC9646701"
+      },
+      {
+        "id": "PMC9646701-09",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC9646701"
+      },
+      {
+        "id": "PMC9646701-10",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "hard",
+        "question_type": "methodological",
+        "paper": "PMC9646701"
+      },
+      {
+        "id": "PMC9646701-11",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC9646701"
+      },
+      {
+        "id": "PMC9929861-01",
+        "accuracy": 1.0,
+        "f1": 0.75,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-02",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-03",
+        "accuracy": 1.0,
+        "f1": 0.5455,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-04",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-05",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-06",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "hard",
+        "question_type": "inferential",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-07",
+        "accuracy": 1.0,
+        "f1": 0.5714,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-08",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-09",
+        "accuracy": 1.0,
+        "f1": 0.2857,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-10",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "medium",
+        "question_type": "causal",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-11",
+        "accuracy": 1.0,
+        "f1": 0.8,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-12",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "easy",
+        "question_type": "methodological",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-13",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "hard",
+        "question_type": "inferential",
+        "paper": "PMC9929861"
+      }
+    ]
+  },
+  {
+    "log_file": "2026-03-17T17-30-05-07-00_nf-rag-pubs_7Ct2uquTMg723xGfEgmJqd.eval",
+    "model": "openai/gpt-5.4",
+    "question_style": "precise",
+    "status": "success",
+    "samples": 130,
+    "total_samples": 130,
+    "task_version": "0",
+    "started_at": "2026-03-17T17:30:06-07:00",
+    "completed_at": "2026-03-17T17:32:06-07:00",
+    "input_tokens": 1360860,
+    "output_tokens": 56360,
+    "input_tokens_cache_write": 0,
+    "input_tokens_cache_read": 354688,
+    "total_tokens": 1417220,
+    "cost": 4.34,
+    "min_sample_time": 2.8,
+    "max_sample_time": 37.2,
+    "avg_sample_time": 7.4,
+    "accuracy": 0.9846,
+    "accuracy_stderr": 0.0108,
+    "citation_f1": 0.7303,
+    "citation_f1_stderr": 0.0255,
+    "difficulty_accuracy": {
+      "easy": 1.0,
+      "medium": 0.9672,
+      "hard": 1.0
+    },
+    "difficulty_f1": {
+      "easy": 0.7355,
+      "medium": 0.7623,
+      "hard": 0.6746
+    },
+    "question_type_accuracy": {
+      "factual": 0.9787,
+      "comparative": 1.0,
+      "causal": 1.0,
+      "inferential": 1.0,
+      "methodological": 0.9677
+    },
+    "question_type_f1": {
+      "factual": 0.7483,
+      "comparative": 0.6928,
+      "causal": 0.6704,
+      "inferential": 0.6469,
+      "methodological": 0.7892
+    },
+    "paper_accuracy": {
+      "PMC3484870": 1.0,
+      "PMC7305302": 0.8571,
+      "PMC7952412": 1.0,
+      "PMC8150846": 1.0,
+      "PMC8172195": 1.0,
+      "PMC8447793": 1.0,
+      "PMC8469245": 1.0,
+      "PMC8705852": 1.0,
+      "PMC8742817": 1.0,
+      "PMC8959601": 1.0,
+      "PMC9184558": 1.0,
+      "PMC9221468": 0.9167,
+      "PMC9646701": 1.0,
+      "PMC9929861": 1.0
+    },
+    "paper_f1": {
+      "PMC3484870": 0.7856,
+      "PMC7305302": 0.6653,
+      "PMC7952412": 0.7444,
+      "PMC8150846": 0.6476,
+      "PMC8172195": 0.7292,
+      "PMC8447793": 0.5265,
+      "PMC8469245": 0.5833,
+      "PMC8705852": 0.6458,
+      "PMC8742817": 0.8436,
+      "PMC8959601": 0.8179,
+      "PMC9184558": 0.7182,
+      "PMC9221468": 0.7389,
+      "PMC9646701": 0.7364,
+      "PMC9929861": 0.7744
+    },
+    "per_sample": [
+      {
+        "id": "PMC3484870-01",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC3484870"
+      },
+      {
+        "id": "PMC3484870-02",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC3484870"
+      },
+      {
+        "id": "PMC3484870-03",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC3484870"
+      },
+      {
+        "id": "PMC3484870-04",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "medium",
+        "question_type": "causal",
+        "paper": "PMC3484870"
+      },
+      {
+        "id": "PMC3484870-05",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC3484870"
+      },
+      {
+        "id": "PMC3484870-06",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "hard",
+        "question_type": "inferential",
+        "paper": "PMC3484870"
+      },
+      {
+        "id": "PMC3484870-07",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC3484870"
+      },
+      {
+        "id": "PMC3484870-08",
+        "accuracy": 1.0,
+        "f1": 0.8889,
+        "difficulty": "hard",
+        "question_type": "inferential",
+        "paper": "PMC3484870"
+      },
+      {
+        "id": "PMC3484870-09",
+        "accuracy": 1.0,
+        "f1": 0.8,
+        "difficulty": "hard",
+        "question_type": "causal",
+        "paper": "PMC3484870"
+      },
+      {
+        "id": "PMC3484870-10",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC3484870"
+      },
+      {
+        "id": "PMC7305302-01",
+        "accuracy": 0.0,
+        "f1": 0.0,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC7305302"
+      },
+      {
+        "id": "PMC7305302-02",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC7305302"
+      },
+      {
+        "id": "PMC7305302-03",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC7305302"
+      },
+      {
+        "id": "PMC7305302-04",
+        "accuracy": 1.0,
+        "f1": 0.8,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC7305302"
+      },
+      {
+        "id": "PMC7305302-05",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "hard",
+        "question_type": "methodological",
+        "paper": "PMC7305302"
+      },
+      {
+        "id": "PMC7305302-06",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "medium",
+        "question_type": "causal",
+        "paper": "PMC7305302"
+      },
+      {
+        "id": "PMC7305302-07",
+        "accuracy": 1.0,
+        "f1": 0.8571,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC7305302"
+      },
+      {
+        "id": "PMC7952412-01",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC7952412"
+      },
+      {
+        "id": "PMC7952412-02",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC7952412"
+      },
+      {
+        "id": "PMC7952412-03",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "hard",
+        "question_type": "inferential",
+        "paper": "PMC7952412"
+      },
+      {
+        "id": "PMC7952412-04",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "easy",
+        "question_type": "methodological",
+        "paper": "PMC7952412"
+      },
+      {
+        "id": "PMC7952412-05",
+        "accuracy": 1.0,
+        "f1": 0.8,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC7952412"
+      },
+      {
+        "id": "PMC7952412-06",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC7952412"
+      },
+      {
+        "id": "PMC8150846-01",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC8150846"
+      },
+      {
+        "id": "PMC8150846-02",
+        "accuracy": 1.0,
+        "f1": 0.5714,
+        "difficulty": "hard",
+        "question_type": "factual",
+        "paper": "PMC8150846"
+      },
+      {
+        "id": "PMC8150846-03",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC8150846"
+      },
+      {
+        "id": "PMC8150846-04",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC8150846"
+      },
+      {
+        "id": "PMC8150846-05",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC8150846"
+      },
+      {
+        "id": "PMC8172195-01",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC8172195"
+      },
+      {
+        "id": "PMC8172195-02",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "easy",
+        "question_type": "methodological",
+        "paper": "PMC8172195"
+      },
+      {
+        "id": "PMC8172195-03",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC8172195"
+      },
+      {
+        "id": "PMC8172195-04",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC8172195"
+      },
+      {
+        "id": "PMC8172195-05",
+        "accuracy": 1.0,
+        "f1": 0.0,
+        "difficulty": "hard",
+        "question_type": "causal",
+        "paper": "PMC8172195"
+      },
+      {
+        "id": "PMC8172195-06",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "causal",
+        "paper": "PMC8172195"
+      },
+      {
+        "id": "PMC8172195-07",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "easy",
+        "question_type": "methodological",
+        "paper": "PMC8172195"
+      },
+      {
+        "id": "PMC8172195-08",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC8172195"
+      },
+      {
+        "id": "PMC8447793-01",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC8447793"
+      },
+      {
+        "id": "PMC8447793-02",
+        "accuracy": 1.0,
+        "f1": 0.0,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC8447793"
+      },
+      {
+        "id": "PMC8447793-03",
+        "accuracy": 1.0,
+        "f1": 0.2857,
+        "difficulty": "hard",
+        "question_type": "causal",
+        "paper": "PMC8447793"
+      },
+      {
+        "id": "PMC8447793-04",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC8447793"
+      },
+      {
+        "id": "PMC8447793-05",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC8447793"
+      },
+      {
+        "id": "PMC8447793-06",
+        "accuracy": 1.0,
+        "f1": 0.4,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC8447793"
+      },
+      {
+        "id": "PMC8447793-07",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC8447793"
+      },
+      {
+        "id": "PMC8469245-01",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC8469245"
+      },
+      {
+        "id": "PMC8469245-02",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC8469245"
+      },
+      {
+        "id": "PMC8469245-03",
+        "accuracy": 1.0,
+        "f1": 0.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC8469245"
+      },
+      {
+        "id": "PMC8469245-04",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC8469245"
+      },
+      {
+        "id": "PMC8469245-05",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "hard",
+        "question_type": "methodological",
+        "paper": "PMC8469245"
+      },
+      {
+        "id": "PMC8469245-06",
+        "accuracy": 1.0,
+        "f1": 0.3333,
+        "difficulty": "hard",
+        "question_type": "inferential",
+        "paper": "PMC8469245"
+      },
+      {
+        "id": "PMC8705852-01",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC8705852"
+      },
+      {
+        "id": "PMC8705852-02",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC8705852"
+      },
+      {
+        "id": "PMC8705852-03",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "hard",
+        "question_type": "factual",
+        "paper": "PMC8705852"
+      },
+      {
+        "id": "PMC8705852-04",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC8705852"
+      },
+      {
+        "id": "PMC8705852-05",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC8705852"
+      },
+      {
+        "id": "PMC8705852-06",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC8705852"
+      },
+      {
+        "id": "PMC8705852-07",
+        "accuracy": 1.0,
+        "f1": 0.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC8705852"
+      },
+      {
+        "id": "PMC8705852-08",
+        "accuracy": 1.0,
+        "f1": 0.0,
+        "difficulty": "hard",
+        "question_type": "methodological",
+        "paper": "PMC8705852"
+      },
+      {
+        "id": "PMC8742817-01",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-02",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-03",
+        "accuracy": 1.0,
+        "f1": 0.8,
+        "difficulty": "medium",
+        "question_type": "causal",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-04",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-05",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-06",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-07",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-08",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-09",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-10",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "hard",
+        "question_type": "factual",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-11",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "easy",
+        "question_type": "comparative",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-12",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "hard",
+        "question_type": "inferential",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-13",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8959601-01",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-02",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-03",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-04",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-05",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-06",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "hard",
+        "question_type": "causal",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-07",
+        "accuracy": 1.0,
+        "f1": 0.0,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-08",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "hard",
+        "question_type": "causal",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-09",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-10",
+        "accuracy": 1.0,
+        "f1": 0.8,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-11",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "hard",
+        "question_type": "methodological",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-12",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-13",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC9184558-01",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC9184558"
+      },
+      {
+        "id": "PMC9184558-02",
+        "accuracy": 1.0,
+        "f1": 0.3333,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC9184558"
+      },
+      {
+        "id": "PMC9184558-03",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC9184558"
+      },
+      {
+        "id": "PMC9184558-04",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC9184558"
+      },
+      {
+        "id": "PMC9184558-05",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "causal",
+        "paper": "PMC9184558"
+      },
+      {
+        "id": "PMC9184558-06",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC9184558"
+      },
+      {
+        "id": "PMC9184558-07",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC9184558"
+      },
+      {
+        "id": "PMC9184558-08",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC9184558"
+      },
+      {
+        "id": "PMC9184558-09",
+        "accuracy": 1.0,
+        "f1": 0.4,
+        "difficulty": "hard",
+        "question_type": "methodological",
+        "paper": "PMC9184558"
+      },
+      {
+        "id": "PMC9184558-10",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC9184558"
+      },
+      {
+        "id": "PMC9184558-11",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "causal",
+        "paper": "PMC9184558"
+      },
+      {
+        "id": "PMC9221468-01",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9221468-02",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9221468-03",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "causal",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9221468-04",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9221468-05",
+        "accuracy": 0.0,
+        "f1": 0.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9221468-06",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9221468-07",
+        "accuracy": 1.0,
+        "f1": 0.8,
+        "difficulty": "hard",
+        "question_type": "inferential",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9221468-08",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9221468-09",
+        "accuracy": 1.0,
+        "f1": 0.4,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9221468-10",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "hard",
+        "question_type": "methodological",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9221468-11",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "hard",
+        "question_type": "factual",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9221468-12",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9646701-01",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC9646701"
+      },
+      {
+        "id": "PMC9646701-02",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "easy",
+        "question_type": "methodological",
+        "paper": "PMC9646701"
+      },
+      {
+        "id": "PMC9646701-03",
+        "accuracy": 1.0,
+        "f1": 0.8,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC9646701"
+      },
+      {
+        "id": "PMC9646701-04",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC9646701"
+      },
+      {
+        "id": "PMC9646701-05",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC9646701"
+      },
+      {
+        "id": "PMC9646701-06",
+        "accuracy": 1.0,
+        "f1": 0.0,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC9646701"
+      },
+      {
+        "id": "PMC9646701-07",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "hard",
+        "question_type": "causal",
+        "paper": "PMC9646701"
+      },
+      {
+        "id": "PMC9646701-08",
+        "accuracy": 1.0,
+        "f1": 0.8,
+        "difficulty": "hard",
+        "question_type": "inferential",
+        "paper": "PMC9646701"
+      },
+      {
+        "id": "PMC9646701-09",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC9646701"
+      },
+      {
+        "id": "PMC9646701-10",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "hard",
+        "question_type": "methodological",
+        "paper": "PMC9646701"
+      },
+      {
+        "id": "PMC9646701-11",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC9646701"
+      },
+      {
+        "id": "PMC9929861-01",
+        "accuracy": 1.0,
+        "f1": 0.4,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-02",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-03",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-04",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-05",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-06",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "hard",
+        "question_type": "inferential",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-07",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-08",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-09",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-10",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "causal",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-11",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-12",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "easy",
+        "question_type": "methodological",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-13",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "hard",
+        "question_type": "inferential",
+        "paper": "PMC9929861"
+      }
+    ]
+  },
+  {
+    "log_file": "2026-03-17T17-32-09-07-00_nf-rag-pubs_4FVPhTRTbHUW8M4xFjknJU.eval",
+    "model": "openai/gpt-5.4",
+    "question_style": "user_query",
+    "status": "success",
+    "samples": 130,
+    "total_samples": 130,
+    "task_version": "0",
+    "started_at": "2026-03-17T17:32:09-07:00",
+    "completed_at": "2026-03-17T17:33:58-07:00",
+    "input_tokens": 1600970,
+    "output_tokens": 61405,
+    "input_tokens_cache_write": 0,
+    "input_tokens_cache_read": 325760,
+    "total_tokens": 1662375,
+    "cost": 5.0,
+    "min_sample_time": 3.2,
+    "max_sample_time": 30.2,
+    "avg_sample_time": 8.2,
+    "accuracy": 0.9923,
+    "accuracy_stderr": 0.0077,
+    "citation_f1": 0.7087,
+    "citation_f1_stderr": 0.0262,
+    "difficulty_accuracy": {
+      "easy": 1.0,
+      "medium": 0.9836,
+      "hard": 1.0
+    },
+    "difficulty_f1": {
+      "easy": 0.5948,
+      "medium": 0.7791,
+      "hard": 0.6886
+    },
+    "question_type_accuracy": {
+      "factual": 0.9787,
+      "comparative": 1.0,
+      "causal": 1.0,
+      "inferential": 1.0,
+      "methodological": 1.0
+    },
+    "question_type_f1": {
+      "factual": 0.6708,
+      "comparative": 0.7491,
+      "causal": 0.6204,
+      "inferential": 0.6284,
+      "methodological": 0.7914
+    },
+    "paper_accuracy": {
+      "PMC3484870": 1.0,
+      "PMC7305302": 0.8571,
+      "PMC7952412": 1.0,
+      "PMC8150846": 1.0,
+      "PMC8172195": 1.0,
+      "PMC8447793": 1.0,
+      "PMC8469245": 1.0,
+      "PMC8705852": 1.0,
+      "PMC8742817": 1.0,
+      "PMC8959601": 1.0,
+      "PMC9184558": 1.0,
+      "PMC9221468": 1.0,
+      "PMC9646701": 1.0,
+      "PMC9929861": 1.0
+    },
+    "paper_f1": {
+      "PMC3484870": 0.6489,
+      "PMC7305302": 0.7095,
+      "PMC7952412": 0.8333,
+      "PMC8150846": 0.7048,
+      "PMC8172195": 0.5083,
+      "PMC8447793": 0.3408,
+      "PMC8469245": 0.5278,
+      "PMC8705852": 0.6875,
+      "PMC8742817": 0.8436,
+      "PMC8959601": 0.8179,
+      "PMC9184558": 0.761,
+      "PMC9221468": 0.8167,
+      "PMC9646701": 0.7567,
+      "PMC9929861": 0.6872
+    },
+    "per_sample": [
+      {
+        "id": "PMC3484870-01",
+        "accuracy": 1.0,
+        "f1": 0.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC3484870"
+      },
+      {
+        "id": "PMC3484870-02",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC3484870"
+      },
+      {
+        "id": "PMC3484870-03",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC3484870"
+      },
+      {
+        "id": "PMC3484870-04",
+        "accuracy": 1.0,
+        "f1": 0.8,
+        "difficulty": "medium",
+        "question_type": "causal",
+        "paper": "PMC3484870"
+      },
+      {
+        "id": "PMC3484870-05",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC3484870"
+      },
+      {
+        "id": "PMC3484870-06",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "hard",
+        "question_type": "inferential",
+        "paper": "PMC3484870"
+      },
+      {
+        "id": "PMC3484870-07",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC3484870"
+      },
+      {
+        "id": "PMC3484870-08",
+        "accuracy": 1.0,
+        "f1": 0.8889,
+        "difficulty": "hard",
+        "question_type": "inferential",
+        "paper": "PMC3484870"
+      },
+      {
+        "id": "PMC3484870-09",
+        "accuracy": 1.0,
+        "f1": 0.8,
+        "difficulty": "hard",
+        "question_type": "causal",
+        "paper": "PMC3484870"
+      },
+      {
+        "id": "PMC3484870-10",
+        "accuracy": 1.0,
+        "f1": 0.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC3484870"
+      },
+      {
+        "id": "PMC7305302-01",
+        "accuracy": 0.0,
+        "f1": 0.0,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC7305302"
+      },
+      {
+        "id": "PMC7305302-02",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC7305302"
+      },
+      {
+        "id": "PMC7305302-03",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC7305302"
+      },
+      {
+        "id": "PMC7305302-04",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC7305302"
+      },
+      {
+        "id": "PMC7305302-05",
+        "accuracy": 1.0,
+        "f1": 0.8,
+        "difficulty": "hard",
+        "question_type": "methodological",
+        "paper": "PMC7305302"
+      },
+      {
+        "id": "PMC7305302-06",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "medium",
+        "question_type": "causal",
+        "paper": "PMC7305302"
+      },
+      {
+        "id": "PMC7305302-07",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC7305302"
+      },
+      {
+        "id": "PMC7952412-01",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC7952412"
+      },
+      {
+        "id": "PMC7952412-02",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC7952412"
+      },
+      {
+        "id": "PMC7952412-03",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "hard",
+        "question_type": "inferential",
+        "paper": "PMC7952412"
+      },
+      {
+        "id": "PMC7952412-04",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "easy",
+        "question_type": "methodological",
+        "paper": "PMC7952412"
+      },
+      {
+        "id": "PMC7952412-05",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC7952412"
+      },
+      {
+        "id": "PMC7952412-06",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC7952412"
+      },
+      {
+        "id": "PMC8150846-01",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC8150846"
+      },
+      {
+        "id": "PMC8150846-02",
+        "accuracy": 1.0,
+        "f1": 0.8571,
+        "difficulty": "hard",
+        "question_type": "factual",
+        "paper": "PMC8150846"
+      },
+      {
+        "id": "PMC8150846-03",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC8150846"
+      },
+      {
+        "id": "PMC8150846-04",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC8150846"
+      },
+      {
+        "id": "PMC8150846-05",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC8150846"
+      },
+      {
+        "id": "PMC8172195-01",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC8172195"
+      },
+      {
+        "id": "PMC8172195-02",
+        "accuracy": 1.0,
+        "f1": 0.4,
+        "difficulty": "easy",
+        "question_type": "methodological",
+        "paper": "PMC8172195"
+      },
+      {
+        "id": "PMC8172195-03",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC8172195"
+      },
+      {
+        "id": "PMC8172195-04",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC8172195"
+      },
+      {
+        "id": "PMC8172195-05",
+        "accuracy": 1.0,
+        "f1": 0.0,
+        "difficulty": "hard",
+        "question_type": "causal",
+        "paper": "PMC8172195"
+      },
+      {
+        "id": "PMC8172195-06",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "causal",
+        "paper": "PMC8172195"
+      },
+      {
+        "id": "PMC8172195-07",
+        "accuracy": 1.0,
+        "f1": 0.0,
+        "difficulty": "easy",
+        "question_type": "methodological",
+        "paper": "PMC8172195"
+      },
+      {
+        "id": "PMC8172195-08",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC8172195"
+      },
+      {
+        "id": "PMC8447793-01",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC8447793"
+      },
+      {
+        "id": "PMC8447793-02",
+        "accuracy": 1.0,
+        "f1": 0.4,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC8447793"
+      },
+      {
+        "id": "PMC8447793-03",
+        "accuracy": 1.0,
+        "f1": 0.2857,
+        "difficulty": "hard",
+        "question_type": "causal",
+        "paper": "PMC8447793"
+      },
+      {
+        "id": "PMC8447793-04",
+        "accuracy": 1.0,
+        "f1": 0.4,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC8447793"
+      },
+      {
+        "id": "PMC8447793-05",
+        "accuracy": 1.0,
+        "f1": 0.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC8447793"
+      },
+      {
+        "id": "PMC8447793-06",
+        "accuracy": 1.0,
+        "f1": 0.8,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC8447793"
+      },
+      {
+        "id": "PMC8447793-07",
+        "accuracy": 1.0,
+        "f1": 0.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC8447793"
+      },
+      {
+        "id": "PMC8469245-01",
+        "accuracy": 1.0,
+        "f1": 0.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC8469245"
+      },
+      {
+        "id": "PMC8469245-02",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC8469245"
+      },
+      {
+        "id": "PMC8469245-03",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC8469245"
+      },
+      {
+        "id": "PMC8469245-04",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC8469245"
+      },
+      {
+        "id": "PMC8469245-05",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "hard",
+        "question_type": "methodological",
+        "paper": "PMC8469245"
+      },
+      {
+        "id": "PMC8469245-06",
+        "accuracy": 1.0,
+        "f1": 0.0,
+        "difficulty": "hard",
+        "question_type": "inferential",
+        "paper": "PMC8469245"
+      },
+      {
+        "id": "PMC8705852-01",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC8705852"
+      },
+      {
+        "id": "PMC8705852-02",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC8705852"
+      },
+      {
+        "id": "PMC8705852-03",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "hard",
+        "question_type": "factual",
+        "paper": "PMC8705852"
+      },
+      {
+        "id": "PMC8705852-04",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC8705852"
+      },
+      {
+        "id": "PMC8705852-05",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC8705852"
+      },
+      {
+        "id": "PMC8705852-06",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC8705852"
+      },
+      {
+        "id": "PMC8705852-07",
+        "accuracy": 1.0,
+        "f1": 0.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC8705852"
+      },
+      {
+        "id": "PMC8705852-08",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "hard",
+        "question_type": "methodological",
+        "paper": "PMC8705852"
+      },
+      {
+        "id": "PMC8742817-01",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-02",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-03",
+        "accuracy": 1.0,
+        "f1": 0.8,
+        "difficulty": "medium",
+        "question_type": "causal",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-04",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-05",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-06",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-07",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-08",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-09",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-10",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "hard",
+        "question_type": "factual",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-11",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "easy",
+        "question_type": "comparative",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-12",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "hard",
+        "question_type": "inferential",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8742817-13",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC8742817"
+      },
+      {
+        "id": "PMC8959601-01",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-02",
+        "accuracy": 1.0,
+        "f1": 0.8,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-03",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-04",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-05",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-06",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "hard",
+        "question_type": "causal",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-07",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-08",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "hard",
+        "question_type": "causal",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-09",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-10",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-11",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "hard",
+        "question_type": "methodological",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-12",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC8959601-13",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC8959601"
+      },
+      {
+        "id": "PMC9184558-01",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC9184558"
+      },
+      {
+        "id": "PMC9184558-02",
+        "accuracy": 1.0,
+        "f1": 0.5714,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC9184558"
+      },
+      {
+        "id": "PMC9184558-03",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC9184558"
+      },
+      {
+        "id": "PMC9184558-04",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC9184558"
+      },
+      {
+        "id": "PMC9184558-05",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "causal",
+        "paper": "PMC9184558"
+      },
+      {
+        "id": "PMC9184558-06",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC9184558"
+      },
+      {
+        "id": "PMC9184558-07",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC9184558"
+      },
+      {
+        "id": "PMC9184558-08",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC9184558"
+      },
+      {
+        "id": "PMC9184558-09",
+        "accuracy": 1.0,
+        "f1": 0.8,
+        "difficulty": "hard",
+        "question_type": "methodological",
+        "paper": "PMC9184558"
+      },
+      {
+        "id": "PMC9184558-10",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC9184558"
+      },
+      {
+        "id": "PMC9184558-11",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "causal",
+        "paper": "PMC9184558"
+      },
+      {
+        "id": "PMC9221468-01",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9221468-02",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9221468-03",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "medium",
+        "question_type": "causal",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9221468-04",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9221468-05",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9221468-06",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9221468-07",
+        "accuracy": 1.0,
+        "f1": 0.8,
+        "difficulty": "hard",
+        "question_type": "inferential",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9221468-08",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9221468-09",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9221468-10",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "hard",
+        "question_type": "methodological",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9221468-11",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "hard",
+        "question_type": "factual",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9221468-12",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC9221468"
+      },
+      {
+        "id": "PMC9646701-01",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC9646701"
+      },
+      {
+        "id": "PMC9646701-02",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "easy",
+        "question_type": "methodological",
+        "paper": "PMC9646701"
+      },
+      {
+        "id": "PMC9646701-03",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC9646701"
+      },
+      {
+        "id": "PMC9646701-04",
+        "accuracy": 1.0,
+        "f1": 0.0,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC9646701"
+      },
+      {
+        "id": "PMC9646701-05",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC9646701"
+      },
+      {
+        "id": "PMC9646701-06",
+        "accuracy": 1.0,
+        "f1": 0.8571,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC9646701"
+      },
+      {
+        "id": "PMC9646701-07",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "hard",
+        "question_type": "causal",
+        "paper": "PMC9646701"
+      },
+      {
+        "id": "PMC9646701-08",
+        "accuracy": 1.0,
+        "f1": 0.8,
+        "difficulty": "hard",
+        "question_type": "inferential",
+        "paper": "PMC9646701"
+      },
+      {
+        "id": "PMC9646701-09",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC9646701"
+      },
+      {
+        "id": "PMC9646701-10",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "hard",
+        "question_type": "methodological",
+        "paper": "PMC9646701"
+      },
+      {
+        "id": "PMC9646701-11",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC9646701"
+      },
+      {
+        "id": "PMC9929861-01",
+        "accuracy": 1.0,
+        "f1": 0.0,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-02",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-03",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "hard",
+        "question_type": "comparative",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-04",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-05",
+        "accuracy": 1.0,
+        "f1": 0.8,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-06",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "hard",
+        "question_type": "inferential",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-07",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "factual",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-08",
+        "accuracy": 1.0,
+        "f1": 0.8,
+        "difficulty": "medium",
+        "question_type": "methodological",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-09",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "easy",
+        "question_type": "factual",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-10",
+        "accuracy": 1.0,
+        "f1": 0.6667,
+        "difficulty": "medium",
+        "question_type": "causal",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-11",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "medium",
+        "question_type": "comparative",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-12",
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "difficulty": "easy",
+        "question_type": "methodological",
+        "paper": "PMC9929861"
+      },
+      {
+        "id": "PMC9929861-13",
+        "accuracy": 1.0,
+        "f1": 0.5,
+        "difficulty": "hard",
+        "question_type": "inferential",
+        "paper": "PMC9929861"
+      }
+    ]
+  }
+]
