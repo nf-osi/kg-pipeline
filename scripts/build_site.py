@@ -1044,6 +1044,29 @@ def write_pubs_site(pubs_data: list[dict], destination: Path) -> None:
         qtype_acc_chart.append(qa_entry)
         qtype_f1_chart.append(qf_entry)
 
+    # Build scatter plot data: cost and time vs accuracy and citation_f1
+    cost_acc_data = []
+    cost_f1_data = []
+    time_acc_data = []
+    time_f1_data = []
+    for run in pubs_data:
+        if run.get("status") != "success":
+            continue
+        label = f"{_esc(run.get('model', ''))} ({run.get('question_style', '')})"
+        acc = run.get("accuracy")
+        f1 = run.get("citation_f1") or run.get("passage_f1")
+        cost = run.get("cost")
+        total_secs = _duration_seconds(run.get("started_at"), run.get("completed_at"))
+
+        if cost is not None and acc is not None:
+            cost_acc_data.append({"x": cost, "y": acc, "label": label})
+        if cost is not None and f1 is not None:
+            cost_f1_data.append({"x": cost, "y": f1, "label": label})
+        if total_secs is not None and acc is not None:
+            time_acc_data.append({"x": total_secs / 60, "y": acc, "label": label})
+        if total_secs is not None and f1 is not None:
+            time_f1_data.append({"x": total_secs / 60, "y": f1, "label": label})
+
     diff_labels_json = json.dumps([k.title() for k in difficulty_keys])
     qtype_labels_json = json.dumps([k.title() for k in qtype_keys])
     generated = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
@@ -1097,6 +1120,22 @@ def write_pubs_site(pubs_data: list[dict], destination: Path) -> None:
 
   <div class="charts">
     <figure>
+      <figcaption>Cost vs Accuracy</figcaption>
+      <canvas id="cost-acc-chart" width="720" height="420"></canvas>
+    </figure>
+    <figure>
+      <figcaption>Time vs Accuracy</figcaption>
+      <canvas id="time-acc-chart" width="720" height="420"></canvas>
+    </figure>
+    <figure>
+      <figcaption>Cost vs Citation F1</figcaption>
+      <canvas id="cost-f1-chart" width="720" height="420"></canvas>
+    </figure>
+    <figure>
+      <figcaption>Time vs Citation F1</figcaption>
+      <canvas id="time-f1-chart" width="720" height="420"></canvas>
+    </figure>
+    <figure>
       <figcaption>Accuracy by Difficulty</figcaption>
       <canvas id="diff-acc-chart" width="900" height="420"></canvas>
     </figure>
@@ -1117,6 +1156,82 @@ def write_pubs_site(pubs_data: list[dict], destination: Path) -> None:
   <p>Raw data: <a href="pubs_runs.json">pubs_runs.json</a></p>
 
 <script>
+function drawScatter(canvasId, data, xLabel, yLabel, xFmt) {{
+  if (!data.length) return;
+  var canvas = document.getElementById(canvasId);
+  var ctx = canvas.getContext("2d");
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  var W = canvas.width, H = canvas.height;
+  var pad = {{top: 30, right: 30, bottom: 50, left: 60}};
+  var pW = W - pad.left - pad.right;
+  var pH = H - pad.top - pad.bottom;
+
+  var maxX = Math.max.apply(null, data.map(function(d) {{ return d.x; }})) * 1.15;
+  var minY = Math.max(0, Math.min.apply(null, data.map(function(d) {{ return d.y; }})) - 0.05);
+  var maxY = Math.min(1, Math.max.apply(null, data.map(function(d) {{ return d.y; }})) + 0.05);
+  var rangeY = maxY - minY;
+
+  ctx.strokeStyle = "#999";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(pad.left, pad.top);
+  ctx.lineTo(pad.left, H - pad.bottom);
+  ctx.lineTo(W - pad.right, H - pad.bottom);
+  ctx.stroke();
+
+  ctx.fillStyle = "#666";
+  ctx.font = "12px sans-serif";
+  ctx.textAlign = "center";
+  for (var i = 0; i <= 5; i++) {{
+    var xVal = (maxX / 5) * i;
+    var x = pad.left + (xVal / maxX) * pW;
+    ctx.fillText(xFmt(xVal), x, H - pad.bottom + 18);
+    ctx.strokeStyle = "#eee";
+    ctx.beginPath(); ctx.moveTo(x, pad.top); ctx.lineTo(x, H - pad.bottom); ctx.stroke();
+  }}
+  ctx.textAlign = "right";
+  for (var j = 0; j <= 5; j++) {{
+    var yVal = minY + (rangeY / 5) * j;
+    var y = H - pad.bottom - ((yVal - minY) / rangeY) * pH;
+    ctx.fillText(yVal.toFixed(2), pad.left - 8, y + 4);
+    ctx.strokeStyle = "#eee";
+    ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(W - pad.right, y); ctx.stroke();
+  }}
+
+  ctx.fillStyle = "#333";
+  ctx.font = "14px sans-serif";
+  ctx.textAlign = "center";
+  ctx.fillText(xLabel, W / 2, H - 5);
+  ctx.save();
+  ctx.translate(15, H / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.fillText(yLabel, 0, 0);
+  ctx.restore();
+
+  var colors = ["#4e79a7","#f28e2b","#e15759","#76b7b2","#59a14f","#edc948","#b07aa1","#ff9da7"];
+  var modelColors = {{}};
+  var ci = 0;
+  data.forEach(function(d) {{
+    if (!modelColors[d.label]) modelColors[d.label] = colors[ci++ % colors.length];
+  }});
+
+  data.forEach(function(d) {{
+    var x = pad.left + (d.x / maxX) * pW;
+    var y = H - pad.bottom - ((d.y - minY) / rangeY) * pH;
+    ctx.fillStyle = modelColors[d.label];
+    ctx.beginPath();
+    ctx.arc(x, y, 6, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.strokeStyle = "#fff";
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    ctx.fillStyle = "#333";
+    ctx.font = "11px sans-serif";
+    ctx.textAlign = "left";
+    ctx.fillText(d.label, x + 9, y + 4);
+  }});
+}}
+
 function drawGroupedBar(canvasId, data, groups, yLabel) {{
   if (!data.length) return;
   var canvas = document.getElementById(canvasId);
@@ -1203,6 +1318,10 @@ function drawGroupedBar(canvasId, data, groups, yLabel) {{
 document.addEventListener("DOMContentLoaded", function() {{
   var diffLabels = {diff_labels_json};
   var qtypeLabels = {qtype_labels_json};
+  drawScatter("cost-acc-chart", {json.dumps(cost_acc_data)}, "Total Cost (USD)", "Accuracy", function(v) {{ return "$" + v.toFixed(2); }});
+  drawScatter("time-acc-chart", {json.dumps(time_acc_data)}, "Total Time (minutes)", "Accuracy", function(v) {{ return v.toFixed(1) + "m"; }});
+  drawScatter("cost-f1-chart", {json.dumps(cost_f1_data)}, "Total Cost (USD)", "Citation F1", function(v) {{ return "$" + v.toFixed(2); }});
+  drawScatter("time-f1-chart", {json.dumps(time_f1_data)}, "Total Time (minutes)", "Citation F1", function(v) {{ return v.toFixed(1) + "m"; }});
   drawGroupedBar("diff-acc-chart", {json.dumps(diff_acc_chart)}, diffLabels, "Accuracy");
   drawGroupedBar("diff-f1-chart", {json.dumps(diff_f1_chart)}, diffLabels, "Citation F1");
   drawGroupedBar("qtype-acc-chart", {json.dumps(qtype_acc_chart)}, qtypeLabels, "Accuracy");
