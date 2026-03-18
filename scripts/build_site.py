@@ -966,12 +966,266 @@ document.addEventListener("DOMContentLoaded", function() {{
     (destination / "index.html").write_text(html_content)
 
 
+def write_pubs_site(pubs_data: list[dict], destination: Path) -> None:
+    """Generate HTML dashboard for nf_rag_pubs evaluation results."""
+    destination.mkdir(parents=True, exist_ok=True)
+    (destination / "pubs_runs.json").write_text(json.dumps(pubs_data, indent=2))
+
+    # Build summary table rows
+    rows = []
+    for run in pubs_data:
+        model = _esc(run.get("model", ""))
+        style = _esc(run.get("question_style", ""))
+        status = run.get("status", "")
+        samples = run.get("samples", 0)
+        total = run.get("total_samples", 130)
+        acc = run.get("accuracy")
+        acc_se = run.get("accuracy_stderr")
+        # Current key is citation_f1; older extracts used passage_f1
+        f1 = run.get("citation_f1") or run.get("passage_f1")
+        f1_se = run.get("citation_f1_stderr") or run.get("passage_f1_stderr")
+        started = _format_date(run.get("started_at"))
+        total_secs = _duration_seconds(run.get("started_at"), run.get("completed_at"))
+        cost = run.get("cost")
+        avg_t = run.get("avg_sample_time")
+        min_t = run.get("min_sample_time")
+        max_t = run.get("max_sample_time")
+        samples_str = f"{samples}/{total}" if status != "success" else str(samples)
+        status_badge = status if status == "success" else f"<em>{status}</em>"
+        rows.append(
+            f"<tr><td>{model}</td><td>{style}</td><td>{samples_str}</td>"
+            f"<td>{_format_score_with_stderr(acc, acc_se)}</td>"
+            f"<td>{_format_score_with_stderr(f1, f1_se)}</td>"
+            f"<td>{_format_cost(cost)}</td>"
+            f"<td>{_format_duration(total_secs)}</td>"
+            f"<td>{_format_duration(avg_t)}</td>"
+            f"<td>{_format_duration(min_t)}</td>"
+            f"<td>{_format_duration(max_t)}</td>"
+            f"<td>{status_badge}</td><td>{started}</td></tr>"
+        )
+    rows_html = "\n".join(rows)
+
+    # Build chart data: difficulty breakdown
+    difficulty_keys = ["easy", "medium", "hard"]
+    diff_acc_chart = []
+    diff_f1_chart = []
+    for run in pubs_data:
+        if run.get("status") != "success":
+            continue
+        label = f"{_esc(run.get('model', ''))} ({run.get('question_style', '')})"
+        da = run.get("difficulty_accuracy", {})
+        df = run.get("difficulty_f1", {})
+        diff_acc_entry = {"label": label}
+        diff_f1_entry = {"label": label}
+        for k in difficulty_keys:
+            diff_acc_entry[k.title()] = da.get(k)
+            diff_f1_entry[k.title()] = df.get(k)
+        diff_acc_chart.append(diff_acc_entry)
+        diff_f1_chart.append(diff_f1_entry)
+
+    # Build chart data: question type breakdown
+    qtype_keys = sorted({
+        k for run in pubs_data
+        for k in run.get("question_type_accuracy", {})
+    })
+    qtype_acc_chart = []
+    qtype_f1_chart = []
+    for run in pubs_data:
+        if run.get("status") != "success":
+            continue
+        label = f"{_esc(run.get('model', ''))} ({run.get('question_style', '')})"
+        qa = run.get("question_type_accuracy", {})
+        qf = run.get("question_type_f1", {})
+        qa_entry = {"label": label}
+        qf_entry = {"label": label}
+        for k in qtype_keys:
+            qa_entry[k.title()] = qa.get(k)
+            qf_entry[k.title()] = qf.get(k)
+        qtype_acc_chart.append(qa_entry)
+        qtype_f1_chart.append(qf_entry)
+
+    diff_labels_json = json.dumps([k.title() for k in difficulty_keys])
+    qtype_labels_json = json.dumps([k.title() for k in qtype_keys])
+    generated = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+
+    html_content = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>NF Publication RAG Evaluation</title>
+  <style>
+    body {{ font-family: sans-serif; margin: 2rem; }}
+    table {{ border-collapse: collapse; width: 100%; margin-bottom: 2rem; }}
+    th, td {{ border: 1px solid #ccc; padding: 0.5rem; text-align: left; }}
+    th {{ background: #e3f2fd; font-weight: 600; cursor: pointer; }}
+    .charts {{ display: flex; flex-wrap: wrap; gap: 2rem; justify-content: center; }}
+    .charts figure {{ margin: 0; text-align: center; }}
+    .charts figcaption {{ font-weight: bold; margin-bottom: 0.5rem; }}
+    canvas {{ border: 1px solid #eee; }}
+    em {{ color: #e65100; }}
+  </style>
+</head>
+<body>
+  <h1>NF Publication RAG Evaluation</h1>
+  <p>Generated {generated} &mdash; 130 questions across 14 papers</p>
+
+  <h2>Summary</h2>
+  <p><strong>Accuracy</strong> measures whether the agent selected the correct answer from the multiple-choice options.
+  <strong>Citation F1</strong> measures how well the agent cited the correct supporting passages (PMID + passage index tuples) &mdash;
+  precision is the fraction of cited passages that are relevant, and recall is the fraction of expected passages that were cited.</p>
+  <table id="runs-table">
+    <thead>
+      <tr>
+        <th>Model</th>
+        <th>Question Style</th>
+        <th>Samples</th>
+        <th>Accuracy</th>
+        <th>Citation F1</th>
+        <th>Total Cost (USD)</th>
+        <th>Total Time</th>
+        <th>Avg / Sample</th>
+        <th>Shortest</th>
+        <th>Longest</th>
+        <th>Status</th>
+        <th>Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      {rows_html}
+    </tbody>
+  </table>
+
+  <div class="charts">
+    <figure>
+      <figcaption>Accuracy by Difficulty</figcaption>
+      <canvas id="diff-acc-chart" width="900" height="420"></canvas>
+    </figure>
+    <figure>
+      <figcaption>Citation F1 by Difficulty</figcaption>
+      <canvas id="diff-f1-chart" width="900" height="420"></canvas>
+    </figure>
+    <figure>
+      <figcaption>Accuracy by Question Type</figcaption>
+      <canvas id="qtype-acc-chart" width="900" height="420"></canvas>
+    </figure>
+    <figure>
+      <figcaption>Citation F1 by Question Type</figcaption>
+      <canvas id="qtype-f1-chart" width="900" height="420"></canvas>
+    </figure>
+  </div>
+
+  <p>Raw data: <a href="pubs_runs.json">pubs_runs.json</a></p>
+
+<script>
+function drawGroupedBar(canvasId, data, groups, yLabel) {{
+  if (!data.length) return;
+  var canvas = document.getElementById(canvasId);
+  var ctx = canvas.getContext("2d");
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  var W = canvas.width, H = canvas.height;
+  var pad = {{top: 30, right: 20, bottom: 100, left: 60}};
+  var pW = W - pad.left - pad.right;
+  var pH = H - pad.top - pad.bottom;
+
+  var n = data.length;
+  var g = groups.length;
+  var groupWidth = pW / n;
+  var barWidth = (groupWidth * 0.8) / g;
+  var gap = groupWidth * 0.2;
+
+  var colors = ["#4e79a7","#f28e2b","#e15759","#76b7b2","#59a14f","#edc948","#b07aa1","#ff9da7"];
+
+  ctx.strokeStyle = "#999";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(pad.left, pad.top);
+  ctx.lineTo(pad.left, H - pad.bottom);
+  ctx.lineTo(W - pad.right, H - pad.bottom);
+  ctx.stroke();
+
+  ctx.fillStyle = "#666";
+  ctx.font = "12px sans-serif";
+  ctx.textAlign = "right";
+  for (var j = 0; j <= 5; j++) {{
+    var yVal = j * 0.2;
+    var y = H - pad.bottom - yVal * pH;
+    ctx.fillText(yVal.toFixed(1), pad.left - 8, y + 4);
+    ctx.strokeStyle = "#eee";
+    ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(W - pad.right, y); ctx.stroke();
+  }}
+
+  ctx.fillStyle = "#333";
+  ctx.font = "14px sans-serif";
+  ctx.save();
+  ctx.translate(15, H / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.textAlign = "center";
+  ctx.fillText(yLabel, 0, 0);
+  ctx.restore();
+
+  data.forEach(function(entry, i) {{
+    var x0 = pad.left + i * groupWidth + gap / 2;
+    groups.forEach(function(gName, gi) {{
+      var val = entry[gName];
+      if (val == null) return;
+      var bx = x0 + gi * barWidth;
+      var bh = val * pH;
+      var by = H - pad.bottom - bh;
+      ctx.fillStyle = colors[gi % colors.length];
+      ctx.fillRect(bx, by, barWidth - 1, bh);
+      ctx.fillStyle = "#333";
+      ctx.font = "10px sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText(val.toFixed(2), bx + barWidth / 2, by - 4);
+    }});
+    ctx.fillStyle = "#333";
+    ctx.font = "11px sans-serif";
+    ctx.save();
+    ctx.translate(x0 + (g * barWidth) / 2, H - pad.bottom + 12);
+    ctx.rotate(-Math.PI / 6);
+    ctx.textAlign = "right";
+    ctx.fillText(entry.label, 0, 0);
+    ctx.restore();
+  }});
+
+  var lx = W - pad.right - 10;
+  var ly = pad.top + 5;
+  groups.forEach(function(gName, gi) {{
+    ctx.fillStyle = "#333";
+    ctx.font = "12px sans-serif";
+    ctx.textAlign = "right";
+    ctx.fillText(gName, lx - 16, ly + gi * 18 + 11);
+    ctx.fillStyle = colors[gi % colors.length];
+    ctx.fillRect(lx - 12, ly + gi * 18, 12, 12);
+  }});
+}}
+
+document.addEventListener("DOMContentLoaded", function() {{
+  var diffLabels = {diff_labels_json};
+  var qtypeLabels = {qtype_labels_json};
+  drawGroupedBar("diff-acc-chart", {json.dumps(diff_acc_chart)}, diffLabels, "Accuracy");
+  drawGroupedBar("diff-f1-chart", {json.dumps(diff_f1_chart)}, diffLabels, "Citation F1");
+  drawGroupedBar("qtype-acc-chart", {json.dumps(qtype_acc_chart)}, qtypeLabels, "Accuracy");
+  drawGroupedBar("qtype-f1-chart", {json.dumps(qtype_f1_chart)}, qtypeLabels, "Citation F1");
+}});
+</script>
+</body>
+</html>
+"""
+    (destination / "pubs.html").write_text(html_content)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "runs_json",
         type=Path,
         help="Path to runs.json file",
+    )
+    parser.add_argument(
+        "--pubs",
+        action="store_true",
+        help="Generate pubs evaluation dashboard (input is pubs_runs.json)",
     )
     parser.add_argument(
         "--out",
@@ -990,13 +1244,19 @@ def main() -> None:
     if not args.runs_json.exists():
         raise SystemExit(f"Input file {args.runs_json} does not exist")
 
-    runs = load_runs_from_json(args.runs_json)
-    if not runs:
-        raise SystemExit("No runs found in JSON file")
-
-    question_meta = load_question_metadata(args.eval_metadata)
-    write_site(runs, args.out, question_meta)
-    print(f"✓ Site generated at {args.out}/index.html")
+    if args.pubs:
+        pubs_data = json.loads(args.runs_json.read_text())
+        if not pubs_data:
+            raise SystemExit("No runs found in JSON file")
+        write_pubs_site(pubs_data, args.out)
+        print(f"✓ Pubs dashboard generated at {args.out}/pubs.html")
+    else:
+        runs = load_runs_from_json(args.runs_json)
+        if not runs:
+            raise SystemExit("No runs found in JSON file")
+        question_meta = load_question_metadata(args.eval_metadata)
+        write_site(runs, args.out, question_meta)
+        print(f"✓ Site generated at {args.out}/index.html")
 
 
 if __name__ == "__main__":

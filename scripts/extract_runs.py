@@ -314,8 +314,174 @@ def append_runs(json_path: Path, new_runs: list[RunSummary]) -> None:
     print(f"✓ Wrote {len(all_runs)} runs to {json_path}")
 
 
+_MODEL_PRICING: dict[str, dict[str, float]] = {
+    # $/M tokens: base input, cache write, cache read, output
+    "anthropic/claude-sonnet-4-5": {
+        "input": 3.0, "cache_write": 3.75, "cache_read": 0.30, "output": 15.0,
+    },
+    "anthropic/claude-haiku-4-5": {
+        "input": 0.80, "cache_write": 1.00, "cache_read": 0.08, "output": 4.0,
+    },
+}
+
+
+def _compute_cost(model: str, usage) -> float | None:
+    """Compute approximate USD cost from ModelUsage and known pricing."""
+    pricing = _MODEL_PRICING.get(model)
+    if pricing is None or usage is None:
+        return None
+    cost = 0.0
+    cost += (usage.input_tokens or 0) * pricing["input"] / 1_000_000
+    cost += (usage.input_tokens_cache_write or 0) * pricing["cache_write"] / 1_000_000
+    cost += (usage.input_tokens_cache_read or 0) * pricing["cache_read"] / 1_000_000
+    cost += (usage.output_tokens or 0) * pricing["output"] / 1_000_000
+    return round(cost, 2)
+
+
+def load_pubs_runs(log_dir: Path) -> list[dict]:
+    """Load nf_rag_pubs results from .eval files using inspect_ai."""
+    from inspect_ai.log import read_eval_log
+
+    eval_files = sorted(log_dir.glob("*nf-rag-pubs*.eval"))
+    if not eval_files:
+        return []
+
+    runs = []
+    for eval_file in eval_files:
+        log = read_eval_log(str(eval_file))
+        model = log.eval.model
+        task_args = log.eval.task_args or {}
+        style = task_args.get("question_style", "precise")
+        n_samples = len(log.samples) if log.samples else 0
+        status = log.status
+
+        entry: dict = {
+            "log_file": eval_file.name,
+            "model": model,
+            "question_style": style,
+            "status": status,
+            "samples": n_samples,
+            "total_samples": 130,
+        }
+
+        # Extract timestamps
+        if hasattr(log.eval, "created") and log.eval.created:
+            entry["started_at"] = log.eval.created
+        if hasattr(log, "stats") and log.stats:
+            started = getattr(log.stats, "started_at", None)
+            completed = getattr(log.stats, "completed_at", None)
+            if started:
+                entry["started_at"] = started
+            if completed:
+                entry["completed_at"] = completed
+
+        # Extract cost from model usage
+        if log.stats and log.stats.model_usage:
+            usage = log.stats.model_usage.get(model)
+            if usage:
+                entry["input_tokens"] = usage.input_tokens or 0
+                entry["output_tokens"] = usage.output_tokens or 0
+                entry["input_tokens_cache_write"] = usage.input_tokens_cache_write or 0
+                entry["input_tokens_cache_read"] = usage.input_tokens_cache_read or 0
+                cost = _compute_cost(model, usage)
+                if cost is not None:
+                    entry["cost"] = cost
+
+        # Extract per-sample timing
+        if log.samples:
+            times = [s.total_time for s in log.samples if s.total_time is not None]
+            if times:
+                entry["min_sample_time"] = round(min(times), 1)
+                entry["max_sample_time"] = round(max(times), 1)
+                entry["avg_sample_time"] = round(sum(times) / len(times), 1)
+
+        # Extract aggregate metrics from completed runs
+        if log.results and log.results.scores:
+            for scorer in log.results.scores:
+                if scorer.name == "score_answer":
+                    entry["accuracy"] = round(scorer.metrics["accuracy"].value, 4)
+                    entry["accuracy_stderr"] = round(scorer.metrics["stderr"].value, 4)
+                elif scorer.name == "score_attribution":
+                    # Current metric name is citation_f1; older evals used passage_f1
+                    f1_key = "citation_f1" if "citation_f1" in scorer.metrics else "passage_f1"
+                    entry["citation_f1"] = round(scorer.metrics[f1_key].value, 4)
+                    entry["citation_f1_stderr"] = round(scorer.metrics["stderr"].value, 4)
+
+        # Per-sample breakdown by difficulty, question_type, paper
+        diff_acc: dict[str, list[float]] = {}
+        diff_f1: dict[str, list[float]] = {}
+        qtype_acc: dict[str, list[float]] = {}
+        qtype_f1: dict[str, list[float]] = {}
+        paper_acc: dict[str, list[float]] = {}
+        paper_f1: dict[str, list[float]] = {}
+        per_sample: list[dict] = []
+
+        if log.samples:
+            for s in log.samples:
+                sid = s.id or ""
+                meta = s.metadata or {}
+                difficulty = meta.get("difficulty", "unknown")
+                qtype = meta.get("question_type", "unknown")
+                paper = meta.get("category", sid.rsplit("-", 1)[0])
+
+                sample_acc = 0.0
+                sample_f1 = 0.0
+                if "score_answer" in s.scores:
+                    sc = s.scores["score_answer"]
+                    correct = (sc.metadata or {}).get("answer_correct", False)
+                    sample_acc = 1.0 if correct else 0.0
+                if "score_attribution" in s.scores:
+                    sc = s.scores["score_attribution"]
+                    sample_f1 = (sc.metadata or {}).get("f1", 0.0)
+
+                diff_acc.setdefault(difficulty, []).append(sample_acc)
+                diff_f1.setdefault(difficulty, []).append(sample_f1)
+                qtype_acc.setdefault(qtype, []).append(sample_acc)
+                qtype_f1.setdefault(qtype, []).append(sample_f1)
+                paper_acc.setdefault(paper, []).append(sample_acc)
+                paper_f1.setdefault(paper, []).append(sample_f1)
+
+                per_sample.append({
+                    "id": sid,
+                    "accuracy": sample_acc,
+                    "f1": round(sample_f1, 4),
+                    "difficulty": difficulty,
+                    "question_type": qtype,
+                    "paper": paper,
+                })
+
+        # For incomplete runs without aggregate metrics, compute from samples
+        if "accuracy" not in entry and per_sample:
+            vals = [s["accuracy"] for s in per_sample]
+            entry["accuracy"] = round(sum(vals) / len(vals), 4)
+        if "citation_f1" not in entry and per_sample:
+            vals = [s["f1"] for s in per_sample]
+            entry["citation_f1"] = round(sum(vals) / len(vals), 4)
+
+        def _mean(vals: list[float]) -> float:
+            return round(sum(vals) / len(vals), 4) if vals else 0.0
+
+        entry["difficulty_accuracy"] = {k: _mean(v) for k, v in diff_acc.items()}
+        entry["difficulty_f1"] = {k: _mean(v) for k, v in diff_f1.items()}
+        entry["question_type_accuracy"] = {k: _mean(v) for k, v in qtype_acc.items()}
+        entry["question_type_f1"] = {k: _mean(v) for k, v in qtype_f1.items()}
+        entry["paper_accuracy"] = {k: _mean(v) for k, v in paper_acc.items()}
+        entry["paper_f1"] = {k: _mean(v) for k, v in paper_f1.items()}
+        entry["per_sample"] = per_sample
+
+        runs.append(entry)
+        print(f"  {eval_file.name}: {model} ({style}) — {n_samples} samples, status={status}")
+
+    return runs
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--pubs",
+        action="store_true",
+        help="Extract nf_rag_pubs results from .eval files",
+    )
     parser.add_argument(
         "--log-dir",
         type=Path,
@@ -331,7 +497,7 @@ def main() -> None:
     parser.add_argument(
         "--output",
         type=Path,
-        default=Path("evaluation/runs.json"),
+        default=None,
         help="Output JSON file path",
     )
     args = parser.parse_args()
@@ -339,14 +505,23 @@ def main() -> None:
     if not args.log_dir.exists():
         raise SystemExit(f"Log directory {args.log_dir} does not exist")
 
-    question_meta = load_question_metadata(args.eval_metadata)
-    runs = load_runs(args.log_dir, question_meta)
-
-    if not runs:
-        raise SystemExit("No scored runs found in logs directory")
-
-    print(f"Found {len(runs)} runs in {args.log_dir}")
-    append_runs(args.output, runs)
+    if args.pubs:
+        output = args.output or Path("evaluation/pubs_runs.json")
+        runs = load_pubs_runs(args.log_dir)
+        if not runs:
+            raise SystemExit("No nf_rag_pubs .eval files found in logs directory")
+        print(f"Found {len(runs)} pubs runs in {args.log_dir}")
+        output.parent.mkdir(parents=True, exist_ok=True)
+        output.write_text(json.dumps(runs, indent=2) + "\n")
+        print(f"✓ Wrote {len(runs)} runs to {output}")
+    else:
+        output = args.output or Path("evaluation/runs.json")
+        question_meta = load_question_metadata(args.eval_metadata)
+        runs = load_runs(args.log_dir, question_meta)
+        if not runs:
+            raise SystemExit("No scored runs found in logs directory")
+        print(f"Found {len(runs)} runs in {args.log_dir}")
+        append_runs(output, runs)
 
 
 if __name__ == "__main__":
