@@ -12,7 +12,7 @@ Required models (need ANTHROPIC_API_KEY):
     anthropic/claude-sonnet-4-5, anthropic/claude-haiku-4-5
 
 With --full, additionally runs (need GOOGLE_API_KEY and OPENAI_API_KEY):
-    google/gemini-2.5-pro, openai/gpt-5.2
+    google/gemini-2.5-pro, openai/gpt-5.4
 
 With --google / --openai, runs only the specified non-Anthropic
 model(s) instead of Anthropic models. Can be combined.
@@ -46,7 +46,7 @@ ANTHROPIC_MODELS = [
 ]
 
 GOOGLE_MODELS = ["google/gemini-2.5-pro"]
-OPENAI_MODELS = ["openai/gpt-5.2"]
+OPENAI_MODELS = ["openai/gpt-5.4"]
 
 
 # ---------------------------------------------------------------------------
