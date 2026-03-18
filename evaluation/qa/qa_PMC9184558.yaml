@@ -23,6 +23,7 @@ questions:
   - 30
   difficulty: easy
   question_type: factual
+  persona: Bench Scientist
 - id: PMC9184558-02
   pmcid: PMC9184558
   author: claude-opus-4-6
@@ -44,6 +45,7 @@ questions:
   - 45
   difficulty: easy
   question_type: factual
+  persona: Bench Scientist
 - id: PMC9184558-03
   pmcid: PMC9184558
   author: claude-opus-4-6
@@ -64,6 +66,7 @@ questions:
   - 21
   difficulty: medium
   question_type: factual
+  persona: Bench Scientist
 - id: PMC9184558-04
   pmcid: PMC9184558
   author: claude-opus-4-6
@@ -83,6 +86,7 @@ questions:
   - 30
   difficulty: medium
   question_type: methodological
+  persona: Bench Scientist
 - id: PMC9184558-05
   pmcid: PMC9184558
   author: claude-opus-4-6
@@ -105,6 +109,7 @@ questions:
   - 28
   difficulty: medium
   question_type: causal
+  persona: Bench Scientist
 - id: PMC9184558-06
   pmcid: PMC9184558
   author: claude-opus-4-6
@@ -130,6 +135,7 @@ questions:
   - 39
   difficulty: medium
   question_type: methodological
+  persona: Bioinformatician
 - id: PMC9184558-07
   pmcid: PMC9184558
   author: claude-opus-4-6
@@ -156,6 +162,7 @@ questions:
   - 41
   difficulty: hard
   question_type: comparative
+  persona: Bench Scientist
 - id: PMC9184558-08
   pmcid: PMC9184558
   author: claude-opus-4-6
@@ -177,6 +184,7 @@ questions:
   - 42
   difficulty: medium
   question_type: factual
+  persona: Researcher
 - id: PMC9184558-09
   pmcid: PMC9184558
   author: claude-opus-4-6
@@ -204,6 +212,7 @@ questions:
   - 87
   difficulty: hard
   question_type: methodological
+  persona: Bench Scientist
 - id: PMC9184558-10
   pmcid: PMC9184558
   author: claude-opus-4-6
@@ -228,6 +237,7 @@ questions:
   question_type: factual
   editor_note: Ideal answer corrected — original incorrectly mentioned "a single NF1
     mutation (c.2041C>T)" which does not appear in this paper.
+  persona: Researcher
 - id: PMC9184558-11
   pmcid: PMC9184558
   author: claude-opus-4-6
@@ -249,3 +259,4 @@ questions:
   - 62
   difficulty: medium
   question_type: causal
+  persona: Bench Scientist

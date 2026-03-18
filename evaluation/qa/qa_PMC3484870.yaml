@@ -20,6 +20,7 @@ questions:
   - 10
   difficulty: easy
   question_type: factual
+  persona: Bench Scientist
 - id: PMC3484870-02
   pmcid: PMC3484870
   author: claude-opus-4-6
@@ -38,6 +39,7 @@ questions:
   - 5
   difficulty: easy
   question_type: factual
+  persona: Bioinformatician
 - id: PMC3484870-03
   pmcid: PMC3484870
   author: claude-opus-4-6
@@ -60,6 +62,7 @@ questions:
   - 28
   difficulty: medium
   question_type: comparative
+  persona: Bench Scientist
 - id: PMC3484870-04
   pmcid: PMC3484870
   author: claude-opus-4-6
@@ -83,6 +86,7 @@ questions:
   - 19
   difficulty: medium
   question_type: causal
+  persona: Bench Scientist
 - id: PMC3484870-05
   pmcid: PMC3484870
   author: claude-opus-4-6
@@ -105,6 +109,7 @@ questions:
   - 26
   difficulty: medium
   question_type: comparative
+  persona: Bench Scientist
 - id: PMC3484870-06
   pmcid: PMC3484870
   author: claude-opus-4-6
@@ -137,6 +142,7 @@ questions:
   - 44
   difficulty: hard
   question_type: inferential
+  persona: Bench Scientist
 - id: PMC3484870-07
   pmcid: PMC3484870
   author: claude-opus-4-6
@@ -160,6 +166,7 @@ questions:
   - 9
   difficulty: medium
   question_type: factual
+  persona: Bench Scientist
 - id: PMC3484870-08
   pmcid: PMC3484870
   author: claude-opus-4-6
@@ -195,6 +202,7 @@ questions:
   - 28
   difficulty: hard
   question_type: inferential
+  persona: Bench Scientist
 - id: PMC3484870-09
   pmcid: PMC3484870
   author: claude-opus-4-6
@@ -223,6 +231,7 @@ questions:
   - 41
   difficulty: hard
   question_type: causal
+  persona: Bench Scientist
 - id: PMC3484870-10
   pmcid: PMC3484870
   author: claude-opus-4-6
@@ -242,3 +251,4 @@ questions:
   - 30
   difficulty: easy
   question_type: factual
+  persona: Bench Scientist

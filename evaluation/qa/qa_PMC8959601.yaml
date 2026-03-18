@@ -7,10 +7,11 @@ questions:
 - id: PMC8959601-01
   pmcid: PMC8959601
   author: claude-opus-4-6
-  question: In the P2RY14 study, what is the optimal concentration of the P2ry14 inhibitor PPTN that was
-    determined through dose-response analysis in mouse Schwann cell precursor sphere
-    assays?
-  user_query: what was the best PPTN concentration for the SCP sphere assay in the P2RY14 study?
+  question: In the P2RY14 study, what is the optimal concentration of the P2ry14 inhibitor
+    PPTN that was determined through dose-response analysis in mouse Schwann cell
+    precursor sphere assays?
+  user_query: what was the best PPTN concentration for the SCP sphere assay in the
+    P2RY14 study?
   ideal: The optimal concentration of the P2ry14 inhibitor PPTN was 300 nM. Concentrations
     of 500 nM were found to be toxic to the cells.
   choices:
@@ -23,6 +24,7 @@ questions:
   - 15
   difficulty: easy
   question_type: factual
+  persona: Bench Scientist
 - id: PMC8959601-02
   pmcid: PMC8959601
   author: claude-opus-4-6
@@ -42,6 +44,7 @@ questions:
   - 8
   difficulty: easy
   question_type: factual
+  persona: Bench Scientist
 - id: PMC8959601-03
   pmcid: PMC8959601
   author: claude-opus-4-6
@@ -61,13 +64,15 @@ questions:
   - 11
   difficulty: medium
   question_type: comparative
+  persona: Bench Scientist
 - id: PMC8959601-04
   pmcid: PMC8959601
   author: claude-opus-4-6
   question: How was the P2ry14 inhibitor PPTN delivered to neurofibroma-bearing mice
     in the in vivo pharmacological study, and what was the daily dose and duration
     of treatment?
-  user_query: in P2RY14 study, how did they give PPTN to the mice in vivo and for how long?
+  user_query: in P2RY14 study, how did they give PPTN to the mice in vivo and for
+    how long?
   ideal: Due to poor oral bioavailability, PPTN was delivered via subcutaneously implanted
     osmotic minipumps that released a daily dose of 4.55 mg/kg for 14 days.
   choices:
@@ -81,6 +86,7 @@ questions:
   - 82
   difficulty: medium
   question_type: methodological
+  persona: Bench Scientist
 - id: PMC8959601-05
   pmcid: PMC8959601
   author: claude-opus-4-6
@@ -104,12 +110,13 @@ questions:
   - 40
   difficulty: medium
   question_type: factual
+  persona: Bench Scientist
 - id: PMC8959601-06
   pmcid: PMC8959601
   author: claude-opus-4-6
-  question: How does the P2RY14 study use p-PKA substrate phosphorylation as a readout, and
-    what was the effect of P2ry14 deletion on p-PKA substrate phosphorylation in Nf1
-    mutant nerves in vivo?
+  question: How does the P2RY14 study use p-PKA substrate phosphorylation as a readout,
+    and what was the effect of P2ry14 deletion on p-PKA substrate phosphorylation
+    in Nf1 mutant nerves in vivo?
   user_query: what happened to pPKA staining when P2ry14 was knocked out in NF1 mice
     nerves?
   ideal: p-PKA substrate phosphorylation was used as an indirect readout of cAMP levels.
@@ -130,6 +137,7 @@ questions:
   - 24
   difficulty: hard
   question_type: causal
+  persona: Bench Scientist
 - id: PMC8959601-07
   pmcid: PMC8959601
   author: claude-opus-4-6
@@ -152,6 +160,7 @@ questions:
   - 32
   difficulty: medium
   question_type: factual
+  persona: Bench Scientist
 - id: PMC8959601-08
   pmcid: PMC8959601
   author: claude-opus-4-6
@@ -178,6 +187,7 @@ questions:
   - 49
   difficulty: hard
   question_type: causal
+  persona: Bench Scientist
 - id: PMC8959601-09
   pmcid: PMC8959601
   author: claude-opus-4-6
@@ -202,13 +212,14 @@ questions:
   - 36
   difficulty: medium
   question_type: comparative
+  persona: Researcher
 - id: PMC8959601-10
   pmcid: PMC8959601
   author: claude-opus-4-6
-  question: In the P2RY14 study, what approaches were used to silence P2ry14 in mouse SCPs in vitro, and
-    how many different shRNAs were tested?
-  user_query: in P2RY14 study, how did they knock down P2ry14 in vitro and how many shRNAs did they
-    use?
+  question: In the P2RY14 study, what approaches were used to silence P2ry14 in mouse
+    SCPs in vitro, and how many different shRNAs were tested?
+  user_query: in P2RY14 study, how did they knock down P2ry14 in vitro and how many
+    shRNAs did they use?
   ideal: 'P2ry14 was silenced using short-hairpin RNAs (shRNAs) delivered via lentiviral
     particles. Three different shRNAs targeting P2ry14 were used: shP2ry14(09), shP2ry14(84),
     and shP2ry14(64), each tested in three biological replicates with similar results.'
@@ -223,6 +234,7 @@ questions:
   - 70
   difficulty: medium
   question_type: methodological
+  persona: Bench Scientist
 - id: PMC8959601-11
   pmcid: PMC8959601
   author: claude-opus-4-6
@@ -249,13 +261,15 @@ questions:
   - 30
   difficulty: hard
   question_type: methodological
+  persona: Bench Scientist
 - id: PMC8959601-12
   pmcid: PMC8959601
   author: claude-opus-4-6
-  question: In the P2RY14 study, what is the combined effect of rolipram and PPTN treatment on Nf1-/- SCP
-    self-renewal in vitro, and what does this suggest about the P2ry14-cAMP signaling
-    axis?
-  user_query: what happened when they combined rolipram and PPTN on NF1 null SCPs in the P2RY14 study?
+  question: In the P2RY14 study, what is the combined effect of rolipram and PPTN
+    treatment on Nf1-/- SCP self-renewal in vitro, and what does this suggest about
+    the P2ry14-cAMP signaling axis?
+  user_query: what happened when they combined rolipram and PPTN on NF1 null SCPs
+    in the P2RY14 study?
   ideal: Treatment with 1 µM rolipram or 300 nM PPTN individually decreased Nf1-/-
     SCP self-renewal. The combination showed additional effect, largely at early passage.
     These results support the idea that elevated self-renewal in Nf1-/- SCPs is due
@@ -272,6 +286,7 @@ questions:
   - 25
   difficulty: hard
   question_type: comparative
+  persona: Bench Scientist
 - id: PMC8959601-13
   pmcid: PMC8959601
   author: claude-opus-4-6
@@ -293,3 +308,4 @@ questions:
   - 50
   difficulty: medium
   question_type: methodological
+  persona: Bench Scientist

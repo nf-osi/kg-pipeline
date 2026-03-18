@@ -24,6 +24,7 @@ questions:
   - 56
   difficulty: easy
   question_type: factual
+  persona: Bioinformatician
 - id: PMC9929861-02
   pmcid: PMC9929861
   author: claude-opus-4-6
@@ -49,6 +50,7 @@ questions:
   - 53
   difficulty: medium
   question_type: methodological
+  persona: Bench Scientist
 - id: PMC9929861-03
   pmcid: PMC9929861
   author: claude-opus-4-6
@@ -83,6 +85,7 @@ questions:
   - 57
   difficulty: hard
   question_type: comparative
+  persona: Researcher
 - id: PMC9929861-04
   pmcid: PMC9929861
   author: claude-opus-4-6
@@ -100,6 +103,7 @@ questions:
   - 29
   difficulty: easy
   question_type: factual
+  persona: Bioinformatician
 - id: PMC9929861-05
   pmcid: PMC9929861
   author: claude-opus-4-6
@@ -122,6 +126,7 @@ questions:
   - 57
   difficulty: medium
   question_type: factual
+  persona: Bioinformatician
 - id: PMC9929861-06
   pmcid: PMC9929861
   author: claude-opus-4-6
@@ -148,6 +153,7 @@ questions:
   - 57
   difficulty: hard
   question_type: inferential
+  persona: Researcher
 - id: PMC9929861-07
   pmcid: PMC9929861
   author: claude-opus-4-6
@@ -169,6 +175,7 @@ questions:
   - 42
   difficulty: medium
   question_type: factual
+  persona: Researcher
 - id: PMC9929861-08
   pmcid: PMC9929861
   author: claude-opus-4-6
@@ -193,6 +200,7 @@ questions:
   - 102
   difficulty: medium
   question_type: methodological
+  persona: Bioinformatician
 - id: PMC9929861-09
   pmcid: PMC9929861
   author: claude-opus-4-6
@@ -211,6 +219,7 @@ questions:
   - 11
   difficulty: easy
   question_type: factual
+  persona: Patient Advocate
 - id: PMC9929861-10
   pmcid: PMC9929861
   author: claude-opus-4-6
@@ -239,6 +248,7 @@ questions:
   - 51
   difficulty: medium
   question_type: causal
+  persona: Bench Scientist
 - id: PMC9929861-11
   pmcid: PMC9929861
   author: claude-opus-4-6
@@ -266,6 +276,7 @@ questions:
   - 49
   difficulty: medium
   question_type: comparative
+  persona: Bench Scientist
 - id: PMC9929861-12
   pmcid: PMC9929861
   author: claude-opus-4-6
@@ -288,6 +299,7 @@ questions:
   - 63
   difficulty: easy
   question_type: methodological
+  persona: Bench Scientist
 - id: PMC9929861-13
   pmcid: PMC9929861
   author: claude-opus-4-6
@@ -313,3 +325,4 @@ questions:
   - 57
   difficulty: hard
   question_type: inferential
+  persona: Bioinformatician

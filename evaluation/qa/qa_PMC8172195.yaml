@@ -23,6 +23,7 @@ questions:
   - 32
   difficulty: easy
   question_type: factual
+  persona: Researcher
 - id: PMC8172195-02
   pmcid: PMC8172195
   author: gemini-3.1-pro-preview
@@ -42,6 +43,7 @@ questions:
   - 37
   difficulty: easy
   question_type: methodological
+  persona: Bench Scientist
 - id: PMC8172195-03
   pmcid: PMC8172195
   author: gemini-3.1-pro-preview
@@ -63,6 +65,7 @@ questions:
   - 37
   difficulty: medium
   question_type: comparative
+  persona: Bench Scientist
 - id: PMC8172195-04
   pmcid: PMC8172195
   author: gemini-3.1-pro-preview
@@ -86,6 +89,7 @@ questions:
   - 35
   difficulty: medium
   question_type: factual
+  persona: Researcher
 - id: PMC8172195-05
   pmcid: PMC8172195
   author: gemini-3.1-pro-preview
@@ -106,6 +110,7 @@ questions:
   - 40
   difficulty: hard
   question_type: causal
+  persona: Bench Scientist
 - id: PMC8172195-06
   pmcid: PMC8172195
   author: gemini-3.1-pro-preview
@@ -125,6 +130,7 @@ questions:
   - 37
   difficulty: medium
   question_type: causal
+  persona: Bench Scientist
 - id: PMC8172195-07
   pmcid: PMC8172195
   author: gemini-3.1-pro-preview
@@ -145,6 +151,7 @@ questions:
   - 29
   difficulty: easy
   question_type: methodological
+  persona: Bench Scientist
 - id: PMC8172195-08
   pmcid: PMC8172195
   author: gemini-3.1-pro-preview
@@ -167,3 +174,4 @@ questions:
   - 43
   difficulty: hard
   question_type: comparative
+  persona: Bench Scientist

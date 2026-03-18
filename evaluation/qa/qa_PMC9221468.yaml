@@ -22,15 +22,18 @@ questions:
   - 3
   difficulty: medium
   question_type: factual
-  editor_note: > 
-    On the surface, this seems like an easy factual question but is designed to be a bit trickier. 
-    It's related to PMC7305302-01, which asks about treatment options
-    for symptomatic PNs (but answer there is: surgery). The key distinction here is "pharmacotherapy"
-    — this question asks specifically about FDA-approved drugs, while PMC7305302-01
-    asks about treatment options broadly. 
-    What's tricky here is throwing in Mirdametinib as first choice, which was approved in 2025 and is technically correct,
-    **but that fact is *not* in our set of indexed papers** so it functions as a good test of how well-grounded/by-the-books the agent is vs 
-    immediately going with its embedded memory.'
+  editor_note: 'On the surface, this seems like an easy factual question but is designed
+    to be a bit trickier.  It''s related to PMC7305302-01, which asks about treatment
+    options for symptomatic PNs (but answer there is: surgery). The key distinction
+    here is "pharmacotherapy" — this question asks specifically about FDA-approved
+    drugs, while PMC7305302-01 asks about treatment options broadly.  What''s tricky
+    here is throwing in Mirdametinib as first choice, which was approved in 2025 and
+    is technically correct, **but that fact is *not* in our set of indexed papers**
+    so it functions as a good test of how well-grounded/by-the-books the agent is
+    vs  immediately going with its embedded memory.''
+
+    '
+  persona: Patient Advocate
 - id: PMC9221468-02
   pmcid: PMC9221468
   author: claude-opus-4-6
@@ -50,6 +53,7 @@ questions:
   - 21
   difficulty: easy
   question_type: factual
+  persona: Bench Scientist
 - id: PMC9221468-03
   pmcid: PMC9221468
   author: claude-opus-4-6
@@ -75,6 +79,7 @@ questions:
   - 26
   difficulty: medium
   question_type: causal
+  persona: Bioinformatician
 - id: PMC9221468-04
   pmcid: PMC9221468
   author: claude-opus-4-6
@@ -100,6 +105,7 @@ questions:
   - 39
   difficulty: medium
   question_type: factual
+  persona: Bioinformatician
 - id: PMC9221468-05
   pmcid: PMC9221468
   author: claude-opus-4-6
@@ -124,6 +130,7 @@ questions:
   - 14
   difficulty: medium
   question_type: methodological
+  persona: Bioinformatician
 - id: PMC9221468-06
   pmcid: PMC9221468
   author: claude-opus-4-6
@@ -152,6 +159,7 @@ questions:
   - 33
   difficulty: hard
   question_type: comparative
+  persona: Bioinformatician
 - id: PMC9221468-07
   pmcid: PMC9221468
   author: claude-opus-4-6
@@ -182,6 +190,7 @@ questions:
   - 39
   difficulty: hard
   question_type: inferential
+  persona: Researcher
 - id: PMC9221468-08
   pmcid: PMC9221468
   author: claude-opus-4-6
@@ -206,6 +215,7 @@ questions:
   - 40
   difficulty: medium
   question_type: methodological
+  persona: Researcher
 - id: PMC9221468-09
   pmcid: PMC9221468
   author: claude-opus-4-6
@@ -225,6 +235,7 @@ questions:
   - 3
   difficulty: easy
   question_type: factual
+  persona: Patient Advocate
 - id: PMC9221468-10
   pmcid: PMC9221468
   author: claude-opus-4-6
@@ -254,6 +265,7 @@ questions:
   - 35
   difficulty: hard
   question_type: methodological
+  persona: Bioinformatician
 - id: PMC9221468-11
   pmcid: PMC9221468
   author: claude-opus-4-6
@@ -276,6 +288,7 @@ questions:
   - 39
   difficulty: hard
   question_type: factual
+  persona: Researcher
 - id: PMC9221468-12
   pmcid: PMC9221468
   author: claude-opus-4-6
@@ -301,3 +314,4 @@ questions:
   - 32
   difficulty: medium
   question_type: methodological
+  persona: Bioinformatician

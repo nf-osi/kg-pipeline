@@ -23,6 +23,7 @@ questions:
   - 16
   difficulty: easy
   question_type: factual
+  persona: Bench Scientist
 - id: PMC9646701-02
   pmcid: PMC9646701
   author: claude-opus-4-6
@@ -42,6 +43,7 @@ questions:
   - 18
   difficulty: easy
   question_type: methodological
+  persona: Bench Scientist
 - id: PMC9646701-03
   pmcid: PMC9646701
   author: claude-opus-4-6
@@ -70,6 +72,7 @@ questions:
   - 37
   difficulty: medium
   question_type: methodological
+  persona: Bioinformatician
 - id: PMC9646701-04
   pmcid: PMC9646701
   author: claude-opus-4-6
@@ -94,6 +97,7 @@ questions:
   - 45
   difficulty: medium
   question_type: comparative
+  persona: Bench Scientist
 - id: PMC9646701-05
   pmcid: PMC9646701
   author: claude-opus-4-6
@@ -117,6 +121,7 @@ questions:
   - 54
   difficulty: medium
   question_type: factual
+  persona: Bench Scientist
 - id: PMC9646701-06
   pmcid: PMC9646701
   author: claude-opus-4-6
@@ -142,6 +147,7 @@ questions:
   - 67
   difficulty: medium
   question_type: comparative
+  persona: Bench Scientist
 - id: PMC9646701-07
   pmcid: PMC9646701
   author: claude-opus-4-6
@@ -163,6 +169,7 @@ questions:
   - 71
   difficulty: hard
   question_type: causal
+  persona: Researcher
 - id: PMC9646701-08
   pmcid: PMC9646701
   author: claude-opus-4-6
@@ -194,6 +201,7 @@ questions:
   - 72
   difficulty: hard
   question_type: inferential
+  persona: Researcher
 - id: PMC9646701-09
   pmcid: PMC9646701
   author: claude-opus-4-6
@@ -213,6 +221,7 @@ questions:
   question_type: factual
   editor_note: Removed NF1 incidence sub-question (1:2000) to avoid cross-paper overlap
     with PMC8959601-14 which asks about NF1 prevalence with a different reported figure.
+  persona: Bench Scientist
 - id: PMC9646701-10
   pmcid: PMC9646701
   author: claude-opus-4-6
@@ -243,6 +252,7 @@ questions:
   - 60
   difficulty: hard
   question_type: methodological
+  persona: Bench Scientist
 - id: PMC9646701-11
   pmcid: PMC9646701
   author: claude-opus-4-6
@@ -268,3 +278,4 @@ questions:
   - 6
   difficulty: medium
   question_type: comparative
+  persona: Researcher

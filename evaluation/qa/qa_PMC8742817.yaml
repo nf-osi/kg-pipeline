@@ -21,6 +21,7 @@ questions:
   - 7
   difficulty: easy
   question_type: factual
+  persona: Researcher
 - id: PMC8742817-02
   pmcid: PMC8742817
   author: claude-opus-4-6
@@ -40,6 +41,7 @@ questions:
   - 5
   difficulty: easy
   question_type: factual
+  persona: Researcher
 - id: PMC8742817-03
   pmcid: PMC8742817
   author: claude-opus-4-6
@@ -60,6 +62,7 @@ questions:
   - 49
   difficulty: medium
   question_type: causal
+  persona: Researcher
 - id: PMC8742817-04
   pmcid: PMC8742817
   author: claude-opus-4-6
@@ -79,6 +82,7 @@ questions:
   - 52
   difficulty: medium
   question_type: comparative
+  persona: Researcher
 - id: PMC8742817-05
   pmcid: PMC8742817
   author: claude-opus-4-6
@@ -97,6 +101,7 @@ questions:
   - 55
   difficulty: medium
   question_type: factual
+  persona: Researcher
 - id: PMC8742817-06
   pmcid: PMC8742817
   author: claude-opus-4-6
@@ -119,6 +124,7 @@ questions:
   - 58
   difficulty: medium
   question_type: comparative
+  persona: Bench Scientist
 - id: PMC8742817-07
   pmcid: PMC8742817
   author: claude-opus-4-6
@@ -143,6 +149,7 @@ questions:
   - 67
   difficulty: hard
   question_type: comparative
+  persona: Researcher
 - id: PMC8742817-08
   pmcid: PMC8742817
   author: claude-opus-4-6
@@ -165,6 +172,7 @@ questions:
   - 46
   difficulty: hard
   question_type: comparative
+  persona: Bench Scientist
 - id: PMC8742817-09
   pmcid: PMC8742817
   author: claude-opus-4-6
@@ -186,6 +194,7 @@ questions:
   - 14
   difficulty: medium
   question_type: methodological
+  persona: Bioinformatician
 - id: PMC8742817-10
   pmcid: PMC8742817
   author: claude-opus-4-6
@@ -207,6 +216,7 @@ questions:
   - 81
   difficulty: hard
   question_type: factual
+  persona: Bench Scientist
 - id: PMC8742817-11
   pmcid: PMC8742817
   author: claude-opus-4-6
@@ -225,6 +235,7 @@ questions:
   - 52
   difficulty: easy
   question_type: comparative
+  persona: Researcher
 - id: PMC8742817-12
   pmcid: PMC8742817
   author: claude-opus-4-6
@@ -248,6 +259,7 @@ questions:
   - 73
   difficulty: hard
   question_type: inferential
+  persona: Bench Scientist
 - id: PMC8742817-13
   pmcid: PMC8742817
   author: claude-opus-4-6
@@ -268,3 +280,4 @@ questions:
   - 66
   difficulty: medium
   question_type: factual
+  persona: Researcher

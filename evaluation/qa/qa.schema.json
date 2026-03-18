@@ -65,6 +65,11 @@
       "type": "string",
       "enum": ["factual", "causal", "comparative", "inferential", "methodological", "hypothetical", "other"]
     },
+    "persona": {
+      "description": "User persona who would typically ask this question: Researcher = general scientific researcher, Bioinformatician = computational/data analysis focus, Bench Scientist = experimental/lab focus, Patient Advocate = patient-centered perspective",
+      "type": "string",
+      "enum": ["Researcher", "Bioinformatician", "Bench Scientist", "Patient Advocate"]
+    },
     "editor_note": {
       "description": "Free-text note from the editor/curator, e.g. to flag cross-paper overlap or justify difficulty rating. Not used at eval time.",
       "type": "string"

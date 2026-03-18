@@ -25,12 +25,13 @@ questions:
   - 31
   difficulty: medium
   question_type: comparative
+  persona: Bench Scientist
 - id: PMC8150846-02
   pmcid: PMC8150846
   author: gemini-3.1-pro-preview
   question: In the neurofibromin/FAK/ECM 3D colony study, which combination of pharmacological
-    inhibitors fully suppressed colony growth of neurofibromin-deficient cells by targeting
-    parallel oncogenic signaling pathways?
+    inhibitors fully suppressed colony growth of neurofibromin-deficient cells by
+    targeting parallel oncogenic signaling pathways?
   user_query: what drug combo stopped colony growth in the FAK/ECM neurofibroma 3D
     study
   ideal: The combinatorial treatment with the MEK inhibitor Selumetinib (AZD6244)
@@ -49,6 +50,7 @@ questions:
   - 47
   difficulty: hard
   question_type: factual
+  persona: Bench Scientist
 - id: PMC8150846-03
   pmcid: PMC8150846
   author: gemini-3.1-pro-preview
@@ -68,6 +70,7 @@ questions:
   - 41
   difficulty: medium
   question_type: factual
+  persona: Bench Scientist
 - id: PMC8150846-04
   pmcid: PMC8150846
   author: gemini-3.1-pro-preview
@@ -92,6 +95,7 @@ questions:
   - 39
   difficulty: hard
   question_type: comparative
+  persona: Bench Scientist
 - id: PMC8150846-05
   pmcid: PMC8150846
   author: gemini-3.1-pro-preview
@@ -114,3 +118,4 @@ questions:
   - 39
   difficulty: medium
   question_type: methodological
+  persona: Bench Scientist

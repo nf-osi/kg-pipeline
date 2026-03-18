@@ -9,9 +9,10 @@ questions:
   question: For patients with neurofibromatosis type 1 (NF1) who have symptomatic
     plexiform neurofibromas, what was the first available treatment option?
   user_query: nf1 symptomatic pnf first tx option?
-  ideal: PMID32561749 mentions a state where surgery was the only treatment option for patients with
-    NF1 who have symptomatic plexiform neurofibromas, without yet nonsurgical (pharmacological) therapy, 
-    therefore surgery must have been the first treatment option.
+  ideal: PMID32561749 mentions a state where surgery was the only treatment option
+    for patients with NF1 who have symptomatic plexiform neurofibromas, without yet
+    nonsurgical (pharmacological) therapy, therefore surgery must have been the first
+    treatment option.
   choices:
   - Radiation therapy
   - Surgery
@@ -22,11 +23,13 @@ questions:
   - 4
   difficulty: medium
   question_type: inferential
-  editor_note: 'We also have question PMC9221468-01 which asks about FDA-approved pharmacotherapy
-    for PNs (answer: selumetinib). This question asks about *first* treatment option
-    — the answer per this paper is surgery. "MEK inhibitor therapy" is a
-    distractor here bc technically it is a valid treatment option, but not the first. Upgraded from
-    easy to medium given close question interpretation and cross-paper disambiguation required.'
+  editor_note: 'We also have question PMC9221468-01 which asks about FDA-approved
+    pharmacotherapy for PNs (answer: selumetinib). This question asks about *first*
+    treatment option — the answer per this paper is surgery. "MEK inhibitor therapy"
+    is a distractor here bc technically it is a valid treatment option, but not the
+    first. Upgraded from easy to medium given close question interpretation and cross-paper
+    disambiguation required.'
+  persona: Patient Advocate
 - id: PMC7305302-02
   pmcid: PMC7305302
   author: gpt-5.4
@@ -59,6 +62,7 @@ questions:
   - 15
   difficulty: medium
   question_type: methodological
+  persona: Researcher
 - id: PMC7305302-03
   pmcid: PMC7305302
   author: gpt-5.4
@@ -86,6 +90,7 @@ questions:
   - 25
   difficulty: medium
   question_type: methodological
+  persona: Bench Scientist
 - id: PMC7305302-04
   pmcid: PMC7305302
   author: gpt-5.4
@@ -114,6 +119,7 @@ questions:
   - 19
   difficulty: medium
   question_type: methodological
+  persona: Bench Scientist
 - id: PMC7305302-05
   pmcid: PMC7305302
   author: gpt-5.4
@@ -141,6 +147,7 @@ questions:
   - 46
   difficulty: hard
   question_type: methodological
+  persona: Bioinformatician
 - id: PMC7305302-06
   pmcid: PMC7305302
   author: gpt-5.4
@@ -177,6 +184,7 @@ questions:
   - 50
   difficulty: medium
   question_type: causal
+  persona: Researcher
 - id: PMC7305302-07
   pmcid: PMC7305302
   author: gpt-5.4
@@ -207,3 +215,4 @@ questions:
   - 50
   difficulty: hard
   question_type: comparative
+  persona: Bioinformatician

@@ -86,16 +86,22 @@ python evaluation/qa/generate_qa.py --validate-only
 - **Hard**: 38 (29.2%)
 
 #### By Question Type
-- **factual**: 47 (36.2%)
+- **factual**: 46 (35.4%)
 - **methodological**: 31 (23.8%)
 - **comparative**: 29 (22.3%)
 - **causal**: 14 (10.8%)
-- **inferential**: 9 (6.9%)
+- **inferential**: 10 (7.7%)
 
 #### By Author/Model
 - **claude-opus-4-6**: 83 (63.8%)
 - **gemini-3.1-pro-preview**: 40 (30.8%)
 - **gpt-5.4**: 7 (5.4%)
+
+#### By Persona
+- **Bench Scientist**: 76 (58.5%)
+- **Researcher**: 29 (22.3%)
+- **Bioinformatician**: 21 (16.2%)
+- **Patient Advocate**: 4 (3.1%)
 
 
 <!-- END AUTO-GENERATED QA STATS -->

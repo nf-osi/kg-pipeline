@@ -43,6 +43,11 @@
 #       * "methodological" - Questions about research methods and experimental approaches
 #       * "hypothetical" - Questions about potential scenarios or applications
 #       * "other" - Questions not fitting other categories
+#   - persona: User type who would typically ask this question
+#       * "Researcher" - General scientific researcher
+#       * "Bioinformatician" - Computational/data analysis focus
+#       * "Bench Scientist" - Experimental/lab work focus
+#       * "Patient Advocate" - Patient-centered perspective
 
 metadata:
   version: v1

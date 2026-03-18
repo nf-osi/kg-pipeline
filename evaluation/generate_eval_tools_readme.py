@@ -371,6 +371,7 @@ def generate_qa_stats(qa_dir):
         'by_difficulty': Counter(),
         'by_question_type': Counter(),
         'by_author': Counter(),
+        'by_persona': Counter(),
         'papers': []
     }
 
@@ -397,6 +398,8 @@ def generate_qa_stats(qa_dir):
             stats['by_difficulty'][item.get('difficulty', 'unknown')] += 1
             stats['by_question_type'][item.get('question_type', 'unknown')] += 1
             stats['by_author'][item.get('author', 'unknown')] += 1
+            if 'persona' in item:
+                stats['by_persona'][item.get('persona')] += 1
 
     return stats
 
@@ -433,6 +436,13 @@ def format_qa_stats_markdown(stats):
         for author, count in stats['by_author'].most_common():
             pct = 100 * count / stats['total_questions'] if stats['total_questions'] > 0 else 0
             lines.append(f"- **{author}**: {count} ({pct:.1f}%)")
+        lines.append("")
+
+    if stats['by_persona']:
+        lines.append("#### By Persona")
+        for persona, count in stats['by_persona'].most_common():
+            pct = 100 * count / stats['total_questions'] if stats['total_questions'] > 0 else 0
+            lines.append(f"- **{persona}**: {count} ({pct:.1f}%)")
         lines.append("")
 
     return '\n'.join(lines)
