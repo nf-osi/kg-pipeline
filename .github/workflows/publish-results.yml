@@ -6,7 +6,9 @@ on:
       - develop
     paths:
       - 'evaluation/runs.json'
+      - 'evaluation/pubs_runs.json'
       - 'scripts/build_site.py'
+      - 'scripts/extract_runs.py'
 
 concurrency:
   group: "pages"
@@ -40,6 +42,7 @@ jobs:
       - name: Build site
         run: |
           python scripts/build_site.py evaluation/runs.json --out _site
+          python scripts/build_site.py evaluation/pubs_runs.json --pubs --out _site
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
