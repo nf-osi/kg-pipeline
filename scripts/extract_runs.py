@@ -314,27 +314,53 @@ def append_runs(json_path: Path, new_runs: list[RunSummary]) -> None:
     print(f"✓ Wrote {len(all_runs)} runs to {json_path}")
 
 
-_MODEL_PRICING: dict[str, dict[str, float]] = {
-    # $/M tokens: base input, cache write, cache read, output
-    "anthropic/claude-sonnet-4-5": {
-        "input": 3.0, "cache_write": 3.75, "cache_read": 0.30, "output": 15.0,
-    },
-    "anthropic/claude-haiku-4-5": {
-        "input": 0.80, "cache_write": 1.00, "cache_read": 0.08, "output": 4.0,
-    },
-}
+_COST_OVERRIDES_PATH = (
+    Path(__file__).resolve().parent.parent
+    / "astabench" / "astabench" / "config" / "litellm_cost_overrides.json"
+)
+
+_cost_overrides_cache: dict | None = None
+
+
+def _load_cost_overrides() -> dict:
+    """Load litellm cost overrides, cached after first call."""
+    global _cost_overrides_cache
+    if _cost_overrides_cache is None:
+        if _COST_OVERRIDES_PATH.exists():
+            _cost_overrides_cache = json.loads(_COST_OVERRIDES_PATH.read_text())
+        else:
+            _cost_overrides_cache = {}
+    return _cost_overrides_cache
+
+
+def _resolve_pricing(model: str) -> dict | None:
+    """Look up per-token pricing from litellm cost overrides.
+
+    Strips the provider prefix (e.g. 'anthropic/claude-sonnet-4-5' -> 'claude-sonnet-4-5')
+    and tries exact match, then a prefix match for versioned model IDs.
+    """
+    overrides = _load_cost_overrides()
+    if not overrides:
+        return None
+    # Strip provider prefix
+    bare = model.split("/", 1)[-1] if "/" in model else model
+    # Try exact match first, then prefix match (e.g. 'gpt-5.4' matches 'gpt-5.4')
+    for key in overrides:
+        if key == bare or key.startswith(bare):
+            return overrides[key]
+    return None
 
 
 def _compute_cost(model: str, usage) -> float | None:
-    """Compute approximate USD cost from ModelUsage and known pricing."""
-    pricing = _MODEL_PRICING.get(model)
+    """Compute USD cost from ModelUsage and litellm cost overrides."""
+    pricing = _resolve_pricing(model)
     if pricing is None or usage is None:
         return None
     cost = 0.0
-    cost += (usage.input_tokens or 0) * pricing["input"] / 1_000_000
-    cost += (usage.input_tokens_cache_write or 0) * pricing["cache_write"] / 1_000_000
-    cost += (usage.input_tokens_cache_read or 0) * pricing["cache_read"] / 1_000_000
-    cost += (usage.output_tokens or 0) * pricing["output"] / 1_000_000
+    cost += (usage.input_tokens or 0) * pricing.get("input_cost_per_token", 0)
+    cost += (usage.input_tokens_cache_write or 0) * pricing.get("cache_creation_input_token_cost", 0)
+    cost += (usage.input_tokens_cache_read or 0) * pricing.get("cache_read_input_token_cost", 0)
+    cost += (usage.output_tokens or 0) * pricing.get("output_cost_per_token", 0)
     return round(cost, 2)
 
 
