@@ -16,7 +16,11 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository_owner }}/kg-qlever
+  IMAGE_NAME_TEXT: ${{ github.repository_owner }}/kg-qlever-text
+  ECR_REPOSITORY: kg-qlever
+  ECR_REPOSITORY_TEXT: kg-qlever-text
   RMLMAPPER_VERSION: "8.1.0"
+  AWS_REGION: us-east-1
 
 jobs:
   build:
@@ -24,6 +28,7 @@ jobs:
     permissions:
       contents: read
       packages: write
+      id-token: write
 
     steps:
       - uses: actions/checkout@v4
@@ -45,31 +50,24 @@ jobs:
           curl -sL -o tools/rmlmapper-${RMLMAPPER_VERSION}.jar \
             "https://github.com/RMLio/rmlmapper-java/releases/download/v${RMLMAPPER_VERSION}/rmlmapper-${RMLMAPPER_VERSION}-r380-all.jar"
 
-      - name: Materialize pipeline
+      - name: Materialize RDF pipeline
         run: dagster asset materialize -m dagster_pipeline --select "*"
 
       - name: Validate RDF outputs
-        run: |
-          expected="animal_models antibodies biobanks cell_lines development donor_tool donors files funders genetic_reagents investigators mutation_model mutations observations publications resources studies"
-          fail=0
-          for name in $expected; do
-            f="data/rdf/${name}.ttl"
-            if [ ! -e "$f" ]; then
-              echo "::error::Missing: $f"
-              fail=$((fail + 1))
-            elif [ ! -s "$f" ]; then
-              echo "::error::Empty: $f"
-              fail=$((fail + 1))
-            else
-              echo "  ok: $f ($(wc -c < "$f") bytes)"
-            fi
-          done
-          if [ "$fail" -gt 0 ]; then
-            exit 1
-          fi
-          echo "All 17 RDF outputs validated"
+        run: ./scripts/validate_rdf.sh
 
-      - name: Upload artifacts
+      # Generate QLever text index files
+      - name: Fetch PubTator3 annotations
+        working-directory: pubs
+        run: |
+          python3 scripts/fetch_pubtator3.py subsets/tools-portal-pmc-derivatives-ok.tsv
+
+      - name: Generate QLever text index files
+        working-directory: pubs
+        run: |
+          python3 scripts/pubtator3_to_qlever.py
+
+      - name: Upload artifacts (RDF data)
         uses: actions/upload-artifact@v4
         with:
           name: kg-data
@@ -80,7 +78,25 @@ jobs:
             reports/
             schema/
 
-      # Build and push Docker image
+      - name: Upload artifacts (text index)
+        uses: actions/upload-artifact@v4
+        with:
+          name: kg-text-data
+          path: |
+            pubs/qlever_text/
+
+      # Authenticate to AWS
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::050451359079:role/GitHubActionPushKGToECR
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Log in to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      # Log in to GitHub Container Registry
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
         with:
@@ -88,21 +104,50 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract metadata
+      # Build RDF-only image
+      - name: Extract metadata (RDF-only)
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          images: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+            ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}
           tags: |
             type=raw,value=latest
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=raw,value=${{ inputs.tag || format('build-{0}', github.run_number) }},enable=${{ github.event_name == 'workflow_dispatch' }}
 
-      - name: Build and push
+      - name: Build and push (RDF-only)
         uses: docker/build-push-action@v6
         with:
           context: .
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            TEXT_INDEX=0
+
+      # Build text-inclusive image
+      - name: Extract metadata (text-inclusive)
+        id: meta-text
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_TEXT }}
+            ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_TEXT }}
+          tags: |
+            type=raw,value=latest
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=raw,value=${{ inputs.tag || format('build-{0}', github.run_number) }},enable=${{ github.event_name == 'workflow_dispatch' }}
+
+      - name: Build and push (text-inclusive)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta-text.outputs.tags }}
+          labels: ${{ steps.meta-text.outputs.labels }}
+          build-args: |
+            TEXT_INDEX=1
