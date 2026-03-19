@@ -410,6 +410,7 @@ TABLES: Dict[str, Dict[str, Any]] = {
         "columns": [
             {"target": "animalModelId", "source": "animalModelId", "type": "iri"},
             {"target": "donorId", "source": "donorId", "type": "iri", "references": {"table": "donors", "column": "donorId"}},
+            {"target": "species", "source": "species", "type": "text+", "transform": "string_list"},
             {"target": "transplantationDonorId", "source": "transplantationDonorId", "type": "iri", "references": {"table": "donors", "column": "donorId"}},
             {"target": "backgroundStrain", "source": "backgroundStrain", "type": "text"},
             {"target": "backgroundSubstrain", "source": "backgroundSubstrain", "type": "text"},
@@ -847,6 +848,25 @@ def _find_raw_csv(raw_dir: Path, raw_filename: str) -> Optional[Path]:
     return None
 
 
+def apply_derived_columns(
+    table_name: str,
+    df: pd.DataFrame,
+    processed_tables: Dict[str, pd.DataFrame],
+) -> pd.DataFrame:
+    if table_name != "animal_models" or "species" in df.columns:
+        return df
+
+    donors_df = processed_tables.get("donors")
+    if donors_df is None:
+        raise ValueError("animal_models requires donors to be processed first so species can be derived")
+
+    donor_species = donors_df.loc[:, ["donorId", "species"]].drop_duplicates(
+        subset=["donorId"],
+        keep="first",
+    )
+    return df.merge(donor_species, on="donorId", how="left")
+
+
 def check_config(config_path: Path) -> int:
     """Verify that TABLES and data_sources.yaml agree on names and Synapse IDs."""
     with config_path.open() as f:
@@ -942,11 +962,15 @@ def main(argv: List[str] | None = None) -> int:
     else:
         table_names = sorted(TABLES.keys())
 
+    if "donors" in table_names:
+        table_names = ["donors"] + [name for name in table_names if name != "donors"]
+
     syn = None
     if not args.from_cache:
         # Do NOT call login() — anonymous access is used for public data only.
         syn = synapseclient.Synapse()
 
+    processed_tables: Dict[str, pd.DataFrame] = {}
     for table_name in table_names:
         config = TABLES[table_name]
 
@@ -976,6 +1000,8 @@ def main(argv: List[str] | None = None) -> int:
         if n_dupes:
             print(f"  Dropped {n_dupes} duplicate rows", flush=True)
 
+        df = apply_derived_columns(table_name, df, processed_tables)
+        processed_tables[table_name] = df.copy()
         data_rows = build_rows(df, config["columns"])
         write_processed_csv(config["csv_path"], config["columns"], data_rows)
         print(f"  Wrote CSV -> {config['csv_path']}")

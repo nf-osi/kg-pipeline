@@ -85,6 +85,15 @@ TABLE_CONFIGS["cell_lines"].harmonize_args = [
     "--lookup", "mappings/sssom/cell_line_category_lookup.sssom.tsv",
 ]
 
+# Configure harmonization for animal models (species to subclass IRIs)
+TABLE_CONFIGS["animal_models"].harmonize_script = "scripts/classify_animal_models.py"
+TABLE_CONFIGS["animal_models"].harmonize_output = Path("data/csv/animal_models_harmonized.csv")
+TABLE_CONFIGS["animal_models"].harmonize_args = [
+    "--input", "data/csv/animal_models.csv",
+    "--output", "data/csv/animal_models_harmonized.csv",
+    "--lookup", "mappings/sssom/animal_model_species_lookup.sssom.tsv",
+]
+
 # Configure harmonization for genetic reagents (vectorType to subclass IRIs)
 TABLE_CONFIGS["genetic_reagents"].harmonize_script = "scripts/classify_genetic_reagents.py"
 TABLE_CONFIGS["genetic_reagents"].harmonize_output = Path("data/csv/genetic_reagents_harmonized.csv")

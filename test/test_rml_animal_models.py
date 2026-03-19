@@ -14,7 +14,7 @@ def animal_models_graph(rml_runner, namespaces):
     """Load animal models RDF graph from test data"""
     graph = rml_runner(
         mapping_file="animal_models.rml.ttl",
-        csv_replacements={"data/csv/animal_models.csv": "test/animal_models.csv"}
+        csv_replacements={"data/csv/animal_models_harmonized.csv": "test/animal_models.csv"}
     )
     return graph
 
@@ -34,6 +34,15 @@ class TestAnimalModelsCore:
         for model in models:
             assert isinstance(model, URIRef), \
                 f"Animal model ID should be IRI, got {type(model)}"
+
+    def test_animal_model_subclass_is_materialized(self, animal_models_graph, namespaces):
+        """Species-derived animal model subclasses should be materialized as rdf:type"""
+        NF = namespaces["nf"]
+        mouse_models = list(animal_models_graph.subjects(RDF.type, NF.MouseModel))
+        zebrafish_models = list(animal_models_graph.subjects(RDF.type, NF.ZebrafishModel))
+
+        assert any("test-animal-001" in str(model) for model in mouse_models)
+        assert any("test-animal-004" in str(model) for model in zebrafish_models)
 
 
 class TestAnimalModelsIRIFields:

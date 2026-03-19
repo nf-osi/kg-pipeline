@@ -416,6 +416,11 @@ shapes:AnimalModelShape a sh:NodeShape ;
         sh:maxCount 1 ;
     ] ;
     sh:property [
+        sh:path nf:species ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
         sh:path nf:transplantationDonorId ;
         sh:nodeKind sh:IRI ;
         sh:maxCount 1 ;

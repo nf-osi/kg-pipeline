@@ -36,12 +36,12 @@ nf:GeneticReagent a owl:Class ;
 nf:BacterialExpressionVector a owl:Class ;
     rdfs:subClassOf nf:GeneticReagent ;
     rdfs:label "Bacterial Expression Vector" ;
-    rdfs:comment "A bacterial expression vector." .
+    rdfs:comment "A plasmid designed for protein expression in bacterial hosts (typically E. coli). Contains bacterial promoters (e.g., T7, lac) and ribosome binding sites for prokaryotic translation. Used to produce recombinant proteins in bacteria." .
 
 nf:CRISPRReagent a owl:Class ;
     rdfs:subClassOf nf:GeneticReagent ;
     rdfs:label "CRISPR Reagent" ;
-    rdfs:comment "A CRISPR-based genetic reagent." .
+    rdfs:comment "A CRISPR-based genetic reagent, including guide RNAs (gRNA/sgRNA), CRISPR plasmids, or ribonucleoprotein complexes. Some CRISPR reagents are synthetic oligos or in vitro transcribed RNA delivered directly without plasmid cloning, while others (e.g., pX330) are plasmids propagated in E. coli." .
 
 nf:sgRNA a owl:Class ;
     rdfs:subClassOf nf:CRISPRReagent ; 
@@ -52,17 +52,17 @@ nf:sgRNA a owl:Class ;
 nf:GatewayEntryClone a owl:Class ;
     rdfs:subClassOf nf:GeneticReagent ;
     rdfs:label "Gateway Entry Clone" ;
-    rdfs:comment "A Gateway entry clone." .
+    rdfs:comment "A plasmid containing attL sites for use in the Gateway cloning system. Entry clones are propagated in E. coli (not for expression) and serve as intermediate storage/transfer vectors before recombination into destination expression vectors." .
 
 nf:LentiviralVector a owl:Class ;
     rdfs:subClassOf nf:GeneticReagent ;
     rdfs:label "Lentiviral Vector" ;
-    rdfs:comment "A lentiviral vector." .
+    rdfs:comment "A plasmid used to create lentiviral particles for transducing mammalian cells. Contains viral packaging signals and mammalian expression elements. The plasmid itself is propagated in E. coli, then transfected into packaging cells to produce virus for gene delivery." .
 
 nf:MammalianExpressionVector a owl:Class ;
     rdfs:subClassOf nf:GeneticReagent ;
     rdfs:label "Mammalian Expression Vector" ;
-    rdfs:comment "A mammalian expression vector." .
+    rdfs:comment "A plasmid designed for protein expression in mammalian cell lines. Contains mammalian promoters (e.g., CMV, SV40) and selection markers. Propagated in E. coli for cloning, then transfected into mammalian cells for expression." .
 
 nf:MouseTargetingVector a owl:Class ;
     rdfs:subClassOf nf:GeneticReagent ;
@@ -72,22 +72,23 @@ nf:MouseTargetingVector a owl:Class ;
 nf:RNAiReagent a owl:Class ;
     rdfs:subClassOf nf:GeneticReagent ;
     owl:equivalentClass obo:SO_0000337 ;
-    rdfs:label "RNAi Reagent" .
+    rdfs:label "RNAi Reagent" ;
+    rdfs:comment "An RNAi reagent for gene silencing, including shRNA/siRNA expression plasmids or synthetic siRNA oligos. Plasmid-based RNAi reagents are propagated in E. coli, while synthetic siRNA oligos are chemically synthesized and transfected directly." .
 
 nf:TransferVector a owl:Class ;
     rdfs:subClassOf nf:GeneticReagent ;
     rdfs:label "Transfer Vector" ;
-    rdfs:comment "A transfer vector." .
+    rdfs:comment "A plasmid used to transfer genetic material or as an intermediate cloning vector. Often propagated in E. coli for storage and amplification, but not necessarily designed for protein expression in bacteria. May be used to transfer constructs into viral packaging systems or other expression platforms." .
 
 nf:TransposonVector a owl:Class ;
     rdfs:subClassOf nf:GeneticReagent ;
     rdfs:label "Transposon Vector" ;
-    rdfs:comment "A transposon vector." .
+    rdfs:comment "A transposon-based vector system for genomic integration or mutagenesis (e.g., Sleeping Beauty, PiggyBac). May be delivered as plasmids, integrated constructs, or part of transposon/transposase systems. Not all transposon vectors require E. coli propagation." .
 
 nf:YeastExpressionVector a owl:Class ;
     rdfs:subClassOf nf:GeneticReagent ;
     rdfs:label "Yeast Expression Vector" ;
-    rdfs:comment "A yeast expression vector." .
+    rdfs:comment "A plasmid designed for protein expression in yeast hosts (e.g., S. cerevisiae). Contains yeast promoters and selection markers. Typically propagated in E. coli for cloning and storage before transformation into yeast for expression." .
 
 nf:Mutation a owl:Class ;
     rdfs:label "Mutation" ;
@@ -289,7 +290,32 @@ nf:AnimalModel a owl:Class ;
     rdfs:subClassOf nf:Tool ;
     owl:equivalentClass efo:EFO_0022953 ;
     rdfs:label "Animal Model" ;
-    rdfs:comment "An animal model used in research." .
+    rdfs:comment "An animal model used in research. Animal models can be filtered by species." .
+
+nf:MouseModel a owl:Class ;
+    rdfs:subClassOf nf:AnimalModel ;
+    rdfs:label "Mouse Model" ;
+    rdfs:comment "An animal model derived from Mus musculus." .
+
+nf:ZebrafishModel a owl:Class ;
+    rdfs:subClassOf nf:AnimalModel ;
+    rdfs:label "Zebrafish Model" ;
+    rdfs:comment "An animal model derived from Danio rerio." .
+
+nf:FlyModel a owl:Class ;
+    rdfs:subClassOf nf:AnimalModel ;
+    rdfs:label "Fly Model" ;
+    rdfs:comment "An animal model derived from Drosophila melanogaster." .
+
+nf:PorcineModel a owl:Class ;
+    rdfs:subClassOf nf:AnimalModel ;
+    rdfs:label "Porcine Model" ;
+    rdfs:comment "An animal model derived from Sus scrofa." .
+
+nf:YeastModel a owl:Class ;
+    rdfs:subClassOf nf:AnimalModel ;
+    rdfs:label "Yeast Model" ;
+    rdfs:comment "A model system entry in the animal-model table derived from Saccharomyces cerevisiae." .
 
 nf:Biobank a owl:Class ;
     rdfs:subClassOf nf:Tool ;
@@ -648,8 +674,8 @@ nf:cloningMethod a owl:DatatypeProperty ;
 
 nf:copyNumber a owl:DatatypeProperty ;
     rdfs:label "copyNumber" ;
-    rdfs:comment "Plasmid copy number." ;
-    rdfs:domain [ a owl:Class ; owl:unionOf (nf:GatewayEntryClone nf:LentiviralVector nf:MammalianExpressionVector nf:MouseTargetingVector nf:RNAiReagent nf:TransferVector nf:YeastExpressionVector) ] ;
+    rdfs:comment "Plasmid copy number in the propagation host (typically E. coli), indicating DNA yield from standard miniprep and growth characteristics. High copy plasmids produce sufficient DNA under normal growth conditions, while low copy plasmids may require special conditions or be difficult to grow. Values: 'High Copy', 'Low Copy', 'Unknown'. Note: This refers to copy number during bacterial propagation for cloning/repository purposes. For a cloning/repository database, propagation host copy number is arguably more useful day-to-day. For experimental design contexts, expression host copy number matters more, but this database focuses on propagation characteristics." ;
+    rdfs:domain [ a owl:Class ; owl:unionOf (nf:BacterialExpressionVector nf:GatewayEntryClone nf:LentiviralVector nf:MammalianExpressionVector nf:MouseTargetingVector nf:RNAiReagent nf:TransferVector nf:YeastExpressionVector) ] ;
     rdfs:range xsd:string .
 
 nf:promoter a owl:DatatypeProperty ;
@@ -660,19 +686,19 @@ nf:promoter a owl:DatatypeProperty ;
 
 nf:bacterialResistance a owl:DatatypeProperty ;
     rdfs:label "bacterialResistance" ;
-    rdfs:comment "Bacterial antibiotic resistance marker." ;
+    rdfs:comment "Bacterial antibiotic resistance marker for selection during E. coli propagation (e.g., 'Ampicillin', 'Kanamycin', 'Spectinomycin', 'Chloramphenicol'). Used for maintaining plasmids during cloning, regardless of final expression host." ;
     rdfs:domain [ a owl:Class ; owl:unionOf (nf:GatewayEntryClone nf:LentiviralVector nf:MammalianExpressionVector nf:MouseTargetingVector nf:RNAiReagent nf:TransferVector nf:YeastExpressionVector) ] ;
     rdfs:range xsd:string .
 
 nf:growthTemp a owl:DatatypeProperty ;
     rdfs:label "growthTemp" ;
-    rdfs:comment "Recommended bacterial growth temperature." ;
+    rdfs:comment "Recommended bacterial growth temperature for plasmid propagation in E. coli (e.g., '37 C', '30 C'). Applies to all plasmids regardless of final expression host." ;
     rdfs:domain [ a owl:Class ; owl:unionOf (nf:GatewayEntryClone nf:LentiviralVector nf:MammalianExpressionVector nf:MouseTargetingVector nf:RNAiReagent nf:TransferVector nf:YeastExpressionVector) ] ;
     rdfs:range xsd:string .
 
 nf:growthStrain a owl:DatatypeProperty ;
     rdfs:label "growthStrain" ;
-    rdfs:comment "Recommended bacterial growth strain." ;
+    rdfs:comment "Recommended E. coli strain for plasmid propagation and maintenance (e.g., 'DH5alpha', 'DH10B', 'NEB Stable', 'ccdb Survival', 'Pir1'). These strains are used for cloning and amplifying plasmid DNA, regardless of the vector's final expression host." ;
     rdfs:domain [ a owl:Class ; owl:unionOf (nf:GatewayEntryClone nf:LentiviralVector nf:MammalianExpressionVector nf:MouseTargetingVector nf:RNAiReagent nf:TransferVector nf:YeastExpressionVector) ] ;
     rdfs:range xsd:string .
 
