@@ -16,9 +16,9 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository_owner }}/kg-qlever
-  IMAGE_NAME_TEXT: ${{ github.repository_owner }}/kg-qlever-text
+  IMAGE_NAME_TEXT: ${{ github.repository_owner }}/kg-qlever-plus-text
   ECR_REPOSITORY: kg-qlever
-  ECR_REPOSITORY_TEXT: kg-qlever-text
+  ECR_REPOSITORY_TEXT: kg-qlever-plus-text
   RMLMAPPER_VERSION: "8.1.0"
   AWS_REGION: us-east-1
 
@@ -57,6 +57,14 @@ jobs:
         run: ./scripts/validate_rdf.sh
 
       # Generate QLever text index files
+      - name: Cache PubTator3 files
+        uses: actions/cache@v4
+        with:
+          path: pubs/pubtator3/
+          key: pubtator3-${{ hashFiles('pubs/subsets/tools-portal-pmc-derivatives-ok.tsv') }}
+          restore-keys: |
+            pubtator3-
+
       - name: Fetch PubTator3 annotations
         working-directory: pubs
         run: |
@@ -66,6 +74,9 @@ jobs:
         working-directory: pubs
         run: |
           python3 scripts/pubtator3_to_qlever.py
+
+      - name: Validate QLever text index files
+        run: ./scripts/validate_qlever_text.sh
 
       - name: Upload artifacts (RDF data)
         uses: actions/upload-artifact@v4
@@ -128,8 +139,8 @@ jobs:
           build-args: |
             TEXT_INDEX=0
 
-      # Build text-inclusive image
-      - name: Extract metadata (text-inclusive)
+      # Build plus-text image
+      - name: Extract metadata (plus-text)
         id: meta-text
         uses: docker/metadata-action@v5
         with:
@@ -142,7 +153,7 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
             type=raw,value=${{ inputs.tag || format('build-{0}', github.run_number) }},enable=${{ github.event_name == 'workflow_dispatch' }}
 
-      - name: Build and push (text-inclusive)
+      - name: Build and push (plus-text)
         uses: docker/build-push-action@v6
         with:
           context: .
