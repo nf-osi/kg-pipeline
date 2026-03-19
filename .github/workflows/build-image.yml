@@ -56,7 +56,18 @@ jobs:
       - name: Validate RDF outputs
         run: ./scripts/validate_rdf.sh
 
-      # Generate QLever text index files
+      - name: Upload artifacts (RDF data)
+        uses: actions/upload-artifact@v4
+        with:
+          name: kg-data
+          path: |
+            data/raw/
+            data/csv/
+            data/rdf/
+            reports/
+            schema/
+
+      # Additional plus-text index files
       - name: Cache PubTator3 files
         uses: actions/cache@v4
         with:
@@ -65,7 +76,7 @@ jobs:
           restore-keys: |
             pubtator3-
 
-      - name: Fetch PubTator3 annotations
+      - name: Fetch PubTator3 content
         working-directory: pubs
         run: |
           python3 scripts/fetch_pubtator3.py subsets/tools-portal-pmc-derivatives-ok.tsv
@@ -78,18 +89,7 @@ jobs:
       - name: Validate QLever text index files
         run: ./scripts/validate_qlever_text.sh
 
-      - name: Upload artifacts (RDF data)
-        uses: actions/upload-artifact@v4
-        with:
-          name: kg-data
-          path: |
-            data/raw/
-            data/csv/
-            data/rdf/
-            reports/
-            schema/
-
-      - name: Upload artifacts (text index)
+      - name: Upload artifacts (QLever text index files)
         uses: actions/upload-artifact@v4
         with:
           name: kg-text-data
