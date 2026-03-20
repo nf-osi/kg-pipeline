@@ -337,6 +337,13 @@ shapes:CellLineShape a sh:NodeShape ;
     sh:property [
         sh:path nf:donorId ;
         sh:nodeKind sh:IRI ;
+        sh:class nf:Donor ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:fromDonor ;
+        sh:nodeKind sh:IRI ;
+        sh:class nf:Donor ;
         sh:maxCount 1 ;
     ] ;
     sh:property [
@@ -346,6 +353,11 @@ shapes:CellLineShape a sh:NodeShape ;
     ] ;
     sh:property [
         sh:path nf:organ ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:race ;
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
     ] ;
@@ -413,6 +425,13 @@ shapes:AnimalModelShape a sh:NodeShape ;
     sh:property [
         sh:path nf:donorId ;
         sh:nodeKind sh:IRI ;
+        sh:class nf:Donor ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:fromDonor ;
+        sh:nodeKind sh:IRI ;
+        sh:class nf:Donor ;
         sh:maxCount 1 ;
     ] ;
     sh:property [
