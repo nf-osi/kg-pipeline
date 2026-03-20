@@ -25,11 +25,18 @@ from .config import TABLE_CONFIGS, TableConfig
 def create_csv_asset(table_name: str, config: TableConfig):
     """Create a Dagster asset for downloading a CSV table from Synapse."""
 
+    deps = []
+    if table_name == "animal_models":
+        deps.append(["portal", "csv", "donors"])
+    if table_name == "cell_lines":
+        deps.append(["portal", "csv", "donors"])
+
     @asset(
         name=table_name,
         key_prefix=["portal", "csv"],
         compute_kind="synapse",
         group_name=table_name,
+        deps=deps,
         metadata={
             "synapse_id": config.synapse_id,
             "table": table_name,
@@ -37,12 +44,39 @@ def create_csv_asset(table_name: str, config: TableConfig):
     )
     def _csv_asset(context: AssetExecutionContext, synapse: SynapseResource) -> pd.DataFrame:
         """Download and process table from Synapse."""
-        context.log.info(f"Fetching {table_name} from Synapse ({config.synapse_id})")
+        from scripts.prepare_portal_tables import (
+            normalize_fetched_df,
+            resolve_source_synapse_ids,
+            write_raw,
+        )
 
-        # Use the existing prepare_portal_tables.py logic
-        df = synapse.fetch_table(config.synapse_id, config.columns, config.select_clause)
+        project_root = Path(__file__).parent.parent.parent
+        raw_dir = project_root / "data" / "raw"
+        raw_path = raw_dir / config.raw_filename
 
-        # Write processed CSV
+        if raw_path.exists():
+            context.log.info(f"Using cached raw table for {table_name} from {raw_path}")
+            df = pd.read_csv(raw_path, keep_default_na=False, dtype=str)
+        else:
+            source_ids = resolve_source_synapse_ids(project_root / "data_sources.yaml", "release")
+            fetch_id = source_ids.get(table_name, config.synapse_id)
+            context.log.info(f"Fetching {table_name} from Synapse ({fetch_id})")
+
+            df = synapse.fetch_table(fetch_id, config.columns, config.select_clause)
+            write_raw(raw_dir, config.raw_filename, df)
+            context.log.info(f"Wrote raw cache {raw_path}")
+
+        processed_tables = {}
+        if table_name in {"animal_models", "cell_lines"}:
+            donors_csv = project_root / "data" / "csv" / "donors.csv"
+            if not donors_csv.exists():
+                raise RuntimeError(f"{table_name} requires data/csv/donors.csv before processing")
+            processed_tables["donors"] = pd.read_csv(donors_csv, keep_default_na=False, dtype=str)
+
+        df, n_dupes = normalize_fetched_df(table_name, df, processed_tables)
+        if n_dupes:
+            context.log.info(f"Dropped {n_dupes} duplicate rows for {table_name}")
+
         csv_path = config.csv_path
         csv_path.parent.mkdir(parents=True, exist_ok=True)
         synapse.write_processed_csv(csv_path, config.columns, df)
@@ -52,6 +86,7 @@ def create_csv_asset(table_name: str, config: TableConfig):
             "num_rows": len(df),
             "num_columns": len(df.columns),
             "path": str(csv_path),
+            "raw_cache_path": str(raw_path.relative_to(project_root)),
         })
 
         return df

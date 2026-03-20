@@ -11,6 +11,7 @@ class TableConfig:
 
     name: str
     synapse_id: str
+    raw_filename: str
     csv_path: Path
     rml_path: Path
     rdf_path: Path
@@ -36,6 +37,7 @@ for table_name, table_data in TABLES.items():
     config = TableConfig(
         name=table_name,
         synapse_id=table_data["synapse_id"],
+        raw_filename=table_data["raw_filename"],
         csv_path=table_data["csv_path"],
         rml_path=Path(f"mappings/rml/{table_name}.rml.ttl"),
         rdf_path=Path(f"data/rdf/{table_name}.ttl"),
