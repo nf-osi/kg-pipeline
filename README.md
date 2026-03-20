@@ -91,6 +91,12 @@ pytest test/
 Each RML mapping has a corresponding test that runs RMLMapper against a small
 fixture CSV and validates the output graph with SPARQL. See `test/README.md`.
 
+### SPARQL+Text
+
+Publication full-text from 139 NF papers is indexed alongside the RDF graph,
+enabling combined text search and graph queries. See
+[PLUS_PUB_TEXT.md](PLUS_PUB_TEXT.md) for design, scripts, and query examples.
+
 ### Build and Release
 
 Pre-built [QLever](https://github.com/ad-freiburg/qlever) images with indexed data
@@ -113,6 +119,16 @@ docker compose up qlever-server        # serve on :7001
 ### Evaluation
 
 See [EVALUATION.md](EVALUATION.md).
+
+### License
+
+The base KG image (Synapse metadata only) is distributed under
+[CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+
+The text-indexed image additionally includes a publication text corpus derived
+from PMC articles under CC-BY, CC-BY-4.0, CC-BY-NC, CC-BY-NC-SA, and Public
+Domain licenses; the derived corpus is distributed under
+[CC-BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/).
 
 ### Dependencies
 
