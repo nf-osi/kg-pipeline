@@ -70,6 +70,25 @@ class TestAnimalModelsIRIFields:
             assert "test-donor" in str(row.donorId) or len(str(row.donorId).split('/')[-1]) > 10, \
                 f"donorId should be valid IRI: {row.donorId}"
 
+    def test_from_donor_as_iri(self, animal_models_graph, namespaces):
+        """fromDonor should be an IRI reference"""
+        NF = namespaces["nf"]
+
+        query = """
+        SELECT ?model ?donor
+        WHERE {
+            ?model a nf:AnimalModel ;
+                   nf:fromDonor ?donor .
+        }
+        """
+        results = list(animal_models_graph.query(query, initNs={"nf": NF}))
+
+        assert len(results) > 0, "No fromDonor found"
+
+        for row in results:
+            assert isinstance(row.donor, URIRef), \
+                f"fromDonor should be IRI, got {type(row.donor)}"
+
     def test_transplantation_donor_id_as_iri(self, animal_models_graph, namespaces):
         """TransplantationDonorId should be an IRI reference"""
         NF = namespaces["nf"]
