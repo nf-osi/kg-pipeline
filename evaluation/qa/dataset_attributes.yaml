@@ -1,0 +1,59 @@
+# Publication QA Evaluation Dataset
+#
+# Question answering over full-text biomedical literature using SPARQL+Text retrieval.
+# Evaluates accuracy and citation attribution across diverse question types.
+#
+# This dataset consists of multiple-choice questions derived from 14 NF-related
+# publications. Each question tests the model's ability to:
+# 1. Select the correct answer from multiple-choice options (Accuracy)
+# 2. Cite the correct supporting passages from the paper (Citation F1)
+#
+# Dataset Structure:
+#   - Individual YAML files per paper (qa_PMC*.yaml)
+#   - Each question includes:
+#     * question: Precise academic phrasing
+#     * user_query: Natural language version (realistic user phrasing)
+#     * ideal: Expected answer text
+#     * choices: Multiple-choice options
+#     * correct_choice_index: Index of correct answer
+#     * passage_indices: Supporting passage references
+#     * difficulty: easy, medium, hard
+#     * question_type: factual, comparative, mechanistic, etc.
+#
+# Question Styles:
+#   - precise: Academically-phrased questions with complete context
+#   - user_query: Natural language questions as users would actually ask them
+#
+# Metrics:
+#   - Accuracy: Fraction of questions with correct answer selected
+#   - Citation F1: F1 score over (PMID, passage_index) tuples
+#     * Precision: Fraction of cited passages that are ground truth
+#     * Recall: Fraction of ground truth passages that were cited
+#
+# Dataset Item Attributes:
+#   - difficulty: Complexity of reasoning required
+#       * "easy" - Direct lookup, single fact
+#       * "medium" - Requires synthesis of 2-3 related facts
+#       * "hard" - Complex reasoning, multiple steps, domain expertise
+#   - question_type: Category of question
+#       * "factual" - What/which/who questions about specific entities
+#       * "causal" - How/why questions about biological processes and mechanisms
+#       * "comparative" - Comparing conditions, treatments, or outcomes
+#       * "inferential" - Questions requiring logical inference from text
+#       * "methodological" - Questions about research methods and experimental approaches
+#       * "hypothetical" - Questions about potential scenarios or applications
+#       * "other" - Questions not fitting other categories
+#   - persona: User type who would typically ask this question
+#       * "Researcher" - General scientific researcher
+#       * "Bioinformatician" - Computational/data analysis focus
+#       * "Bench Scientist" - Experimental/lab work focus
+#       * "Patient Advocate" - Patient-centered perspective
+
+metadata:
+  version: v1
+  total_papers: 14
+  total_questions: 130
+  question_styles:
+    - precise
+    - user_query
+  data_location: evaluation/qa/

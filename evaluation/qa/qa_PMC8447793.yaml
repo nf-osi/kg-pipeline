@@ -1,0 +1,177 @@
+title: R-Ras subfamily proteins elicit distinct physiologic effects and phosphoproteome
+  alterations in neurofibromin-null MPNST cells
+pmcid: PMC8447793
+pmid: '34530870'
+reviewer: https://orcid.org/0000-0003-1488-6730
+questions:
+- id: PMC8447793-01
+  pmcid: PMC8447793
+  author: gemini-3.1-pro-preview
+  question: In malignant peripheral nerve sheath tumor (MPNST) cells, what specific
+    cellular behaviors are inhibited by the expression of a dominant negative (DN)
+    R-Ras mutant?
+  user_query: what does DN R-Ras do to MPNST cells?
+  ideal: Expression of DN R-Ras inhibits cellular proliferation, migration, and invasion,
+    but it does not inhibit survival.
+  choices:
+  - Migration and invasion, but not proliferation
+  - Proliferation, survival, and migration
+  - Not in knowledgebase
+  - Proliferation, migration, and invasion, but not survival
+  correct_choice_index: 3
+  passage_indices:
+  - 6
+  - 65
+  - 69
+  difficulty: easy
+  question_type: factual
+  persona: Bench Scientist
+- id: PMC8447793-02
+  pmcid: PMC8447793
+  author: gemini-3.1-pro-preview
+  question: How does the phenotypic effect of globally inhibiting R-Ras signaling
+    via a dominant negative mutant contrast with the inhibition of classic Ras signaling
+    via dominant negative H-Ras in MPNST cells?
+  user_query: difference between DN R-Ras and DN H-Ras in MPNST
+  ideal: While both mutants inhibit cellular proliferation, only DN R-Ras inhibits
+    migration and invasion. Conversely, DN H-Ras impairs cell survival under stressed
+    conditions, whereas DN R-Ras does not affect survival under the same conditions.
+  choices:
+  - DN R-Ras promotes proliferation and survival, while DN H-Ras promotes migration
+    and invasion.
+  - DN R-Ras inhibits survival but not migration, whereas DN H-Ras inhibits migration
+    but not survival. Both inhibit proliferation.
+  - DN R-Ras inhibits migration but not survival, whereas DN H-Ras inhibits survival
+    but not migration. Both inhibit proliferation.
+  - Not in knowledgebase
+  correct_choice_index: 2
+  passage_indices:
+  - 67
+  - 69
+  difficulty: medium
+  question_type: comparative
+  persona: Bench Scientist
+- id: PMC8447793-03
+  pmcid: PMC8447793
+  author: gemini-3.1-pro-preview
+  question: How do R-Ras subfamily proteins mediate their effects on cellular morphology
+    and migration in MPNST cells, and what phenotypic changes occur when this specific
+    signaling node is inhibited?
+  user_query: how does R-ras control shape and movement in MPNSTs and what happens
+    if you block it?
+  ideal: R-Ras proteins activate the RhoA/ROCK1/MYPT1 signaling cascade. Inhibiting
+    this cascade, either by expressing DN R-Ras or applying the ROCK1 inhibitor Y27632,
+    decreases ROCK1 and MYPT1 phosphorylation, impairs cellular migration, and triggers
+    the accumulation of abnormal actin-rimmed intracellular vacuoles/vesicles.
+  choices:
+  - Not in knowledgebase
+  - They activate the RhoA/ROCK1/MYPT1 cascade; inhibition decreases ROCK1/MYPT1 phosphorylation,
+    impairs migration, and triggers the accumulation of actin-rimmed intracellular
+    vesicles.
+  - They activate the Raf/MEK/ERK cascade; inhibition decreases ERK phosphorylation,
+    blocks cell cycle progression, and induces apoptosis.
+  - They activate PI3K/Akt signaling; inhibition leads to microtubule destabilization
+    and increased survival.
+  correct_choice_index: 1
+  passage_indices:
+  - 81
+  - 82
+  - 84
+  - 95
+  difficulty: hard
+  question_type: causal
+  persona: Bench Scientist
+- id: PMC8447793-04
+  pmcid: PMC8447793
+  author: gemini-3.1-pro-preview
+  question: What specific methodological approach was used to identify phosphoproteome
+    alterations distinctly regulated by dominant negative R-Ras in MPNST cells?
+  user_query: how did they figure out which proteins R-ras changes the phosphorylation
+    of?
+  ideal: The researchers used SILAC (stable-isotopic labeling using amino acids in
+    cell culture) to differentially label MPNST cells with (heavy isotope) or without
+    (light isotope) doxycycline-induced DN R-Ras. They then enriched phosphoproteins
+    using Ga2+ immobilized metal ion affinity chromatography (IMAC) columns and identified
+    the relative quantities of the proteins via LC-MS/MS.
+  choices:
+  - 2D gel electrophoresis followed by MALDI-TOF mass spectrometry.
+  - Western blotting arrays using a panel of 100 phospho-specific antibodies.
+  - Not in knowledgebase
+  - SILAC metabolic labeling coupled with Ga2+ IMAC phosphoprotein enrichment and
+    LC-MS/MS analysis.
+  correct_choice_index: 3
+  passage_indices:
+  - 47
+  - 71
+  difficulty: medium
+  question_type: methodological
+  persona: Bioinformatician
+- id: PMC8447793-05
+  pmcid: PMC8447793
+  author: gemini-3.1-pro-preview
+  question: Which R-Ras subfamily member was found to be ubiquitously expressed at
+    the mRNA level across all eight tested human MPNST cell lines?
+  user_query: is R-ras or R-ras2 expressed in all the MPNST cell lines?
+  ideal: R-Ras2 (TC21) was found to be uniformly expressed in all eight MPNST cell
+    lines tested, whereas R-Ras was only detected in a subset of the lines (five out
+    of eight).
+  choices:
+  - R-Ras2
+  - Not in knowledgebase
+  - H-Ras
+  - M-Ras
+  correct_choice_index: 0
+  passage_indices:
+  - 58
+  difficulty: easy
+  question_type: factual
+  persona: Bench Scientist
+- id: PMC8447793-06
+  pmcid: PMC8447793
+  author: gemini-3.1-pro-preview
+  question: Based on shRNA experiments in ST88-14 cells, what are the respective contributions
+    of the RRAS and RRAS2 isoforms to proliferation and migration, and how do their
+    individual knockdowns affect downstream ROCK1 signaling?
+  user_query: do rras and rras2 do the exact same thing in MPNST proliferation and
+    migration based on shRNA?
+  ideal: 'Both RRAS and RRAS2 are required for migration and both contribute to activating
+    the downstream ROCK1/MYPT1 cascade. However, they differ in their control of proliferation:
+    RRAS2 knockdown significantly reduced cellular proliferation, while RRAS knockdown
+    had no effect on proliferation.'
+  choices:
+  - Not in knowledgebase
+  - RRAS controls proliferation while RRAS2 controls migration; only RRAS knockdown
+    decreases ROCK1 phosphorylation.
+  - Both are required for migration and ROCK1/MYPT1 phosphorylation, but only RRAS2
+    knockdown reduces proliferation.
+  - Both are required for proliferation and ROCK1/MYPT1 phosphorylation, but only
+    RRAS knockdown reduces migration.
+  correct_choice_index: 2
+  passage_indices:
+  - 87
+  - 88
+  difficulty: hard
+  question_type: comparative
+  persona: Bench Scientist
+- id: PMC8447793-07
+  pmcid: PMC8447793
+  author: gemini-3.1-pro-preview
+  question: Why was transient transfection of Myc-tagged H-Ras into ST88-14 cells
+    stably transfected with doxycycline-inducible DN R-Ras performed?
+  user_query: why test Myc-H-ras in cells with DN R-ras?
+  ideal: This experiment was conducted to verify that the dominant negative R-Ras
+    mutant specifically inhibited the R-Ras subfamily and did not unintentionally
+    cross-react with or suppress the activation of classic Ras proteins (like H-Ras)
+    due to shared guanine nucleotide exchange factors (GEFs).
+  choices:
+  - To ensure the DN R-Ras mutant specifically inhibited the R-Ras subfamily without
+    unintendedly suppressing classic Ras protein activation.
+  - To assess whether DN R-Ras could successfully induce the degradation of H-Ras.
+  - To measure the additive effects of H-Ras and R-Ras on cellular migration.
+  - Not in knowledgebase
+  correct_choice_index: 0
+  passage_indices:
+  - 64
+  difficulty: medium
+  question_type: methodological
+  persona: Bench Scientist

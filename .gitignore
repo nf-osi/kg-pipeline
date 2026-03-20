@@ -2,6 +2,7 @@
 # Keep data directory contents out of the repository
 # (files will remain locally but will not be tracked)
 data/
+tmp/
 
 # Ignore RMLMapper logs
 logs/
@@ -37,5 +38,6 @@ env/
 .tmp_dagster_home_*/
 .dagster_home/
 
-# Ignore local preview of docs site
+# Ignore artifacts for docs site
+ _site
 preview/

@@ -1,0 +1,254 @@
+title: Zebrafish neurofibromatosis type 1 genes have redundant functions in tumorigenesis
+  and embryonic development
+pmcid: PMC3484870
+pmid: '22773753'
+reviewer: https://orcid.org/0000-0003-1488-6730
+questions:
+- id: PMC3484870-01
+  pmcid: PMC3484870
+  author: claude-opus-4-6
+  question: At what time point do nf1a-/-; nf1b-/- zebrafish larvae begin to die?
+  user_query: when do nf1a nf1b double knockout zebrafish die
+  ideal: At 7 days post fertilization (dpf), with none surviving beyond 10 dpf.
+  choices:
+  - At 7 days post fertilization (dpf), with none surviving beyond 10 dpf.
+  - At 3 days post fertilization (dpf), with none surviving beyond 5 dpf.
+  - At 10 days post fertilization (dpf), with none surviving beyond 14 dpf.
+  - Not in knowledgebase
+  correct_choice_index: 0
+  passage_indices:
+  - 10
+  difficulty: easy
+  question_type: factual
+  persona: Bench Scientist
+- id: PMC3484870-02
+  pmcid: PMC3484870
+  author: claude-opus-4-6
+  question: What percentage of amino acid identity do the two zebrafish NF1 orthologues
+    share with human NF1?
+  user_query: how similar are zebrafish nf1 genes to human NF1
+  ideal: Approximately 84% identity overall, including 91-93% identity within the
+    GTPase-activating protein-related domain (GRD).
+  choices:
+  - Approximately 84% identity overall, including 91-93% identity within the GRD.
+  - Approximately 70% identity overall, including 80-85% identity within the GRD.
+  - Approximately 95% identity overall, including 98% identity within the GRD.
+  - Not in knowledgebase
+  correct_choice_index: 0
+  passage_indices:
+  - 5
+  difficulty: easy
+  question_type: factual
+  persona: Bioinformatician
+- id: PMC3484870-03
+  pmcid: PMC3484870
+  author: claude-opus-4-6
+  question: What was the tumor penetrance at 45 weeks post fertilization in nf1a+/-;
+    nf1b-/-; p53e7/e7 fish compared to nf1a+/+; nf1b-/-; p53e7/e7 fish?
+  user_query: tumor penetrance nf1a het nf1b null p53 mutant zebrafish vs controls
+    at 45 weeks
+  ideal: At 45 wpf, tumor penetrance was 62% (24/39) in nf1a+/-; nf1b-/-; p53e7/e7
+    fish versus 7% (1/14) in nf1a+/+; nf1b-/-; p53e7/e7 fish.
+  choices:
+  - 62% in nf1a+/-; nf1b-/-; p53e7/e7 fish versus 7% in nf1a+/+; nf1b-/-; p53e7/e7
+    fish
+  - 28% in nf1a+/-; nf1b-/-; p53e7/e7 fish versus 7% in nf1a+/+; nf1b-/-; p53e7/e7
+    fish
+  - 62% in nf1a+/-; nf1b-/-; p53e7/e7 fish versus 28% in nf1a+/+; nf1b-/-; p53e7/e7
+    fish
+  - Not in knowledgebase
+  correct_choice_index: 0
+  passage_indices:
+  - 28
+  difficulty: medium
+  question_type: comparative
+  persona: Bench Scientist
+- id: PMC3484870-04
+  pmcid: PMC3484870
+  author: claude-opus-4-6
+  question: Why does the loss of nf1a and nf1b lead to OPC hyperplasia in zebrafish
+    larvae?
+  user_query: why do nf1 knockout zebrafish get OPC hyperplasia
+  ideal: Loss of nf1a and nf1b leads to OPC hyperplasia because neurofibromin normally
+    suppresses the proliferation of OPCs. Increased BrdU incorporation in nf1-null
+    OPCs at 4 and 5 dpf demonstrates that increased proliferation, rather than altered
+    specification, drives the expansion of OPCs.
+  choices:
+  - Because neurofibromin normally suppresses OPC proliferation, and its loss leads
+    to increased OPC proliferation as shown by BrdU incorporation at 4 and 5 dpf
+  - Because nf1 loss increases the initial specification of OPCs at 2 dpf, leading
+    to greater numbers from the start of development
+  - Because nf1 loss causes decreased OPC apoptosis rather than increased proliferation
+  - Not in knowledgebase
+  correct_choice_index: 0
+  passage_indices:
+  - 15
+  - 19
+  difficulty: medium
+  question_type: causal
+  persona: Bench Scientist
+- id: PMC3484870-05
+  pmcid: PMC3484870
+  author: claude-opus-4-6
+  question: What evidence suggests that mTOR signaling is not significantly altered
+    in the spinal cord of nf1-null zebrafish larvae, despite upregulation of ERK signaling?
+  user_query: is mTOR changed in nf1 null zebrafish spinal cord
+  ideal: Immunohistochemical analysis using anti-pS6 antibody showed that although
+    pS6 signaling was evident in multiple spinal cord neurons, no differences were
+    observed between wild-type and nf1 mutant animals at 2, 3, or 4 dpf. In contrast,
+    pERK1/2 was markedly upregulated in nf1a-/-; nf1b-/- larvae beginning at 3 dpf.
+  choices:
+  - pS6 levels in spinal cord neurons were unchanged between wild-type and nf1 mutants
+    at 2, 3, and 4 dpf, while pERK1/2 was markedly upregulated
+  - Both pERK1/2 and pS6 were equally upregulated in nf1 mutant spinal cords compared
+    to wild-type
+  - pS6 was decreased in nf1-null larvae while pERK1/2 was increased
+  - Not in knowledgebase
+  correct_choice_index: 0
+  passage_indices:
+  - 26
+  difficulty: medium
+  question_type: comparative
+  persona: Bench Scientist
+- id: PMC3484870-06
+  pmcid: PMC3484870
+  author: claude-opus-4-6
+  question: How do the brain tumors observed in nf1a+/-; nf1b-/-; p53e7/e7 zebrafish
+    compare to known human NF1-associated malignancies, and what molecular markers
+    support this comparison?
+  user_query: do the zebrafish nf1 brain tumors look like human NF1 tumors and what
+    markers
+  ideal: The brain tumors in nf1a+/-; nf1b-/-; p53e7/e7 zebrafish were diffuse high-grade
+    gliomas resembling human anaplastic astrocytoma or anaplastic oligoastrocytoma
+    WHO grade III. They stained positive for the oligodendroglial marker Sox10 (~80%
+    of cells) and showed a Gfap-positive astrocytic component, while lacking mature
+    neuronal markers HuC/D and synaptophysin. Some tumors showed hyperactivation of
+    ERK and mTOR pathways, consistent with mouse and human NF1-derived gliomas. Human
+    NF1 patients are known to develop optic gliomas, glioblastoma, and other malignancies.
+  choices:
+  - They were high-grade gliomas resembling anaplastic astrocytoma/oligoastrocytoma,
+    expressing Sox10 and Gfap but not neuronal markers, with ERK/mTOR hyperactivation
+    consistent with human NF1-derived tumors
+  - They were low-grade gliomas expressing only neuronal markers HuC/D and synaptophysin,
+    unlike human NF1 tumors which are high-grade
+  - They were primarily MPNSTs with no glial markers, differing fundamentally from
+    any human NF1-associated brain tumor
+  - Not in knowledgebase
+  correct_choice_index: 0
+  passage_indices:
+  - 2
+  - 30
+  - 33
+  - 44
+  difficulty: hard
+  question_type: inferential
+  persona: Bench Scientist
+- id: PMC3484870-07
+  pmcid: PMC3484870
+  author: claude-opus-4-6
+  question: What strategies were used to generate zebrafish nf1a and nf1b mutant alleles?
+  user_query: how were the nf1a and nf1b zebrafish mutants made
+  ideal: 'Two strategies were employed: zinc finger nucleases (ZFNs) were engineered
+    to target exon 26 of nf1a and exon 17 of nf1b, generating frameshift mutations
+    (nf1aΔ5, nf1aΔ8, nf1b+10, nf1bΔ55). Additionally, targeting induced local lesions
+    in genomes (TILLING) using an ENU-mutagenized zebrafish library identified a nonsense
+    mutation in exon 29 of nf1a (nf1aL1247X).'
+  choices:
+  - Zinc finger nucleases (ZFNs) targeting exon 26 of nf1a and exon 17 of nf1b, and
+    TILLING from an ENU-mutagenized library identifying a nonsense mutation in exon
+    29 of nf1a
+  - CRISPR/Cas9 targeting both nf1a and nf1b exons, combined with morpholino knockdown
+    for validation
+  - TALENs directed against the GRD-encoding exons of nf1a and nf1b only
+  - Not in knowledgebase
+  correct_choice_index: 0
+  passage_indices:
+  - 9
+  difficulty: medium
+  question_type: factual
+  persona: Bench Scientist
+- id: PMC3484870-08
+  pmcid: PMC3484870
+  author: claude-opus-4-6
+  question: What evidence supports functional redundancy between zebrafish nf1a and
+    nf1b in both embryonic development and tumorigenesis?
+  user_query: evidence for nf1a nf1b redundancy in zebrafish development and cancer
+  ideal: In embryonic development, homozygous loss of either nf1a or nf1b alone produces
+    viable, fertile, phenotypically normal animals, whereas combined loss of both
+    genes (nf1a-/-; nf1b-/-) results in larval lethality, OPC/Schwann cell hyperplasia,
+    myelination defects, melanophore defects, and motor/learning deficits. A single
+    wild-type allele of either gene is sufficient for normal development. Similarly
+    in tumorigenesis, neither nf1a nor nf1b homozygous loss alone (even over 18 months)
+    produced tumors, whereas nf1a+/-; nf1b-/-; p53e7/e7 animals showed accelerated
+    and highly penetrant gliomas and MPNSTs compared to nf1a+/+; nf1b-/-; p53e7/e7
+    animals. Western blot analysis showed that pERK1/2 was elevated only in double-homozygous
+    null larvae, not in single-gene homozygous mutants, further supporting functional
+    redundancy.
+  choices:
+  - Single-gene homozygous mutants are normal and viable; only combined loss produces
+    developmental defects, lethality, and accelerated tumorigenesis, with pERK1/2
+    elevated only in double-null larvae
+  - Both nf1a and nf1b single homozygous mutants show partial phenotypes that become
+    more severe when combined, indicating additive rather than redundant functions
+  - Redundancy is demonstrated by the fact that nf1a-/- and nf1b-/- single mutants
+    both develop tumors independently at similar rates
+  - Not in knowledgebase
+  correct_choice_index: 0
+  passage_indices:
+  - 2
+  - 6
+  - 10
+  - 26
+  - 28
+  difficulty: hard
+  question_type: inferential
+  persona: Bench Scientist
+- id: PMC3484870-09
+  pmcid: PMC3484870
+  author: claude-opus-4-6
+  question: What melanophore phenotype is observed in nf1-null zebrafish larvae, and
+    what is its significance?
+  user_query: melanophore phenotype in nf1 null zebrafish larvae whats the significance
+  ideal: nf1-null larvae display a significant reduction in lateral stripe melanophore
+    numbers at 6 dpf, with disruption of the normally uniform melanophore pattern.
+    This phenotype is first appreciable at 4 dpf and is attributed to defects in migration
+    or differentiation of regeneration and metamorphic lineage melanophores (not embryonic
+    melanophores). This represents the first vertebrate animal model of the pathognomonic
+    pigmentation lesions (cafe-au-lait spots) associated with human NF1.
+  choices:
+  - Reduced lateral stripe melanophores at 6 dpf due to defects in regeneration/metamorphic
+    melanophore lineages, representing the first vertebrate model of NF1 cafe-au-lait-like
+    pigmentation defects
+  - Increased melanophore numbers along the lateral stripes causing hyperpigmentation,
+    modeling the neurofibromas seen in NF1 patients
+  - Complete absence of all melanophores throughout the body by 3 dpf due to failure
+    of neural crest cell specification
+  - Not in knowledgebase
+  correct_choice_index: 0
+  passage_indices:
+  - 6
+  - 37
+  - 41
+  difficulty: hard
+  question_type: causal
+  persona: Bench Scientist
+- id: PMC3484870-10
+  pmcid: PMC3484870
+  author: claude-opus-4-6
+  question: What types of tumors were identified in nf1a+/-; nf1b-/-; p53e7/e7 zebrafish?
+  user_query: what kind of tumors do nf1a+/- nf1b-/- p53 mutant zebrafish get
+  ideal: Tumors were observed in the brain (n=2), eye (n=8), gill (n=1), abdomen (n=8),
+    and trunk (n=5). Brain tumors demonstrated features of diffuse high-grade gliomas,
+    whereas all other tumor types were most consistent with malignant peripheral nerve
+    sheath tumors (MPNSTs).
+  choices:
+  - High-grade gliomas in the brain and MPNSTs in the eye, gill, abdomen, and trunk
+  - Only MPNSTs throughout the body with no brain tumors observed
+  - Low-grade optic pathway gliomas and cutaneous neurofibromas only
+  - Not in knowledgebase
+  correct_choice_index: 0
+  passage_indices:
+  - 30
+  difficulty: easy
+  question_type: factual
+  persona: Bench Scientist

@@ -1,0 +1,137 @@
+title: 'MicroRNA Expression Profiles in Autism Spectrum Disorder: Role for miR-181
+  in Immunomodulation'
+pmcid: PMC8469245
+pmid: '34575699'
+reviewer: https://orcid.org/0000-0003-1488-6730
+questions:
+- id: PMC8469245-01
+  pmcid: PMC8469245
+  author: gemini-3.1-pro-preview
+  question: In the miR-181 immunomodulation study of autism spectrum disorder, what
+    type of cell line was used to examine differential microRNA expression?
+  user_query: what cell lines were used in the miR-181 ASD miRNA study?
+  ideal: The study utilized lymphoblastoid cell lines (LCLs) derived from individuals
+    with autism spectrum disorder, typically developing siblings, and unrelated controls.
+  choices:
+  - Induced pluripotent stem cells (iPSCs)
+  - Lymphoblastoid cell lines (LCLs)
+  - Peripheral blood mononuclear cells (PBMCs)
+  - Not in knowledgebase
+  correct_choice_index: 1
+  passage_indices:
+  - 1
+  difficulty: easy
+  question_type: factual
+  persona: Bench Scientist
+- id: PMC8469245-02
+  pmcid: PMC8469245
+  author: gemini-3.1-pro-preview
+  question: According to KEGG enrichment analysis in the study of microRNA profiles
+    in autism spectrum disorder, which signaling pathways were identified as targets
+    of the dysregulated miRNAs?
+  user_query: kegg pathways for dysregulated mirnas in asd?
+  ideal: The target genes of dysregulated miRNAs were enriched in pathways involving
+    MAPK signaling, cytokine-cytokine receptor interaction, spliceosome, calcium signaling,
+    WNT signaling, and cancer.
+  choices:
+  - Hedgehog signaling, TGF-beta signaling, cell cycle, and mismatch repair
+  - p53 signaling, apoptosis, oxidative phosphorylation, and Notch signaling
+  - Not in knowledgebase
+  - MAPK signaling, cytokine-cytokine receptor interaction, spliceosome, calcium signaling,
+    and WNT signaling
+  correct_choice_index: 3
+  passage_indices:
+  - 5
+  - 32
+  difficulty: medium
+  question_type: factual
+  persona: Bioinformatician
+- id: PMC8469245-03
+  pmcid: PMC8469245
+  author: gemini-3.1-pro-preview
+  question: What clinical symptom of autism spectrum disorder was found to be positively
+    correlated with the expression of CaMKII beta in lymphoblastoid cell lines?
+  user_query: camkii beta correlation with asd symptoms?
+  ideal: The expression of CaMKII beta was found to have a positive correlation with
+    the severity of stereotyped behavior and restricted interest score in ASD participants.
+  choices:
+  - Frequency of gastrointestinal distress and sleep disturbances
+  - Severity of stereotyped behavior and restricted interests
+  - Not in knowledgebase
+  - Deficits in social communication and eye contact
+  correct_choice_index: 1
+  passage_indices:
+  - 34
+  difficulty: easy
+  question_type: factual
+  persona: Researcher
+- id: PMC8469245-04
+  pmcid: PMC8469245
+  author: gemini-3.1-pro-preview
+  question: How did the expression levels of AKT2 and AKT3 differ in the lymphoblastoid
+    cell lines of autism spectrum disorder (ASD) patients compared to unrelated controls?
+  user_query: akt2 and akt3 expression differences in asd vs controls?
+  ideal: In ASD LCLs, AKT3 expression was significantly up-regulated, whereas AKT2
+    expression was significantly down-regulated compared to unrelated controls.
+  choices:
+  - Not in knowledgebase
+  - Both AKT2 and AKT3 were up-regulated.
+  - AKT3 was up-regulated, while AKT2 was down-regulated.
+  - AKT2 was up-regulated, while AKT3 was down-regulated.
+  correct_choice_index: 2
+  passage_indices:
+  - 33
+  difficulty: medium
+  question_type: comparative
+  persona: Bioinformatician
+- id: PMC8469245-05
+  pmcid: PMC8469245
+  author: gemini-3.1-pro-preview
+  question: In the ASD LCL small RNA-seq miRNA profiling study, how was the normalization
+    of sequence counts achieved for each sample?
+  user_query: how did they normalize counts in the ASD LCL small RNA-seq study?
+  ideal: Normalization was achieved by dividing the sequence counts by a library size
+    parameter for the corresponding sample, which is the median value of the ratio
+    between the counts of a specific sample and a pseudo-reference sample.
+  choices:
+  - By dividing the sequence counts by a library size parameter of the corresponding
+    sample.
+  - Not in knowledgebase
+  - By applying a log2 transformation followed by quantile normalization across all
+    samples.
+  - By normalizing the counts to the expression of housekeeping genes like GAPDH and
+    HPRT.
+  correct_choice_index: 0
+  passage_indices:
+  - 15
+  difficulty: hard
+  question_type: methodological
+  persona: Bioinformatician
+- id: PMC8469245-06
+  pmcid: PMC8469245
+  author: gemini-3.1-pro-preview
+  question: Based on the study's findings, how does the dysregulation of the miR-181
+    family potentially contribute to the pathophysiology of autism spectrum disorder?
+  user_query: role of mir-181 in asd pathophysiology?
+  ideal: Members of the miR-181 family were significantly down-regulated in ASD. Since
+    this family regulates pathways involved in synaptic plasticity, mitochondrial
+    metabolism, neuroinflammation, immune system regulation (such as NK cell differentiation
+    and TNF alpha modulation), and targets genes like AKT3 and AKT2, its down-regulation
+    impacts multiple signaling pathways and physiological systems associated with
+    ASD.
+  choices:
+  - It strictly regulates the expression of SHANK3 and NRXN1, leading to disrupted
+    synapse formation.
+  - Its up-regulation enhances mTOR signaling and promotes excessive neuronal proliferation
+    and survival.
+  - Its down-regulation impacts pathways involved in synaptic plasticity, neuroinflammation,
+    immune regulation, and targets genes like AKT2, AKT3, and TNF alpha.
+  - Not in knowledgebase
+  correct_choice_index: 2
+  passage_indices:
+  - 30
+  - 39
+  - 46
+  difficulty: hard
+  question_type: inferential
+  persona: Researcher

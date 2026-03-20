@@ -1,0 +1,177 @@
+title: 'A novel mutation in NF1 gene of patient with Neurofibromatosis type 1: A case
+  report and functional study'
+pmcid: PMC8172195
+pmid: '33764694'
+reviewer: https://orcid.org/0000-0003-1488-6730
+questions:
+- id: PMC8172195-01
+  pmcid: PMC8172195
+  author: gemini-3.1-pro-preview
+  question: What specific mutation in the NF1 gene was identified in the Chinese patient
+    with neurofibromatosis type 1, and what is its effect on the protein sequence?
+  user_query: what's the exact NF1 mutation in that chinese neurofibromatosis patient?
+  ideal: A frame-shift mutation, c.2064delGGATGCAGCGG, in exon 18 was identified,
+    which introduces a premature stop codon at codon 696 (p.Gly672AsnfsTer24).
+  choices:
+  - c.2064delGGATGCAGCGG resulting in p.Gly672AsnfsTer24
+  - c.2064insGGATGCAGCGG resulting in p.Gly672AsnfsTer24
+  - c.2064delGGATGCAGCGG resulting in p.Gly696AsnfsTer24
+  - Not in knowledgebase
+  correct_choice_index: 0
+  passage_indices:
+  - 5
+  - 32
+  difficulty: easy
+  question_type: factual
+  persona: Researcher
+- id: PMC8172195-02
+  pmcid: PMC8172195
+  author: gemini-3.1-pro-preview
+  question: In the functional study of the NF1 c.2064delGGATGCAGCGG mutation, which
+    cell line was used to assess the effect on Ras/Erk signaling?
+  user_query: what cells did they use to test the c.2064del NF1 mutation signaling?
+  ideal: Human HEK293T cells were used for the transfection of wild-type and mutant
+    NF1 plasmids to study Ras/Erk signaling.
+  choices:
+  - HeLa cells
+  - Human HEK293T cells
+  - Murine osteoblast cells
+  - Not in knowledgebase
+  correct_choice_index: 1
+  passage_indices:
+  - 23
+  - 37
+  difficulty: easy
+  question_type: methodological
+  persona: Bench Scientist
+- id: PMC8172195-03
+  pmcid: PMC8172195
+  author: gemini-3.1-pro-preview
+  question: How do the mRNA and protein expression levels of the mutant NF1 (p.Gly672AsnfsTer24)
+    compare to those of wild-type NF1 when expressed in HEK293T cells?
+  user_query: did the NF1 mutation change mrna or protein levels compared to wildtype?
+  ideal: Both the mRNA and protein expression levels of the mutant NF1 were lower
+    than those of the wild-type NF1.
+  choices:
+  - The mutant NF1 had higher mRNA but lower protein expression levels than wild-type
+    NF1.
+  - Both the mRNA and protein expression levels of mutant NF1 were lower than those
+    of wild-type NF1.
+  - Both the mRNA and protein expression levels of mutant NF1 were higher than those
+    of wild-type NF1.
+  - Not in knowledgebase
+  correct_choice_index: 1
+  passage_indices:
+  - 37
+  difficulty: medium
+  question_type: comparative
+  persona: Bench Scientist
+- id: PMC8172195-04
+  pmcid: PMC8172195
+  author: gemini-3.1-pro-preview
+  question: Based on the reported clinical characteristics and laboratory findings,
+    what bone-related phenotypes did the proband exhibit, and how did her mother's
+    height compare to the normal range?
+  user_query: what bone problems did the girl and her mom have in the NF1 paper?
+  ideal: The proband exhibited short stature (-2.0SD), pectus excavatum, scoliosis,
+    and imperfect bone strength in the distal radius. Her mother also showed an unsatisfied
+    final height of 146 cm (-2.0SD).
+  choices:
+  - The proband had pseudarthrosis and tibial dysplasia, while the mother had normal
+    height.
+  - The proband had short stature, pectus excavatum, scoliosis, and imperfect bone
+    strength; her mother had a short final height of 146 cm (-2.0SD).
+  - The proband only showed scoliosis, and the mother had a final height of 160 cm
+    (+1.0SD).
+  - Not in knowledgebase
+  correct_choice_index: 1
+  passage_indices:
+  - 35
+  difficulty: medium
+  question_type: factual
+  persona: Researcher
+- id: PMC8172195-05
+  pmcid: PMC8172195
+  author: gemini-3.1-pro-preview
+  question: In the study of the NF1 c.2064delGGATGCAGCGG mutation, what domain is
+    missing in the truncated protein, and what is its normal function in Ras signaling?
+  user_query: what part of the NF1 protein is missing in this mutation and what does
+    it normally do?
+  ideal: The truncating mutation results in the loss of the GAP-related domain (GRD),
+    which is a critical domain that normally negatively regulates the Ras state.
+  choices:
+  - It misses the SEC14-PH domain, which positively regulates the Ras state.
+  - It misses the GAP-related domain (GRD), which negatively regulates the Ras state.
+  - It misses the Carboxy-terminal domain (CTD), which normally phosphorylates Erk.
+  - Not in knowledgebase
+  correct_choice_index: 1
+  passage_indices:
+  - 38
+  - 40
+  difficulty: hard
+  question_type: causal
+  persona: Bench Scientist
+- id: PMC8172195-06
+  pmcid: PMC8172195
+  author: gemini-3.1-pro-preview
+  question: In the NF1 c.2064delGGATGCAGCGG functional study, what were the effects
+    of knocking down NF1 using shRNAs in HEK293T cells on Ras and Erk signaling?
+  user_query: what happened to ras and erk when they knocked down NF1 in the c.2064del
+    study?
+  ideal: Knocking down NF1 significantly activated the Ras-GTP and phospho-Erk1/2
+    signaling pathways in HEK293T cells.
+  choices:
+  - It significantly decreased Ras-GTP and phospho-Erk1/2 signaling.
+  - It completely inhibited Ras-GTP but activated phospho-Erk1/2.
+  - It significantly activated the Ras-GTP and phospho-Erk1/2 signaling pathways.
+  - Not in knowledgebase
+  correct_choice_index: 2
+  passage_indices:
+  - 37
+  difficulty: medium
+  question_type: causal
+  persona: Bench Scientist
+- id: PMC8172195-07
+  pmcid: PMC8172195
+  author: gemini-3.1-pro-preview
+  question: In the NF1 c.2064delGGATGCAGCGG functional study, which assay was used
+    to determine the levels of GTP-bound Ras in HEK293T cells?
+  user_query: how did they measure active ras in the c.2064del NF1 mutation study?
+  ideal: A Ras activation assay kit was used, where GTP-bound Ras levels were determined
+    by incubating cell lysates with Raf-1 Ras-binding domain conjugated to agarose
+    beads, followed by immunoblotting with an anti-pan-Ras antibody.
+  choices:
+  - Real-time PCR
+  - A Ras activation assay using Raf-1 Ras-binding domain conjugated to agarose beads
+    followed by immunoblotting
+  - ELISA using anti-phospho-Ras antibodies
+  - Not in knowledgebase
+  correct_choice_index: 1
+  passage_indices:
+  - 29
+  difficulty: easy
+  question_type: methodological
+  persona: Bench Scientist
+- id: PMC8172195-08
+  pmcid: PMC8172195
+  author: gemini-3.1-pro-preview
+  question: How does the functional impact of the novel NF1 p.Gly672AsnfsTer24 mutation
+    on the Ras/Erk signaling pathway contrast with that of wild-type NF1?
+  user_query: how is the mutant NF1 different from wildtype in terms of ras/erk signaling?
+  ideal: The mutant NF1 loses the ability to inhibit the Ras/Erk signaling pathway,
+    resulting in hyperactive Ras/Erk signaling, whereas wild-type NF1 properly inhibits
+    this pathway.
+  choices:
+  - Mutant NF1 further suppresses Ras/Erk signaling compared to wild-type NF1.
+  - Mutant NF1 loses the inhibition on Ras/Erk signaling, leading to hyperactivity,
+    whereas wild-type NF1 inhibits it.
+  - Both mutant and wild-type NF1 equally activate the Ras/Erk signaling pathway.
+  - Not in knowledgebase
+  correct_choice_index: 1
+  passage_indices:
+  - 37
+  - 38
+  - 43
+  difficulty: hard
+  question_type: comparative
+  persona: Bench Scientist
