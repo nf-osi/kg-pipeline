@@ -226,7 +226,7 @@ nf:Donor a owl:Class ;
 nf:CellLine a owl:Class ;
     rdfs:subClassOf nf:Tool ;
     rdfs:label "Cell Line" ;
-    rdfs:comment "A cell line used in research." .
+    rdfs:comment "A cell line used in research. Cell lines can be filtered by race." .
 
 nf:CancerCellLine a owl:Class ;
     rdfs:subClassOf nf:CellLine ;
@@ -834,9 +834,11 @@ nf:hasMutation a owl:ObjectProperty ;
     rdfs:range nf:Mutation .
 
 # Donor
-nf:donorId a owl:DatatypeProperty ;
-    rdfs:domain [ a owl:Class ; owl:unionOf (nf:Donor nf:CellLine nf:AnimalModel) ] ;
-    rdfs:range xsd:string .
+nf:donorId a owl:ObjectProperty ;
+    rdfs:label "donorId" ;
+    rdfs:comment "Links to the donor entity corresponding to the source donorId field." ;
+    rdfs:domain [ a owl:Class ; owl:unionOf (nf:CellLine nf:AnimalModel) ] ;
+    rdfs:range nf:Donor .
 
 nf:age a owl:DatatypeProperty ;
     rdfs:label "age" ;
@@ -847,7 +849,7 @@ nf:age a owl:DatatypeProperty ;
 nf:race a owl:DatatypeProperty ;
     rdfs:label "race" ;
     rdfs:comment "Race or ethnicity of the donor." ;
-    rdfs:domain nf:Donor ;
+    rdfs:domain [ a owl:Class ; owl:unionOf (nf:Donor nf:CellLine) ] ;
     rdfs:range xsd:string .
 
 nf:transplantationDonorId a owl:ObjectProperty ;
