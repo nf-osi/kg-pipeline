@@ -432,6 +432,7 @@ TABLES: Dict[str, Dict[str, Any]] = {
             {"target": "donorId", "source": "donorId", "type": "iri", "references": {"table": "donors", "column": "donorId"}},
             {"target": "originYear", "source": "originYear", "type": "text"},
             {"target": "organ", "source": "organ", "type": "text"},
+            {"target": "race", "source": "race", "type": "text"},
             {"target": "strProfile", "source": "strProfile", "type": "text"},
             {"target": "tissue", "source": "tissue", "type": "text"},
             {"target": "cellLineManifestation", "source": "cellLineManifestation", "type": "text+", "transform": "string_list"},
@@ -853,18 +854,55 @@ def apply_derived_columns(
     df: pd.DataFrame,
     processed_tables: Dict[str, pd.DataFrame],
 ) -> pd.DataFrame:
-    if table_name != "animal_models" or "species" in df.columns:
-        return df
+    if table_name == "animal_models":
+        if "species" in df.columns:
+            return df
 
-    donors_df = processed_tables.get("donors")
-    if donors_df is None:
-        raise ValueError("animal_models requires donors to be processed first so species can be derived")
+        donors_df = processed_tables.get("donors")
+        if donors_df is None:
+            raise ValueError("animal_models requires donors to be processed first so species can be derived")
 
-    donor_species = donors_df.loc[:, ["donorId", "species"]].drop_duplicates(
-        subset=["donorId"],
-        keep="first",
-    )
-    return df.merge(donor_species, on="donorId", how="left")
+        donor_species = donors_df.loc[:, ["donorId", "species"]].drop_duplicates(
+            subset=["donorId"],
+            keep="first",
+        )
+        return df.merge(donor_species, on="donorId", how="left")
+
+    if table_name == "cell_lines":
+        if "race" in df.columns:
+            return df
+
+        donors_df = processed_tables.get("donors")
+        if donors_df is None:
+            raise ValueError("cell_lines requires donors to be processed first so race can be derived")
+
+        donor_race = donors_df.loc[:, ["donorId", "race"]].drop_duplicates(
+            subset=["donorId"],
+            keep="first",
+        )
+        return df.merge(donor_race, on="donorId", how="left")
+
+    return df
+
+
+def normalize_fetched_df(
+    table_name: str,
+    df: pd.DataFrame,
+    processed_tables: Dict[str, pd.DataFrame],
+) -> tuple[pd.DataFrame, int]:
+    """Apply post-fetch normalization so all fetch paths behave the same."""
+    n_before = len(df)
+
+    # Synapse may return list-typed columns which are unhashable;
+    # convert to tuples so drop_duplicates() can hash every cell.
+    for col in df.columns:
+        if df[col].apply(lambda x: isinstance(x, list)).any():
+            df[col] = df[col].apply(lambda x: tuple(x) if isinstance(x, list) else x)
+
+    df = df.drop_duplicates()
+    n_dupes = n_before - len(df)
+    df = apply_derived_columns(table_name, df, processed_tables)
+    return df, n_dupes
 
 
 def check_config(config_path: Path) -> int:
@@ -910,6 +948,26 @@ def check_config(config_path: Path) -> int:
     return 0
 
 
+def resolve_source_synapse_ids(config_path: Path, profile: str) -> Dict[str, str]:
+    """Resolve table fetch IDs, appending source_version when present."""
+    with config_path.open() as f:
+        config = yaml.safe_load(f)
+
+    profiles = config.get("profiles", {})
+    if profile not in profiles:
+        raise ValueError(f"Profile '{profile}' not found in {config_path}")
+
+    resolved: Dict[str, str] = {}
+    for table_name, table_info in profiles[profile].get("tables", {}).items():
+        synapse_id = table_info["synapse_id"]
+        source_version = table_info.get("source_version")
+        if source_version:
+            resolved[table_name] = f"{synapse_id}.{source_version}"
+        else:
+            resolved[table_name] = synapse_id
+    return resolved
+
+
 def main(argv: List[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         description=__doc__,
@@ -947,6 +1005,17 @@ def main(argv: List[str] | None = None) -> int:
         action="store_true",
         help="Run FK validation on processed CSVs after writing.",
     )
+    parser.add_argument(
+        "--source-config",
+        type=Path,
+        default=Path("data_sources.yaml"),
+        help="Path to data_sources.yaml for source-versioned fetch IDs (default: data_sources.yaml).",
+    )
+    parser.add_argument(
+        "--source-profile",
+        default="release",
+        help="Profile in --source-config to use for source-versioned fetch IDs (default: release).",
+    )
     args = parser.parse_args(argv)
 
     if args.check_config is not None:
@@ -964,6 +1033,8 @@ def main(argv: List[str] | None = None) -> int:
 
     if "donors" in table_names:
         table_names = ["donors"] + [name for name in table_names if name != "donors"]
+
+    source_synapse_ids = resolve_source_synapse_ids(args.source_config, args.source_profile)
 
     syn = None
     if not args.from_cache:
@@ -983,24 +1054,17 @@ def main(argv: List[str] | None = None) -> int:
             df = pd.read_csv(raw_path, keep_default_na=False, dtype=str)
             print(f"  Read {len(df)} rows", flush=True)
         else:
-            print(f"Fetching {table_name} ({config['synapse_id']}) ...", flush=True)
+            fetch_synapse_id = source_synapse_ids.get(table_name, config["synapse_id"])
+            print(f"Fetching {table_name} ({fetch_synapse_id}) ...", flush=True)
             select_clause_text = config.get("select_clause")
-            df = fetch_table(syn, config["synapse_id"], config["columns"], select_clause_text)
+            df = fetch_table(syn, fetch_synapse_id, config["columns"], select_clause_text)
             print(f"  Retrieved {len(df)} rows", flush=True)
             write_raw(args.raw_dir, config["raw_filename"], df)
 
-        n_before = len(df)
-        # Synapse may return list-typed columns which are unhashable;
-        # convert to tuples so drop_duplicates() can hash every cell.
-        for col in df.columns:
-            if df[col].apply(lambda x: isinstance(x, list)).any():
-                df[col] = df[col].apply(lambda x: tuple(x) if isinstance(x, list) else x)
-        df = df.drop_duplicates()
-        n_dupes = n_before - len(df)
+        df, n_dupes = normalize_fetched_df(table_name, df, processed_tables)
         if n_dupes:
             print(f"  Dropped {n_dupes} duplicate rows", flush=True)
 
-        df = apply_derived_columns(table_name, df, processed_tables)
         processed_tables[table_name] = df.copy()
         data_rows = build_rows(df, config["columns"])
         write_processed_csv(config["csv_path"], config["columns"], data_rows)
