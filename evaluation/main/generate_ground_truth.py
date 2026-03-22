@@ -63,14 +63,48 @@ def run_queries(data):
     
     # Pre-compute joins
     if not data['models'].empty and not data['donors'].empty:
-        models_donors = pd.merge(data['models'], data['donors'], on='donorId', how='left')
+        models_donors = pd.merge(
+            data['models'],
+            data['donors'],
+            on='donorId',
+            how='left',
+            suffixes=('_model', '_donor'),
+        )
     else:
         models_donors = pd.DataFrame()
         
     if not data['cell_lines'].empty and not data['donors'].empty:
-        cells_donors = pd.merge(data['cell_lines'], data['donors'], on='donorId', how='left')
+        cells_donors = pd.merge(
+            data['cell_lines'],
+            data['donors'],
+            on='donorId',
+            how='left',
+            suffixes=('_cell', '_donor'),
+        )
     else:
         cells_donors = pd.DataFrame()
+
+    if not data['models'].empty and not data['resources'].empty:
+        models_resources = pd.merge(
+            data['models'],
+            data['resources'],
+            on='animalModelId',
+            how='left',
+            suffixes=('', '_resource'),
+        )
+    else:
+        models_resources = pd.DataFrame()
+
+    if not cells_donors.empty and not data['resources'].empty:
+        cells_donors_resources = pd.merge(
+            cells_donors,
+            data['resources'],
+            on='cellLineId',
+            how='left',
+            suffixes=('_cell', '_resource'),
+        )
+    else:
+        cells_donors_resources = pd.DataFrame()
 
     # Mutation joins
     if not data['mutations'].empty and not data['mutation_model'].empty:
@@ -192,9 +226,12 @@ def run_queries(data):
     # --- Animal Models ---
     
     # AM-001: Optic glioma models
-    if not data['models'].empty:
-        df = data['models']
-        matches = df[df['animalModelOfManifestation'].str.contains('Optic Nerve Glioma', case=False, na=False)]
+    if not models_resources.empty:
+        df = models_resources
+        matches = df[
+            df['animalModelOfManifestation'].str.contains('Optic Nerve Glioma', case=False, na=False) |
+            df['description'].str.contains('optic glioma', case=False, na=False)
+        ]
         results['AM-001'] = ensure_resource_id(matches['animalModelId'].tolist())
 
     # AM-002: Energy expenditure
@@ -284,9 +321,20 @@ def run_queries(data):
         results['CL-003'] = ensure_resource_id(matches['cellLineId'].tolist())
 
     # CL-004: Black patients
-    if not cells_donors.empty:
-        df = cells_donors
-        matches = df[df['race'].str.contains('Black|African', case=False, na=False)]
+    if not cells_donors_resources.empty:
+        df = cells_donors_resources
+        race_series = df.get('race_cell', pd.Series('', index=df.index)).fillna('')
+        if 'race_donor' in df.columns:
+            race_series = race_series.mask(race_series.eq(''), df['race_donor'].fillna(''))
+        matches = df[
+            race_series.str.contains('Black|African', case=False, na=False) &
+            (
+                df['cellLineGeneticDisorder'].str.contains('Neurofibromatosis type 1', case=False, na=False) |
+                df['resourceName'].str.contains(r'\bNF1\b|Neurofibromin', case=False, na=False, regex=True) |
+                df['synonyms'].str.contains(r'\bNF1\b|Neurofibromin', case=False, na=False, regex=True) |
+                df['description'].str.contains(r'\bNF1\b|Neurofibromin', case=False, na=False, regex=True)
+            )
+        ]
         results['CL-004'] = ensure_resource_id(matches['cellLineId'].tolist())
 
     # CL-005: pediatric donors
@@ -302,15 +350,20 @@ def run_queries(data):
 
     if not cells_donors.empty:
         df = cells_donors
-        ped_human = df[df['age'].apply(is_pediatric) & df['species'].str.contains('Homo sapiens|Human', case=False, na=False)]
+        species_series = df['species_donor'] if 'species_donor' in df.columns else df['species']
+        ped_human = df[
+            df['age'].apply(is_pediatric) &
+            species_series.str.contains('Homo sapiens|Human', case=False, na=False)
+        ]
         results['CL-005'] = ensure_resource_id(ped_human['cellLineId'].tolist())
 
     # CL-006: Human lung cell lines
     if not cells_donors.empty:
         df = cells_donors
+        species_series = df['species_donor'] if 'species_donor' in df.columns else df['species']
         matches = df[
             (df['organ'].str.contains('Lung', case=False, na=False)) &
-            (df['species'].str.contains('Homo sapiens|Human', case=False, na=False))
+            (species_series.str.contains('Homo sapiens|Human', case=False, na=False))
         ]
         results['CL-006'] = ensure_resource_id(matches['cellLineId'].tolist())
 
