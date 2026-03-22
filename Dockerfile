@@ -3,6 +3,7 @@
 # The build context should contain:
 #   data/rdf/*.ttl       — materialized RDF triples
 #   schema/ontology.ttl  — OWL ontology
+#   schema/shapes.ttl    — SHACL shapes
 #
 # Optional text index (set TEXT_INDEX=1 to enable):
 #   pubs/qlever_text/text_entities.ttl
@@ -20,7 +21,7 @@ RUN mkdir -p /input/rdf /input/schema /input/text /index \
     && chown -R qlever:qlever /input /index
 USER qlever
 
-COPY --chown=qlever:qlever schema/ontology.ttl /input/schema/
+COPY --chown=qlever:qlever schema/ontology.ttl schema/shapes.ttl /input/schema/
 COPY --chown=qlever:qlever data/rdf/ /input/rdf/
 
 # Copy text index files if TEXT_INDEX is enabled
@@ -34,13 +35,14 @@ COPY --chown=qlever:qlever pubs/qlever_text/ /input/text/
 
 RUN if [ "$TEXT_INDEX" = "1" ]; then \
       cat /input/schema/ontology.ttl \
+          /input/schema/shapes.ttl \
           /input/text/text_entities.ttl \
           /input/rdf/*.ttl \
         | qlever-index -F ttl -f - -i /index/kg --parse-parallel false \
             -w /input/text/wordsfile.tsv \
             -d /input/text/docsfile.tsv; \
     else \
-      cat /input/schema/ontology.ttl /input/rdf/*.ttl \
+      cat /input/schema/ontology.ttl /input/schema/shapes.ttl /input/rdf/*.ttl \
         | qlever-index -F ttl -f - -i /index/kg --parse-parallel false; \
     fi
 

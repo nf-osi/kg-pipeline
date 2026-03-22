@@ -9,6 +9,7 @@ data/rdf/*.rml.ttl
 
 # Include ontology
 !schema/ontology.ttl
+!schema/shapes.ttl
 
 # Include text index files (for plus-text builds)
 !pubs/qlever_text/
