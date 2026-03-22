@@ -7,6 +7,7 @@ pytest-xdist>=3.3.0        # Parallel test execution
 
 # RDF handling
 rdflib>=7.0.0              # RDF graph manipulation and SPARQL
+reasonable>=0.2.6          # Derived RDF materialization helpers
 
 # Test reporting
 pytest-html>=3.2.0         # HTML test reports
