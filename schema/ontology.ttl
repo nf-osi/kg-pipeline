@@ -94,6 +94,15 @@ nf:Mutation a owl:Class ;
     rdfs:label "Mutation" ;
     rdfs:comment "A genetic mutation." .
 
+nf:MutationSet a owl:Class ;
+    rdfs:label "Mutation Set" ;
+    rdfs:comment "A derived set of mutations grouped for comparison or query convenience." .
+
+nf:Nf1MutationSet a owl:Class ;
+    rdfs:subClassOf nf:MutationSet ;
+    rdfs:label "NF1 Mutation Set" ;
+    rdfs:comment "A derived mutation set containing only NF1 mutations for a cell line. The set IRI is stable for a given sorted list of member mutation UUIDs." .
+
 nf:SinglePointMutation a owl:Class ;
     rdfs:subClassOf nf:Mutation ;
     rdfs:label "Single Point Mutation" ;
@@ -226,7 +235,7 @@ nf:Donor a owl:Class ;
 nf:CellLine a owl:Class ;
     rdfs:subClassOf nf:Tool ;
     rdfs:label "Cell Line" ;
-    rdfs:comment "A cell line used in research. Cell lines can be filtered by race." .
+    rdfs:comment "A cell line used in research. Cell lines can be filtered by race and may participate in donor-matching links via sharedDonor." .
 
 nf:CancerCellLine a owl:Class ;
     rdfs:subClassOf nf:CellLine ;
@@ -290,7 +299,7 @@ nf:AnimalModel a owl:Class ;
     rdfs:subClassOf nf:Tool ;
     owl:equivalentClass efo:EFO_0022953 ;
     rdfs:label "Animal Model" ;
-    rdfs:comment "An animal model used in research. Animal models can be filtered by species." .
+    rdfs:comment "An animal model used in research. Animal models can be filtered by species and may participate in donor-matching links via sharedDonor." .
 
 nf:MouseModel a owl:Class ;
     rdfs:subClassOf nf:AnimalModel ;
@@ -833,6 +842,12 @@ nf:hasMutation a owl:ObjectProperty ;
     rdfs:comment "Links a resource (cell line, animal model, etc.) to a mutation it carries." ;
     rdfs:range nf:Mutation .
 
+nf:hasNf1MutationSet a owl:ObjectProperty ;
+    rdfs:label "hasNf1MutationSet" ;
+    rdfs:comment "Links a cell line to a derived NF1 mutation set node, identified from the sorted UUIDs of its NF1 mutations." ;
+    rdfs:domain nf:CellLine ;
+    rdfs:range nf:Nf1MutationSet .
+
 # Donor
 nf:donorId a owl:ObjectProperty ;
     rdfs:label "donorId" ;
@@ -869,6 +884,11 @@ nf:fromDonor a owl:ObjectProperty ;
     rdfs:comment "Links a resource (cell line, animal model) to the donor it was derived from." ;
     rdfs:range nf:Donor ;
     owl:inverseOf nf:hasDerivedResource .
+
+nf:sharedDonor a owl:ObjectProperty ;
+    rdfs:label "sharedDonor" ;
+    rdfs:comment "Links a resource to a donor only when that donor is used to match animal models and cell lines across resource types. In the current graph this is materialized for cases where an animal model transplantationDonorId matches a cell line donorId." ;
+    rdfs:range nf:Donor .
 
 # Do not use this yet 
 #

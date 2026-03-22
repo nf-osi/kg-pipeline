@@ -7,10 +7,11 @@ This directory contains the Dagster orchestration for the NF Knowledge Graph pip
 The pipeline is organized as a DAG of **assets**:
 
 ```
-Synapse Tables → CSV → [Harmonize] → RML → RDF (.ttl)
+Synapse Tables → CSV → [Harmonize] → RML → RDF (.ttl) → [Derived RDF]
 ```
 
 - **Harmonize** (studies, observations, files, genetic_reagents, mutations): classify/link CSV data before RML mapping
+- **Derived RDF**: post-RML graph materialization for links that should only be asserted after comparing multiple RDF tables
 
 ### Asset Groups
 
@@ -29,7 +30,13 @@ Each portal table has its own asset group (17 tables total):
    - Runs RMLMapper (CSV → RDF)
    - Writes to `data/rdf/`
 
-4. **FK Validation Asset** (`portal/quality/fk_validation`) - *single asset, runs once*
+4. **Derived RDF Asset** (`portal/rdf/shared_donor_links`) - *single asset, runs after `cell_lines` and `animal_models` RDF*
+   - Runs [`scripts/materialize_shared_donor_links.py`](../scripts/materialize_shared_donor_links.py)
+   - Uses `reasonable` to load the relevant RDF and materialize `nf:sharedDonor`
+   - Writes `data/rdf/shared_donor_links.ttl`
+   - Only asserts `sharedDonor` when `AnimalModel.transplantationDonorId` matches `CellLine.donorId`
+
+5. **FK Validation Asset** (`portal/quality/fk_validation`) - *single asset, runs once*
    - Depends on all CSV assets
    - Checks referential integrity across tables (see [HARMONIZATION.md](../HARMONIZATION.md))
    - Non-blocking: logs results and attaches metadata but never raises
@@ -47,6 +54,9 @@ source .venv/bin/activate
 
 # Install dependencies
 pip install -e ".[dev]"
+
+# Derived RDF step also requires:
+pip install reasonable rdflib
 ```
 
 ## Usage
@@ -93,6 +103,7 @@ Asset keys follow the pattern `portal/{stage}/{table}`:
 
 - `portal/csv/donors` — single asset
 - `group:donors` — all assets in the donors group (CSV + harmonize + RDF)
+- `portal/rdf/shared_donor_links` — derived RDF asset built from existing RDF
 - `group:validation` — FK validation asset
 - `+portal/rdf/studies` — asset and all upstream dependencies
 - `portal/csv/studies+` — asset and all downstream dependents
@@ -109,6 +120,9 @@ orchestration/
 ├── pyproject.toml        # Dependencies
 └── README.md             # This file
 ```
+
+Derived RDF scripts live in the top-level [`scripts/`](../scripts/) directory and
+write directly into [`data/rdf/`](../data/rdf/).
 
 ## Configuration
 

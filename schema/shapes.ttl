@@ -347,6 +347,11 @@ shapes:CellLineShape a sh:NodeShape ;
         sh:maxCount 1 ;
     ] ;
     sh:property [
+        sh:path nf:sharedDonor ;
+        sh:nodeKind sh:IRI ;
+        sh:class nf:Donor ;
+    ] ;
+    sh:property [
         sh:path nf:originYear ;
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
@@ -402,6 +407,36 @@ shapes:CellLineShape a sh:NodeShape ;
     sh:property [
         sh:path nf:hasMutation ;
         sh:nodeKind sh:IRI ;
+    ] ;
+    sh:property [
+        sh:path nf:hasNf1MutationSet ;
+        sh:nodeKind sh:IRI ;
+        sh:class nf:Nf1MutationSet ;
+        sh:maxCount 1 ;
+    ] .
+
+################################################################################
+# NF1 Mutation Set
+################################################################################
+
+shapes:Nf1MutationSetShape a sh:NodeShape ;
+    sh:targetClass nf:Nf1MutationSet ;
+    rdfs:label "NF1 Mutation Set shape" ;
+    rdfs:comment "Expected properties for derived NF1 mutation set instances." ;
+    sh:property [
+        sh:path rdfs:label ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path rdfs:comment ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:hasMutation ;
+        sh:nodeKind sh:IRI ;
+        sh:class nf:Mutation ;
     ] .
 
 ################################################################################
@@ -433,6 +468,11 @@ shapes:AnimalModelShape a sh:NodeShape ;
         sh:nodeKind sh:IRI ;
         sh:class nf:Donor ;
         sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:sharedDonor ;
+        sh:nodeKind sh:IRI ;
+        sh:class nf:Donor ;
     ] ;
     sh:property [
         sh:path nf:species ;

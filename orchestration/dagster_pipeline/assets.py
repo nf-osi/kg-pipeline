@@ -283,6 +283,64 @@ def create_rdf_asset(table_name: str, config: TableConfig):
     return _rdf_asset
 
 
+@asset(
+    name="shared_donor_links",
+    key_prefix=["portal", "rdf"],
+    compute_kind="python",
+    group_name="relationships",
+    deps=[["portal", "rdf", "cell_lines"], ["portal", "rdf", "animal_models"]],
+)
+def shared_donor_links_asset(context: AssetExecutionContext) -> Path:
+    """Generate derived sharedDonor links after core RDF is available."""
+    from scripts.materialize_shared_donor_links import materialize_shared_donor_links
+
+    project_root = Path(__file__).parent.parent.parent
+    output_file = project_root / "data" / "rdf" / "shared_donor_links.ttl"
+
+    materialize_shared_donor_links(
+        cell_lines_ttl=project_root / "data" / "rdf" / "cell_lines.ttl",
+        animal_models_ttl=project_root / "data" / "rdf" / "animal_models.ttl",
+        output_ttl=output_file,
+    )
+
+    size_mb = output_file.stat().st_size / (1024 * 1024)
+    context.add_output_metadata({
+        "path": str(output_file.relative_to(project_root)),
+        "size_mb": round(size_mb, 4),
+    })
+
+    return output_file
+
+
+@asset(
+    name="nf1_mutation_sets",
+    key_prefix=["portal", "rdf"],
+    compute_kind="python",
+    group_name="relationships",
+    deps=[["portal", "rdf", "cell_lines"], ["portal", "rdf", "mutations"]],
+)
+def nf1_mutation_sets_asset(context: AssetExecutionContext) -> Path:
+    """Generate derived NF1 mutation set nodes after core RDF is available."""
+    from scripts.materialize_nf1_mutation_sets import materialize_nf1_mutation_sets
+
+    project_root = Path(__file__).parent.parent.parent
+    output_file = project_root / "data" / "rdf" / "nf1_mutation_sets.ttl"
+
+    materialize_nf1_mutation_sets(
+        cell_lines_ttl=project_root / "data" / "rdf" / "cell_lines.ttl",
+        mutations_ttl=project_root / "data" / "rdf" / "mutations.ttl",
+        output_ttl=output_file,
+    )
+
+    size_mb = output_file.stat().st_size / (1024 * 1024)
+    context.add_output_metadata({
+        "path": str(output_file.relative_to(project_root)),
+        "size_mb": round(size_mb, 4),
+    })
+
+    return output_file
+
+
 # =============================================================================
 # Generate all assets
 # =============================================================================
@@ -312,6 +370,8 @@ def generate_portal_assets() -> List:
     # Add FK validation asset (depends on all CSV assets)
     validation_asset = create_validation_asset(csv_asset_keys)
     assets.append(validation_asset)
+    assets.append(shared_donor_links_asset)
+    assets.append(nf1_mutation_sets_asset)
 
     return assets
 

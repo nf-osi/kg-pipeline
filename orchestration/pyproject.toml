@@ -11,6 +11,8 @@ dependencies = [
     "dagster>=1.7.0",
     "dagster-webserver>=1.7.0",
     "pandas>=1.5.0",
+    "rdflib>=7.0.0",
+    "reasonable>=0.2.6",
     "synapseclient>=3.0.0",
 ]
 
