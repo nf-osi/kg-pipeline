@@ -50,6 +50,12 @@ jobs:
           curl -sL -o tools/rmlmapper-${RMLMAPPER_VERSION}.jar \
             "https://github.com/RMLio/rmlmapper-java/releases/download/v${RMLMAPPER_VERSION}/rmlmapper-${RMLMAPPER_VERSION}-r380-all.jar"
 
+      - name: Cache raw source tables
+        uses: actions/cache@v4
+        with:
+          path: data/raw/
+          key: raw-tables-${{ runner.os }}-${{ hashFiles('data_sources.yaml', 'scripts/prepare_portal_tables.py') }}
+
       - name: Materialize RDF pipeline
         run: dagster asset materialize -m dagster_pipeline --select "*"
 
