@@ -96,12 +96,12 @@ nf:Mutation a owl:Class ;
 
 nf:MutationSet a owl:Class ;
     rdfs:label "Mutation Set" ;
-    rdfs:comment "A derived set of mutations grouped for comparison or query convenience." .
+    rdfs:comment "A derived node representing a distinct combination of mutations, used to group and compare tools by mutation profile. Each set is identified by a stable IRI derived from the sorted UUIDs of its member mutations, so two tools with identical mutations share the same set IRI." .
 
 nf:Nf1MutationSet a owl:Class ;
     rdfs:subClassOf nf:MutationSet ;
     rdfs:label "NF1 Mutation Set" ;
-    rdfs:comment "A derived mutation set containing only NF1 mutations for a cell line. The set IRI is stable for a given sorted list of member mutation UUIDs." .
+    rdfs:comment "A derived mutation set containing only NF1-gene mutations for a cell line, used to identify isogenic or divergent lines from the same donor. The IRI is stable for a given sorted list of member mutation UUIDs. The special instance nf:mutationSet/nf1_none represents cell lines with no recorded NF1 mutations." .
 
 nf:SinglePointMutation a owl:Class ;
     rdfs:subClassOf nf:Mutation ;
