@@ -317,7 +317,7 @@ def shared_donor_links_asset(context: AssetExecutionContext) -> Path:
     key_prefix=["portal", "rdf"],
     compute_kind="python",
     group_name="relationships",
-    deps=[["portal", "rdf", "cell_lines"], ["portal", "rdf", "mutations"]],
+    deps=[["portal", "rdf", "cell_lines"], ["portal", "rdf", "mutations"], ["portal", "rdf", "mutation_model"]],
 )
 def nf1_mutation_sets_asset(context: AssetExecutionContext) -> Path:
     """Generate derived NF1 mutation set nodes after core RDF is available."""
@@ -330,6 +330,7 @@ def nf1_mutation_sets_asset(context: AssetExecutionContext) -> Path:
         cell_lines_ttl=project_root / "data" / "rdf" / "cell_lines.ttl",
         mutations_ttl=project_root / "data" / "rdf" / "mutations.ttl",
         output_ttl=output_file,
+        mutation_model_ttl=project_root / "data" / "rdf" / "mutation_model.ttl",
     )
 
     size_mb = output_file.stat().st_size / (1024 * 1024)

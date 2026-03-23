@@ -19,6 +19,8 @@ def _uuid_from_iri(iri) -> str:
 
 
 def _mutation_set_iri(mutation_uuids: tuple[str, ...]):
+    if not mutation_uuids:
+        return NF["mutationSet/nf1_none"]
     joined = "|".join(mutation_uuids)
     digest = hashlib.sha256(joined.encode("utf-8")).hexdigest()[:12]
     return NF[f"mutationSet/nf1_{digest}"]
@@ -28,11 +30,14 @@ def materialize_nf1_mutation_sets(
     cell_lines_ttl: Path,
     mutations_ttl: Path,
     output_ttl: Path,
+    mutation_model_ttl: Path | None = None,
 ) -> Path:
     """Build derived NF1 mutation set triples from existing RDF."""
     graph = Graph()
     graph.parse(cell_lines_ttl, format="turtle")
     graph.parse(mutations_ttl, format="turtle")
+    if mutation_model_ttl and mutation_model_ttl.exists():
+        graph.parse(mutation_model_ttl, format="turtle")
 
     derived = Graph()
     derived.bind("nf", NF)
@@ -94,6 +99,12 @@ def main() -> None:
         help="Path to mutation RDF Turtle",
     )
     parser.add_argument(
+        "--mutation-model",
+        default="data/rdf/mutation_model.ttl",
+        type=Path,
+        help="Path to mutation model RDF Turtle (cell/animal to mutation links)",
+    )
+    parser.add_argument(
         "--output",
         default="data/rdf/nf1_mutation_sets.ttl",
         type=Path,
@@ -105,6 +116,7 @@ def main() -> None:
         cell_lines_ttl=args.cell_lines,
         mutations_ttl=args.mutations,
         output_ttl=args.output,
+        mutation_model_ttl=args.mutation_model,
     )
 
 
