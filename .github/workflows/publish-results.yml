@@ -6,22 +6,19 @@ on:
       - develop
     paths:
       - 'evaluation/runs.json'
+      - 'evaluation/pubs_runs.json'
       - 'scripts/build_site.py'
+      - 'scripts/extract_runs.py'
 
 concurrency:
   group: "pages"
   cancel-in-progress: true
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
 jobs:
   build-and-deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -40,15 +37,13 @@ jobs:
       - name: Build site
         run: |
           python scripts/build_site.py evaluation/runs.json --out _site
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: '_site'
+          python scripts/build_site.py evaluation/pubs_runs.json --pubs --out _site
+          touch _site/.nojekyll
 
       - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./_site
+          publish_branch: gh-pages
+          force_orphan: false

@@ -1140,11 +1140,10 @@ nf:journal a owl:DatatypeProperty ;
     rdfs:domain nf:Publication ;
     rdfs:range xsd:string .
 
-nf:pmid a owl:DatatypeProperty ;
+nf:pmid a owl:ObjectProperty ;
     rdfs:label "pmid" ;
     rdfs:comment "PubMed ID of the publication." ;
-    rdfs:domain nf:Publication ;
-    rdfs:range xsd:string .
+    rdfs:domain nf:Publication .
 
 nf:authors a owl:DatatypeProperty ;
     rdfs:label "authors" ;
@@ -1225,3 +1224,26 @@ nf:referencesPublication a owl:ObjectProperty ;
     rdfs:comment "Links an observation to a supporting publication." ;
     rdfs:domain nf:Observation ;
     rdfs:range nf:Publication .
+
+################################################################################
+# Classes - Text entity annotations (from PubTator3 text index)
+################################################################################
+
+nf:Gene a owl:Class ;
+    owl:equivalentClass <http://purl.uniprot.org/core/Gene> ;
+    rdfs:label "Gene" ;
+    rdfs:comment "A gene entity annotated in publication text." .
+
+nf:DiseaseAnnotation a owl:Class ;
+    rdfs:subClassOf <http://purl.uniprot.org/core/Disease_Annotation> ;
+    rdfs:label "Disease Annotation" ;
+    rdfs:comment "A disease entity annotated in publication text." .
+
+nf:Chemical a owl:Class ;
+    rdfs:label "Chemical" ;
+    rdfs:comment "A chemical entity annotated in publication text." .
+
+nf:Variant a owl:Class ;
+    owl:equivalentClass obo:SO_0001564 ;
+    rdfs:label "Variant" ;
+    rdfs:comment "A genetic variant annotated in publication text." .

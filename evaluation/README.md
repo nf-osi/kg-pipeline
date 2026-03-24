@@ -1,15 +1,135 @@
 # Evaluation Suite
 
-**Personas** referenced in the evaluation datasets have descriptions [here](https://docs.google.com/spreadsheets/d/15KSQJn4F7nk8d3v2N9StILFhdyD5AiamTtnfr-QwusQ/edit?gid=0#gid=0).
+This directory contains two evaluation tracks:
 
-For **reproducibility**, evaluation datasets are versioned and accompanied by data archive. 
-Download the appropriate archive from linked Synapse ID and extract to `evaluation/data` as needed.
+| Track | Directory | Purpose |
+|-------|-----------|---------|
+| **Research Tools Discovery** | [`main/`](main/) | Structured queries against the Research Tools Portal (facets, text search, graph hops) |
+| **Publication QA** | [`qa/`](qa/) | LLM-generated question-answer pairs grounded in PubTator3 full-text papers |
+
+---
+
+## Publication QA Evaluation
+
+To evaluate the overall RAG-based system for publications, we primarily use multiple-choice QA pairs, a similar format to [PaperQA2](https://huggingface.co/datasets/futurehouse/lab-bench/viewer/LitQA2) and [Humanity's Last Exam](https://www.nature.com/articles/s41586-025-09962-4). 
+Items are first generated using current frontier models with PubTator3 full-text papers, then further curated and edited by the NF-OSI team.
+Each paper has between 5 to 15 questions spanning different difficulty levels and question types.
+How well the system performs is based on *both* the ergonomics of retrieval (influenced by what and how things are indexed) as well as the agent chosen for the system.
+
+Important item characteristics:
+
+- **question_type**: `factual`, `causal`, `comparative`, `inferential`, `methodological`, `hypothetical`, `other` — weighted toward factual, comparative, and methodological by design
+- **difficulty**: `easy` (single-fact lookup), `medium` (within-passage synthesis), `hard` (cross-passage inference)
+
+#### Curation process
+
+After initial generation, items undergo manual review and editing to address several types of issues that have well-known precedents. 
+For example, in an earlier version of Humanity’s Last Exam, ~30% of the text-only chemistry and biology questions had answers with directly conflicting evidence in peer reviewed literature, requiring additional rounds of removal and editing ([ref](https://www.futurehouse.org/research-announcements/hle-exam)).
+
+- **Cross-paper overlap and conflict**: When the same fact appears in multiple papers with potentially different answers, overlapping questions are either removed, deduplicated, or made more specific. An example of a question removed was one with slightly different reported values for NF1 population incidence -- 1:2000 vs 1:2500. An example for a question that was made more specific: For "What is the current treatment for symptomatic PNs?", where one paper says surgery and another says selumetinib, to distinguish questions we can use the keyword "pharmacotherapy". Potential overlaps are noted in `editor_note` field. 
+- **Hallucinated content**: LLM-generated ideal answers sometimes include facts not present in the source paper (e.g. have found citation of a specific mutation variant that doesn't appear in the paper). These are corrected against the actual paper text.
+- **Vague study anchoring**: Questions like "What was the CS in the eyeblink conditioning experiments?" or "What are the limitations of the isogenic cell line experiments?" are too generic — the same methodology or finding may appear across multiple indexed papers. Questions are rewritten to better anchor to the specific study (e.g. "In the Nf1+/- mouse eyeblink conditioning study, what was used as the CS?", "What are the key limitations acknowledged in the Cancer Pathway Knockout Panel study?"). **This is important because questions are presented in the eval without explicit info on which paper to reference, in order to implicitly test paper selection as well, and during eval the models cannot ask for clarification.** 
+- **Difficulty calibration**: Questions that appear simple in isolation but require cross-paper disambiguation are upgraded from `easy` to `medium`.
+- **Trivial or obvious questions**: Removal of questions where the answer is obvious without retrieval (e.g. what protein does the NF1 mutation affect) or the distractors are implausible/absurd (e.g. which standard technique was used for proteomics analysis and no distractors are even proteomics assays), as these don't meaningfully test the system or are unlikely to be asked by a real researcher.
+
+#### Limitations
+
+- The dataset so far has undergone only one round of review -- potentially, we may add additional rounds of review to yield a more ideal and tighter final version. 
+- Questions may ask to provide answers by drawing conclusions *across passages in the same paper*, but currently *not across papers*; this would be considered a new *very hard* level, potentially for a dataset sequel.
+- Ground truth for the exact attribution passage list can be especially hard to finalize.  
+- While designed for multiple-choice eval format first and foremost, the dataset should be usable for short-answer eval format as well, though any tweaks needed have not been comprehensively evaluated.
+- *question_type* classification is probably still somewhat fudgy.
+
+### Files
+
+| File | Description |
+|------|-------------|
+| `qa/qa.schema.json` | JSON Schema for QA items |
+| `qa/generate_qa.py` | Generation script (prompt-only by default, `--generate` to call API) |
+| `qa/qa_{PMCID}.yaml` | Generated QA pairs, one file per paper |
+
+
+### Usage
+
+PubTator3 full-text biocjson must be available locally as input for generation, i.e. in a `pubs` directory. 
+The Anthropic default has average cost of ~$0.40/paper; other providers and models can be specified. 
+Requires `ANTHROPIC_API_KEY` or `GOOGLE_API_KEY`.
+
+```bash
+# Preview prompt for a specific paper
+python evaluation/qa/generate_qa.py --pmcid PMC7952412
+
+# Generate QA pairs (calls Anthropic API by default)
+python evaluation/qa/generate_qa.py --generate --pmcid PMC7952412
+
+# Generate for the default random-15 selection
+python evaluation/qa/generate_qa.py --generate
+
+# Generate QA pairs using the Google Gemini model
+python generate_qa.py --generate --provider google
+
+# Validate all generated output files
+python evaluation/qa/generate_qa.py --validate-only
+```
+
+<!-- BEGIN AUTO-GENERATED QA STATS -->
+
+### Dataset Statistics
+
+- **Total Papers**: 14
+- **Total Questions**: 130
+- **Average Questions/Paper**: 9.3
+
+#### By Difficulty
+- **Easy**: 31 (23.8%)
+- **Medium**: 61 (46.9%)
+- **Hard**: 38 (29.2%)
+
+#### By Question Type
+- **factual**: 46 (35.4%)
+- **methodological**: 31 (23.8%)
+- **comparative**: 29 (22.3%)
+- **causal**: 14 (10.8%)
+- **inferential**: 10 (7.7%)
+
+#### By Author/Model
+- **claude-opus-4-6**: 83 (63.8%)
+- **gemini-3.1-pro-preview**: 40 (30.8%)
+- **gpt-5.4**: 7 (5.4%)
+
+#### By Persona
+- **Bench Scientist**: 76 (58.5%)
+- **Researcher**: 29 (22.3%)
+- **Bioinformatician**: 21 (16.2%)
+- **Patient Advocate**: 4 (3.1%)
+
+
+<!-- END AUTO-GENERATED QA STATS -->
+
+---
 
 ## Research Tools Discovery Evaluation
 
-Benchmark suite for evaluating queries across the Research Tools Portal entities.
+Benchmark suite for evaluating search/discovery queries across the Research Tools Portal entities using Synapse metadata. 
 
-### Dataset Files
+Important item characteristics:
+
+- Each item represents a user **Persona**, which have descriptions [here](https://docs.google.com/spreadsheets/d/15KSQJn4F7nk8d3v2N9StILFhdyD5AiamTtnfr-QwusQ/edit?gid=0#gid=0)
+- **Complexity**: Number of graph hops required (0-hop, 1-hop, 2-hop, 3-hop)
+- **Level**: Difficulty/capability level of the question
+  - `baseline`: baseline functionality established by current portal technologies and configuration
+  - `advanced`: harder questions not handled by portal infra currently (e.g. missing materialization and aggregation, missing integration of additional semantics)
+- **Facet**: Whether answerable via portal UI facets alone
+  - `Yes`: fully answerable using available facets
+  - `Partial`: answerable but requires workarounds, manual filtering, or multiple steps
+  - `No`: cannot be answered via facets alone
+- **Text Search**: Whether answerable via MySQL text search today
+  - `Yes`: fully answerable using text search
+  - `Partial`: answerable but with limitations, missing results, or requires knowing exact terms
+  - `No`: cannot be answered via text search 
+
+
+### Files
 
 - **`main/eval_tools.yaml`**: Question definitions and metadata (stats below)
 - **`main/eval_tools_ground_auto.yaml`**: Automatically generated ground truth
@@ -39,23 +159,6 @@ There is only one question that returns a number (count) instead of uuid(s).
 **Dataset Version**: v1
 
 Data archived at **syn73695746**
-
----
-
-### Legend
-
-- **Complexity**: Number of graph hops required (0-hop, 1-hop, 2-hop, 3-hop)
-- **Level**: Difficulty/capability level of the question
-  - `baseline`: baseline functionality established by current portal technologies and configuration
-  - `advanced`: harder questions not handled by portal infra currently (e.g. missing materialization and aggregation, missing integration of additional semantics)
-- **Facet**: Whether answerable via portal UI facets alone
-  - `Yes`: fully answerable using available facets
-  - `Partial`: answerable but requires workarounds, manual filtering, or multiple steps
-  - `No`: cannot be answered via facets alone
-- **Text Search**: Whether answerable via MySQL text search today
-  - `Yes`: fully answerable using text search
-  - `Partial`: answerable but with limitations, missing results, or requires knowing exact terms
-  - `No`: cannot be answered via text search
 
 ---
 

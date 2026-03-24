@@ -1,16 +1,19 @@
 # QLever SPARQL endpoint for the NF knowledge graph.
 #
-# Usage:
-#   docker compose run --rm qlever-index   # build index (one-shot)
-#   docker compose up qlever-server        # start SPARQL endpoint on :7001
-#   ./scripts/test_sparql.sh               # verify with test queries
+# Usage (RDF only):
+#   docker compose run --rm qlever-index        # build index
+#   ./scripts/test_sparql.sh                    # start server, test, stop
+#
+# Usage (RDF + text):
+#   docker compose run --rm qlever-index-text   # build index with text
+#   ./scripts/test_sparql_with_text.sh          # start server, test, stop
 #
 # To rebuild after data changes, remove the volume first:
 #   docker compose down -v
-#   docker compose run --rm qlever-index
 
 volumes:
   qlever-index:
+  qlever-index-text:
 
 services:
   qlever-index:
@@ -35,3 +38,30 @@ services:
       - "7001:7001"
     volumes:
       - qlever-index:/index:ro
+
+  qlever-index-text:
+    image: adfreiburg/qlever
+    entrypoint: ["/bin/bash", "-c"]
+    command:
+      - |
+        sudo chown qlever:qlever /index &&
+        cat /input/schema/ontology.ttl \
+            /input/text/text_entities.ttl \
+            $(ls /input/rdf/*.ttl | grep -v '\.rml\.ttl$$') \
+          | qlever-index -F ttl -f - -i /index/kg --parse-parallel false \
+              -w /input/text/wordsfile.tsv \
+              -d /input/text/docsfile.tsv
+    volumes:
+      - ./data/rdf:/input/rdf:ro
+      - ./schema:/input/schema:ro
+      - ./pubs/qlever_text:/input/text:ro
+      - qlever-index-text:/index
+
+  qlever-server-text:
+    image: adfreiburg/qlever
+    entrypoint: ["qlever-server"]
+    command: ["-i", "/index/kg", "-p", "7001", "-t"]
+    ports:
+      - "7001:7001"
+    volumes:
+      - qlever-index-text:/index:ro

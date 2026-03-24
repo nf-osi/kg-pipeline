@@ -1,0 +1,66 @@
+name: Deploy PR Preview for Doc
+
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - closed
+    paths:
+      - 'evaluation/runs.json'
+      - 'evaluation/pubs_runs.json'
+      - 'scripts/build_site.py'
+      - 'scripts/extract_runs.py'
+
+concurrency: preview-${{ github.ref }}
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  deploy-preview:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        if: github.event.action != 'closed'
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        if: github.event.action != 'closed'
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyyaml
+
+      - name: Build site
+        if: github.event.action != 'closed'
+        run: |
+          python scripts/build_site.py evaluation/runs.json --out _site
+          python scripts/build_site.py evaluation/pubs_runs.json --pubs --out _site
+          touch _site/.nojekyll
+
+      - name: Copy docs for preview
+        if: github.event.action != 'closed'
+        run: |
+          if [ -d "docs" ]; then
+            cp -r docs _site/docs
+          fi
+          if [ -f "README.md" ]; then
+            cp README.md _site/
+          fi
+          if [ -f "EVALUATION.md" ]; then
+            cp EVALUATION.md _site/
+          fi
+
+      - name: Deploy preview
+        uses: rossjrw/pr-preview-action@v1
+        with:
+          source-dir: _site
+          preview-branch: gh-pages
+          umbrella-dir: pr-preview

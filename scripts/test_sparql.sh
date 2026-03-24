@@ -1,35 +1,13 @@
 #!/usr/bin/env bash
-# Test queries against the QLever SPARQL endpoint.
-# Usage: ./scripts/test_sparql.sh [endpoint]
+# Test graph queries against the QLever endpoint.
+# Starts qlever-server, runs queries, then stops the service.
+#
+# Usage:
+#   ./scripts/test_sparql.sh          # manage server lifecycle automatically
+#   ./scripts/test_sparql.sh <url>    # run against an already-running endpoint
 
-set -euo pipefail
-
-ENDPOINT="${1:-http://localhost:7001}"
-
-query() {
-  local description="$1" sparql="$2" format="${3:-tsv}"
-  echo "--- $description ---"
-  if [ "$format" = "tsv" ]; then
-    response=$(curl -s -w "\n%{http_code}" "$ENDPOINT" \
-      --data-urlencode "query=$sparql" \
-      --data-urlencode "action=tsv_export")
-  else
-    response=$(curl -s -w "\n%{http_code}" "$ENDPOINT" \
-      --data-urlencode "query=$sparql")
-  fi
-  http_code=$(echo "$response" | tail -1)
-  body=$(echo "$response" | sed '$d')
-  if [ "$http_code" -ne 200 ]; then
-    echo "FAIL (HTTP $http_code)"
-    echo "$body" | head -5
-    return 1
-  fi
-  echo "$body"
-  echo
-}
-
-echo "Endpoint: $ENDPOINT"
-echo
+SERVER_SERVICE="qlever-server"
+source "$(dirname "$0")/qlever_test_helpers.sh"
 
 # 1. Health check (JSON -- ASK returns boolean)
 query "Health check" \
@@ -52,3 +30,4 @@ query "Sample NF instances" \
   "SELECT ?s ?type WHERE { ?s a ?type . FILTER(STRSTARTS(STR(?type), 'http://nf-osi.github.com/terms#')) } LIMIT 10"
 
 echo "All queries completed."
+echo "Log: $LOG_FILE"
