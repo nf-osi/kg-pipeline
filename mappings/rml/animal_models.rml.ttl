@@ -15,7 +15,7 @@
 ################################################################################
 
 map:PortalAnimalModelsSource a rml:LogicalSource ;
-    rml:source "data/csv/animal_models.csv" ;
+    rml:source "data/csv/animal_models_harmonized.csv" ;
     rml:referenceFormulation ql:CSV .
 
 ################################################################################
@@ -30,8 +30,11 @@ map:AnimalModelCore a rr:TriplesMap ;
         rr:termType rr:IRI
     ] ;
     rr:predicateObjectMap [ rr:predicate rdf:type ; rr:objectMap [ rr:constant nf:AnimalModel ; rr:termType rr:IRI ] ] ;
+    rr:predicateObjectMap [ rr:predicate rdf:type ; rr:objectMap [ rml:reference "animalModelClass" ; rr:termType rr:IRI ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:animalModelId ; rr:objectMap [ rml:reference "animalModelId" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:donorId ; rr:objectMap [ rr:template "http://nf-osi.github.com/terms#donor/{donorId}" ; rr:termType rr:IRI ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:fromDonor ; rr:objectMap [ rr:template "http://nf-osi.github.com/terms#donor/{donorId}" ; rr:termType rr:IRI ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:species ; rr:objectMap [ rml:reference "species" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:transplantationDonorId ; rr:objectMap [ rr:template "http://nf-osi.github.com/terms#donor/{transplantationDonorId}" ; rr:termType rr:IRI ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:backgroundStrain ; rr:objectMap [ rml:reference "backgroundStrain" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:backgroundSubstrain ; rr:objectMap [ rml:reference "backgroundSubstrain" ; rr:datatype xsd:string ] ] ;

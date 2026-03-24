@@ -1,0 +1,12 @@
+#curie_map:
+#  nf: http://nf-osi.github.com/terms#
+#  skos: http://www.w3.org/2004/02/skos/core#
+#  semapv: https://w3id.org/semapv/vocab/
+#mapping_set_id: https://w3id.org/synapse/nfosi/mapping/animalmodelspecies
+#license: https://creativecommons.org/licenses/by/4.0/
+subject_id	subject_label	predicate_id	object_id	mapping_justification
+	Mus musculus	skos:exactMatch	nf:MouseModel	semapv:ManualMappingCuration
+	Danio rerio	skos:exactMatch	nf:ZebrafishModel	semapv:ManualMappingCuration
+	Drosophila melanogaster	skos:exactMatch	nf:FlyModel	semapv:ManualMappingCuration
+	Sus scrofa	skos:exactMatch	nf:PorcineModel	semapv:ManualMappingCuration
+	Saccharomyces cerevisiae	skos:exactMatch	nf:YeastModel	semapv:ManualMappingCuration

@@ -125,6 +125,25 @@ class TestCellLinesIRIFields:
             assert "test-donor" in str(row.donorId) or len(str(row.donorId).split('/')[-1]) > 10, \
                 f"donorId should be valid IRI: {row.donorId}"
 
+    def test_from_donor_as_iri(self, cell_lines_graph, namespaces):
+        """fromDonor should be an IRI reference"""
+        NF = namespaces["nf"]
+
+        query = """
+        SELECT ?cellLine ?donor
+        WHERE {
+            ?cellLine a nf:CellLine ;
+                      nf:fromDonor ?donor .
+        }
+        """
+        results = list(cell_lines_graph.query(query, initNs={"nf": NF}))
+
+        assert len(results) > 0, "No fromDonor found"
+
+        for row in results:
+            assert isinstance(row.donor, URIRef), \
+                f"fromDonor should be IRI, got {type(row.donor)}"
+
 
 class TestCellLinesMultiValue:
     """Test multi-value field handling (pipe-delimited lists)"""
@@ -170,6 +189,24 @@ class TestCellLinesMultiValue:
 
 class TestCellLinesSpecificFields:
     """Test cell line specific fields"""
+
+    def test_race_field_present(self, cell_lines_graph, namespaces):
+        """Race field should be present when provided in the CSV"""
+        NF = namespaces["nf"]
+
+        query = """
+        SELECT ?race
+        WHERE {
+            ?cellLine a nf:CellLine ;
+                      nf:race ?race .
+            FILTER(CONTAINS(STR(?cellLine), "test-cell-001"))
+        }
+        """
+        results = list(cell_lines_graph.query(query, initNs={"nf": NF}))
+
+        assert len(results) == 1, "Expected exactly one race value for test-cell-001"
+        assert str(results[0].race) == "Black", \
+            f"Expected 'Black', got {results[0].race}"
 
     def test_resistance_field_present(self, cell_lines_graph, namespaces):
         """Resistance field should be present for relevant cell lines"""

@@ -11,6 +11,7 @@ class TableConfig:
 
     name: str
     synapse_id: str
+    raw_filename: str
     csv_path: Path
     rml_path: Path
     rdf_path: Path
@@ -36,6 +37,7 @@ for table_name, table_data in TABLES.items():
     config = TableConfig(
         name=table_name,
         synapse_id=table_data["synapse_id"],
+        raw_filename=table_data["raw_filename"],
         csv_path=table_data["csv_path"],
         rml_path=Path(f"mappings/rml/{table_name}.rml.ttl"),
         rdf_path=Path(f"data/rdf/{table_name}.ttl"),
@@ -83,6 +85,15 @@ TABLE_CONFIGS["cell_lines"].harmonize_args = [
     "--input", "data/csv/cell_lines.csv",
     "--output", "data/csv/cell_lines_harmonized.csv",
     "--lookup", "mappings/sssom/cell_line_category_lookup.sssom.tsv",
+]
+
+# Configure harmonization for animal models (species to subclass IRIs)
+TABLE_CONFIGS["animal_models"].harmonize_script = "scripts/classify_animal_models.py"
+TABLE_CONFIGS["animal_models"].harmonize_output = Path("data/csv/animal_models_harmonized.csv")
+TABLE_CONFIGS["animal_models"].harmonize_args = [
+    "--input", "data/csv/animal_models.csv",
+    "--output", "data/csv/animal_models_harmonized.csv",
+    "--lookup", "mappings/sssom/animal_model_species_lookup.sssom.tsv",
 ]
 
 # Configure harmonization for genetic reagents (vectorType to subclass IRIs)

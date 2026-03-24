@@ -17,71 +17,171 @@ profiles:
       studies:
         synapse_id: syn52694652
         concrete_type: MaterializedView
-        note: Study metadata (name, summary, initiative, leads, institutions, disease focus, funding, status)
+        note: Study metadata (name, summary, initiative, leads, institutions, disease
+          focus, funding, status)
+        source_version: null
+        source_version_label: null
+        source_version_comment: Pinned source table/view versions before base KG image
+          v1.1 build
+        source_version_date: null
+        source_version_note: MaterializedView is not versionable
       files:
         synapse_id: syn16858331
         concrete_type: EntityView
-        note: File-level annotations (assay, platform, data type, diagnosis, species, tissue, etc.)
+        note: File-level annotations (assay, platform, data type, diagnosis, species,
+          tissue, etc.)
+        source_version: 241
+        source_version_label: null
+        source_version_comment: Pinned source table/view versions before base KG image
+          v1.1 build
+        source_version_date: 2026-03-19 23:03:24 UTC
       mutations:
         synapse_id: syn26486835
         concrete_type: TableEntity
-        note: Mutation details (affected gene, allele type, mutation method, sequence/protein variation)
+        note: Mutation details (affected gene, allele type, mutation method, sequence/protein
+          variation)
+        source_version: 4
+        source_version_label: null
+        source_version_comment: Pinned source table/view versions before base KG image
+          v1.1 build
+        source_version_date: 2026-03-19 23:03:24 UTC
       genetic_reagents:
         synapse_id: syn26486832
         concrete_type: TableEntity
-        note: Genetic reagent details (vector type, insert, cloning method, primers, tags)
+        note: Genetic reagent details (vector type, insert, cloning method, primers,
+          tags)
+        source_version: 4
+        source_version_label: null
+        source_version_comment: Pinned source table/view versions before base KG image
+          v1.1 build
+        source_version_date: 2026-03-19 23:03:24 UTC
       animal_models:
         synapse_id: syn26486808
         concrete_type: TableEntity
-        note: Animal model details (strain, nomenclature, manifestation, genetic disorder, transplantation)
+        note: Animal model details (strain, nomenclature, manifestation, genetic disorder,
+          transplantation)
+        source_version: 8
+        source_version_label: null
+        source_version_comment: Pinned source table/view versions before base KG image
+          v1.1 build
+        source_version_date: 2026-03-19 23:03:24 UTC
       cell_lines:
         synapse_id: syn26486823
         concrete_type: TableEntity
-        note: Cell line details (origin, organ, tissue, manifestation, resistance, genetic disorder)
+        note: Cell line details (origin, organ, tissue, manifestation, resistance,
+          genetic disorder)
+        source_version: 8
+        source_version_label: null
+        source_version_comment: Pinned source table/view versions before base KG image
+          v1.1 build
+        source_version_date: 2026-03-19 23:03:24 UTC
       donors:
         synapse_id: syn26486829
         concrete_type: TableEntity
-        note: Donor demographics (species, race, sex, age, parent/transplantation donor links)
+        note: Donor demographics (species, race, sex, age, parent/transplantation
+          donor links)
+        source_version: 4
+        source_version_label: null
+        source_version_comment: Pinned source table/view versions before base KG image
+          v1.1 build
+        source_version_date: 2026-03-19 23:03:24 UTC
       antibodies:
         synapse_id: syn26486811
         concrete_type: TableEntity
-        note: Antibody details (UniProt ID, clone, reactive species, host organism, target antigen)
+        note: Antibody details (UniProt ID, clone, reactive species, host organism,
+          target antigen)
+        source_version: 4
+        source_version_label: null
+        source_version_comment: Pinned source table/view versions before base KG image
+          v1.1 build
+        source_version_date: 2026-03-19 23:03:24 UTC
       resources:
         synapse_id: syn26450069
         concrete_type: TableEntity
-        note: Central resource registry linking to reagents, antibodies, cell lines, animal models, and biobanks
+        note: Central resource registry linking to reagents, antibodies, cell lines,
+          animal models, and biobanks
+        source_version: 9
+        source_version_label: null
+        source_version_comment: Pinned source table/view versions before base KG image
+          v1.1 build
+        source_version_date: 2026-03-19 23:03:24 UTC
       observations:
         synapse_id: syn26486836
         concrete_type: TableEntity
         note: Curator/community observations about resources with ratings and links
+        source_version: 7
+        source_version_label: null
+        source_version_comment: Pinned source table/view versions before base KG image
+          v1.1 build
+        source_version_date: 2026-03-19 23:03:24 UTC
       development:
         synapse_id: syn26486807
         concrete_type: TableEntity
-        note: Junction table linking development records to resources, investigators, publications, and funders
+        note: Junction table linking development records to resources, investigators,
+          publications, and funders
+        source_version: 4
+        source_version_label: null
+        source_version_comment: Pinned source table/view versions before base KG image
+          v1.1 build
+        source_version_date: 2026-03-19 23:03:24 UTC
       funders:
         synapse_id: syn26486830
         concrete_type: TableEntity
         note: Funder details (name); linked from development table via funderId
+        source_version: 4
+        source_version_label: null
+        source_version_comment: Pinned source table/view versions before base KG image
+          v1.1 build
+        source_version_date: 2026-03-19 23:03:24 UTC
       investigators:
         synapse_id: syn26486833
         concrete_type: TableEntity
-        note: Investigator details (name, institution, ORCID, Synapse ID); linked from development table via investigatorId
+        note: Investigator details (name, institution, ORCID, Synapse ID); linked
+          from development table via investigatorId
+        source_version: 4
+        source_version_label: null
+        source_version_comment: Pinned source table/view versions before base KG image
+          v1.1 build
+        source_version_date: 2026-03-19 23:03:24 UTC
       publications:
         synapse_id: syn26486839
         concrete_type: TableEntity
-        note: Publication details (title, DOI, PMID, abstract, journal, authors, date); linked from development table via publicationId
+        note: Publication details (title, DOI, PMID, abstract, journal, authors, date);
+          linked from development table via publicationId
+        source_version: 4
+        source_version_label: null
+        source_version_comment: Pinned source table/view versions before base KG image
+          v1.1 build
+        source_version_date: 2026-03-19 23:03:24 UTC
       donor_tool:
         synapse_id: syn51735419
         concrete_type: MaterializedView
         note: Materialized view linking donors to resources
+        source_version: null
+        source_version_label: null
+        source_version_comment: Pinned source table/view versions before base KG image
+          v1.1 build
+        source_version_date: null
+        source_version_note: MaterializedView is not versionable
       mutation_model:
         synapse_id: syn26486834
         concrete_type: TableEntity
         note: Junction table linking mutations to animal models and cell lines
+        source_version: 9
+        source_version_label: null
+        source_version_comment: Pinned source table/view versions before base KG image
+          v1.1 build
+        source_version_date: 2026-03-19 23:03:24 UTC
       biobanks:
         synapse_id: syn26486821
         concrete_type: TableEntity
-        note: Biobank details (disease type, specimen type/format/tissue, tumor type, contact)
+        note: Biobank details (disease type, specimen type/format/tissue, tumor type,
+          contact)
+        source_version: 4
+        source_version_label: null
+        source_version_comment: Pinned source table/view versions before base KG image
+          v1.1 build
+        source_version_date: 2026-03-19 23:03:24 UTC
   evaluation:
     version: KG v0.1-eval
     date: '2025-02-10'
@@ -100,51 +200,138 @@ profiles:
       studies:
         synapse_id: syn52694652
         concrete_type: MaterializedView
+        source_version: null
+        source_version_label: null
+        source_version_comment: Pinned source table/view versions before base KG image
+          v1.1 build
+        source_version_date: null
+        source_version_note: MaterializedView is not versionable
       files:
         synapse_id: syn16858331
         concrete_type: EntityView
+        source_version: 241
+        source_version_label: null
+        source_version_comment: Pinned source table/view versions before base KG image
+          v1.1 build
+        source_version_date: 2026-03-19 23:03:24 UTC
       mutations:
         synapse_id: syn26486835
         concrete_type: TableEntity
+        source_version: 4
+        source_version_label: null
+        source_version_comment: Pinned source table/view versions before base KG image
+          v1.1 build
+        source_version_date: 2026-03-19 23:03:24 UTC
       genetic_reagents:
         synapse_id: syn26486832
         concrete_type: TableEntity
+        source_version: 4
+        source_version_label: null
+        source_version_comment: Pinned source table/view versions before base KG image
+          v1.1 build
+        source_version_date: 2026-03-19 23:03:24 UTC
       animal_models:
         synapse_id: syn26486808
         concrete_type: TableEntity
+        source_version: 8
+        source_version_label: null
+        source_version_comment: Pinned source table/view versions before base KG image
+          v1.1 build
+        source_version_date: 2026-03-19 23:03:24 UTC
       cell_lines:
         synapse_id: syn26486823
         concrete_type: TableEntity
+        source_version: 8
+        source_version_label: null
+        source_version_comment: Pinned source table/view versions before base KG image
+          v1.1 build
+        source_version_date: 2026-03-19 23:03:24 UTC
       donors:
         synapse_id: syn26486829
         concrete_type: TableEntity
+        source_version: 4
+        source_version_label: null
+        source_version_comment: Pinned source table/view versions before base KG image
+          v1.1 build
+        source_version_date: 2026-03-19 23:03:24 UTC
       antibodies:
         synapse_id: syn26486811
         concrete_type: TableEntity
+        source_version: 4
+        source_version_label: null
+        source_version_comment: Pinned source table/view versions before base KG image
+          v1.1 build
+        source_version_date: 2026-03-19 23:03:24 UTC
       resources:
         synapse_id: syn26450069
         concrete_type: TableEntity
+        source_version: 9
+        source_version_label: null
+        source_version_comment: Pinned source table/view versions before base KG image
+          v1.1 build
+        source_version_date: 2026-03-19 23:03:24 UTC
       observations:
         synapse_id: syn26486836
         concrete_type: TableEntity
+        source_version: 7
+        source_version_label: null
+        source_version_comment: Pinned source table/view versions before base KG image
+          v1.1 build
+        source_version_date: 2026-03-19 23:03:24 UTC
       development:
         synapse_id: syn26486807
         concrete_type: TableEntity
+        source_version: 4
+        source_version_label: null
+        source_version_comment: Pinned source table/view versions before base KG image
+          v1.1 build
+        source_version_date: 2026-03-19 23:03:24 UTC
       funders:
         synapse_id: syn26486830
         concrete_type: TableEntity
+        source_version: 4
+        source_version_label: null
+        source_version_comment: Pinned source table/view versions before base KG image
+          v1.1 build
+        source_version_date: 2026-03-19 23:03:24 UTC
       investigators:
         synapse_id: syn26486833
         concrete_type: TableEntity
+        source_version: 4
+        source_version_label: null
+        source_version_comment: Pinned source table/view versions before base KG image
+          v1.1 build
+        source_version_date: 2026-03-19 23:03:24 UTC
       publications:
         synapse_id: syn26486839
         concrete_type: TableEntity
+        source_version: 4
+        source_version_label: null
+        source_version_comment: Pinned source table/view versions before base KG image
+          v1.1 build
+        source_version_date: 2026-03-19 23:03:24 UTC
       donor_tool:
         synapse_id: syn51735419
         concrete_type: MaterializedView
+        source_version: null
+        source_version_label: null
+        source_version_comment: Pinned source table/view versions before base KG image
+          v1.1 build
+        source_version_date: null
+        source_version_note: MaterializedView is not versionable
       mutation_model:
         synapse_id: syn26486834
         concrete_type: TableEntity
+        source_version: 9
+        source_version_label: null
+        source_version_comment: Pinned source table/view versions before base KG image
+          v1.1 build
+        source_version_date: 2026-03-19 23:03:24 UTC
       biobanks:
         synapse_id: syn26486821
         concrete_type: TableEntity
+        source_version: 4
+        source_version_label: null
+        source_version_comment: Pinned source table/view versions before base KG image
+          v1.1 build
+        source_version_date: 2026-03-19 23:03:24 UTC

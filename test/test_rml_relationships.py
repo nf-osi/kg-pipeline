@@ -193,11 +193,8 @@ class TestDonorToolRelationship:
 
     def test_bidirectional_property(self, donor_tool_graph, namespaces):
         """fromDonor has inverse property hasDerivedResource (defined in ontology)"""
-        # This test verifies the relationship exists
-        # The inverse is defined in ontology, not in RML
         NF = namespaces["nf"]
 
-        # Just verify fromDonor exists
         query = """
         SELECT ?resource ?donor
         WHERE {

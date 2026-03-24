@@ -25,11 +25,18 @@ from .config import TABLE_CONFIGS, TableConfig
 def create_csv_asset(table_name: str, config: TableConfig):
     """Create a Dagster asset for downloading a CSV table from Synapse."""
 
+    deps = []
+    if table_name == "animal_models":
+        deps.append(["portal", "csv", "donors"])
+    if table_name == "cell_lines":
+        deps.append(["portal", "csv", "donors"])
+
     @asset(
         name=table_name,
         key_prefix=["portal", "csv"],
         compute_kind="synapse",
         group_name=table_name,
+        deps=deps,
         metadata={
             "synapse_id": config.synapse_id,
             "table": table_name,
@@ -37,12 +44,39 @@ def create_csv_asset(table_name: str, config: TableConfig):
     )
     def _csv_asset(context: AssetExecutionContext, synapse: SynapseResource) -> pd.DataFrame:
         """Download and process table from Synapse."""
-        context.log.info(f"Fetching {table_name} from Synapse ({config.synapse_id})")
+        from scripts.prepare_portal_tables import (
+            normalize_fetched_df,
+            resolve_source_synapse_ids,
+            write_raw,
+        )
 
-        # Use the existing prepare_portal_tables.py logic
-        df = synapse.fetch_table(config.synapse_id, config.columns, config.select_clause)
+        project_root = Path(__file__).parent.parent.parent
+        raw_dir = project_root / "data" / "raw"
+        raw_path = raw_dir / config.raw_filename
 
-        # Write processed CSV
+        if raw_path.exists():
+            context.log.info(f"Using cached raw table for {table_name} from {raw_path}")
+            df = pd.read_csv(raw_path, keep_default_na=False, dtype=str)
+        else:
+            source_ids = resolve_source_synapse_ids(project_root / "data_sources.yaml", "release")
+            fetch_id = source_ids.get(table_name, config.synapse_id)
+            context.log.info(f"Fetching {table_name} from Synapse ({fetch_id})")
+
+            df = synapse.fetch_table(fetch_id, config.columns, config.select_clause)
+            write_raw(raw_dir, config.raw_filename, df)
+            context.log.info(f"Wrote raw cache {raw_path}")
+
+        processed_tables = {}
+        if table_name in {"animal_models", "cell_lines"}:
+            donors_csv = project_root / "data" / "csv" / "donors.csv"
+            if not donors_csv.exists():
+                raise RuntimeError(f"{table_name} requires data/csv/donors.csv before processing")
+            processed_tables["donors"] = pd.read_csv(donors_csv, keep_default_na=False, dtype=str)
+
+        df, n_dupes = normalize_fetched_df(table_name, df, processed_tables)
+        if n_dupes:
+            context.log.info(f"Dropped {n_dupes} duplicate rows for {table_name}")
+
         csv_path = config.csv_path
         csv_path.parent.mkdir(parents=True, exist_ok=True)
         synapse.write_processed_csv(csv_path, config.columns, df)
@@ -52,6 +86,7 @@ def create_csv_asset(table_name: str, config: TableConfig):
             "num_rows": len(df),
             "num_columns": len(df.columns),
             "path": str(csv_path),
+            "raw_cache_path": str(raw_path.relative_to(project_root)),
         })
 
         return df
@@ -248,6 +283,65 @@ def create_rdf_asset(table_name: str, config: TableConfig):
     return _rdf_asset
 
 
+@asset(
+    name="shared_donor_links",
+    key_prefix=["portal", "rdf"],
+    compute_kind="python",
+    group_name="relationships",
+    deps=[["portal", "rdf", "cell_lines"], ["portal", "rdf", "animal_models"]],
+)
+def shared_donor_links_asset(context: AssetExecutionContext) -> Path:
+    """Generate derived sharedDonor links after core RDF is available."""
+    from scripts.materialize_shared_donor_links import materialize_shared_donor_links
+
+    project_root = Path(__file__).parent.parent.parent
+    output_file = project_root / "data" / "rdf" / "shared_donor_links.ttl"
+
+    materialize_shared_donor_links(
+        cell_lines_ttl=project_root / "data" / "rdf" / "cell_lines.ttl",
+        animal_models_ttl=project_root / "data" / "rdf" / "animal_models.ttl",
+        output_ttl=output_file,
+    )
+
+    size_mb = output_file.stat().st_size / (1024 * 1024)
+    context.add_output_metadata({
+        "path": str(output_file.relative_to(project_root)),
+        "size_mb": round(size_mb, 4),
+    })
+
+    return output_file
+
+
+@asset(
+    name="nf1_mutation_sets",
+    key_prefix=["portal", "rdf"],
+    compute_kind="python",
+    group_name="relationships",
+    deps=[["portal", "rdf", "cell_lines"], ["portal", "rdf", "mutations"], ["portal", "rdf", "mutation_model"]],
+)
+def nf1_mutation_sets_asset(context: AssetExecutionContext) -> Path:
+    """Generate derived NF1 mutation set nodes after core RDF is available."""
+    from scripts.materialize_nf1_mutation_sets import materialize_nf1_mutation_sets
+
+    project_root = Path(__file__).parent.parent.parent
+    output_file = project_root / "data" / "rdf" / "nf1_mutation_sets.ttl"
+
+    materialize_nf1_mutation_sets(
+        cell_lines_ttl=project_root / "data" / "rdf" / "cell_lines.ttl",
+        mutations_ttl=project_root / "data" / "rdf" / "mutations.ttl",
+        output_ttl=output_file,
+        mutation_model_ttl=project_root / "data" / "rdf" / "mutation_model.ttl",
+    )
+
+    size_mb = output_file.stat().st_size / (1024 * 1024)
+    context.add_output_metadata({
+        "path": str(output_file.relative_to(project_root)),
+        "size_mb": round(size_mb, 4),
+    })
+
+    return output_file
+
+
 # =============================================================================
 # Generate all assets
 # =============================================================================
@@ -277,6 +371,8 @@ def generate_portal_assets() -> List:
     # Add FK validation asset (depends on all CSV assets)
     validation_asset = create_validation_asset(csv_asset_keys)
     assets.append(validation_asset)
+    assets.append(shared_donor_links_asset)
+    assets.append(nf1_mutation_sets_asset)
 
     return assets
 
