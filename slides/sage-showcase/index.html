@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>NF Knowledge Graph</title>
+<style>
+/* ── Reset & base ──────────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#172430;color:#e2e8f0}
+
+/* ── Slide container ───────────────────────────────────────── */
+.deck{position:relative;width:100%;height:100%}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:3rem 5rem;opacity:0;pointer-events:none;transition:opacity .45s ease,transform .45s ease;transform:translateX(40px)}
+.slide.active{opacity:1;pointer-events:auto;transform:translateX(0)}
+.slide.exit{opacity:0;transform:translateX(-40px)}
+
+/* ── Typography ────────────────────────────────────────────── */
+h1{font-size:2.8rem;font-weight:700;line-height:1.15;color:#f8fafc;margin-bottom:.6rem}
+h2{font-size:2rem;font-weight:700;color:#f8fafc;margin-bottom:1.2rem;letter-spacing:-.02em}
+h3{font-size:1.25rem;font-weight:600;color:#94a3b8;margin-bottom:1rem}
+p,.body{font-size:1.05rem;line-height:1.65;color:#cbd5e1;max-width:56rem}
+.subtitle{font-size:1.3rem;color:#94a3b8;margin-bottom:1.8rem;font-weight:400}
+.date{font-size:1rem;color:#64748b;margin-top:.5rem}
+.tag{display:inline-block;font-size:.75rem;font-weight:600;padding:.2rem .7rem;border-radius:9999px;text-transform:uppercase;letter-spacing:.06em}
+.tag.done{background:#065f46;color:#6ee7b7}
+.tag.active{background:#1e3a5f;color:#7dd3fc}
+.tag.planned{background:rgba(247,198,221,0.15);color:#F7C6DD}
+.tag.hero{background:#312e81;color:#a5b4fc;font-size:.85rem;padding:.3rem .9rem}
+.tag.pub{background:#2e1065;color:#c4b5fd}
+.accent{color:#38bdf8}
+.green{color:#4ade80}
+.amber{color:#fbbf24}
+.dim{color:#64748b}
+
+/* ── Layout helpers ────────────────────────────────────────── */
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:2.5rem;width:100%;max-width:60rem}
+.cols-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem;width:100%;max-width:64rem}
+.full{width:100%;max-width:64rem}
+.center{text-align:center}
+ul{list-style:none;padding:0}
+ul li{padding:.35rem 0;padding-left:1.4rem;position:relative;font-size:1.05rem;color:#cbd5e1}
+ul li::before{content:'';position:absolute;left:0;top:.7rem;width:6px;height:6px;border-radius:50%;background:#38bdf8}
+ul.checks li::before{content:'✓';background:none;color:#4ade80;font-size:.9rem;top:.35rem;left:0;width:auto;height:auto;border-radius:0}
+
+/* ── Cards ─────────────────────────────────────────────────── */
+.card{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:1.5rem;transition:border-color .2s}
+.card:hover{border-color:#475569}
+.card h3{color:#f1f5f9;margin-bottom:.5rem}
+.card p,.card li{font-size:.95rem;color:#94a3b8}
+
+/* ── Chart containers ──────────────────────────────────────── */
+.chart-wrap{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:1.5rem;width:100%}
+.chart-title{font-size:1rem;font-weight:600;color:#e2e8f0;margin-bottom:1rem;text-align:center}
+.bar-chart{display:flex;align-items:flex-end;gap:1.2rem;height:220px;padding:0 1rem;justify-content:center}
+.bar-group{display:flex;flex-direction:column;align-items:center;gap:.4rem;flex:1;max-width:10rem}
+.bar{width:100%;border-radius:6px 6px 0 0;position:relative;transition:height .6s ease;min-height:2px}
+.bar .val{position:absolute;top:-1.5rem;left:50%;transform:translateX(-50%);font-size:.85rem;font-weight:700;white-space:nowrap}
+.bar-label{font-size:.78rem;color:#94a3b8;text-align:center;line-height:1.2;margin-top:.15rem}
+
+/* ── Metric row ────────────────────────────────────────────── */
+.metrics{display:flex;gap:1.5rem;justify-content:center;flex-wrap:wrap}
+.metric{text-align:center;background:#1e293b;border:1px solid #334155;border-radius:12px;padding:1.2rem 1.8rem;min-width:7rem}
+.metric .num{font-size:2rem;font-weight:800;line-height:1}
+.metric .lbl{font-size:.8rem;color:#94a3b8;margin-top:.3rem}
+
+/* ── Progress bar (bottom) ─────────────────────────────────── */
+#progress{position:fixed;bottom:0;left:0;height:3px;background:linear-gradient(90deg,#38bdf8,#F7C6DD);transition:width .35s ease;z-index:100}
+#slide-num{position:fixed;bottom:.8rem;right:1.2rem;font-size:.8rem;color:#475569;z-index:100;font-variant-numeric:tabular-nums}
+
+/* ── Pipeline diagram ──────────────────────────────────────── */
+.pipeline{display:flex;align-items:center;gap:0;flex-wrap:wrap}
+.pipe-step{background:#1e293b;border:1px solid #334155;border-radius:10px;padding:.7rem 1.1rem;text-align:center}
+.pipe-step .label{font-weight:700;color:#f1f5f9;font-size:.95rem;margin-bottom:.2rem}
+.pipe-step .desc{font-size:.75rem;color:#94a3b8;line-height:1.3}
+.pipe-arrow{font-size:1.3rem;color:#475569;padding:0 .3rem;flex-shrink:0}
+
+/* ── Nav arrows ────────────────────────────────────────────── */
+.nav{position:fixed;top:50%;transform:translateY(-50%);background:rgba(30,41,59,.7);border:1px solid #334155;color:#94a3b8;font-size:1.4rem;width:2.6rem;height:2.6rem;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:100;transition:background .2s,color .2s}
+.nav:hover{background:#334155;color:#e2e8f0}
+#prev{left:.8rem}
+#next{right:.8rem}
+</style>
+</head>
+<body>
+
+<div class="deck" id="deck">
+
+<!-- ════════════════════ SLIDE 1: Title ════════════════════ -->
+<div class="slide active" data-slide="0">
+  <div class="center">
+    <h1>NF Knowledge Graph</h1>
+    <p class="subtitle">SciData Showcase</p>
+    <p class="date">March 25, 2026</p>
+  </div>
+</div>
+
+<!-- ════════════════════ SLIDE 2: Context ════════════════════ -->
+<div class="slide" data-slide="1">
+  <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.2rem">
+    <h2 style="margin:0">Context</h2>
+  </div>
+  <div style="width:100%;max-width:64rem">
+    <img src="../images/deliverable.png" alt="Jira deliverable" style="width:100%;border-radius:10px;border:1px solid #334155;display:block;margin-bottom:1.2rem">
+    <ul>
+      <li><strong style="color:#f1f5f9">Gilbert Family Foundation</strong> is interested in a <span class="accent">portal copilot</span> for a more engaging and helpful user experience with the NF research tools database</li>
+      <li>Phase 1 delivers the core KG infrastructure; <strong style="color:#f1f5f9">Phase 2</strong> extends it with publications and full-text search</li>
+      <li>Open to being pitched other integrations and developments later</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ════════════════════ SLIDE: AI Chatbot Architecture ════════════════════ -->
+<div class="slide" data-slide="2">
+  <h2 style="margin-bottom:1.4rem">Portal Copilot &mdash; How RAG System Works</h2>
+  <svg viewBox="0 0 800 230" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:62rem;height:auto">
+    <defs>
+      <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+        <path d="M0,0 L0,6 L8,3 z" fill="#475569"/>
+      </marker>
+      <marker id="arr-blue" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+        <path d="M0,0 L0,6 L8,3 z" fill="#38bdf8"/>
+      </marker>
+      <marker id="arr-green" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+        <path d="M0,0 L0,6 L8,3 z" fill="#469285"/>
+      </marker>
+    </defs>
+
+    <!-- ── User icon + box ── -->
+    <!-- person: head -->
+    <circle cx="75" cy="38" r="13" fill="none" stroke="#64748b" stroke-width="1.5"/>
+    <!-- person: shoulders -->
+    <path d="M48,68 Q48,52 75,52 Q102,52 102,68" fill="none" stroke="#64748b" stroke-width="1.5"/>
+    <!-- box -->
+    <rect x="10" y="100" width="130" height="70" rx="10" fill="#1e293b" stroke="#475569" stroke-width="1.5"/>
+    <text x="75" y="133" text-anchor="middle" fill="#94a3b8" font-family="'Segoe UI',system-ui,sans-serif" font-size="13" font-weight="600">Researcher</text>
+    <text x="75" y="152" text-anchor="middle" fill="#64748b" font-family="'Segoe UI',system-ui,sans-serif" font-size="11">natural language</text>
+
+    <!-- ── AI Agent icon: robot ── -->
+    <!-- antenna -->
+    <line x1="290" y1="14" x2="290" y2="21" stroke="#F7C6DD" stroke-width="1.5"/>
+    <circle cx="290" cy="12" r="3" fill="none" stroke="#F7C6DD" stroke-width="1.5"/>
+    <!-- head -->
+    <rect x="272" y="21" width="36" height="30" rx="5" fill="none" stroke="#F7C6DD" stroke-width="1.5"/>
+    <!-- eyes -->
+    <circle cx="282" cy="32" r="4" fill="#312e81" stroke="#F7C6DD" stroke-width="1.5"/>
+    <circle cx="298" cy="32" r="4" fill="#312e81" stroke="#F7C6DD" stroke-width="1.5"/>
+    <!-- eye shine -->
+    <circle cx="284" cy="30" r="1" fill="#F7C6DD"/>
+    <circle cx="300" cy="30" r="1" fill="#F7C6DD"/>
+    <!-- mouth -->
+    <line x1="281" y1="43" x2="285" y2="43" stroke="#F7C6DD" stroke-width="1.5"/>
+    <line x1="288" y1="43" x2="292" y2="43" stroke="#F7C6DD" stroke-width="1.5"/>
+    <line x1="295" y1="43" x2="299" y2="43" stroke="#F7C6DD" stroke-width="1.5"/>
+    <!-- ears -->
+    <rect x="268" y="28" width="4" height="8" rx="2" fill="none" stroke="#F7C6DD" stroke-width="1.5"/>
+    <rect x="308" y="28" width="4" height="8" rx="2" fill="none" stroke="#F7C6DD" stroke-width="1.5"/>
+    <!-- box -->
+    <rect x="220" y="100" width="140" height="70" rx="10" fill="#1e293b" stroke="#F7C6DD" stroke-width="1.5"/>
+    <text x="290" y="133" text-anchor="middle" fill="#F7C6DD" font-family="'Segoe UI',system-ui,sans-serif" font-size="13" font-weight="700">AI Agent</text>
+    <text x="290" y="152" text-anchor="middle" fill="#F7C6DD" font-family="'Segoe UI',system-ui,sans-serif" font-size="11">LLM + tool calling</text>
+
+    <!-- ── DB icon + box ── -->
+    <!-- cylinder: top ellipse -->
+    <ellipse cx="640" cy="22" rx="28" ry="8" fill="none" stroke="#469285" stroke-width="1.5"/>
+    <!-- cylinder: sides -->
+    <line x1="612" y1="22" x2="612" y2="46" stroke="#469285" stroke-width="1.5"/>
+    <line x1="668" y1="22" x2="668" y2="46" stroke="#469285" stroke-width="1.5"/>
+    <!-- cylinder: bottom ellipse -->
+    <ellipse cx="640" cy="46" rx="28" ry="8" fill="none" stroke="#469285" stroke-width="1.5"/>
+    <!-- cylinder: middle line (second tier) -->
+    <path d="M612,34 Q640,42 668,34" fill="none" stroke="#469285" stroke-width="1" opacity="0.5"/>
+    <!-- box -->
+    <rect x="520" y="100" width="260" height="110" rx="10" fill="#0f2a1a" stroke="#469285" stroke-width="1.5"/>
+    <text x="650" y="130" text-anchor="middle" fill="#4ade80" font-family="'Segoe UI',system-ui,sans-serif" font-size="13" font-weight="700">Knowledge Graph</text>
+    <text x="650" y="149" text-anchor="middle" fill="#6ee7b7" font-family="'Segoe UI',system-ui,sans-serif" font-size="11">SPARQL+Text endpoint</text>
+    <line x1="540" y1="158" x2="760" y2="158" stroke="#166534" stroke-width="1"/>
+    <text x="650" y="175" text-anchor="middle" fill="#6ee7b7" font-family="'Segoe UI',system-ui,sans-serif" font-size="10">Portal entities &amp; publications</text>
+    <text x="650" y="191" text-anchor="middle" fill="#6ee7b7" font-family="'Segoe UI',system-ui,sans-serif" font-size="10">Full-text passage index</text>
+    <text x="650" y="203" text-anchor="middle" fill="#64748b" font-family="'Segoe UI',system-ui,sans-serif" font-size="10" font-style="italic">single endpoint</text>
+
+    <!-- ── Arrows: user ↔ agent ── -->
+    <line x1="142" y1="128" x2="218" y2="128" stroke="#38bdf8" stroke-width="1.5" marker-end="url(#arr-blue)"/>
+    <line x1="218" y1="145" x2="142" y2="145" stroke="#475569" stroke-width="1.5" marker-end="url(#arr)"/>
+
+    <!-- ── Arrows: agent ↔ KG ── -->
+    <line x1="362" y1="128" x2="518" y2="128" stroke="#469285" stroke-width="1.5" marker-end="url(#arr-green)"/>
+    <line x1="518" y1="145" x2="362" y2="145" stroke="#475569" stroke-width="1.5" marker-end="url(#arr)"/>
+    <!-- SPARQL label: centred in the gap, above the arrows -->
+    <text x="440" y="113" text-anchor="middle" fill="#469285" font-family="'Segoe UI',system-ui,sans-serif" font-size="9.5">SPARQL / SPARQL+Text</text>
+  </svg>
+</div>
+
+<!-- ════════════════════ SLIDE 2: KG Layers ════════════════════ -->
+<div class="slide" data-slide="1">
+  <h2 style="margin-bottom:.8rem">Knowledge Graph: Data Layers</h2>
+  <div style="width:100%;max-width:60rem">
+    <svg viewBox="0 0 960 500" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto">
+
+      <!-- ── Layer 1: Portal Metadata Tables (bottom / foundation) ── -->
+      <polygon points="280,445 450,415 620,445 450,475" fill="#469285"/>
+      <polygon points="280,445 450,475 450,485 280,455" fill="#065f46"/>
+      <polygon points="620,445 450,475 450,485 620,455" fill="#059669"/>
+      <line x1="620" y1="445" x2="642" y2="445" stroke="#469285" stroke-width="1.5"/>
+      <text x="648" y="439" fill="#469285" font-family="'Segoe UI',system-ui,sans-serif" font-size="12" font-weight="700">1 — Portal Entities &amp; Ontology</text>
+      <text x="648" y="452" fill="#6ee7b7" font-family="'Segoe UI',system-ui,sans-serif" font-size="10">Tools (Animal Models, Cell Lines, …) · Studies</text>
+      <text x="648" y="465" fill="#6ee7b7" font-family="'Segoe UI',system-ui,sans-serif" font-size="10">Files · Datasets · NF Ontology</text>
+
+      <!-- ── Layer 2: Publications ── -->
+      <polygon points="280,355 450,325 620,355 450,385" fill="#38bdf8"/>
+      <polygon points="280,355 450,385 450,395 280,365" fill="#0369a1"/>
+      <polygon points="620,355 450,385 450,395 620,365" fill="#0284c7"/>
+      <line x1="620" y1="355" x2="642" y2="355" stroke="#38bdf8" stroke-width="1.5"/>
+      <text x="648" y="349" fill="#38bdf8" font-family="'Segoe UI',system-ui,sans-serif" font-size="12" font-weight="700">2 — Publications</text>
+      <text x="648" y="364" fill="#93c5fd" font-family="'Segoe UI',system-ui,sans-serif" font-size="10">PMC full-text · Study links · Entity extraction</text>
+
+      <!-- ── Layer 3: External Ontologies & Data Sources ── -->
+      <polygon points="280,265 450,235 620,265 450,295" fill="#818cf8"/>
+      <polygon points="280,265 450,295 450,305 280,275" fill="#3730a3"/>
+      <polygon points="620,265 450,295 450,305 620,275" fill="#6366f1"/>
+      <line x1="620" y1="265" x2="642" y2="265" stroke="#818cf8" stroke-width="1.5"/>
+      <text x="648" y="259" fill="#818cf8" font-family="'Segoe UI',system-ui,sans-serif" font-size="12" font-weight="700">3 — External Ontologies &amp; Data Sources</text>
+      <text x="648" y="274" fill="#818cf8" font-family="'Segoe UI',system-ui,sans-serif" font-size="10">OpenTargets · OBO ontologies</text>
+
+      <!-- ── Layer 4: Actual Data Content (potential) ── -->
+      <polygon points="280,175 450,145 620,175 450,205" fill="#334155"/>
+      <polygon points="280,175 450,205 450,215 280,185" fill="#1e293b"/>
+      <polygon points="620,175 450,205 450,215 620,185" fill="#293548"/>
+      <line x1="620" y1="175" x2="642" y2="175" stroke="#475569" stroke-width="1.5" stroke-dasharray="4,3"/>
+      <text x="648" y="169" fill="#64748b" font-family="'Segoe UI',system-ui,sans-serif" font-size="12" font-weight="700">4 — Actual Data Content</text>
+      <text x="648" y="184" fill="#475569" font-family="'Segoe UI',system-ui,sans-serif" font-size="10" font-style="italic">assay results · omics · imaging</text>
+
+      <!-- ── Layer 5: User Knowledge / Hypotheses (potential, top) ── -->
+      <polygon points="280,85 450,55 620,85 450,115" fill="#1e293b"/>
+      <polygon points="280,85 450,115 450,125 280,95" fill="#0f172a"/>
+      <polygon points="620,85 450,115 450,125 620,95" fill="#172030"/>
+      <line x1="620" y1="85" x2="642" y2="85" stroke="#334155" stroke-width="1.5" stroke-dasharray="4,3"/>
+      <text x="648" y="79" fill="#475569" font-family="'Segoe UI',system-ui,sans-serif" font-size="12" font-weight="700">5 — User Knowledge &amp; Hypotheses</text>
+      <text x="648" y="94" fill="#334155" font-family="'Segoe UI',system-ui,sans-serif" font-size="10" font-style="italic">hypotheses · in-progress findings</text>
+
+    </svg>
+  </div>
+</div>
+
+<!-- ════════════════════ SLIDE: PubTator Example Passage ════════════════════ -->
+<div class="slide" data-slide="2">
+  <h1 style="margin-bottom:1.2rem">Indexed Example: Annotated Passage</h1>
+  <div style="display:flex;gap:1.6rem;align-items:flex-start;max-width:72rem;width:100%">
+
+    <!-- Passage text -->
+    <div style="flex:1.6;background:#1e2d3d;border:1px solid #334155;border-radius:10px;padding:1.2rem 1.4rem;font-size:.83rem;line-height:1.7;color:#cbd5e1">
+      <div style="font-size:.7rem;color:#64748b;margin-bottom:.6rem;text-transform:uppercase;letter-spacing:.06em">PMC7952412 &middot; DISCUSS &middot; Passage 40</div>
+      The nerve-associated tumor from which we derived <mark style="background:rgba(74,222,128,.15);color:#4ade80;padding:.05rem .2rem;border-radius:3px">2XSB</mark> cells was diagnosed as an MPNST after eliminating other diagnostic possibilities and its identification as an MPNST was supported by histologic, immunohistochemical and genomic analyses. The patient from which the tumor was resected had no previous diagnosis of any malignancy, lacked the clinical features characteristic of <mark style="background:rgba(56,189,248,.15);color:#93c5fd;padding:.05rem .2rem;border-radius:3px">NF1</mark> and had no previous history of radiotherapy, leading us to conclude that this tumor was a sporadic MPNST. High-density SNP array and whole exome sequencing analyses showed no evidence of inactivating <mark style="background:rgba(56,189,248,.15);color:#93c5fd;padding:.05rem .2rem;border-radius:3px">NF1</mark> mutations in either <mark style="background:rgba(74,222,128,.15);color:#4ade80;padding:.05rem .2rem;border-radius:3px">2XSB</mark> cells or their parent tumor and we demonstrated that <mark style="background:rgba(74,222,128,.15);color:#4ade80;padding:.05rem .2rem;border-radius:3px">2XSB</mark> cells expressed functional full-length neurofibromin protein, indicating that <mark style="background:rgba(74,222,128,.15);color:#4ade80;padding:.05rem .2rem;border-radius:3px">2XSB</mark> cells are derived from the subset of sporadic MPNSTs that have intact <mark style="background:rgba(56,189,248,.15);color:#93c5fd;padding:.05rem .2rem;border-radius:3px">NF1</mark>. As the pathogenesis of <mark style="background:rgba(56,189,248,.15);color:#93c5fd;padding:.05rem .2rem;border-radius:3px">NF1</mark>-intact sporadic MPNSTs is poorly understood, the <mark style="background:rgba(74,222,128,.15);color:#4ade80;padding:.05rem .2rem;border-radius:3px">2XSB</mark> cell line represents a valuable tool for investigating the mechanisms underlying the pathogenesis of neurofibromin-expressing sporadic MPNSTs. However, the distinct subpopulations of <mark style="background:rgba(56,189,248,.15);color:#93c5fd;padding:.05rem .2rem;border-radius:3px">Sox2</mark>-positive cells and polyploid cells that we identified raise important questions about the biology of sporadic MPNSTs and their response to therapeutic agents. Although we recognize the risks of generalizing findings from one cell line, the genomic abnormalities that we identified in <mark style="background:rgba(74,222,128,.15);color:#4ade80;padding:.05rem .2rem;border-radius:3px">2XSB</mark> cells may also point to some of the signaling pathways that will be important therapeutic targets in neurofibromin-positive sporadic MPNSTs.
+    </div>
+
+    <!-- Entity sidebar -->
+    <div style="flex:.8;display:flex;flex-direction:column;gap:.7rem">
+      <div style="font-size:.72rem;color:#64748b;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.1rem">Linked Entities</div>
+
+      <div style="background:#1e2d3d;border:1px solid #334155;border-radius:8px;padding:.7rem 1rem">
+        <div style="font-size:.65rem;color:#64748b;margin-bottom:.4rem;text-transform:uppercase;letter-spacing:.05em">Cell Line</div>
+        <div style="font-size:.8rem;color:#4ade80">2XSB</div>
+        <div style="font-size:.7rem;color:#475569">CVCL:A7NI</div>
+      </div>
+
+      <div style="background:#1e2d3d;border:1px solid #334155;border-radius:8px;padding:.7rem 1rem">
+        <div style="font-size:.65rem;color:#64748b;margin-bottom:.4rem;text-transform:uppercase;letter-spacing:.05em">Gene</div>
+        <div style="font-size:.8rem;color:#93c5fd">NF1 &middot; SOX2</div>
+        <div style="font-size:.7rem;color:#475569">NCBI:4763 &middot; NCBI:6657</div>
+      </div>
+
+      <div style="background:#1e2d3d;border:1px solid #334155;border-radius:8px;padding:.7rem 1rem">
+        <div style="font-size:.65rem;color:#64748b;margin-bottom:.4rem;text-transform:uppercase;letter-spacing:.05em">Disease</div>
+        <div style="font-size:.8rem;color:#f9a8d4">Neurofibrosarcoma &middot; Neoplasms</div>
+        <div style="font-size:.7rem;color:#475569">MESH:D018319 &middot; MESH:D009369</div>
+      </div>
+
+      <div style="background:#1e2d3d;border:1px solid #334155;border-radius:8px;padding:.7rem 1rem">
+        <div style="font-size:.65rem;color:#64748b;margin-bottom:.4rem;text-transform:uppercase;letter-spacing:.05em">Species</div>
+        <div style="font-size:.8rem;color:#e2e8f0">Human</div>
+        <div style="font-size:.7rem;color:#475569">NCBITaxon:9606</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════ SLIDE 3: Pipeline Architecture ════════════════════ -->
+<div class="slide" data-slide="2">
+  <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.4rem">
+    <h2 style="margin:0">Pipeline Architecture</h2>
+  </div>
+  <div style="width:100%;max-width:64rem;display:flex;flex-direction:column;gap:1.2rem">
+
+    <!-- Layer 1 -->
+    <div style="display:flex;align-items:center;gap:1rem">
+      <div style="flex-shrink:0;width:7rem;text-align:right">
+        <span class="tag done" style="font-size:.7rem">Layer 1</span>
+        <div style="font-size:.72rem;color:#64748b;margin-top:.3rem">Portal Data</div>
+      </div>
+      <div class="pipeline">
+        <div class="pipe-step">
+          <div class="label">Synapse</div>
+          <div class="desc">Portal tables<br>(open data)</div>
+        </div>
+        <div class="pipe-arrow">&rarr;</div>
+        <div class="pipe-step">
+          <div class="label">Extract</div>
+          <div class="desc">Table ingest<br>&amp; normalization</div>
+        </div>
+        <div class="pipe-arrow">&rarr;</div>
+        <div class="pipe-step">
+          <div class="label">Harmonize</div>
+          <div class="desc">SSSOM mappings<br>labels &rarr; IRIs</div>
+        </div>
+        <div class="pipe-arrow">&rarr;</div>
+        <div class="pipe-step">
+          <div class="label">Transform</div>
+          <div class="desc">RML mapping<br>tabular &rarr; RDF</div>
+        </div>
+        <div class="pipe-arrow">&rarr;</div>
+        <div class="pipe-step" style="border-color:#469285">
+          <div class="label" style="color:#469285">KG *</div>
+          <div class="desc">SPARQL endpoint<br>(QLever)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Layer 2 -->
+    <div style="display:flex;align-items:center;gap:1rem">
+      <div style="flex-shrink:0;width:7rem;text-align:right">
+        <span class="tag active" style="font-size:.7rem">Layer 2</span>
+        <div style="font-size:.72rem;color:#64748b;margin-top:.3rem">Publications</div>
+      </div>
+      <div class="pipeline">
+        <div class="pipe-step">
+          <div class="label">Synapse</div>
+          <div class="desc">Pub lists from<br>portal tables</div>
+        </div>
+        <div class="pipe-arrow">&rarr;</div>
+        <div class="pipe-step">
+          <div class="label">PMC / NCBI</div>
+          <div class="desc">Fetch full-text<br>XML &amp; license</div>
+        </div>
+        <div class="pipe-arrow">&rarr;</div>
+        <div class="pipe-step">
+          <div class="label">License Review</div>
+          <div class="desc">Select CC-BY &amp;<br>derivatives-ok</div>
+        </div>
+        <div class="pipe-arrow">&rarr;</div>
+        <div class="pipe-step">
+          <div class="label">Index</div>
+          <div class="desc">Enriched full-text<br>+ PubTator entities</div>
+        </div>
+        <div class="pipe-arrow">&rarr;</div>
+        <div class="pipe-step" style="border-color:#38bdf8">
+          <div class="label" style="color:#38bdf8">KG *</div>
+          <div class="desc">139 papers &middot;<br>SPARQL+Text index</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <p style="margin-top:1rem;font-size:.75rem;color:#475569;max-width:64rem">
+    <strong style="color:#64748b">SSSOM</strong> Simple Standard for Sharing Ontology Mappings &middot;
+    <strong style="color:#64748b">RML</strong> RDF Mapping Language &middot;
+    <strong style="color:#64748b">QLever</strong> High-performance graph engine &middot;
+    <strong style="color:#64748b">PubTator</strong> Biomedical entity annotations (genes, diseases, variants&hellip;)
+  </p>
+  <p style="margin-top:.4rem;font-size:.75rem;color:#475569;max-width:64rem;text-align:left">
+    <strong style="color:#64748b">*</strong> Currently using &ldquo;QLever&rdquo;; also testing loading and configuration in <strong style="color:#64748b">Amazon Neptune</strong> for managed graph infrastructure
+  </p>
+</div>
+
+<!-- ════════════════════ SLIDE 3: Let's talk about evals ════════════════════ -->
+<div class="slide" data-slide="2">
+  <div class="center" style="margin-bottom:1.2rem">
+    <h1>Let&rsquo;s talk about evals!</h1>
+  </div>
+  <div style="width:100%;max-width:58rem">
+    <img src="../images/eval_advice.png" alt="Eval advice" style="width:100%;border-radius:10px;border:1px solid #334155;margin-bottom:1rem">
+    <p style="text-align:center;font-size:.88rem"><a href="https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents" target="_blank" style="color:#38bdf8;text-decoration:none">&#x1F517; Anthropic Engineering &mdash; Demystifying Evals for AI Agents</a></p>
+  </div>
+</div>
+
+<!-- ════════════════════ SLIDE 4: Evaluation Framework ════════════════════ -->
+<div class="slide" data-slide="3">
+  <h2 style="margin-bottom:.8rem">Evaluation Framework</h2>
+  <div style="display:grid;grid-template-columns:auto 1fr;gap:2.5rem;width:100%;max-width:64rem;align-items:start">
+    <img src="../images/astabench.png" alt="AstaBench evaluation run" style="border-radius:12px;max-height:360px;width:auto;border:1px solid #334155">
+    <div style="display:flex;flex-direction:column;gap:1rem">
+      <div class="card" style="border-color:#38bdf8">
+        <h3 style="color:#38bdf8;margin-bottom:.6rem">Main &mdash; Research Tools Discovery</h3>
+        <p style="margin-bottom:.6rem;font-size:.95rem">Tests the KG's ability to answer structured queries about portal entities.</p>
+        <ul>
+          <li>34 questions across 7 categories</li>
+          <li>Animal models, cell lines, mutations, antibodies, vectors</li>
+          <li>0-hop to 2-hop graph traversal &middot; baseline &amp; advanced difficulty</li>
+          <li>User-frustration weighting</li>
+        </ul>
+      </div>
+      <div class="card" style="border-color:#818cf8">
+        <h3 style="color:#818cf8;margin-bottom:.6rem">QA &mdash; Publication Q&amp;A</h3>
+        <p style="margin-bottom:.6rem;font-size:.95rem">Tests the publication text index on factual questions grounded in NF papers.</p>
+        <ul>
+          <li><strong>130 questions</strong> across 14 PMC papers</li>
+          <li>Multiple-choice format (4 options)</li>
+          <li>Easy, medium, and hard difficulty</li>
+          <li>Factual, comparative, and reasoning types</li>
+          <li>"Not in knowledgebase" as valid distractor</li>
+          <li>Also tests passage attribution accuracy</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════ SLIDE 5: Main Eval Example ════════════════════ -->
+<div class="slide" data-slide="4">
+  <div style="display:flex;align-items:center;gap:1rem;margin-bottom:.8rem">
+    <h2 style="margin:0">Main Eval &mdash; Examples</h2>
+    <span class="tag active">Cross-Resource Queries</span>
+  </div>
+  <p style="font-size:.85rem;color:#94a3b8;margin-bottom:.9rem;max-width:62rem">These questions are not easily handled by portal tables &mdash; they require <strong style="color:#e2e8f0">joins and/or aggregation</strong> across multiple entity types</p>
+  <div class="cols" style="gap:1.4rem;max-width:62rem;align-items:start">
+
+    <!-- AM-005 -->
+    <div class="card" style="border-color:#38bdf8;padding:1rem">
+      <div style="font-size:.68rem;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.45rem">AM-005 &middot; Advanced &middot; 2-hop &middot; Frustration: Very High</div>
+      <p style="font-size:.98rem;color:#f1f5f9;font-weight:600;margin:0 0 .4rem">"Find transplantation mouse models (xenografts) and related donor cell lines"</p>
+      <p style="font-size:.8rem;color:#7dd3fc;margin:0 0 .7rem;font-style:italic">Xenograft-to-cell-line donor traversal &mdash; understand tumor source and plan matched in vitro experiments</p>
+      <ul style="margin:.4rem 0 .7rem;font-size:.82rem">
+        <li>Facets: <span class="amber">no</span> &mdash; no facet linking xenografts to donor cell lines</li>
+        <li>KG: traverses <span class="accent">transplantationDonorId &rarr; cellLineId</span></li>
+      </ul>
+      <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#38bdf8;margin-bottom:.35rem">Expected answer</div>
+      <div style="display:flex;flex-wrap:wrap;gap:.35rem">
+        <code style="font-size:.68rem;color:#4ade80;padding:.18rem 0">1b604846-d41c-4969-a79a-9660c04e585c</code>
+        <code style="font-size:.68rem;color:#4ade80;padding:.18rem 0">c8a807e4-502b-461c-a60f-fd10b3cde70e</code>
+      </div>
+    </div>
+
+    <!-- CR-002 -->
+    <div class="card" style="border-color:#38bdf8;padding:1rem">
+      <div style="font-size:.68rem;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.45rem">CR-002 &middot; Advanced &middot; 2-hop &middot; Frustration: Very High</div>
+      <p style="font-size:.98rem;color:#f1f5f9;font-weight:600;margin:0 0 .4rem">"Find human cell lines with the most diverse data types available on the portal"</p>
+      <p style="font-size:.8rem;color:#7dd3fc;margin:0 0 .7rem;font-style:italic">Bioinformatics &amp; multi-omics analysis &mdash; existing characterization data may inform model selection for future experiments</p>
+      <ul style="margin:.4rem 0 .7rem;font-size:.82rem">
+        <li>Facets: <span class="amber">no</span> &mdash; no aggregation across data types per resource</li>
+        <li>KG: joins Files &rarr; CellLine, groups by <span class="accent">dataType</span>, ranks by count</li>
+      </ul>
+      <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#38bdf8;margin-bottom:.35rem">Expected answer</div>
+      <div style="display:flex;flex-wrap:wrap;gap:.35rem">
+        <code style="font-size:.68rem;color:#4ade80;padding:.18rem 0">5502caf5-4cf1-418f-bf50-164cfa316b0f</code>
+        <code style="font-size:.68rem;color:#4ade80;padding:.18rem 0">b44361f2-9021-4920-901a-b1a1f9143f97</code>
+        <code style="font-size:.68rem;color:#4ade80;padding:.18rem 0">be2333d6-6716-4d13-947d-41f4198497a4</code>
+      </div>
+    </div>
+
+  </div>
+  <p style="margin-top:.8rem;font-size:.78rem;color:#64748b;max-width:62rem">Ground truth = sets of <strong style="color:#94a3b8">Synapse entity IDs</strong> &mdash; eval checks whether the model retrieves the correct resources, not just a plausible-sounding description</p>
+</div>
+
+<!-- ════════════════════ SLIDE 6: Main eval performance ════════════════════ -->
+<div class="slide" data-slide="5">
+  <div style="display:flex;align-items:center;gap:1rem;margin-bottom:.8rem">
+    <h2 style="margin:0">Main Eval &mdash; Best Recall</h2>
+    <span class="tag active">34 samples</span>
+  </div>
+  <div class="chart-wrap full" style="max-width:52rem">
+    <div class="bar-chart" id="recall-chart" style="height:220px"></div>
+  </div>
+  <div class="metrics" style="margin-top:1.2rem">
+    <div class="metric"><div class="num" style="color:#c15f3c">79.8%</div><div class="lbl">Best Recall<br>Sonnet 4.5</div></div>
+    <div class="metric"><div class="num" style="color:#e8a87c">60.6%</div><div class="lbl">Best Recall<br>Haiku 4.5</div></div>
+    <div class="metric"><div class="num" style="color:#74aa9c">40.6%</div><div class="lbl">Best Recall<br>GPT-5.2</div></div>
+  </div>
+  <p style="margin-top:1rem;font-size:.8rem;text-align:center"><a href="https://nf-osi.github.io/kg-pipeline/main.html" target="_blank" style="color:#38bdf8;text-decoration:none">&#x1F517; nf-osi.github.io/kg-pipeline/main.html</a></p>
+</div>
+
+<!-- ════════════════════ SLIDE 7: QA Eval Example ════════════════════ -->
+<div class="slide" data-slide="6">
+  <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem">
+    <h2 style="margin:0">QA Eval &mdash; Example</h2>
+    <span class="tag pub">Publication Q&amp;A</span>
+  </div>
+  <div style="width:100%;max-width:58rem">
+    <div style="font-size:.8rem;color:#64748b;margin-bottom:.6rem">PMC8705852 &middot; Bench Scientist &middot; Easy &middot; Factual</div>
+    <div class="card" style="border-color:#469285;margin-bottom:1rem">
+      <div style="font-size:.72rem;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.3rem">User query</div>
+      <p style="color:#94a3b8;font-style:italic;margin-bottom:.8rem">"which nf1 variant in exon 13 for morpholino?"</p>
+      <div style="font-size:.72rem;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.3rem">Formal question</div>
+      <p style="color:#f1f5f9">What is the specific genetic variant in exon 13 of the NF1 gene that creates an intragenic cryptic splice site potentially addressable with morpholino therapy?</p>
+    </div>
+    <div class="cols" style="gap:.8rem;max-width:58rem">
+      <div style="background:#1e293b;border:1px solid #334155;border-radius:8px;padding:.7rem 1rem;font-size:.9rem;color:#64748b">A &nbsp; c.288+2025T&gt;G</div>
+      <div style="background:#1e293b;border:1px solid #334155;border-radius:8px;padding:.7rem 1rem;font-size:.9rem;color:#64748b">B &nbsp; Not in knowledgebase</div>
+      <div style="background:#1e293b;border:1px solid #334155;border-radius:8px;padding:.7rem 1rem;font-size:.9rem;color:#64748b">C &nbsp; R1809C</div>
+      <div style="background:#0f2922;border:1px solid #469285;border-radius:8px;padding:.7rem 1rem;font-size:.9rem;color:#4ade80;font-weight:600">D &nbsp; c.1466A&gt;G (p.Y489C) ✓</div>
+    </div>
+    <p style="margin-top:1rem;font-size:.82rem;color:#64748b;max-width:58rem"><em>Ideal:</em> <span style="color:#94a3b8">The recurrent pathogenic variant c.1466A&gt;G (p.Y489C) in exon 13 creates an intragenic cryptic splice site, resulting in a 57 nt deletion producing an in-frame deletion of 19 amino acids.</span></p>
+    <div style="margin-top:.8rem;background:#0c1a2e;border:1px solid #38bdf8;border-radius:8px;padding:.7rem 1.1rem;display:flex;align-items:center;gap:1rem;max-width:58rem">
+      <span style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#38bdf8;white-space:nowrap">Passage Attribution</span>
+      <span style="color:#334155;font-size:1rem">|</span>
+      <p style="margin:0;font-size:.88rem;color:#7dd3fc">Answer grounded in <strong style="color:#38bdf8">passages 1, 5</strong> of PMC8705852 &mdash; model must also cite the correct source passages</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════ SLIDE 8: QA eval performance ════════════════════ -->
+<div class="slide" data-slide="7">
+  <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem">
+    <h2 style="margin:0">QA Eval &mdash; Accuracy &amp; Citation F1</h2>
+    <span class="tag pub">130 questions &middot; 14 papers</span>
+  </div>
+  <div style="width:100%;max-width:58rem">
+    <div class="cols" style="gap:2rem;margin-bottom:1.2rem">
+      <div class="chart-wrap">
+        <div class="chart-title">Answer Accuracy</div>
+        <div class="bar-chart" id="qa-accuracy-chart" style="height:200px"></div>
+      </div>
+      <div class="chart-wrap">
+        <div class="chart-title">Citation F1 (Passage Attribution)</div>
+        <div class="bar-chart" id="qa-citation-chart" style="height:200px"></div>
+      </div>
+    </div>
+    <div class="metrics">
+      <div class="metric"><div class="num" style="color:#c15f3c">99%</div><div class="lbl">Accuracy<br>Sonnet 4.5</div></div>
+      <div class="metric"><div class="num" style="color:#e8a87c">96%</div><div class="lbl">Accuracy<br>Haiku 4.5</div></div>
+      <div class="metric"><div class="num" style="color:#74aa9c">98%</div><div class="lbl">Accuracy<br>GPT-5.4</div></div>
+      <div class="metric"><div class="num" style="color:#c15f3c">0.77</div><div class="lbl">Citation F1<br>Sonnet 4.5</div></div>
+      <div class="metric"><div class="num" style="color:#e8a87c">0.69</div><div class="lbl">Citation F1<br>Haiku 4.5</div></div>
+      <div class="metric"><div class="num" style="color:#74aa9c">0.73</div><div class="lbl">Citation F1<br>GPT-5.4</div></div>
+    </div>
+    <p style="margin-top:1rem;font-size:.8rem;text-align:center"><a href="https://nf-osi.github.io/kg-pipeline/pubs.html" target="_blank" style="color:#38bdf8;text-decoration:none">&#x1F517; nf-osi.github.io/kg-pipeline/pubs.html</a></p>
+  </div>
+</div>
+
+<!-- ════════════════════ SLIDE 8: Future — Layer 4 ════════════════════ -->
+<div class="slide" data-slide="7">
+  <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem">
+    <h2 style="margin:0">Potential Layer 4 &mdash; Actual Data Content</h2>
+    <span class="tag planned">Horizon</span>
+  </div>
+  <div style="width:100%;max-width:60rem">
+    <div class="cols" style="gap:2rem;margin-bottom:1.2rem">
+      <div class="card">
+        <h3 style="color:#e2e8f0;margin-bottom:.6rem">VCF Files &rarr; Patient Variants</h3>
+        <p style="font-size:.95rem">Per-patient variant call files transformed into graph nodes, linking patients to specific genomic variants, allele frequencies, and affected genes &mdash; enabling population-level queries across the cohort.</p>
+        <ul style="margin-top:.8rem">
+          <li>Query "which patients share this splice variant?"</li>
+          <li>Cross-link to cell lines and animal models carrying the same variant</li>
+          <li>Aggregate variant burden across studies</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 style="color:#e2e8f0;margin-bottom:.6rem">Images &rarr; Embedded Representations</h3>
+        <p style="font-size:.95rem">Histology, MRI, and microscopy images encoded as vector embeddings and stored as graph node properties, enabling similarity-based retrieval alongside structured metadata.</p>
+        <ul style="margin-top:.8rem">
+          <li>Find tumors with similar morphology</li>
+          <li>Link image findings to genomic or clinical context</li>
+          <li>Multimodal queries combining text and image</li>
+        </ul>
+      </div>
+    </div>
+    <div style="border:1.5px solid #fbbf24;border-radius:10px;padding:.8rem 1.2rem;display:flex;align-items:center;gap:.8rem">
+      <span style="font-size:1.8rem;font-weight:900;color:#fbbf24;flex-shrink:0">&#9888;</span>
+      <p style="font-size:.9rem;color:#fbbf24;margin:0;font-weight:600">Currently out of scope and would need governance review</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════ SLIDE 9: Future — Layer 5 ════════════════════ -->
+<div class="slide" data-slide="8">
+  <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem">
+    <h2 style="margin:0">Potential Layer 5 &mdash; User Knowledge &amp; Hypotheses</h2>
+    <span class="tag planned">Horizon</span>
+  </div>
+  <div style="width:100%;max-width:66rem">
+    <p style="font-size:1rem;color:#F7C6DD;margin-bottom:1.2rem">What if researchers could annotate <strong>hypotheses and in-progress findings directly onto each data file in Synapse</strong>? Those annotations could flow into the KG as a queryable, creditable layer of researcher knowledge.</p>
+    <div style="display:grid;grid-template-columns:1fr auto;gap:2rem;align-items:start">
+      <div>
+        <ul>
+          <li>Pre-publication findings become visible and queryable across the community</li>
+          <li>Hypothesis nodes link to specific files, datasets, or tool records already in the KG</li>
+          <li>Negative results and open questions can be surfaced, not buried in notebooks</li>
+        </ul>
+        <div class="card" style="border-color:#469285;margin-top:1rem">
+          <h3 style="color:#469285;margin-bottom:.5rem">DiscourseGraphs</h3>
+          <p style="font-size:.88rem;margin-bottom:.5rem">Organizes research as modular graphs of evidence and claims. Distinguishes <span style="color:#4ade80">evidence</span> from <span style="color:#4ade80">claims</span>, supports multiple interpretations, researcher-controlled.</p>
+          <a href="https://discoursegraphs.com/" target="_blank" style="font-size:.82rem;color:#469285;text-decoration:none">&#x1F517; discoursegraphs.com</a>
+        </div>
+      </div>
+      <img src="../images/discourse_model.webp" alt="DiscourseGraphs model" style="border-radius:10px;max-height:260px;width:auto;border:1px solid #334155">
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════ SLIDE 10: Graph Learning — Spotify Case Study ════════════════════ -->
+<div class="slide" data-slide="9">
+  <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem">
+    <h2 style="margin:0">Graph learning for better search suggestions (based on Spotify)</h2>
+    <span class="tag planned">Horizon</span>
+  </div>
+  <div style="width:100%;max-width:62rem">
+    <div class="cols" style="gap:2rem;margin-bottom:1.2rem">
+      <div>
+        <h3 style="color:#e2e8f0;margin-bottom:.6rem">The Approach</h3>
+        <p style="font-size:.9rem;margin-bottom:.7rem">Spotify built a graph over queries, songs, artists, genres, and topics, then applied <span class="accent">node2vec</span> to learn vector representations of all entities. These embeddings power real-time query suggestions in instant search.</p>
+        <ul>
+          <li>Graph captures co-occurrence and behavioral relationships</li>
+          <li>Suggestions are diverse, not just semantically similar</li>
+          <li>Outperformed transformer-based semantic similarity baseline</li>
+        </ul>
+      </div>
+      <div>
+        <h3 style="color:#e2e8f0;margin-bottom:.6rem">Results</h3>
+        <div class="metrics" style="flex-direction:column;gap:.7rem;align-items:flex-start">
+          <div class="metric" style="flex-direction:row;align-items:center;gap:1rem;min-width:unset;padding:.7rem 1.2rem">
+            <div class="num green" style="font-size:1.4rem">+22%</div>
+            <div class="lbl" style="text-align:left">vs transformer baseline<br><span style="color:#64748b">(offline eval)</span></div>
+          </div>
+          <div class="metric" style="flex-direction:row;align-items:center;gap:1rem;min-width:unset;padding:.7rem 1.2rem">
+            <div class="num accent" style="font-size:1.4rem">+9.4%</div>
+            <div class="lbl" style="text-align:left">exploratory query clicks<br><span style="color:#64748b">(A/B test)</span></div>
+          </div>
+          <div class="metric" style="flex-direction:row;align-items:center;gap:1rem;min-width:unset;padding:.7rem 1.2rem">
+            <div class="num amber" style="font-size:1.4rem">+1.4%</div>
+            <div class="lbl" style="text-align:left">search coverage<br><span style="color:#64748b">(A/B test)</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p style="font-size:.82rem;color:#475569"><a href="https://research.atspotify.com/2023/10/graph-learning-for-exploratory-query-suggestions-in-an-instant-search-system" target="_blank" style="color:#38bdf8;text-decoration:none">&#x1F517; research.atspotify.com &mdash; Graph Learning for Exploratory Query Suggestions in an Instant Search System (2023)</a></p>
+  </div>
+</div>
+
+<!-- ════════════════════ SLIDE 11: Graph Learning on the NF KG ════════════════════ -->
+<div class="slide" data-slide="10">
+  <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem">
+    <h2 style="margin:0">Graph Learning on the NF KG</h2>
+    <span class="tag planned">Horizon</span>
+  </div>
+  <div style="width:100%;max-width:64rem">
+    <div class="cols" style="gap:2rem;margin-bottom:1rem">
+      <div>
+        <h3 style="color:#e2e8f0;margin-bottom:.6rem">Beyond Retrieval</h3>
+        <p style="font-size:.88rem;margin-bottom:.6rem">The current KG supports SPARQL queries and RAG retrieval. Graph learning can go further &mdash; embedding the graph structure itself to power richer discovery.</p>
+        <ul>
+          <li><strong>Node embeddings</strong> &mdash; entities in vector space from graph neighborhood</li>
+          <li><strong>Link prediction</strong> &mdash; surface likely but unrecorded relationships</li>
+          <li><strong>Query suggestions</strong> &mdash; recommend related exploratory queries</li>
+          <li><strong>Anomaly detection</strong> &mdash; flag unexpected connections or data gaps</li>
+        </ul>
+      </div>
+      <div class="card" style="border-color:#38bdf8">
+        <h3 style="color:#38bdf8;margin-bottom:.6rem">Applying it for NF</h3>
+        <ul>
+          <li>Sparse, heterogeneous data across tools, publications, and ontologies</li>
+          <li>Researchers often don't know what to ask &mdash; exploratory queries dominate</li>
+          <li>Cross-modal connections hard to express in SQL/SPARQL</li>
+          <li>Small community benefits from surfacing non-obvious relationships</li>
+          <li class="dim">No search query logs linked to entities yet &mdash; node2vec applies to the KG graph structure directly; query-entity associations could be bootstrapped from interaction data over time</li>
+        </ul>
+      </div>
+    </div>
+    <img src="../images/bioinformatics_ref.png" alt="Bioinformatics reference tool" style="border-radius:10px;width:100%;max-height:160px;object-fit:cover;object-position:top;border:1px solid #334155">
+  </div>
+</div>
+
+<!-- ════════════════════ SLIDE: Supporting SageBrain ════════════════════ -->
+<div class="slide" data-slide="11">
+  <h2 style="margin-bottom:1.2rem">Supporting SageBrain</h2>
+  <div style="width:100%;max-width:52rem">
+    <ul style="display:flex;flex-direction:column;gap:.9rem">
+      <li>The NF KG pipeline outlines <strong>adoptable practices</strong> for building domain-specific knowledge graphs on top of Synapse data &mdash; schema design, ontology mapping, RDF transformation, and SPARQL-based retrieval</li>
+      <li>Serves as a <strong>reference implementation</strong> that other Sage projects can adapt, with documented tooling (Dagster, RML, QLever) and reproducible build processes</li>
+      <li>Efforts underway to load the <strong>RDF dataset into Amazon Neptune</strong>, enabling managed graph infrastructure and integration with AWS-native services</li>
+      <li>Will be <strong>providing support to the EL project</strong>, applying lessons from the NF pipeline to help structure and query their knowledge graph</li>
+    </ul>
+  </div>
+</div>
+
+</div><!-- /deck -->
+
+<!-- Nav controls -->
+<button class="nav" id="prev" aria-label="Previous">&larr;</button>
+<button class="nav" id="next" aria-label="Next">&rarr;</button>
+<div id="progress"></div>
+<div id="slide-num"></div>
+
+<script>
+(function(){
+  /* ── Slide navigation ──────────────────────────────────── */
+  var slides = document.querySelectorAll('.slide');
+  var total = slides.length;
+  var cur = 0;
+
+  function go(n) {
+    if (n < 0 || n >= total || n === cur) return;
+    slides[cur].classList.remove('active');
+    slides[cur].classList.add('exit');
+    var prev = cur;
+    cur = n;
+    slides[cur].classList.add('active');
+    setTimeout(function(){ slides[prev].classList.remove('exit'); }, 460);
+    document.getElementById('progress').style.width = ((cur / (total - 1)) * 100) + '%';
+    document.getElementById('slide-num').textContent = (cur + 1) + ' / ' + total;
+  }
+
+  document.getElementById('prev').addEventListener('click', function(){ go(cur - 1); });
+  document.getElementById('next').addEventListener('click', function(){ go(cur + 1); });
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); go(cur + 1); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); go(cur - 1); }
+    if (e.key === 'Home') { e.preventDefault(); go(0); }
+    if (e.key === 'End') { e.preventDefault(); go(total - 1); }
+  });
+
+  document.getElementById('slide-num').textContent = '1 / ' + total;
+  document.getElementById('progress').style.width = '0%';
+
+  /* ── Chart: overall recall ─────────────────────────────── */
+  var bestRuns = [
+    { label: 'Sonnet 4.5', score: 0.7984, color: '#c15f3c' },
+    { label: 'Haiku 4.5',  score: 0.6059, color: '#e8a87c' },
+    { label: 'GPT-5.2',    score: 0.4063, color: '#74aa9c' }
+  ];
+
+  function renderBarChart(containerId, items, maxVal, fmt) {
+    var c = document.getElementById(containerId);
+    if (!c) return;
+    var chartH = parseInt(c.style.height) || 200;
+    var barMaxH = chartH - 30; // reserve space for label
+    c.innerHTML = '';
+    items.forEach(function(item) {
+      var px = Math.round((item.score / maxVal) * barMaxH);
+      var label = fmt ? fmt(item.score) : (item.score * 100).toFixed(1) + '%';
+      var group = document.createElement('div');
+      group.className = 'bar-group';
+      group.innerHTML =
+        '<div class="bar" style="height:' + px + 'px;background:' + item.color + '">' +
+          '<span class="val" style="color:' + item.color + '">' + label + '</span>' +
+        '</div>' +
+        '<div class="bar-label">' + item.label + '</div>';
+      c.appendChild(group);
+    });
+  }
+
+  renderBarChart('recall-chart', bestRuns, 1);
+
+  /* ── Chart: QA accuracy ─────────────────────────────────── */
+  var qaAccuracy = [
+    { label: 'Sonnet 4.5', score: 0.9923, color: '#c15f3c' },
+    { label: 'Haiku 4.5',  score: 0.9615, color: '#e8a87c' },
+    { label: 'GPT-5.4',    score: 0.9846, color: '#74aa9c' }
+  ];
+  renderBarChart('qa-accuracy-chart', qaAccuracy, 1);
+
+  /* ── Chart: QA citation F1 ──────────────────────────────── */
+  var qaCitation = [
+    { label: 'Sonnet 4.5', score: 0.7717, color: '#c15f3c' },
+    { label: 'Haiku 4.5',  score: 0.6888, color: '#e8a87c' },
+    { label: 'GPT-5.4',    score: 0.7303, color: '#74aa9c' }
+  ];
+  renderBarChart('qa-citation-chart', qaCitation, 1);
+
+})();
+</script>
+</body>
+</html>
