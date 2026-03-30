@@ -28,13 +28,13 @@ RUN cat /input/schema/ontology.ttl \
         /input/schema/shapes.ttl \
         /input/text/text_entities.ttl \
         /input/rdf/*.ttl \
-      | qlever-index -F ttl -f - -i /index/kg --parse-parallel false \
+      | qlever-index -F ttl -f - -i /index/kg -p false \
           -w /input/text/wordsfile.tsv \
           -d /input/text/docsfile.tsv
 
 FROM indexer-base AS indexer-rdf
 RUN cat /input/schema/ontology.ttl /input/schema/shapes.ttl /input/rdf/*.ttl \
-      | qlever-index -F ttl -f - -i /index/kg --parse-parallel false
+      | qlever-index -F ttl -f - -i /index/kg -p false
 
 # --- final image: just the server + pre-built index ---
 FROM adfreiburg/qlever AS runtime-base
