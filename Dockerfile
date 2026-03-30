@@ -5,16 +5,14 @@
 #   schema/ontology.ttl  — OWL ontology
 #   schema/shapes.ttl    — SHACL shapes
 #
-# Optional text index (set TEXT_INDEX=1 to enable):
+# Optional text index files for the plus-text build:
 #   pubs/qlever_text/text_entities.ttl
 #   pubs/qlever_text/wordsfile.tsv
 #   pubs/qlever_text/docsfile.tsv
 #
 # See .dockerignore for what gets included.
 
-FROM adfreiburg/qlever AS indexer
-
-ARG TEXT_INDEX=0
+FROM adfreiburg/qlever AS indexer-base
 
 USER root
 RUN mkdir -p /input/rdf /input/schema /input/text /index \
@@ -24,44 +22,43 @@ USER qlever
 COPY --chown=qlever:qlever schema/ontology.ttl schema/shapes.ttl /input/schema/
 COPY --chown=qlever:qlever data/rdf/ /input/rdf/
 
-# Copy text index files if TEXT_INDEX is enabled
-RUN if [ "$TEXT_INDEX" = "1" ]; then \
-      echo "Text index build enabled"; \
-    else \
-      echo "RDF-only build (no text index)"; \
-    fi
-
+FROM indexer-base AS indexer-text
 COPY --chown=qlever:qlever pubs/qlever_text/ /input/text/
+RUN cat /input/schema/ontology.ttl \
+        /input/schema/shapes.ttl \
+        /input/text/text_entities.ttl \
+        /input/rdf/*.ttl \
+      | qlever-index -F ttl -f - -i /index/kg --parse-parallel false \
+          -w /input/text/wordsfile.tsv \
+          -d /input/text/docsfile.tsv
 
-RUN if [ "$TEXT_INDEX" = "1" ]; then \
-      cat /input/schema/ontology.ttl \
-          /input/schema/shapes.ttl \
-          /input/text/text_entities.ttl \
-          /input/rdf/*.ttl \
-        | qlever-index -F ttl -f - -i /index/kg --parse-parallel false \
-            -w /input/text/wordsfile.tsv \
-            -d /input/text/docsfile.tsv; \
-    else \
-      cat /input/schema/ontology.ttl /input/schema/shapes.ttl /input/rdf/*.ttl \
-        | qlever-index -F ttl -f - -i /index/kg --parse-parallel false; \
-    fi
+FROM indexer-base AS indexer-rdf
+RUN cat /input/schema/ontology.ttl /input/schema/shapes.ttl /input/rdf/*.ttl \
+      | qlever-index -F ttl -f - -i /index/kg --parse-parallel false
 
 # --- final image: just the server + pre-built index ---
-FROM adfreiburg/qlever
-
-ARG TEXT_INDEX=0
+FROM adfreiburg/qlever AS runtime-base
 
 USER root
 RUN mkdir -p /index && chown qlever:qlever /index
 USER qlever
 
-COPY --from=indexer --chown=qlever:qlever /index /index
-
 EXPOSE 7001
+
+FROM runtime-base AS runtime-text
+COPY --from=indexer-text --chown=qlever:qlever /index /index
+HEALTHCHECK --interval=60s --timeout=10s --start-period=60s --retries=3 \
+  CMD curl -f http://localhost:7001/ \
+      -H "Accept: application/sparql-results+json" \
+      --data-urlencode "query=ASK { ?s ?p ?o }" || exit 1
 ENTRYPOINT ["qlever-server"]
-# Use -t flag for text search when TEXT_INDEX is enabled
-CMD if [ "$TEXT_INDEX" = "1" ]; then \
-      exec qlever-server -i /index/kg -p 7001 -t; \
-    else \
-      exec qlever-server -i /index/kg -p 7001; \
-    fi
+CMD ["-i", "/index/kg", "-p", "7001", "-t"]
+
+FROM runtime-base AS runtime-rdf
+COPY --from=indexer-rdf --chown=qlever:qlever /index /index
+HEALTHCHECK --interval=60s --timeout=10s --start-period=60s --retries=3 \
+  CMD curl -f http://localhost:7001/ \
+      -H "Accept: application/sparql-results+json" \
+      --data-urlencode "query=ASK { ?s ?p ?o }" || exit 1
+ENTRYPOINT ["qlever-server"]
+CMD ["-i", "/index/kg", "-p", "7001"]
