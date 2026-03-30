@@ -139,11 +139,10 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
+          target: runtime-rdf
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          build-args: |
-            TEXT_INDEX=0
 
       # Build plus-text image
       - name: Extract metadata (plus-text)
@@ -163,8 +162,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
+          target: runtime-text
           push: true
           tags: ${{ steps.meta-text.outputs.tags }}
           labels: ${{ steps.meta-text.outputs.labels }}
-          build-args: |
-            TEXT_INDEX=1
