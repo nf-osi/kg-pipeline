@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 # Test graph + SPARQL+Text queries against the QLever endpoint.
-# Starts qlever-server-text, runs queries, then stops the service.
+# Starts qlever-text, runs queries, then stops the service.
 #
 # Usage:
 #   ./scripts/test_sparql_with_text.sh          # manage server lifecycle automatically
 #   ./scripts/test_sparql_with_text.sh <url>    # run against an already-running endpoint
 #
-# Prerequisite: docker compose run --rm qlever-index-text
+# Prerequisite: docker compose build qlever-text
 
-SERVER_SERVICE="qlever-server-text"
+SERVER_SERVICE="qlever-text"
 source "$(dirname "$0")/qlever_test_helpers.sh"
 
 # ============================================================

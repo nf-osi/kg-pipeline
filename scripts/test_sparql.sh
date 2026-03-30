@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 # Test graph queries against the QLever endpoint.
-# Starts qlever-server, runs queries, then stops the service.
+# Starts qlever-rdf, runs queries, then stops the service.
 #
 # Usage:
 #   ./scripts/test_sparql.sh          # manage server lifecycle automatically
 #   ./scripts/test_sparql.sh <url>    # run against an already-running endpoint
 
-SERVER_SERVICE="qlever-server"
+SERVER_SERVICE="qlever-rdf"
 source "$(dirname "$0")/qlever_test_helpers.sh"
 
 # 1. Health check (JSON -- ASK returns boolean)

@@ -13,3 +13,7 @@ data/rdf/*.rml.ttl
 
 # Include text index files (for plus-text builds)
 !pubs/qlever_text/
+
+# Include health check files
+!nginx.conf
+!entrypoint.sh

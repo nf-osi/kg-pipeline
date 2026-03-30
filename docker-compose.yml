@@ -1,67 +1,38 @@
 # QLever SPARQL endpoint for the NF knowledge graph.
 #
+# This compose file uses the multi-stage Dockerfile to ensure parity
+# between local development and production builds.
+#
 # Usage (RDF only):
-#   docker compose run --rm qlever-index        # build index
-#   ./scripts/test_sparql.sh                    # start server, test, stop
+#   docker compose build qlever-rdf             # build image with index
+#   docker compose up qlever-rdf                # start server
+#   ./scripts/test_sparql.sh                    # test
 #
 # Usage (RDF + text):
-#   docker compose run --rm qlever-index-text   # build index with text
-#   ./scripts/test_sparql_with_text.sh          # start server, test, stop
+#   docker compose build qlever-text            # build image with text index
+#   docker compose up qlever-text               # start server
+#   ./scripts/test_sparql_with_text.sh          # test
 #
-# To rebuild after data changes, remove the volume first:
-#   docker compose down -v
-
-volumes:
-  qlever-index:
-  qlever-index-text:
+# To rebuild after data changes:
+#   docker compose build --no-cache qlever-rdf
+#   # or
+#   docker compose build --no-cache qlever-text
 
 services:
-  qlever-index:
-    image: adfreiburg/qlever
-    entrypoint: ["/bin/bash", "-c"]
-    command:
-      - |
-        sudo chown qlever:qlever /index &&
-        cat /input/schema/ontology.ttl \
-            $(ls /input/rdf/*.ttl | grep -v '\.rml\.ttl$$') \
-          | qlever-index -F ttl -f - -i /index/kg --parse-parallel false
-    volumes:
-      - ./data/rdf:/input/rdf:ro
-      - ./schema:/input/schema:ro
-      - qlever-index:/index
-
-  qlever-server:
-    image: adfreiburg/qlever
-    entrypoint: ["qlever-server"]
-    command: ["-i", "/index/kg", "-p", "7001"]
+  # RDF-only variant (no text search)
+  qlever-rdf:
+    build:
+      context: .
+      target: runtime-rdf
     ports:
       - "7001:7001"
-    volumes:
-      - qlever-index:/index:ro
+    restart: unless-stopped
 
-  qlever-index-text:
-    image: adfreiburg/qlever
-    entrypoint: ["/bin/bash", "-c"]
-    command:
-      - |
-        sudo chown qlever:qlever /index &&
-        cat /input/schema/ontology.ttl \
-            /input/text/text_entities.ttl \
-            $(ls /input/rdf/*.ttl | grep -v '\.rml\.ttl$$') \
-          | qlever-index -F ttl -f - -i /index/kg --parse-parallel false \
-              -w /input/text/wordsfile.tsv \
-              -d /input/text/docsfile.tsv
-    volumes:
-      - ./data/rdf:/input/rdf:ro
-      - ./schema:/input/schema:ro
-      - ./pubs/qlever_text:/input/text:ro
-      - qlever-index-text:/index
-
-  qlever-server-text:
-    image: adfreiburg/qlever
-    entrypoint: ["qlever-server"]
-    command: ["-i", "/index/kg", "-p", "7001", "-t"]
+  # RDF + full-text search variant
+  qlever-text:
+    build:
+      context: .
+      target: runtime-text
     ports:
       - "7001:7001"
-    volumes:
-      - qlever-index-text:/index:ro
+    restart: unless-stopped
