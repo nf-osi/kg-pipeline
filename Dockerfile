@@ -41,6 +41,15 @@ FROM adfreiburg/qlever AS runtime-base
 
 USER root
 RUN mkdir -p /index && chown qlever:qlever /index
+
+# Install nginx for health-aware proxying on the public service port.
+RUN apt-get update && apt-get install -y nginx && rm -rf /var/lib/apt/lists/*
+
+# Add nginx config and entrypoint wrapper
+COPY --chown=root:root nginx.conf /nginx.conf
+COPY --chown=root:root entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
 USER qlever
 
 EXPOSE 7001
@@ -48,17 +57,13 @@ EXPOSE 7001
 FROM runtime-base AS runtime-text
 COPY --from=indexer-text --chown=qlever:qlever /index /index
 HEALTHCHECK --interval=60s --timeout=10s --start-period=60s --retries=3 \
-  CMD curl -f http://localhost:7001/ \
-      -H "Accept: application/sparql-results+json" \
-      --data-urlencode "query=ASK { ?s ?p ?o }" || exit 1
-ENTRYPOINT ["qlever-server"]
-CMD ["-i", "/index/kg", "-p", "7001", "-t"]
+  CMD curl -f http://localhost:7001/healthz || exit 1
+ENTRYPOINT ["/entrypoint.sh"]
+CMD ["qlever-server", "-i", "/index/kg", "-p", "7002", "-t"]
 
 FROM runtime-base AS runtime-rdf
 COPY --from=indexer-rdf --chown=qlever:qlever /index /index
 HEALTHCHECK --interval=60s --timeout=10s --start-period=60s --retries=3 \
-  CMD curl -f http://localhost:7001/ \
-      -H "Accept: application/sparql-results+json" \
-      --data-urlencode "query=ASK { ?s ?p ?o }" || exit 1
-ENTRYPOINT ["qlever-server"]
-CMD ["-i", "/index/kg", "-p", "7001"]
+  CMD curl -f http://localhost:7001/healthz || exit 1
+ENTRYPOINT ["/entrypoint.sh"]
+CMD ["qlever-server", "-i", "/index/kg", "-p", "7002"]
