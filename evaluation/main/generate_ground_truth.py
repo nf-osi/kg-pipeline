@@ -63,14 +63,48 @@ def run_queries(data):
     
     # Pre-compute joins
     if not data['models'].empty and not data['donors'].empty:
-        models_donors = pd.merge(data['models'], data['donors'], on='donorId', how='left')
+        models_donors = pd.merge(
+            data['models'],
+            data['donors'],
+            on='donorId',
+            how='left',
+            suffixes=('_model', '_donor'),
+        )
     else:
         models_donors = pd.DataFrame()
         
     if not data['cell_lines'].empty and not data['donors'].empty:
-        cells_donors = pd.merge(data['cell_lines'], data['donors'], on='donorId', how='left')
+        cells_donors = pd.merge(
+            data['cell_lines'],
+            data['donors'],
+            on='donorId',
+            how='left',
+            suffixes=('_cell', '_donor'),
+        )
     else:
         cells_donors = pd.DataFrame()
+
+    if not data['models'].empty and not data['resources'].empty:
+        models_resources = pd.merge(
+            data['models'],
+            data['resources'],
+            on='animalModelId',
+            how='left',
+            suffixes=('', '_resource'),
+        )
+    else:
+        models_resources = pd.DataFrame()
+
+    if not cells_donors.empty and not data['resources'].empty:
+        cells_donors_resources = pd.merge(
+            cells_donors,
+            data['resources'],
+            on='cellLineId',
+            how='left',
+            suffixes=('_cell', '_resource'),
+        )
+    else:
+        cells_donors_resources = pd.DataFrame()
 
     # Mutation joins
     if not data['mutations'].empty and not data['mutation_model'].empty:
@@ -192,9 +226,12 @@ def run_queries(data):
     # --- Animal Models ---
     
     # AM-001: Optic glioma models
-    if not data['models'].empty:
-        df = data['models']
-        matches = df[df['animalModelOfManifestation'].str.contains('Optic Nerve Glioma', case=False, na=False)]
+    if not models_resources.empty:
+        df = models_resources
+        matches = df[
+            df['animalModelOfManifestation'].str.contains('Optic Nerve Glioma', case=False, na=False) |
+            df['description'].str.contains('optic glioma', case=False, na=False)
+        ]
         results['AM-001'] = ensure_resource_id(matches['animalModelId'].tolist())
 
     # AM-002: Energy expenditure
@@ -284,9 +321,20 @@ def run_queries(data):
         results['CL-003'] = ensure_resource_id(matches['cellLineId'].tolist())
 
     # CL-004: Black patients
-    if not cells_donors.empty:
-        df = cells_donors
-        matches = df[df['race'].str.contains('Black|African', case=False, na=False)]
+    if not cells_donors_resources.empty:
+        df = cells_donors_resources
+        race_series = df.get('race_cell', pd.Series('', index=df.index)).fillna('')
+        if 'race_donor' in df.columns:
+            race_series = race_series.mask(race_series.eq(''), df['race_donor'].fillna(''))
+        matches = df[
+            race_series.str.contains('Black|African', case=False, na=False) &
+            (
+                df['cellLineGeneticDisorder'].str.contains('Neurofibromatosis type 1', case=False, na=False) |
+                df['resourceName'].str.contains(r'\bNF1\b|Neurofibromin', case=False, na=False, regex=True) |
+                df['synonyms'].str.contains(r'\bNF1\b|Neurofibromin', case=False, na=False, regex=True) |
+                df['description'].str.contains(r'\bNF1\b|Neurofibromin', case=False, na=False, regex=True)
+            )
+        ]
         results['CL-004'] = ensure_resource_id(matches['cellLineId'].tolist())
 
     # CL-005: pediatric donors
@@ -302,7 +350,10 @@ def run_queries(data):
 
     if not cells_donors.empty:
         df = cells_donors
-        ped_human = df[df['age'].apply(is_pediatric) & df['species'].str.contains('Homo sapiens|Human', case=False, na=False)]
+        ped_human = df[
+            df['age'].apply(is_pediatric) &
+            df['species'].str.contains('Homo sapiens|Human', case=False, na=False)
+        ]
         results['CL-005'] = ensure_resource_id(ped_human['cellLineId'].tolist())
 
     # CL-006: Human lung cell lines
@@ -332,10 +383,64 @@ def run_queries(data):
         ]
         results['CL-007'] = ensure_resource_id(matches['cellLineId'].tolist())
 
-    # CL-008: Isogenic pairs
-    if not data['cell_lines'].empty and not data['donors'].empty:
-        isogenic_donors = data['donors'][data['donors']['parentDonorId'].notna()]['donorId'].tolist()
-        results['CL-008'] = ensure_resource_id(data['cell_lines'][data['cell_lines']['donorId'].isin(isogenic_donors)]['cellLineId'].tolist())
+    # CL-008: Isogenic pairs that differ only in NF1 status (by exactly 1 mutation)
+    if not data['cell_lines'].empty and not data['donors'].empty and not data['mutations'].empty and not data['mutation_model'].empty:
+        donors_df = data['donors']
+        cls_df = data['cell_lines']
+        parent_map = dict(zip(donors_df['donorId'], donors_df['parentDonorId']))
+
+        # Walk parentDonorId chain to find root donor for each donor
+        def find_root(did):
+            visited = set()
+            current = did
+            while pd.notna(parent_map.get(current)) and current not in visited:
+                visited.add(current)
+                current = parent_map[current]
+            return current
+
+        # Group donors into families by root
+        family_groups = {}
+        for did in donors_df['donorId']:
+            root = find_root(did)
+            family_groups.setdefault(root, set()).add(did)
+
+        # Count mutations per cell line (total and NF1-only)
+        cl_mut = data['mutation_model'][data['mutation_model']['cellLineId'].notna()]
+        total_mut_count = cl_mut.groupby('cellLineId')['mutationId'].nunique()
+        nf1_mut_ids = data['mutations'][data['mutations']['affectedGeneSymbol'] == 'NF1']['mutationId']
+        nf1_cl_mut = cl_mut[cl_mut['mutationId'].isin(nf1_mut_ids)]
+        nf1_mut_count = nf1_cl_mut.groupby('cellLineId')['mutationId'].nunique()
+
+        # Cell lines with exactly 1 total mutation and that mutation is NF1
+        one_nf1_only = set(nf1_mut_count[nf1_mut_count == 1].index) & set(total_mut_count[total_mut_count == 1].index)
+        # Cell lines with 0 total mutations
+        all_cl_ids = set(cls_df['cellLineId'])
+        zero_mut_ids = all_cl_ids - set(total_mut_count.index)
+
+        # Find families with both 0-mutation and exactly-1-NF1-only-mutation members
+        qualifying_ids = []
+        for root, family_donors in family_groups.items():
+            if len(family_donors) < 2:
+                continue
+            family_cls = cls_df[cls_df['donorId'].isin(family_donors)]
+            if family_cls.empty:
+                continue
+            zero_mut = family_cls[family_cls['cellLineId'].isin(zero_mut_ids)]
+            one_mut = family_cls[family_cls['cellLineId'].isin(one_nf1_only)]
+            if zero_mut.empty or one_mut.empty:
+                continue
+            # Only pair lines with matching tissue type (tissue, organ, cellLineCategory)
+            for _, om in one_mut.iterrows():
+                matched_wt = zero_mut[
+                    (zero_mut['tissue'].fillna('') == (om['tissue'] if pd.notna(om['tissue']) else '')) &
+                    (zero_mut['organ'].fillna('') == (om['organ'] if pd.notna(om['organ']) else '')) &
+                    (zero_mut['cellLineCategory'].fillna('') == (om['cellLineCategory'] if pd.notna(om['cellLineCategory']) else ''))
+                ]
+                if not matched_wt.empty:
+                    qualifying_ids.append(om['cellLineId'])
+                    qualifying_ids.extend(matched_wt['cellLineId'].tolist())
+
+        results['CL-008'] = ensure_resource_id(qualifying_ids)
 
     # CL-009: Different tissues same donor
     if not data['cell_lines'].empty:

@@ -1,5 +1,5 @@
 metadata:
-  generated_at: '2026-02-10T00:56:06.723692'
+  generated_at: '2026-04-16T09:58:19.165195'
   skipped_questions:
   - AM-004
   - CR-001
@@ -21,7 +21,7 @@ ground_truth:
     - c70c0de8-16c2-4aec-8af8-b50c47797345
     - db7bf81f-e9f8-4fad-9e6e-3cba8d6ca84a
   AB-003:
-    question: Find antibodies for studying NF1 phosphorylation and post-translational
+    question: Give me antibodies for studying NF1 phosphorylation and post-translational
       regulation
     results:
     - 077df72b-88a2-41b9-aad0-8bb5ff52c046
@@ -31,17 +31,19 @@ ground_truth:
     - e860b011-a781-42b7-af23-c8b08bc25ebc
     - eb5d7230-1787-4f68-b3d8-ccf87041976d
   AM-001:
-    question: Find animal models for optic glioma
+    question: I want animal models to study optic glioma
     results:
     - 118aa95e-27f4-48fa-94c7-5f786b8b4f2f
     - 893695cf-daa7-42eb-998c-9b04af941964
+    - d1c0c790-acff-486a-b794-b0429b09eeec
+    - e487fd33-48d3-4a02-b2e0-4d0525ee8e20
   AM-002:
-    question: Find animal models for energy expenditure study
+    question: Help me find animal models suitable for energy expenditure studies
     results:
     - 033b7173-4c58-410e-b441-579ba05c388a
     - 8e5c372e-dec8-4693-98a8-b07f3014257d
   AM-003:
-    question: Find non-mouse mammalian models
+    question: Are there any non-mouse mammalian models available?
     results:
     - 209c16d7-c1fa-414f-8f08-458eaefc2259
     - 57625a6e-c039-418e-8e22-db464f8aa827
@@ -52,7 +54,7 @@ ground_truth:
     - 1b604846-d41c-4969-a79a-9660c04e585c
     - c8a807e4-502b-461c-a60f-fd10b3cde70e
   AM-006:
-    question: "Find animal models that develop caf\xE9-au-lait spots"
+    question: "Which animal models develop caf\xE9-au-lait spots?"
     results:
     - 02aba952-5860-4bd9-bfb2-ff796b22bf48
     - 209c16d7-c1fa-414f-8f08-458eaefc2259
@@ -60,7 +62,7 @@ ground_truth:
     - 89b2f63c-1538-468e-9ca1-7ff948cb354e
     - d27fd7b0-ed8f-4ee2-a8d9-26748c12518c
   CL-001:
-    question: Find plexiform neurofibroma cell lines
+    question: Show me plexiform neurofibroma cell lines
     results:
     - 00f8dcc6-a2b2-4fc2-a327-e87367bffa21
     - 3dedf9d2-614c-4cf9-8d18-aff8aa2dc0eb
@@ -73,13 +75,13 @@ ground_truth:
     - be2333d6-6716-4d13-947d-41f4198497a4
     - f21cb7db-ee85-48a7-8f41-e4603238bede
   CL-002:
-    question: Find hybridoma cell lines
+    question: What hybridoma cell lines are available?
     results:
     - 42257ac4-1950-4541-9bee-b9a965e2fa86
     - 65d07476-2469-4679-85b2-e2ca67f3b01b
     - f410431d-7571-4302-8870-eb115b71d0ce
   CL-003:
-    question: Find normal schwann cell lines
+    question: I need normal schwann cell lines
     results:
     - 617cb183-3377-4473-8ad8-2f6472bce1fa
   CL-004:
@@ -87,10 +89,7 @@ ground_truth:
     results:
     - 2549e536-b033-43e4-acf6-501499b6e498
     - 7ef2fd6f-9ba6-4e30-94fc-d4ffd61de6e6
-    - 93469888-1234-4f52-b3a7-175423b817cc
-    - 95e9ea19-3d84-43a5-b003-347ecec6b1fa
     - 9db66052-f458-4400-ae1b-3f5c075dbd25
-    - a14754e6-1c26-4224-9ef9-a1abfd1538eb
     - ad2e271b-55ac-44ae-b39d-f1a6d76e1dc3
     - b26e0c8b-689f-4018-bf27-e2d3a522e039
     - f2677690-2137-408e-b250-784a0cd235f4
@@ -194,57 +193,16 @@ ground_truth:
   CL-008:
     question: Find isogenic cell line pairs that differ only in NF1 status
     results:
-    - 02dacc42-ea46-48fb-a4df-7a875d801086
-    - 130fd347-28e1-46c2-a72d-d243e99322b7
-    - 14353c91-2be9-4617-b337-c29080961826
-    - 1b604846-d41c-4969-a79a-9660c04e585c
-    - 234515dd-7c28-4172-83c7-59dddfa22acb
-    - 25fa8030-970e-48ec-8e22-55e23a747164
-    - 3239573e-4ae1-4e01-8098-00dce6ac0a84
-    - 32f73d96-fd2a-4966-a150-ba5fa47d150c
-    - 3a3e5460-3d5b-45f9-995d-25bd49c06f34
-    - 3beebac1-95b0-4834-9008-19f7d268fc5b
-    - 3f29aa26-1d05-453a-a6ac-d4e37d609dba
+    - 0a1a3741-0337-4067-95ab-fb0dc9562d66
     - 44f9c496-ddd8-4e4b-bddb-6b93f7e04fc2
-    - 46da7a41-c654-426e-bfb7-361caf4d3c4c
+    - 4c4e4b03-5975-4708-a25c-f6c45cbe3abf
     - 4cf14492-2735-4e31-ab6a-75554b9ad298
-    - 590ebb66-5944-4cf7-accc-23e18d6c3818
-    - 5a466cdc-5eaa-45a5-87b1-ba9cac6d7d21
-    - 64615ea4-6879-49ff-8f10-18c6710cb33c
-    - 7126593e-4b96-40a5-9ff4-d41b81fbba4c
-    - 73b8caeb-cc91-4d81-b076-25d611949807
-    - 75d4b88a-a906-4f08-a9f8-66490328b9f1
     - 779714c8-f522-4355-a502-d5d2e6e09afa
-    - 7d565aea-0917-428b-9101-d2a19f3fbcf1
-    - 7ef2fd6f-9ba6-4e30-94fc-d4ffd61de6e6
-    - 882101e0-1207-4323-a354-6d5a642e6ca3
-    - 8e9ec3f3-5622-4f8f-a02c-34d8777c82b6
-    - 96d339f9-9d19-40c3-8f81-3590f7c00205
-    - 96f2ab08-2c90-4ef9-9d56-1705ee49cecc
-    - 9b4b8eca-f981-440d-b478-0a5483353368
-    - a03250ca-0914-4318-b5c6-5b5a86ca1965
+    - 7b6dcc42-3c32-4008-8b2c-309aa01b17be
+    - 8a213a9d-392b-4746-8f59-c12f753d9217
     - a0c91627-fad6-4d60-bf74-67623374eff8
-    - a731535e-f7a6-4c6e-b0db-7f0d0979e69f
-    - aa32fc67-9cc3-4d31-bcbd-f7044f9fd484
-    - ad2e271b-55ac-44ae-b39d-f1a6d76e1dc3
     - ad73cdb2-8add-48ff-b9f2-35a38132db84
-    - ae765b00-9189-4a72-8ae7-cddc41e24055
-    - b4987f0a-67ec-4f13-96f1-9443aac6e5ac
-    - bd74fd9f-6357-40d5-8569-96883628fb1a
-    - c5b9e065-6855-4a11-bceb-681d8e82ae5e
     - c88fcbc9-24c1-4f2b-8d13-02f5037dcf1c
-    - d390b3f3-fea7-46d2-9bb7-dc72d59b2ccc
-    - d6a101aa-9ca8-4191-9b43-eddf327ea48b
-    - d86c2e88-3de9-4c0f-9cb5-de2921b8207f
-    - df513bb8-697a-4cac-ae6c-5aca6113ac24
-    - eb920757-ad44-4705-815e-31b5bd6105f5
-    - f047cff6-98c8-4562-b589-94b864ae35a1
-    - f103987e-5196-440e-a6ba-53d39305c714
-    - f2d00598-9db3-4549-a473-16b1db349614
-    - f59f3308-a440-497d-8eee-8d7756a9ae2b
-    - f5ec9375-0564-414a-94ad-86d5083b440f
-    - faf29a50-3168-4ccd-a484-f2a78a026af3
-    - fb67363f-d309-4c7c-ba1e-f295ba411018
   CL-009:
     question: Find cell lines from different tissues of the same donor
     results:
@@ -264,13 +222,13 @@ ground_truth:
     - 1b604846-d41c-4969-a79a-9660c04e585c
     - c8a807e4-502b-461c-a60f-fd10b3cde70e
   GR-001:
-    question: Find CRISPR vectors
+    question: Need CRISPR vectors
     results:
     - 0af1bf36-fa11-4e30-ac58-7a3dbce6c227
     - 0ffb7ddf-418f-4e35-b134-e9ab3df13f85
     - eb0b9d5c-ff06-4e86-8191-dc5336c0a372
   GR-002:
-    question: Find lentiviral vectors for RNAi
+    question: Need lentiviral vectors for RNAi
     results:
     - 58a67e29-1551-4828-97da-85d37b88f4f1
   GR-003:
@@ -322,14 +280,16 @@ ground_truth:
     - d9e0d028-18dd-4e08-b191-d1161ba96fbd
     - fc763fda-e198-4351-912d-82fb223bf916
   MUT-001:
-    question: Find relevant animal or cell line models with mutation NM_000267.3(NF1):c.2041C>T
-      (p.Arg681Ter) (ClinVar)
+    question: What animal or cell line models are available with mutation NM_000267.3(NF1):c.2041C>T
+      (p.Arg681Ter) (ClinVar)?
     results:
     - 033b7173-4c58-410e-b441-579ba05c388a
+    - 03ecfea8-e812-40a8-8938-0979f15b3f53
     - 1ae5651a-818f-4732-8045-17bea2555056
     - 32f73d96-fd2a-4966-a150-ba5fa47d150c
     - 47f50ef0-8d59-430d-9d05-7df1a4f41c3b
     - 504d7dfe-acf9-476c-974d-e8665095afbb
+    - 530e83c9-385e-40f5-8f89-5728f5db211d
     - 6ff97eee-5c1a-4439-9df6-d1715cbdd189
     - 70c1e3f6-751f-49e4-aa47-e3bea4aeac43
     - 8b964052-b74b-4ca3-ad82-31bd2f3457aa
@@ -345,7 +305,7 @@ ground_truth:
     - 27c1a639-9e98-4289-872d-f275d4e49be7
     - ddf3618d-dda5-4c03-a4b4-b9263dba0a31
   MUT-003:
-    question: Find cell line with 'c.104del' sequence variation
+    question: Which cell lines have the 'c.104del' sequence variation?
     results:
     - 02dacc42-ea46-48fb-a4df-7a875d801086
     - 130fd347-28e1-46c2-a72d-d243e99322b7
@@ -362,7 +322,7 @@ ground_truth:
     - f59f3308-a440-497d-8eee-8d7756a9ae2b
     - fb67363f-d309-4c7c-ba1e-f295ba411018
   MUT-004:
-    question: Find animal or cell line models with splice-site variants
+    question: Show me animal or cell line models with splice-site variants
     results:
     - 0f404e70-2acf-4877-bcd5-6da81d9fa41e
     - 46da7a41-c654-426e-bfb7-361caf4d3c4c
@@ -377,6 +337,9 @@ ground_truth:
     - 1b604846-d41c-4969-a79a-9660c04e585c
     - 7fe31236-bc93-449b-b559-9394999be926
     - 827f08a1-3d0f-4fd8-98e4-fb5c40a9c742
+    - b2fb9f7e-ea11-404f-8c0c-c9dc36367f2d
+    - c0a60dec-8ead-43c5-abc2-b06b89dd20cd
+    - d6a101aa-9ca8-4191-9b43-eddf327ea48b
     - f17b839e-acd9-4dbc-a5bb-7d72ed0d0bd8
     - fc3ae45e-9a5b-4fa5-8430-f53479f07f5a
   MUT-006:
@@ -385,7 +348,7 @@ ground_truth:
     - 41883c45-fa85-4101-aba4-1076708d9f18
     - c4456e3a-5007-455b-bf85-f04b440284d6
   PI-001:
-    question: Find tools developed by Piotr Topilko
+    question: What tools have been developed by Piotr Topilko
     results:
     - 15c3bd82-9791-4a53-b6f7-4d23b882a285
   PI-002:
