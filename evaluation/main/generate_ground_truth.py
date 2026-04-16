@@ -385,10 +385,64 @@ def run_queries(data):
         ]
         results['CL-007'] = ensure_resource_id(matches['cellLineId'].tolist())
 
-    # CL-008: Isogenic pairs
-    if not data['cell_lines'].empty and not data['donors'].empty:
-        isogenic_donors = data['donors'][data['donors']['parentDonorId'].notna()]['donorId'].tolist()
-        results['CL-008'] = ensure_resource_id(data['cell_lines'][data['cell_lines']['donorId'].isin(isogenic_donors)]['cellLineId'].tolist())
+    # CL-008: Isogenic pairs that differ only in NF1 status (by exactly 1 mutation)
+    if not data['cell_lines'].empty and not data['donors'].empty and not data['mutations'].empty and not data['mutation_model'].empty:
+        donors_df = data['donors']
+        cls_df = data['cell_lines']
+        parent_map = dict(zip(donors_df['donorId'], donors_df['parentDonorId']))
+
+        # Walk parentDonorId chain to find root donor for each donor
+        def find_root(did):
+            visited = set()
+            current = did
+            while pd.notna(parent_map.get(current)) and current not in visited:
+                visited.add(current)
+                current = parent_map[current]
+            return current
+
+        # Group donors into families by root
+        family_groups = {}
+        for did in donors_df['donorId']:
+            root = find_root(did)
+            family_groups.setdefault(root, set()).add(did)
+
+        # Count mutations per cell line (total and NF1-only)
+        cl_mut = data['mutation_model'][data['mutation_model']['cellLineId'].notna()]
+        total_mut_count = cl_mut.groupby('cellLineId')['mutationId'].nunique()
+        nf1_mut_ids = data['mutations'][data['mutations']['affectedGeneSymbol'] == 'NF1']['mutationId']
+        nf1_cl_mut = cl_mut[cl_mut['mutationId'].isin(nf1_mut_ids)]
+        nf1_mut_count = nf1_cl_mut.groupby('cellLineId')['mutationId'].nunique()
+
+        # Cell lines with exactly 1 total mutation and that mutation is NF1
+        one_nf1_only = set(nf1_mut_count[nf1_mut_count == 1].index) & set(total_mut_count[total_mut_count == 1].index)
+        # Cell lines with 0 total mutations
+        all_cl_ids = set(cls_df['cellLineId'])
+        zero_mut_ids = all_cl_ids - set(total_mut_count.index)
+
+        # Find families with both 0-mutation and exactly-1-NF1-only-mutation members
+        qualifying_ids = []
+        for root, family_donors in family_groups.items():
+            if len(family_donors) < 2:
+                continue
+            family_cls = cls_df[cls_df['donorId'].isin(family_donors)]
+            if family_cls.empty:
+                continue
+            zero_mut = family_cls[family_cls['cellLineId'].isin(zero_mut_ids)]
+            one_mut = family_cls[family_cls['cellLineId'].isin(one_nf1_only)]
+            if zero_mut.empty or one_mut.empty:
+                continue
+            # Only pair lines with matching tissue type (tissue, organ, cellLineCategory)
+            for _, om in one_mut.iterrows():
+                matched_wt = zero_mut[
+                    (zero_mut['tissue'].fillna('') == (om['tissue'] if pd.notna(om['tissue']) else '')) &
+                    (zero_mut['organ'].fillna('') == (om['organ'] if pd.notna(om['organ']) else '')) &
+                    (zero_mut['cellLineCategory'].fillna('') == (om['cellLineCategory'] if pd.notna(om['cellLineCategory']) else ''))
+                ]
+                if not matched_wt.empty:
+                    qualifying_ids.append(om['cellLineId'])
+                    qualifying_ids.extend(matched_wt['cellLineId'].tolist())
+
+        results['CL-008'] = ensure_resource_id(qualifying_ids)
 
     # CL-009: Different tissues same donor
     if not data['cell_lines'].empty:

@@ -345,7 +345,7 @@ components:
         text_search_answerable: no
         text_search_note: "Isogenic relationships not searchable via text; requires graph traversal through donor lineage"
         user_frustration: very_high
-        note: "Uses parentDonorId property added to schema; enables powerful experimental designs comparing NF1+/+ vs NF1+/- vs NF1-/- from same genetic background"
+        note: "Uses parentDonorId to build isogenic families, then filters to pairs differing by exactly 1 mutation that is NF1. Group donors into families by walking parentDonorId chains to root, count total mutations and NF1 mutations per cell line via mutation_model, and include only families containing both 0-total-mutation (wildtype) and exactly-1-total-mutation-which-is-NF1 members. Pairs must also match on tissue, organ, and cellLineCategory to ensure they differ only in NF1 status. Excludes lines with multiple mutations (multi-allelic CRISPR edits, cDNA rescues) and lines with non-NF1 mutations."
         demo_priority: high
         demo_rationale: "Isogenic pair discovery, uses parentDonorId, powerful experimental design"
 
