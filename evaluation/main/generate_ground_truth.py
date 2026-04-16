@@ -350,20 +350,18 @@ def run_queries(data):
 
     if not cells_donors.empty:
         df = cells_donors
-        species_series = df['species_donor'] if 'species_donor' in df.columns else df['species']
         ped_human = df[
             df['age'].apply(is_pediatric) &
-            species_series.str.contains('Homo sapiens|Human', case=False, na=False)
+            df['species'].str.contains('Homo sapiens|Human', case=False, na=False)
         ]
         results['CL-005'] = ensure_resource_id(ped_human['cellLineId'].tolist())
 
     # CL-006: Human lung cell lines
     if not cells_donors.empty:
         df = cells_donors
-        species_series = df['species_donor'] if 'species_donor' in df.columns else df['species']
         matches = df[
             (df['organ'].str.contains('Lung', case=False, na=False)) &
-            (species_series.str.contains('Homo sapiens|Human', case=False, na=False))
+            (df['species'].str.contains('Homo sapiens|Human', case=False, na=False))
         ]
         results['CL-006'] = ensure_resource_id(matches['cellLineId'].tolist())
 
