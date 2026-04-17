@@ -237,6 +237,13 @@ nf:CellLine a owl:Class ;
     rdfs:label "Cell Line" ;
     rdfs:comment "A cell line used in research. Cell lines can be filtered by race and may participate in donor-matching links via sharedDonor." .
 
+nf:NormalCellLine a owl:Class ;
+    rdfs:subClassOf nf:CellLine ;
+    owl:equivalentClass efo:EFO_0002922 ;
+    owl:unionOf ( nf:FiniteCellLine nf:TelomeraseImmortalizedCellLine ) ;
+    rdfs:label "Normal Cell Line" ;
+    rdfs:comment "A cell line derived from non-diseased tissue that retains key characteristics of normal cells: finite lifespan, genetic stability (normal diploid karyotype), regulated growth, and typical functional characteristics. In experimental contexts, normal cell lines serve as controls or baselines representing the unperturbed biological state" .
+
 nf:CancerCellLine a owl:Class ;
     rdfs:subClassOf nf:CellLine ;
     owl:equivalentClass efo:EFO_0001639 ;
