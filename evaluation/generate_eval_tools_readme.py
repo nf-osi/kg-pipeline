@@ -493,6 +493,10 @@ def main():
     print(f"Updating {readme_path}...")
     final_content = update_readme_section(readme_path, readme_content)
 
+    # Write main section update first so QA stats can read it back
+    with open(readme_path, 'w') as f:
+        f.write(final_content)
+
     # Generate and update QA stats
     print("Generating QA statistics...")
     qa_stats = generate_qa_stats(qa_dir)
@@ -500,11 +504,10 @@ def main():
         qa_stats_md = format_qa_stats_markdown(qa_stats)
         final_content = update_qa_stats_in_readme(readme_path, qa_stats_md)
         print(f"  QA: {qa_stats['total_papers']} papers, {qa_stats['total_questions']} questions")
+        with open(readme_path, 'w') as f:
+            f.write(final_content)
     else:
         print("  No QA files found, skipping QA stats")
-
-    with open(readme_path, 'w') as f:
-        f.write(final_content)
 
     print("✓ README updated successfully!")
     print(f"  Main: {stats['total']} questions ({stats['complete']} complete, {stats['incomplete']} incomplete)")
