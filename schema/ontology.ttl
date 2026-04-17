@@ -1094,7 +1094,7 @@ nf:rrid a owl:ObjectProperty ;
 
 nf:usageRequirements a owl:DatatypeProperty ;
     rdfs:label "usageRequirements" ;
-    rdfs:comment "Requirements or restrictions for using a resource. May include terms such as 'MTA' or 'Materials Transfer Agreement', indicating that a legal agreement is required before the resource can be transferred to the requesting party." ;
+    rdfs:comment "Requirements or restrictions for using a resource. May include terms such as 'MTA' or 'Materials Transfer Agreement', indicating that a legal agreement is required before the resource can be transferred to the requesting party. Note that the absence of an explicit MTA mention does not guarantee that no MTA is required; some providers require MTAs by default and this may not be recorded in the data." ;
     rdfs:range xsd:string .
 
 nf:synonyms a owl:DatatypeProperty ;
