@@ -59,7 +59,7 @@
 #   ✓ Can be explained clearly in <30 seconds
 
 metadata:
-  version: v1
+  version: v1.1
   data_archive: syn73695746
 
 components:
@@ -275,7 +275,7 @@ components:
         text_search_answerable: yes
         text_search_note: "Resource Type = 'Cell Line' + 'Cell Line Genetic Disorder' = 'No known genetic disorder' + 'schwann' in text search; relevant hits at bottom"
         user_frustration: moderate
-        note: Text search returns healthy cell lines at very bottom bc affected cell lines are incorrectly categorized w/ 'No known genetic disorder'; issues with data rather than search capability
+        note: "Not all Schwann cell lines have 'schwann' in their name — some use the abbreviation 'SC' (e.g. hTERT SC ipn02.3) only in synonyms, requiring synonym or description search to find them. Additionally, schwannoma (tumor) lines and NF1 -/- knockouts are miscategorized with 'No known genetic disorder', so naive filtering on that field alone returns false positives."
         demo_priority: medium
         demo_rationale: "Control lines for experiments, common need"
 
@@ -540,3 +540,15 @@ components:
         user_frustration: very_high
         demo_priority: high
         demo_rationale: "Cross-resource matching, donor-based integration"
+
+      - id: CR-004
+        question: "I want to acquire the SZ-NF1 cell line. Does it require a Materials Transfer Agreement (MTA)? Return the exact phrasing of your choice: (A) Yes (B) No (C) Not explicitly documented but likely (D) Not explicitly documented so unlikely"
+        user_story: "As a researcher planning to acquire the SZ-NF1 cell line, I want to know whether I need to arrange an MTA before requesting materials"
+        level: advanced
+        complexity: 1-hop
+        facet_answerable: no
+        text_search_answerable: no
+        user_frustration: moderate
+        note: "Tests agent calibration on a specific cell line. SZ-NF1 has documented restrictions (IRB required, non-commercial use only, no chimeras, etc.) but no explicit MTA mention. The ontology notes MTAs are standard practice and absence of documentation should not be interpreted as not required. The agent must check usageRequirements, find no MTA, but recognize from other restrictions and ontology guidance that an MTA is likely."
+        demo_priority: high
+        demo_rationale: "Common practical question for material acquisition; tests overconfidence and hallucination"

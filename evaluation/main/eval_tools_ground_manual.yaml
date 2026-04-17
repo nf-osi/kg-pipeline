@@ -7,7 +7,9 @@ metadata:
   description: "Manually curated ground truth for complex evaluation questions"
   manually_maintained_questions:
     - AM-004
+    - CL-003
     - CR-001
+    - CR-004
 
 ground_truth:
   AM-004:
@@ -49,6 +51,67 @@ ground_truth:
     notes: >
       Advanced question bc the Observations text needs to be interpeted for actually relevant results. 
       Models found after Observations data review have actual tumor detection at 120 days (4 months).
+
+  CL-003:
+    question: "I need normal schwann cell lines"
+    results:
+      - 13ae2445-21e3-4b75-ae70-317a3d5ee40c  # hTERT SC ipn97.4
+      - 3a507bfd-7d2b-4238-b79a-83fe985c2cea  # hTERT ipn02.3 2λ
+      - 3a8f5be4-aa22-48f2-9a76-9412010ecd45  # hTERT ipn02.8
+      - b751b5d4-56e6-42a2-a2dc-289f90c6dd82  # ScienCell Schwann cells
+
+    methodology: |
+      "Normal" Schwann cell lines must satisfy all of:
+      1. Identified as Schwann cells via name, description, or synonyms
+         (includes "schwann" or the abbreviation "hTERT SC" = Schwann Cell)
+      2. geneticDisorder = "No known genetic disorder"
+      3. Not a schwannoma (tumor-derived) line
+      4. Not an NF1 knockout or engineered mutant (e.g. NF1 -/-)
+      5. Cell line category consistent with "normal" — finite or telomerase
+         immortalized lines qualify; cancer, transformed, iPSC, embryonic stem,
+         hybridoma, hybrid, and spontaneously immortalized lines do not
+
+    notes: |
+      Several lines are miscategorized with "No known genetic disorder" in source data.
+      Recommended corrections:
+      - 617cb183-3377-4473-8ad8-2f6472bce1fa (YST-1, cellLineId 4379c5e8-34d5-43f2-b0a8-2711c513eb40):
+        schwannoma tumor line; should be "Schwannomatosis"
+      - 234515dd-7c28-4172-83c7-59dddfa22acb (Schwann cell NF1 -/- iPN97.4 #24, cellLineId 859f3f11-7be4-41c1-97aa-05e86f0c8202):
+        NF1 knockout; should be "Neurofibromatosis type 1"
+      - faf29a50-3168-4ccd-a484-f2a78a026af3 (Schwann cell NF1 -/- with R681X mNf1 cDNA, cellLineId be5c41c4-e9ae-4330-a48b-7b81d26a0c91):
+        NF1 knockout + rescue; should be "Neurofibromatosis type 1"
+      - 3a3e5460-3d5b-45f9-995d-25bd49c06f34 (Schwann cell NF1 -/- with R816X mNf1 cDNA, cellLineId 766629ea-794c-4678-838d-4309d1e825e2):
+        NF1 knockout + rescue; should be "Neurofibromatosis type 1"
+      - 3beebac1-95b0-4834-9008-19f7d268fc5b (Schwann cell NF1 -/- with WT tagged mNf1 cDNA, cellLineId 36050621-0007-4b26-afec-08d43675afc4):
+        NF1 knockout + rescue; should be "Neurofibromatosis type 1"
+
+      Some Schwann cell lines use the abbreviation "SC" only in synonyms
+      (e.g. "hTERT SC ipn02.3 2lambda"), requiring synonym search to discover.
+
+  CR-004:
+    question: "Does the SZ-NF1 cell line require MTA? Please answer exactly: 'Yes', 'No', 'Not explicitly documented but likely', or 'Not explicitly documented so unlikely'"
+    results:
+      - "Not explicitly documented but likely"
+
+    methodology: |
+      1. Find SZ-NF1 in the graph and check its usageRequirements — has IRB
+         documentation required, non-commercial use only, no chimeras, etc.
+         but no explicit MTA mention
+      2. Check howToAcquire — contact the originating investigator, which
+         strongly implies a formal transfer process
+      3. Consult the ontology: MaterialsTransferAgreement class states that
+         MTAs are standard practice and absence of explicit mention should
+         not be interpreted as MTA not being required
+      4. Correct answer acknowledges the data gap without overconfident assertion
+
+    notes: |
+      This question tests agent calibration and hallucination resistance.
+      - An overconfident agent may answer "Yes" without evidence in the data
+      - A naive agent may answer "No" because usageRequirements doesn't mention MTA
+      - A well-calibrated agent checks SZ-NF1's restrictions, sees the heavy
+        usage constraints and investigator-contact acquisition model, reads
+        the ontology guidance, and correctly hedges with "Not explicitly
+        documented but likely"
 
   CR-001:
     question: "Which cell lines have shown sensitivity to HDAC inhibitors?"

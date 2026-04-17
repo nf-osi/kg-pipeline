@@ -237,6 +237,13 @@ nf:CellLine a owl:Class ;
     rdfs:label "Cell Line" ;
     rdfs:comment "A cell line used in research. Cell lines can be filtered by race and may participate in donor-matching links via sharedDonor." .
 
+nf:NormalCellLine a owl:Class ;
+    rdfs:subClassOf nf:CellLine ;
+    owl:equivalentClass efo:EFO_0002922 ;
+    owl:unionOf ( nf:FiniteCellLine nf:TelomeraseImmortalizedCellLine ) ;
+    rdfs:label "Normal Cell Line" ;
+    rdfs:comment "A cell line derived from non-diseased tissue that retains key characteristics of normal cells: finite lifespan, genetic stability (normal diploid karyotype), regulated growth, and typical functional characteristics. In experimental contexts, normal cell lines serve as controls or baselines representing the unperturbed biological state" .
+
 nf:CancerCellLine a owl:Class ;
     rdfs:subClassOf nf:CellLine ;
     owl:equivalentClass efo:EFO_0001639 ;
@@ -389,6 +396,10 @@ nf:DerivationObservation a owl:Class ;
     rdfs:subClassOf nf:Observation ;
     rdfs:label "Derivation observation" ;
     rdfs:comment "An observation describing the origin, lineage, or creation method of a resource, such as cell line derivation, immortalization, or tissue of origin" .
+
+nf:MaterialsTransferAgreement a owl:Class ;
+    rdfs:label "Materials Transfer Agreement" ;
+    rdfs:comment "A legal agreement governing the transfer of research materials between organizations. MTAs are standard practice in academic and commercial sharing of biological materials such as cell lines, animal models, and genetic reagents. In practice, most providers require an MTA by default even when not explicitly documented. Whether a specific resource explicitly requires an MTA can be checked via the usageRequirements property, but absence of an explicit mention should not be interpreted as MTA not being required. The howToAcquire property may also provide clues: when acquisition requires contacting an originating investigator directly, an MTA is typically involved." .
 
 nf:IssueObservation a owl:Class ;
     rdfs:subClassOf nf:Observation ;
@@ -1070,7 +1081,7 @@ nf:specimenTissueType a owl:DatatypeProperty ;
 # Shared properties
 nf:geneticDisorder a owl:DatatypeProperty ;
     rdfs:label "geneticDisorder" ;
-    rdfs:comment "Genetic disorder associated with the resource." ;
+    rdfs:comment "Genetic disorder associated with the resource. A value of 'No known genetic disorder' indicates a normal, healthy, or control resource with no disease association. When users ask for 'normal' cell lines or animal models, this is the distinguishing attribute." ;
     rdfs:range xsd:string .
 
 nf:organ a owl:DatatypeProperty ;
@@ -1083,7 +1094,7 @@ nf:rrid a owl:ObjectProperty ;
 
 nf:usageRequirements a owl:DatatypeProperty ;
     rdfs:label "usageRequirements" ;
-    rdfs:comment "Requirements or restrictions for using a resource." ;
+    rdfs:comment "Requirements or restrictions for using a resource. May include terms such as 'MTA' or 'Materials Transfer Agreement', indicating that a legal agreement is required before the resource can be transferred to the requesting party. Note that the absence of an explicit MTA mention does not guarantee that no MTA is required; some providers require MTAs by default and this may not be recorded in the data." ;
     rdfs:range xsd:string .
 
 nf:synonyms a owl:DatatypeProperty ;

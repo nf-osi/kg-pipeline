@@ -131,7 +131,7 @@ Important item characteristics:
 
 ### Files
 
-- **`main/eval_tools.yaml`**: Question definitions and metadata (stats below)
+- **`main/dataset_attributes.yaml`**: Question definitions and metadata (stats below)
 - **`main/eval_tools_ground_auto.yaml`**: Automatically generated ground truth
 - **`main/eval_tools_ground_manual.yaml`**: Manually curated ground truth
 - **`main/generate_ground_truth.py`**: Ground truth generation script
@@ -156,7 +156,7 @@ There is only one question that returns a number (count) instead of uuid(s).
 
 ### Data Versioning
 
-**Dataset Version**: v1
+**Dataset Version**: v1.1
 
 Data archived at **syn73695746**
 
@@ -164,21 +164,21 @@ Data archived at **syn73695746**
 
 ### Dataset Statistics
 
-- **Total Questions**: 34
-  - Complete: 34
+- **Total Questions**: 35
+  - Complete: 35
   - Incomplete/WIP: 0
 
 #### By Complexity
 - **0-hop**: 14
-- **1-hop**: 14
+- **1-hop**: 15
 - **2-hop**: 6
 
 #### By Difficulty Level
-- **advanced**: 17
+- **advanced**: 18
 - **baseline**: 17
 
 #### By Persona
-- **Researcher**: 28
+- **Researcher**: 29
 - **Gene Therapy Developer**: 4
 - **Bioinformatician**: 1
 - **Program Officer**: 1
@@ -186,7 +186,7 @@ Data archived at **syn73695746**
 *Total unique personas: 4*
 
 #### By Demo Priority
-- **high**: 14
+- **high**: 15
 - **medium**: 13
 - **low**: 7
 
@@ -194,13 +194,13 @@ Data archived at **syn73695746**
 
 | Technology | Yes | Partial | No |
 |------------|-----|---------|-----|
-| **Facet Filters** | 9 | 3 | 22 |
-| **Text Search** | 13 | 8 | 13 |
+| **Facet Filters** | 9 | 3 | 23 |
+| **Text Search** | 13 | 8 | 14 |
 
 #### Ground Truth Availability
 
-- **Automated** (generated from CSV data): 32
-- **Manual** (curated, requires interpretation): 2
+- **Automated** (generated from CSV data): 31
+- **Manual** (curated, requires interpretation): 4
 
 ---
 
@@ -228,7 +228,7 @@ Data archived at **syn73695746**
 
 | ID | Question | Level | Complexity | Facet | Text Search |
 |----|----------|-------|------------|-------|-------------|
-| AM-001 | What animal models are available for optic glioma? | baseline | 0-hop | Yes | Yes |
+| AM-001 | I want animal models to study optic glioma | baseline | 0-hop | Yes | Yes |
 | AM-002 | Help me find animal models suitable for energy expenditure studies | baseline | 0-hop | Partial | Partial |
 | AM-003 | Are there any non-mouse mammalian models available? | baseline | 0-hop | Yes | Partial |
 | AM-004 | Which mouse model has the earliest observed tumor development? | advanced | 1-hop | No | No |
@@ -245,7 +245,7 @@ Data archived at **syn73695746**
 |----|----------|-------|------------|-------|-------------|
 | CL-001 | Show me plexiform neurofibroma cell lines | baseline | 0-hop | Yes | Yes |
 | CL-002 | What hybridoma cell lines are available? | baseline | 0-hop | Yes | Yes |
-| CL-003 | Find normal schwann cell lines | baseline | 1-hop | Partial | Yes |
+| CL-003 | I need normal schwann cell lines | baseline | 1-hop | Partial | Yes |
 | CL-004 | Find NF1 cell lines from black patients | baseline | 0-hop | Yes | Partial |
 | CL-005 | Find human cell lines from pediatric donors | baseline | 1-hop | Partial | No |
 | CL-006 | Find human lung cell lines for pulmonary toxicity assessment | baseline | 0-hop | No | Yes |
@@ -263,7 +263,7 @@ Data archived at **syn73695746**
 |----|----------|-------|------------|-------|-------------|
 | AB-001 | Find drosophila neurofibromin antibodies | baseline | 0-hop | Yes | Yes |
 | AB-002 | Find antibodies targeting the C-terminal region of neurofibromin | baseline | 0-hop | No | Yes |
-| AB-003 | Find antibodies for studying NF1 phosphorylation and post-translational regul... | advanced | 1-hop | No | Partial |
+| AB-003 | Give me antibodies for studying NF1 phosphorylation and post-translational re... | advanced | 1-hop | No | Partial |
 
 
 #### Genetic Reagent Discovery
@@ -273,8 +273,8 @@ Data archived at **syn73695746**
 
 | ID | Question | Level | Complexity | Facet | Text Search |
 |----|----------|-------|------------|-------|-------------|
-| GR-001 | Find CRISPR vectors | baseline | 0-hop | Yes | Yes |
-| GR-002 | Find lentiviral vectors for RNAi | baseline | 0-hop | Yes | Yes |
+| GR-001 | Need CRISPR vectors | baseline | 0-hop | Yes | Yes |
+| GR-002 | Need lentiviral vectors for RNAi | baseline | 0-hop | Yes | Yes |
 | GR-003 | Find vectors with a CMV promoter | baseline | 0-hop | No | Yes |
 | GR-004 | Find NF1 expression vectors compatible with high-copy E. coli systems | advanced | 1-hop | No | Partial |
 | GR-005 | Find vectors with resistance markers suitable for mammalian selection | advanced | 1-hop | No | No |
@@ -287,20 +287,21 @@ Data archived at **syn73695746**
 
 | ID | Question | Level | Complexity | Facet | Text Search |
 |----|----------|-------|------------|-------|-------------|
-| PI-001 | Find tools developed by Piotr Topilko | baseline | 1-hop | Yes | Yes |
+| PI-001 | What tools have been developed by Piotr Topilko | baseline | 1-hop | Yes | Yes |
 | PI-002 | How many tools have been funded by GFF? | advanced | 2-hop | No | No |
 
 
 #### Integrated Resource Queries
 *Questions that integrate data across multiple resource types or with additional semantics*
 
-**Questions: 3/3 complete**
+**Questions: 4/4 complete**
 
 | ID | Question | Level | Complexity | Facet | Text Search |
 |----|----------|-------|------------|-------|-------------|
 | CR-001 | Which cell lines have shown sensitivity to HDAC inhibitors? | advanced | 1-hop | No | Partial |
 | CR-002 | Find human cell lines with the most diverse data types available on the portal. | advanced | 2-hop | No | No |
 | CR-003 | Find animal models and cell lines that are derived from the same donor | advanced | 2-hop | No | No |
+| CR-004 | I want to acquire the SZ-NF1 cell line. Does it require a Materials Transfer ... | advanced | 1-hop | No | No |
 
 
 ---

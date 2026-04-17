@@ -6,7 +6,7 @@ from datetime import datetime
 
 # Path adjusted for script location in evaluation/main/
 DATA_DIR = '../data/csv'
-EVAL_TOOLS_FILE = 'eval_tools.yaml'
+DATASET_ATTRIBUTES_FILE = 'dataset_attributes.yaml'
 OUTPUT_FILE = 'eval_tools_ground_auto.yaml'
 
 def load_data():
@@ -47,11 +47,11 @@ def load_data():
     return data
 
 def get_all_questions():
-    if not os.path.exists(EVAL_TOOLS_FILE):
+    if not os.path.exists(DATASET_ATTRIBUTES_FILE):
         return {}
-    with open(EVAL_TOOLS_FILE, 'r') as f:
+    with open(DATASET_ATTRIBUTES_FILE, 'r') as f:
         config = yaml.safe_load(f)
-    
+
     questions = {}
     for component in config.get('components', []):
         for q in component.get('questions', []):
@@ -305,20 +305,9 @@ def run_queries(data):
         matches = df[df['cellLineCategory'].str.contains('Hybridoma', case=False, na=False)]
         results['CL-002'] = ensure_resource_id(matches['cellLineId'].tolist())
 
-    # CL-003: normal schwann cell lines
-    if not data['cell_lines'].empty:
-        df = data['cell_lines']
-        matches = df[
-            (df['cellLineGeneticDisorder'].str.contains('No known genetic disorder', case=False, na=False)) &
-            (df['tissue'].str.contains('schwann', case=False, na=False) | 
-             df['cellLineManifestation'].str.contains('schwann', case=False, na=False))
-        ]
-        if matches.empty:
-            matches = df[
-                (df['cellLineGeneticDisorder'].str.contains('No known genetic disorder', case=False, na=False)) &
-                (df.apply(lambda row: row.astype(str).str.contains('schwann', case=False).any(), axis=1))
-            ]
-        results['CL-003'] = ensure_resource_id(matches['cellLineId'].tolist())
+    # CL-003: Moved to eval_tools_ground_manual.yaml — defining "normal" requires
+    # excluding schwannoma, NF1 knockouts, and certain cell line categories (cancer,
+    # transformed, iPSC, etc.) which is better handled by manual curation.
 
     # CL-004: Black patients
     if not cells_donors_resources.empty:

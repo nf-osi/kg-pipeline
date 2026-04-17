@@ -1,10 +1,12 @@
 metadata:
-  generated_at: '2026-04-16T09:58:19.165195'
+  generated_at: '2026-04-17T10:58:20.001669'
   skipped_questions:
   - AM-004
+  - CL-003
   - CR-001
-  total_questions: 34
-  generated_questions: 32
+  - CR-004
+  total_questions: 35
+  generated_questions: 31
 ground_truth:
   AB-001:
     question: Find drosophila neurofibromin antibodies
@@ -80,10 +82,6 @@ ground_truth:
     - 42257ac4-1950-4541-9bee-b9a965e2fa86
     - 65d07476-2469-4679-85b2-e2ca67f3b01b
     - f410431d-7571-4302-8870-eb115b71d0ce
-  CL-003:
-    question: I need normal schwann cell lines
-    results:
-    - 617cb183-3377-4473-8ad8-2f6472bce1fa
   CL-004:
     question: Find NF1 cell lines from black patients
     results:
