@@ -275,7 +275,7 @@ components:
         text_search_answerable: yes
         text_search_note: "Resource Type = 'Cell Line' + 'Cell Line Genetic Disorder' = 'No known genetic disorder' + 'schwann' in text search; relevant hits at bottom"
         user_frustration: moderate
-        note: Text search returns healthy cell lines at very bottom bc affected cell lines are incorrectly categorized w/ 'No known genetic disorder'; issues with data rather than search capability
+        note: "Not all Schwann cell lines have 'schwann' in their name — some use the abbreviation 'SC' (e.g. hTERT SC ipn02.3) only in synonyms, requiring synonym or description search to find them. Additionally, schwannoma (tumor) lines and NF1 -/- knockouts are miscategorized with 'No known genetic disorder', so naive filtering on that field alone returns false positives."
         demo_priority: medium
         demo_rationale: "Control lines for experiments, common need"
 
