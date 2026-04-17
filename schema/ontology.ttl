@@ -399,7 +399,7 @@ nf:DerivationObservation a owl:Class ;
 
 nf:MaterialsTransferAgreement a owl:Class ;
     rdfs:label "Materials Transfer Agreement" ;
-    rdfs:comment "A legal agreement governing the transfer of research materials between organizations. Whether a resource requires an MTA can be inferred from the usageRequirements property containing 'MTA' or 'Materials Transfer Agreement'." .
+    rdfs:comment "A legal agreement governing the transfer of research materials between organizations. MTAs are standard practice in academic and commercial sharing of biological materials such as cell lines, animal models, and genetic reagents. In practice, most providers require an MTA by default even when not explicitly documented. Whether a specific resource explicitly requires an MTA can be checked via the usageRequirements property, but absence of an explicit mention should not be interpreted as MTA not being required. The howToAcquire property may also provide clues: when acquisition requires contacting an originating investigator directly, an MTA is typically involved." .
 
 nf:IssueObservation a owl:Class ;
     rdfs:subClassOf nf:Observation ;
