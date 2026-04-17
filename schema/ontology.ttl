@@ -1158,6 +1158,16 @@ nf:hasInvestigator a owl:ObjectProperty ;
     rdfs:domain nf:Development ;
     rdfs:range nf:Investigator .
 
+nf:createdBy a owl:ObjectProperty ;
+    rdfs:label "createdBy" ;
+    rdfs:comment "Synapse user who created the entity." ;
+    rdfs:domain nf:File .
+
+nf:modifiedBy a owl:ObjectProperty ;
+    rdfs:label "modifiedBy" ;
+    rdfs:comment "Synapse user who last modified the entity." ;
+    rdfs:domain nf:File .
+
 # Publication
 nf:doi a owl:ObjectProperty ;
     rdfs:label "doi" ;

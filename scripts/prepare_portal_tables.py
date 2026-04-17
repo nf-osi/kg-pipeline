@@ -64,7 +64,9 @@ fundingAgency as fundingAgency,
 progressReportNumber as reportMilestone,
 compoundName as compoundName,
 experimentalCondition as experimentalCondition,
-modelSystemName as modelSystemName
+modelSystemName as modelSystemName,
+createdBy as createdBy,
+modifiedBy as modifiedBy
 """
 
 # MUST USE mutationDetailsId as mutationId

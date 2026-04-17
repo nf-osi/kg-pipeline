@@ -303,6 +303,60 @@ class TestFilesIRIFields:
             assert len(results) == 0, f"Expected no {pred} for syn9999993"
 
 
+class TestFilesPersonAttribution:
+    """Test createdBy/modifiedBy person attribution"""
+
+    PROFILE_BASE = "https://www.synapse.org/Profile:"
+
+    def test_created_by_is_iri(self, files_graph, namespaces):
+        """createdBy should be a Synapse Profile IRI"""
+        NF = namespaces["nf"]
+        query = """
+        SELECT ?creator WHERE {
+            <https://www.synapse.org/Synapse:syn9999991> nf:createdBy ?creator .
+        }
+        """
+        results = list(files_graph.query(query, initNs={"nf": NF}))
+        assert len(results) == 1
+        assert str(results[0].creator) == f"{self.PROFILE_BASE}3341049"
+
+    def test_modified_by_is_iri(self, files_graph, namespaces):
+        """modifiedBy should be a Synapse Profile IRI"""
+        NF = namespaces["nf"]
+        query = """
+        SELECT ?modifier WHERE {
+            <https://www.synapse.org/Synapse:syn9999992> nf:modifiedBy ?modifier .
+        }
+        """
+        results = list(files_graph.query(query, initNs={"nf": NF}))
+        assert len(results) == 1
+        assert str(results[0].modifier) == f"{self.PROFILE_BASE}2727272"
+
+    def test_created_by_and_modified_by_different(self, files_graph, namespaces):
+        """A file can have different createdBy and modifiedBy users"""
+        NF = namespaces["nf"]
+        query = """
+        SELECT ?creator ?modifier WHERE {
+            <https://www.synapse.org/Synapse:syn9999992> nf:createdBy ?creator ;
+                                                          nf:modifiedBy ?modifier .
+        }
+        """
+        results = list(files_graph.query(query, initNs={"nf": NF}))
+        assert len(results) == 1
+        assert str(results[0].creator) != str(results[0].modifier)
+
+    def test_empty_created_by_produces_no_triple(self, files_graph, namespaces):
+        """Empty createdBy should not create a triple"""
+        NF = namespaces["nf"]
+        query = """
+        SELECT ?creator WHERE {
+            <https://www.synapse.org/Synapse:syn9999993> nf:createdBy ?creator .
+        }
+        """
+        results = list(files_graph.query(query, initNs={"nf": NF}))
+        assert len(results) == 0
+
+
 class TestFilesNumericFields:
     """Test numeric field handling"""
 

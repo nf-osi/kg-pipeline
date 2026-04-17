@@ -59,7 +59,9 @@ map:FileCore a rr:TriplesMap ;
     rr:predicateObjectMap [ rr:predicate nf:fileFormat ; rr:objectMap [ rml:reference "fileFormat" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:sex ; rr:objectMap [ rml:reference "sex" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:species ; rr:objectMap [ rml:reference "species" ; rr:datatype xsd:string ] ] ;
-    rr:predicateObjectMap [ rr:predicate nf:reportMilestone ; rr:objectMap [ rml:reference "reportMilestone" ; rr:datatype xsd:double ] ] .
+    rr:predicateObjectMap [ rr:predicate nf:reportMilestone ; rr:objectMap [ rml:reference "reportMilestone" ; rr:datatype xsd:double ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:createdBy ; rr:objectMap [ rr:template "https://www.synapse.org/Profile:{createdBy}" ; rr:termType rr:IRI ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:modifiedBy ; rr:objectMap [ rr:template "https://www.synapse.org/Profile:{modifiedBy}" ; rr:termType rr:IRI ] ] .
 
 ################################################################################
 # Model System as IRI (pipe-separated)
