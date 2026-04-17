@@ -129,6 +129,16 @@ shapes:FileShape a sh:NodeShape ;
     sh:property [
         sh:path nf:hasFunder ;
         sh:nodeKind sh:IRI ;
+    ] ;
+    sh:property [
+        sh:path nf:createdBy ;
+        sh:nodeKind sh:IRI ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:modifiedBy ;
+        sh:nodeKind sh:IRI ;
+        sh:maxCount 1 ;
     ] .
 
 ################################################################################
