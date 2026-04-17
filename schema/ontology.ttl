@@ -390,6 +390,10 @@ nf:DerivationObservation a owl:Class ;
     rdfs:label "Derivation observation" ;
     rdfs:comment "An observation describing the origin, lineage, or creation method of a resource, such as cell line derivation, immortalization, or tissue of origin" .
 
+nf:MaterialsTransferAgreement a owl:Class ;
+    rdfs:label "Materials Transfer Agreement" ;
+    rdfs:comment "A legal agreement governing the transfer of research materials between organizations. Whether a resource requires an MTA can be inferred from the usageRequirements property containing 'MTA' or 'Materials Transfer Agreement'." .
+
 nf:IssueObservation a owl:Class ;
     rdfs:subClassOf nf:Observation ;
     rdfs:label "Issue observation" ;
@@ -1070,7 +1074,7 @@ nf:specimenTissueType a owl:DatatypeProperty ;
 # Shared properties
 nf:geneticDisorder a owl:DatatypeProperty ;
     rdfs:label "geneticDisorder" ;
-    rdfs:comment "Genetic disorder associated with the resource." ;
+    rdfs:comment "Genetic disorder associated with the resource. A value of 'No known genetic disorder' indicates a normal, healthy, or control resource with no disease association. When users ask for 'normal' cell lines or animal models, this is the distinguishing attribute." ;
     rdfs:range xsd:string .
 
 nf:organ a owl:DatatypeProperty ;
@@ -1083,7 +1087,7 @@ nf:rrid a owl:ObjectProperty ;
 
 nf:usageRequirements a owl:DatatypeProperty ;
     rdfs:label "usageRequirements" ;
-    rdfs:comment "Requirements or restrictions for using a resource." ;
+    rdfs:comment "Requirements or restrictions for using a resource. May include terms such as 'MTA' or 'Materials Transfer Agreement', indicating that a legal agreement is required before the resource can be transferred to the requesting party." ;
     rdfs:range xsd:string .
 
 nf:synonyms a owl:DatatypeProperty ;
