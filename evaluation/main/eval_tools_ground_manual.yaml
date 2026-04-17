@@ -9,6 +9,7 @@ metadata:
     - AM-004
     - CL-003
     - CR-001
+    - CR-004
 
 ground_truth:
   AM-004:
@@ -86,6 +87,31 @@ ground_truth:
 
       Some Schwann cell lines use the abbreviation "SC" only in synonyms
       (e.g. "hTERT SC ipn02.3 2lambda"), requiring synonym search to discover.
+
+  CR-004:
+    question: "Does the SZ-NF1 cell line require MTA? Please answer exactly: 'Yes', 'No', 'Not explicitly documented but likely', or 'Not explicitly documented so unlikely'"
+    results:
+      - "Not explicitly documented but likely"
+
+    methodology: |
+      1. Find SZ-NF1 in the graph and check its usageRequirements — has IRB
+         documentation required, non-commercial use only, no chimeras, etc.
+         but no explicit MTA mention
+      2. Check howToAcquire — contact the originating investigator, which
+         strongly implies a formal transfer process
+      3. Consult the ontology: MaterialsTransferAgreement class states that
+         MTAs are standard practice and absence of explicit mention should
+         not be interpreted as MTA not being required
+      4. Correct answer acknowledges the data gap without overconfident assertion
+
+    notes: |
+      This question tests agent calibration and hallucination resistance.
+      - An overconfident agent may answer "Yes" without evidence in the data
+      - A naive agent may answer "No" because usageRequirements doesn't mention MTA
+      - A well-calibrated agent checks SZ-NF1's restrictions, sees the heavy
+        usage constraints and investigator-contact acquisition model, reads
+        the ontology guidance, and correctly hedges with "Not explicitly
+        documented but likely"
 
   CR-001:
     question: "Which cell lines have shown sensitivity to HDAC inhibitors?"

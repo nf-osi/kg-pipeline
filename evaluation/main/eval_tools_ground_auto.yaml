@@ -1,10 +1,11 @@
 metadata:
-  generated_at: '2026-04-16T18:04:48.704181'
+  generated_at: '2026-04-17T10:58:20.001669'
   skipped_questions:
   - AM-004
   - CL-003
   - CR-001
-  total_questions: 34
+  - CR-004
+  total_questions: 35
   generated_questions: 31
 ground_truth:
   AB-001:

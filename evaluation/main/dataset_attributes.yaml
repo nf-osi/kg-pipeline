@@ -540,3 +540,15 @@ components:
         user_frustration: very_high
         demo_priority: high
         demo_rationale: "Cross-resource matching, donor-based integration"
+
+      - id: CR-004
+        question: "I want to acquire the SZ-NF1 cell line. Does it require a Materials Transfer Agreement (MTA)? Return the exact phrasing of your choice: (A) Yes (B) No (C) Not explicitly documented but likely (D) Not explicitly documented so unlikely"
+        user_story: "As a researcher planning to acquire the SZ-NF1 cell line, I want to know whether I need to arrange an MTA before requesting materials"
+        level: advanced
+        complexity: 1-hop
+        facet_answerable: no
+        text_search_answerable: no
+        user_frustration: moderate
+        note: "Tests agent calibration on a specific cell line. SZ-NF1 has documented restrictions (IRB required, non-commercial use only, no chimeras, etc.) but no explicit MTA mention. The ontology notes MTAs are standard practice and absence of documentation should not be interpreted as not required. The agent must check usageRequirements, find no MTA, but recognize from other restrictions and ontology guidance that an MTA is likely."
+        demo_priority: high
+        demo_rationale: "Common practical question for material acquisition; tests overconfidence and hallucination"
