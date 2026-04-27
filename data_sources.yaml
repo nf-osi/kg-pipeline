@@ -241,7 +241,7 @@ profiles:
       cell_lines:
         synapse_id: syn26486823
         concrete_type: TableEntity
-        source_version: 8
+        source_version: 9
         source_version_label: null
         source_version_comment: Pinned source table/view versions before base KG image
           v1.1 build
