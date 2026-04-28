@@ -60,6 +60,8 @@ scripts/
   classify_*.py                  Harmonization (one per entity type)
   harmonize_files.py             File-level harmonization (model systems, data types)
   validate_fks.py                CSV-level foreign key validation (see HARMONIZATION.md)
+  archive_rdf.py                 Merge and upload RDF snapshot to Synapse
+  diff_rdf.py                    Diff current build against previous Synapse archive
   astabench.py                   Prepare eval data and run astabench across models
 data/
   csv/                           Source and harmonized CSVs
@@ -107,6 +109,41 @@ fixture CSV and validates the output graph with SPARQL. See `test/README.md`.
 Publication full-text from 139 NF papers is indexed alongside the RDF graph,
 enabling combined text search and graph queries. See
 [PLUS_PUB_TEXT.md](PLUS_PUB_TEXT.md) for design, scripts, and query examples.
+
+### RDF Archiving and Diff Generation
+
+After each build, the full RDF graph (data + schema) is archived to Synapse as a
+single merged `kg_rdf.ttl`. Each upload creates a new version of the same Synapse
+entity; the current version is tracked in `data_sources.yaml` under
+`rdf_archive.archive_id` and `rdf_archive.archive_version`.
+
+Before archiving, a diff is computed between the previous archive and the current
+build, producing:
+- `data/diff/added.ttl` — triples present in the new build but not the previous
+- `data/diff/removed.ttl` — triples present in the previous build but not the new
+
+These diff files support incremental Neptune graph updates without full image rebuilds.
+
+> [!NOTE]
+> The diff covers only the core RDF graph (`data/rdf/` + `schema/`). Publication
+> full-text triples from the PLUS_PUB_TEXT index are excluded — see
+> [PLUS_PUB_TEXT.md](PLUS_PUB_TEXT.md) for that pipeline.
+
+To run manually:
+
+```bash
+# Diff against previous Synapse archive (reads archive_id/version from data_sources.yaml)
+python scripts/diff_rdf.py
+
+# Diff against a local file (useful for testing)
+python scripts/diff_rdf.py --previous path/to/previous.ttl
+
+# Archive current build to Synapse
+python scripts/archive_rdf.py --comment "Build v1.2.0"
+```
+
+Both steps run automatically in CI after `make all` and RDF validation.
+The archive requires `SYNAPSE_AUTH_TOKEN` to be set.
 
 ### Build and Release
 
