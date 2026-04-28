@@ -9,6 +9,7 @@ profiles:
       last_snapshot_comment: null
       last_snapshot_date: null
     rdf_archive:
+      folder_id: syn73695288
       archive_id: null
       archive_version: null
       last_snapshot_comment: null
@@ -192,6 +193,7 @@ profiles:
       last_snapshot_comment: For eval dataset v1
       last_snapshot_date: '2026-02-10 11:15:28'
     rdf_archive:
+      folder_id: syn73695288
       archive_id: null
       archive_version: null
       last_snapshot_comment: null

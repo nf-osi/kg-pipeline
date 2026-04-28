@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 """Archive current RDF build to Synapse and update data_sources.yaml.
 
-Merges all TTL files from data/rdf/ into a single kg_rdf.ttl and uploads
-to the configured Synapse folder. Creates a new Synapse file entity on first
-run; subsequent runs upload a new version of the same entity.
+Merges all TTL files from data/rdf/ and schema/ into a single kg_rdf.ttl and
+uploads to the configured Synapse folder. Creates a new Synapse file entity on
+first run; subsequent runs upload a new version of the same entity.
 
 Updates data_sources.yaml with the new archive_id, archive_version, and
 last_snapshot_date after a successful upload.
 
 Usage:
-    python scripts/archive_rdf.py [--rdf-dir DIR] [--profile PROFILE] [--comment TEXT]
+    python scripts/archive_rdf.py [--rdf-dir DIR] [--schema-dir DIR] [--profile PROFILE] [--comment TEXT]
 
 Examples:
     python scripts/archive_rdf.py
@@ -40,6 +40,7 @@ logger = logging.getLogger(__name__)
 
 DATA_SOURCES = Path("data_sources.yaml")
 DEFAULT_RDF_DIR = Path("data/rdf")
+DEFAULT_SCHEMA_DIR = Path("schema")
 ARCHIVE_FILENAME = "kg_rdf.ttl"
 
 TTL_PREFIXES = {
@@ -52,17 +53,20 @@ TTL_PREFIXES = {
 }
 
 
-def merge_rdf_dir(rdf_dir: Path) -> Store:
-    """Merge all non-raw TTL files from a directory into a single store."""
+def merge_rdf_dirs(rdf_dir: Path, schema_dir: Path) -> Store:
+    """Merge data and schema TTL files into a single store."""
     store = Store()
-    ttl_files = sorted(f for f in rdf_dir.glob("*.ttl") if not f.name.endswith("_raw.ttl"))
-    if not ttl_files:
-        raise FileNotFoundError(f"No TTL files found in {rdf_dir}")
-    for ttl_file in ttl_files:
+    data_files = sorted(f for f in rdf_dir.glob("*.ttl") if not f.name.endswith("_raw.ttl"))
+    schema_files = sorted(schema_dir.glob("*.ttl"))
+    all_files = data_files + schema_files
+    if not all_files:
+        raise FileNotFoundError(f"No TTL files found in {rdf_dir} or {schema_dir}")
+    for ttl_file in all_files:
         logger.info("  Loading %s", ttl_file)
         with open(ttl_file, "rb") as f:
             store.bulk_load(f, RdfFormat.TURTLE)
-    logger.info("Merged %d triples from %d files", len(store), len(ttl_files))
+    logger.info("Merged %d triples from %d files (%d data, %d schema)",
+                len(store), len(all_files), len(data_files), len(schema_files))
     return store
 
 
@@ -75,7 +79,13 @@ def main(argv: list[str] | None = None) -> int:
         "--rdf-dir",
         type=Path,
         default=DEFAULT_RDF_DIR,
-        help=f"Directory containing TTL files to archive (default: {DEFAULT_RDF_DIR})",
+        help=f"Directory containing data TTL files (default: {DEFAULT_RDF_DIR})",
+    )
+    parser.add_argument(
+        "--schema-dir",
+        type=Path,
+        default=DEFAULT_SCHEMA_DIR,
+        help=f"Directory containing schema/ontology TTL files (default: {DEFAULT_SCHEMA_DIR})",
     )
     parser.add_argument(
         "--profile",
@@ -105,8 +115,8 @@ def main(argv: list[str] | None = None) -> int:
         logger.error("rdf_archive.folder_id not set in data_sources.yaml for profile '%s'", args.profile)
         return 1
 
-    logger.info("Merging RDF from %s", args.rdf_dir)
-    store = merge_rdf_dir(args.rdf_dir)
+    logger.info("Merging RDF from %s and %s", args.rdf_dir, args.schema_dir)
+    store = merge_rdf_dirs(args.rdf_dir, args.schema_dir)
 
     with tempfile.TemporaryDirectory() as tmpdir:
         merged_path = Path(tmpdir) / ARCHIVE_FILENAME
