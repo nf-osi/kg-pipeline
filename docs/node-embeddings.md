@@ -66,9 +66,9 @@ make embeddings PECANPY_NUMWALKS=5 PECANPY_WALKLEN=40
 
 ### Step 3: ChromaDB vector index
 
-`apps/personalized_search/index_embeddings.py` indexes all 416k nodes into a persistent
-ChromaDB collection with entity-type metadata fetched from the SPARQL endpoint. This enables
-type-filtered ANN search without loading the full `.emd` file on each query.
+`make index` builds a persistent ChromaDB collection from the `.emd` file, with entity-type
+metadata fetched from the SPARQL endpoint. This enables type-filtered ANN search without
+loading the full `.emd` file on each query.
 
 ```bash
 make index   # Produces data/embeddings/chroma/ (requires qlever-rdf running)
