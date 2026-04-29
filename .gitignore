@@ -4,6 +4,11 @@
 data/
 tmp/
 
+# Node embeddings — generated artifacts, not tracked
+# data/embeddings/kg.edgelist, data/embeddings/kg.emd, and data/embeddings/chroma/
+# are excluded by data/ above.
+# Regenerate with: make edgelist && make embeddings && make index
+
 # Ignore RMLMapper logs
 logs/
 

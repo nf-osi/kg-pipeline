@@ -72,6 +72,10 @@ scripts/
   diff_rdf.py                    Diff current build against previous Synapse archive
   rdf_to_edgelist.py             RDF -> weighted edgelist for node embeddings
   astabench.py                   Prepare eval data and run astabench across models
+apps/
+  personalized_search/           Node embedding-based personalized search (see README)
+docs/
+  node-embeddings.md             Embedding pipeline and ChromaDB index docs
 data/
   csv/                           Source and harmonized CSVs
   rdf/                           Generated RDF (Turtle)

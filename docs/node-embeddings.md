@@ -2,8 +2,8 @@
 
 Node embeddings are generated from the KG RDF using
 [PecanPy](https://github.com/krishnanlab/PecanPy) (node2vec), producing low-dimensional vector
-representations of every entity in the graph. These are used for similarity search, discovery, and
-query suggestions.
+representations of every entity in the graph. These are used for similarity search, discovery,
+query suggestions, and other downstream applications.
 
 ### Overview
 
@@ -15,6 +15,9 @@ data/embeddings/kg.edgelist   ←── weighted IRI edgelist
       │
       ▼ (PecanPy / node2vec)
 data/embeddings/kg.emd        ←── 128-dim node embeddings
+      │
+      ▼ (index_embeddings.py)
+data/embeddings/chroma/       ←── ChromaDB vector index (type-filtered ANN search)
 ```
 
 ### Step 1: Edgelist extraction
@@ -61,9 +64,26 @@ Key parameters (all overridable on the command line):
 make embeddings PECANPY_NUMWALKS=5 PECANPY_WALKLEN=40
 ```
 
-### Usage
+### Step 3: ChromaDB vector index
 
-_To be documented._
+`apps/personalized_search/index_embeddings.py` indexes all 416k nodes into a persistent
+ChromaDB collection with entity-type metadata fetched from the SPARQL endpoint. This enables
+type-filtered ANN search without loading the full `.emd` file on each query.
+
+```bash
+make index   # Produces data/embeddings/chroma/ (requires qlever-rdf running)
+```
+
+**Type-filtered ANN search:** ChromaDB's HNSW index supports metadata filters at query time,
+so a search for "top-10 Studies nearest to this user vector" never touches the 408k File
+nodes — the filter is applied inside the index traversal, not as a post-filter over all
+results. This matters here because Files dominate the graph (98% of nodes); without filtering,
+a nearest-neighbor query would return almost exclusively files regardless of what the caller
+asked for. With the filter, each entity type gets its own fair ranking: the query
+`collection.query(query_embeddings=[vec], where={"type": "Study"}, n_results=10)` returns
+the 10 most similar Study nodes directly. As new entity types are added to the KG and
+embedded, they become queryable by type immediately without code changes — just pass a
+different `where` clause.
 
 ### References
 
