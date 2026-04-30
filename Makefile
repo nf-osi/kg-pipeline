@@ -42,15 +42,5 @@ $(EMBEDDINGS): $(EDGELIST)
 
 embeddings: $(EMBEDDINGS)
 
-CHROMA_DB := data/embeddings/chroma
-INDEX_SCRIPT := apps/personalized_search/index_embeddings.py
-
-$(CHROMA_DB): $(INDEX_SCRIPT) $(EMBEDDINGS)
-	@echo "Building ChromaDB vector index..."
-	@$(PYTHON) $(INDEX_SCRIPT) --db $(CHROMA_DB) --embeddings $(EMBEDDINGS)
-
-index: $(CHROMA_DB)
-
 clean_embeddings:
 	rm -f $(EDGELIST) $(EMBEDDINGS)
-	rm -rf $(CHROMA_DB)
