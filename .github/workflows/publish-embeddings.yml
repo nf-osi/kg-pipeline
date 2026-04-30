@@ -90,7 +90,7 @@ jobs:
                   f = synapseclient.File(filename, parent=folder_id, id=entity_id)
               else:
                   f = synapseclient.File(filename, parent=folder_id)
-              stored = syn.store(f, comment=comment)
+              stored = syn.store(f)
               archive[key] = stored.id
               archive[f"{key.replace('_id', '_version')}"] = stored.versionNumber
 
