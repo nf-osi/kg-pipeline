@@ -14,6 +14,14 @@ profiles:
       archive_version: null
       last_snapshot_comment: null
       last_snapshot_date: null
+    embeddings_archive:
+      folder_id: syn74760363
+      edgelist_archive_id: syn74760478
+      edgelist_archive_version: 1
+      emd_archive_id: syn74760481
+      emd_archive_version: 1
+      last_snapshot_comment: Embeddings from node-embeddings branch (local test)
+      last_snapshot_date: 2026-04-30 00:42:51 UTC
     tables:
       studies:
         synapse_id: syn52694652

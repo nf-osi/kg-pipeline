@@ -25,6 +25,12 @@ data/rdf/*.ttl                  RDF triples
       │
       ▼  derived RDF materialization (e.g. shared donor links)
 data/rdf/shared_donor_links.ttl derived RDF triples
+      │
+      ▼  scripts/rdf_to_edgelist.py
+data/embeddings/kg.edgelist     weighted IRI edgelist
+      │
+      ▼  PecanPy / node2vec
+data/embeddings/kg.emd          128-dim node embeddings
 ```
 
 **1. Extract** — `prepare_portal_tables.py` downloads tables via `synapseclient`,
@@ -48,6 +54,8 @@ using [`reasonable`](https://pypi.org/project/reasonable/) and adds
 `nf:sharedDonor` only when an animal model `transplantationDonorId` matches a
 cell line `donorId`.
 
+**5. Node Embeddings** — See [docs/node-embeddings.md](docs/node-embeddings.md).
+
 ### Project structure
 
 ```
@@ -62,11 +70,15 @@ scripts/
   validate_fks.py                CSV-level foreign key validation (see HARMONIZATION.md)
   archive_rdf.py                 Merge and upload RDF snapshot to Synapse
   diff_rdf.py                    Diff current build against previous Synapse archive
+  rdf_to_edgelist.py             RDF -> weighted edgelist for node embeddings
   astabench.py                   Prepare eval data and run astabench across models
+docs/
+  node-embeddings.md             Embedding pipeline and ChromaDB index docs
 data/
   csv/                           Source and harmonized CSVs
   rdf/                           Generated RDF (Turtle)
   raw/                           Raw Synapse exports (cache)
+  embeddings/                    Edgelist and node embeddings
 orchestration/dagster_pipeline/  Dagster asset definitions for the full pipeline
 astabench/                       Eval framework (git submodule, see Evaluation)
 evaluation/                      Eval datasets for KG quality + RAG
@@ -182,3 +194,4 @@ Domain licenses; the derived corpus is distributed under
 
 - Java 21+ (RMLMapper 8.x)
 - Python 3.10+ with `rdflib`, `reasonable`, `synapseclient`, `pandas`
+- `pecanpy` (`pip install pecanpy`) for node embedding generation

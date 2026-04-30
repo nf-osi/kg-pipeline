@@ -1,0 +1,113 @@
+# Generate and publish node embeddings from a completed graph build.
+#
+# Triggered manually — intended for releases where embeddings are wanted alongside
+# the RDF. Point it at any successful build-image run via build_run_id.
+#
+# Outputs kg.edgelist and kg.emd, archived to Synapse under
+# data_sources.yaml profiles.release.embeddings_archive.folder_id.
+#
+# Runtime note: GitHub-hosted runners have 2 vCPUs. Embedding generation
+# takes ~7 min on 16 cores; expect ~30-40 min on 2 cores.
+# Use a larger self-hosted runner for faster turnaround if available.
+
+name: Publish embeddings
+
+on:
+  workflow_dispatch:
+    inputs:
+      build_run_id:
+        description: "Run ID of the build-image workflow to generate embeddings from"
+        required: true
+        type: string
+      comment:
+        description: "Comment for the Synapse archive entry"
+        required: false
+        default: ""
+        type: string
+
+env:
+  PECANPY_WORKERS: 2
+
+jobs:
+  embeddings:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    permissions:
+      contents: write
+      actions: read
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install pecanpy pyoxigraph synapseclient pyyaml
+
+      - name: Download RDF artifacts from build
+        uses: actions/download-artifact@v7
+        with:
+          name: kg-data
+          path: .
+          run-id: ${{ inputs.build_run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Generate edgelist
+        run: make edgelist
+
+      - name: Generate embeddings
+        run: make embeddings PECANPY_WORKERS=${{ env.PECANPY_WORKERS }}
+
+      - name: Archive edgelist and embeddings to Synapse
+        env:
+          SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
+        run: |
+          python - <<'EOF'
+          import synapseclient, yaml, datetime
+
+          with open("data_sources.yaml") as f:
+              config = yaml.safe_load(f)
+
+          archive = config["profiles"]["release"].setdefault("embeddings_archive", {})
+          folder_id = archive.get("folder_id")
+          if not folder_id:
+              raise SystemExit("embeddings_archive.folder_id not set in data_sources.yaml")
+
+          syn = synapseclient.Synapse()
+          syn.login(authToken="${{ secrets.SYNAPSE_AUTH_TOKEN }}", silent=True)
+
+          comment = "${{ inputs.comment }}" or f"Embeddings from build run ${{ inputs.build_run_id }}"
+          now = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
+
+          for filename, key in [
+              ("data/embeddings/kg.edgelist", "edgelist_archive_id"),
+              ("data/embeddings/kg.emd",      "emd_archive_id"),
+          ]:
+              entity_id = archive.get(key)
+              if entity_id:
+                  f = synapseclient.File(filename, parent=folder_id, id=entity_id)
+              else:
+                  f = synapseclient.File(filename, parent=folder_id)
+              stored = syn.store(f)
+              archive[key] = stored.id
+              archive[f"{key.replace('_id', '_version')}"] = stored.versionNumber
+
+          archive["last_snapshot_comment"] = comment
+          archive["last_snapshot_date"] = now
+
+          with open("data_sources.yaml", "w") as f:
+              yaml.dump(config, f, default_flow_style=False, sort_keys=False)
+
+          print(f"Archived edgelist: {archive['edgelist_archive_id']}")
+          print(f"Archived embeddings: {archive['emd_archive_id']}")
+          EOF
+
+      - name: Commit updated data_sources.yaml
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data_sources.yaml
+          git diff --staged --quiet || git commit -m "chore: update embeddings archive version [skip ci]"
+          git push origin HEAD:${{ github.ref_name }}
