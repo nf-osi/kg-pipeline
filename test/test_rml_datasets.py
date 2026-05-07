@@ -5,7 +5,7 @@ Tests the datasets.rml.ttl mapping against test/datasets.csv
 """
 
 import pytest
-from rdflib import URIRef, Literal, Namespace
+from rdflib import URIRef, Literal, Namespace, XSD
 from rdflib.namespace import RDF
 
 
@@ -159,6 +159,48 @@ class TestDatasetCore:
         assert len(results) == 1
         assert isinstance(results[0].repo, URIRef)
         assert "zenodo" in str(results[0].repo)
+
+    def test_numeric_counts_are_integers(self, datasets_graph, namespaces):
+        """datasetItemCount, individualCount, specimenCount, yearPublished should be typed integers"""
+        query = """
+        SELECT ?itemCount ?indCount ?year
+        WHERE {
+            ?ds a nf:Dataset ;
+                nf:datasetItemCount ?itemCount ;
+                nf:individualCount ?indCount ;
+                nf:yearPublished ?year .
+            FILTER(CONTAINS(STR(?ds), "syn29654184"))
+        }
+        """
+        results = list(datasets_graph.query(query, initNs={"nf": NF}))
+        assert len(results) == 1, "Expected one result for syn29654184"
+        row = results[0]
+        assert isinstance(row.itemCount, Literal), "datasetItemCount should be Literal"
+        assert row.itemCount.datatype == XSD.integer, \
+            f"datasetItemCount should be xsd:integer, got {row.itemCount.datatype}"
+        assert int(row.itemCount) == 24
+        assert row.indCount.datatype == XSD.integer
+        assert int(row.indCount) == 10
+        assert row.year.datatype == XSD.integer
+        assert int(row.year) == 2022
+
+    def test_dataset_size_is_long(self, datasets_graph, namespaces):
+        """datasetSizeInBytes should be typed as xsd:long"""
+        query = """
+        SELECT ?size
+        WHERE {
+            ?ds a nf:Dataset ;
+                nf:datasetSizeInBytes ?size .
+            FILTER(CONTAINS(STR(?ds), "syn29654184"))
+        }
+        """
+        results = list(datasets_graph.query(query, initNs={"nf": NF}))
+        assert len(results) == 1
+        row = results[0]
+        assert isinstance(row.size, Literal)
+        assert row.size.datatype == XSD.long, \
+            f"datasetSizeInBytes should be xsd:long, got {row.size.datatype}"
+        assert int(row.size) == 52000000
 
 
 class TestDatasetMultiValue:

@@ -2,8 +2,8 @@
 Tests for Initiatives RML mapping
 
 Tests the initiatives.rml.ttl mapping against test/initiatives.csv.
-IRIs are constructed from the initiative name (spaces → underscores),
-matching the pattern already used in studies.rml.ttl for nf:initiative links.
+IRIs are constructed from the initiativeKey column (initiative name with spaces
+replaced by underscores), matching the IRI scheme used in studies.rml.ttl.
 """
 
 import pytest
@@ -32,7 +32,7 @@ class TestInitiativeCore:
     def test_has_correct_type(self, initiative_graph, namespaces):
         """All entries should have type nf:Initiative"""
         initiatives = list(initiative_graph.subjects(RDF.type, NF.Initiative))
-        assert len(initiatives) == 3, f"Expected 3 initiatives, got {len(initiatives)}"
+        assert len(initiatives) == 4, f"Expected 4 initiatives, got {len(initiatives)}"
 
     def test_subject_is_iri(self, initiative_graph, namespaces):
         """Subjects should be IRIs"""
@@ -40,27 +40,26 @@ class TestInitiativeCore:
         for ini in initiatives:
             assert isinstance(ini, URIRef), f"Subject should be IRI, got {type(ini)}"
 
-    def test_iri_encodes_spaces_as_underscores(self, initiative_graph, namespaces):
-        """IRI should replace spaces with underscores for the CTF initiative"""
+    def test_iri_uses_underscores_for_spaces(self, initiative_graph, namespaces):
+        """IRI should use underscores in place of spaces"""
         initiatives = list(initiative_graph.subjects(RDF.type, NF.Initiative))
         iris = [str(i) for i in initiatives]
-        # "Children's_Tumor_Foundation" — spaces replaced by underscores in initiativeKey column
-        assert any("Tumor_Foundation" in iri for iri in iris), \
-            f"Expected underscore-encoded initiative IRI, got: {iris}"
+        assert any("Brain_Tumor_Initiative" in iri for iri in iris), \
+            f"Expected underscore-encoded IRI, got: {iris}"
 
-    def test_name_present(self, initiative_graph, namespaces):
-        """nf:name should contain the initiative full name"""
+    def test_name_is_full_initiative_name(self, initiative_graph, namespaces):
+        """nf:name should be the full human-readable initiative name"""
         query = """
-        SELECT ?ini ?name
+        SELECT ?name
         WHERE {
             ?ini a nf:Initiative ;
                  nf:name ?name .
-            FILTER(CONTAINS(STR(?ini), "Children"))
+            FILTER(CONTAINS(STR(?ini), "Brain_Tumor_Initiative"))
         }
         """
         results = list(initiative_graph.query(query, initNs={"nf": NF}))
         assert len(results) == 1
-        assert str(results[0].name) == "Children's Tumor Foundation"
+        assert str(results[0].name) == "Brain Tumor Initiative"
 
     def test_abbreviation_present(self, initiative_graph, namespaces):
         """abbreviation should be present"""
@@ -69,26 +68,26 @@ class TestInitiativeCore:
         WHERE {
             ?ini a nf:Initiative ;
                  nf:abbreviation ?abbr .
-            FILTER(CONTAINS(STR(?ini), "Children"))
+            FILTER(CONTAINS(STR(?ini), "Brain_Tumor_Initiative"))
         }
         """
         results = list(initiative_graph.query(query, initNs={"nf": NF}))
         assert len(results) == 1
-        assert str(results[0].abbr) == "CTF"
+        assert str(results[0].abbr) == "BTI"
 
-    def test_description_present(self, initiative_graph, namespaces):
-        """nf:description (from summary) should be present"""
+    def test_description_from_summary(self, initiative_graph, namespaces):
+        """nf:description should contain the initiative summary text"""
         query = """
         SELECT ?desc
         WHERE {
             ?ini a nf:Initiative ;
                  nf:description ?desc .
-            FILTER(CONTAINS(STR(?ini), "Children"))
+            FILTER(CONTAINS(STR(?ini), "Brain_Tumor_Initiative"))
         }
         """
         results = list(initiative_graph.query(query, initNs={"nf": NF}))
         assert len(results) == 1
-        assert "NF research" in str(results[0].desc)
+        assert "Gilbert Family Foundation" in str(results[0].desc)
 
     def test_website_is_iri(self, initiative_graph, namespaces):
         """website should be an IRI"""
@@ -97,58 +96,57 @@ class TestInitiativeCore:
         WHERE {
             ?ini a nf:Initiative ;
                  nf:website ?web .
-            FILTER(CONTAINS(STR(?ini), "Children"))
+            FILTER(CONTAINS(STR(?ini), "Brain_Tumor_Initiative"))
         }
         """
         results = list(initiative_graph.query(query, initNs={"nf": NF}))
         assert len(results) == 1
         assert isinstance(results[0].web, URIRef)
-        assert str(results[0].web) == "https://www.ctf.org"
+        assert "gilbertfamilyfoundation" in str(results[0].web)
 
-    def test_funder_links_present(self, initiative_graph, namespaces):
-        """hasFunder should link to funder IRIs"""
+    def test_empty_website_produces_no_triple(self, initiative_graph, namespaces):
+        """BTD has no website — should produce no website triple"""
         query = """
-        SELECT ?funder
+        SELECT ?web
         WHERE {
             ?ini a nf:Initiative ;
-                 nf:hasFunder ?funder .
-            FILTER(CONTAINS(STR(?ini), "Therapeutic_Acceleration"))
+                 nf:website ?web .
+            FILTER(CONTAINS(STR(?ini), "Biology_and_Therapeutic"))
         }
         """
         results = list(initiative_graph.query(query, initNs={"nf": NF}))
-        assert len(results) >= 1, "NTAP initiative should have at least one funder"
-        for row in results:
-            assert isinstance(row.funder, URIRef), "hasFunder should be IRI"
+        assert len(results) == 0, "BTD has no website — should produce no triple"
 
-
-class TestInitiativeMultiValue:
-    """Test multi-value funding agency handling"""
-
-    def test_single_funder(self, initiative_graph, namespaces):
-        """CTF should have exactly one funder"""
+    def test_funder_is_iri(self, initiative_graph, namespaces):
+        """hasFunder should link to a funder IRI"""
         query = """
         SELECT ?funder
         WHERE {
             ?ini a nf:Initiative ;
                  nf:hasFunder ?funder .
-            FILTER(CONTAINS(STR(?ini), "Children"))
+            FILTER(CONTAINS(STR(?ini), "Brain_Tumor_Initiative"))
         }
         """
         results = list(initiative_graph.query(query, initNs={"nf": NF}))
         assert len(results) == 1
+        assert isinstance(results[0].funder, URIRef)
+        assert "GFF" in str(results[0].funder)
 
-    def test_multi_funder(self, initiative_graph, namespaces):
-        """NTAP should have two funders (NTAP|JHMI)"""
+    def test_long_summary_preserved(self, initiative_graph, namespaces):
+        """Multi-sentence summary (with commas) should be stored as a single literal"""
         query = """
-        SELECT ?funder
+        SELECT ?desc
         WHERE {
             ?ini a nf:Initiative ;
-                 nf:hasFunder ?funder .
-            FILTER(CONTAINS(STR(?ini), "Therapeutic_Acceleration"))
+                 nf:description ?desc .
+            FILTER(CONTAINS(STR(?ini), "Biology_and_Therapeutic"))
         }
         """
         results = list(initiative_graph.query(query, initNs={"nf": NF}))
-        assert len(results) == 2, f"Expected 2 funders for NTAP, got {len(results)}"
+        assert len(results) == 1
+        desc = str(results[0].desc)
+        assert "9 laboratories" in desc
+        assert "NF1" in desc
 
     def test_no_empty_literals(self, initiative_graph):
         """Graph should not contain empty string literals"""
@@ -161,3 +159,32 @@ class TestInitiativeMultiValue:
         """
         results = list(initiative_graph.query(query))
         assert len(results) == 0, f"Found {len(results)} empty literal values"
+
+
+class TestInitiativeFunders:
+    """Test funder link handling"""
+
+    def test_ntap_initiatives_have_funder(self, initiative_graph, namespaces):
+        """BTD, CCI, and cNF are all funded by NTAP"""
+        query = """
+        SELECT ?ini ?funder
+        WHERE {
+            ?ini a nf:Initiative ;
+                 nf:hasFunder ?funder .
+            FILTER(CONTAINS(STR(?funder), "NTAP"))
+        }
+        """
+        results = list(initiative_graph.query(query, initNs={"nf": NF}))
+        assert len(results) == 3, \
+            f"Expected 3 NTAP-funded initiatives, got {len(results)}"
+
+    def test_all_initiatives_have_at_least_one_funder(self, initiative_graph, namespaces):
+        """Every initiative should have at least one funder"""
+        query = """
+        SELECT DISTINCT ?ini
+        WHERE { ?ini a nf:Initiative ; nf:hasFunder ?funder . }
+        """
+        with_funders = list(initiative_graph.query(query, initNs={"nf": NF}))
+        all_ini = list(initiative_graph.subjects(RDF.type, NF.Initiative))
+        assert len(with_funders) == len(all_ini), \
+            "All initiatives should have at least one funder"

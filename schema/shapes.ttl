@@ -1012,12 +1012,10 @@ shapes:ClinicalAssessmentToolShape a sh:NodeShape ;
     sh:property [
         sh:path nf:assessmentType ;
         sh:datatype xsd:string ;
-        sh:maxCount 1 ;
     ] ;
     sh:property [
         sh:path nf:targetPopulation ;
         sh:datatype xsd:string ;
-        sh:maxCount 1 ;
     ] ;
     sh:property [
         sh:path nf:diseaseSpecific ;
@@ -1056,7 +1054,6 @@ shapes:ClinicalAssessmentToolShape a sh:NodeShape ;
     sh:property [
         sh:path nf:licensingRequirements ;
         sh:datatype xsd:string ;
-        sh:maxCount 1 ;
     ] ;
     sh:property [
         sh:path nf:digitalVersion ;
@@ -1105,12 +1102,10 @@ shapes:PatientDerivedModelShape a sh:NodeShape ;
     sh:property [
         sh:path nf:tumorType ;
         sh:datatype xsd:string ;
-        sh:maxCount 1 ;
     ] ;
     sh:property [
         sh:path nf:engraftmentSite ;
         sh:datatype xsd:string ;
-        sh:maxCount 1 ;
     ] ;
     sh:property [
         sh:path nf:establishmentRate ;
@@ -1259,7 +1254,6 @@ shapes:ComputationalToolShape a sh:NodeShape ;
     sh:property [
         sh:path nf:sourceRepository ;
         sh:nodeKind sh:IRI ;
-        sh:maxCount 1 ;
     ] ;
     sh:property [
         sh:path nf:documentation ;
@@ -1293,7 +1287,6 @@ shapes:ComputationalToolShape a sh:NodeShape ;
     sh:property [
         sh:path nf:maintainer ;
         sh:datatype xsd:string ;
-        sh:maxCount 1 ;
     ] ;
     sh:property [
         sh:path nf:licenseDetails ;
@@ -1443,27 +1436,27 @@ shapes:DatasetShape a sh:NodeShape ;
     ] ;
     sh:property [
         sh:path nf:datasetSizeInBytes ;
-        sh:datatype xsd:string ;
+        sh:datatype xsd:long ;
         sh:maxCount 1 ;
     ] ;
     sh:property [
         sh:path nf:datasetItemCount ;
-        sh:datatype xsd:string ;
+        sh:datatype xsd:integer ;
         sh:maxCount 1 ;
     ] ;
     sh:property [
         sh:path nf:individualCount ;
-        sh:datatype xsd:string ;
+        sh:datatype xsd:integer ;
         sh:maxCount 1 ;
     ] ;
     sh:property [
         sh:path nf:specimenCount ;
-        sh:datatype xsd:string ;
+        sh:datatype xsd:integer ;
         sh:maxCount 1 ;
     ] ;
     sh:property [
         sh:path nf:yearPublished ;
-        sh:datatype xsd:string ;
+        sh:datatype xsd:integer ;
         sh:maxCount 1 ;
     ] ;
     sh:property [

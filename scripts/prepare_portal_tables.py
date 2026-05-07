@@ -613,10 +613,10 @@ TABLES: Dict[str, Dict[str, Any]] = {
             {"target": "resourceName", "source": "resourceName", "type": "text"},
             {"target": "resourceType", "source": "resourceType", "type": "text"},
             {"target": "synonyms", "source": "synonyms", "type": "text+", "transform": "string_list"},
-            {"target": "dateModified", "source": "dateModified", "type": "text"},
+            {"target": "dateModified", "source": "dateModified", "type": "text", "transform": "number"},
             {"target": "rrid", "source": "rrid", "type": "iri"},
             {"target": "description", "source": "description", "type": "text"},
-            {"target": "dateAdded", "source": "dateAdded", "type": "text"},
+            {"target": "dateAdded", "source": "dateAdded", "type": "text", "transform": "number"},
             {"target": "howToAcquire", "source": "howToAcquire", "type": "text"},
         ],
     },
@@ -862,11 +862,11 @@ TABLES: Dict[str, Dict[str, Any]] = {
             {"target": "dataUseModifiers", "source": "dataUseModifiers", "type": "text+", "transform": "string_list"},
             {"target": "countryOfOrigin", "source": "countryOfOrigin", "type": "text+", "transform": "string_list"},
             {"target": "modelSystemName", "source": "modelSystemName", "type": "text"},
-            {"target": "datasetSizeInBytes", "source": "datasetSizeInBytes", "type": "text"},
-            {"target": "datasetItemCount", "source": "datasetItemCount", "type": "text"},
-            {"target": "individualCount", "source": "individualCount", "type": "text"},
-            {"target": "specimenCount", "source": "specimenCount", "type": "text"},
-            {"target": "yearPublished", "source": "yearPublished", "type": "text"},
+            {"target": "datasetSizeInBytes", "source": "datasetSizeInBytes", "type": "text", "transform": "number"},
+            {"target": "datasetItemCount", "source": "datasetItemCount", "type": "text", "transform": "number"},
+            {"target": "individualCount", "source": "individualCount", "type": "text", "transform": "number"},
+            {"target": "specimenCount", "source": "specimenCount", "type": "text", "transform": "number"},
+            {"target": "yearPublished", "source": "yearPublished", "type": "text", "transform": "number"},
             {"target": "visualizeDataOn", "source": "visualizeDataOn", "type": "text+", "transform": "string_list"},
             {"target": "alternateName", "source": "alternateName", "type": "text"},
             {"target": "versionLabel", "source": "versionLabel", "type": "text"},
@@ -902,7 +902,14 @@ def format_number(value: Any) -> str:
     if pd.isna(value):
         return ""
     if isinstance(value, float) and value.is_integer():
-        value = int(value)
+        return str(int(value))
+    if isinstance(value, str):
+        try:
+            f = float(value)
+            if f.is_integer():
+                return str(int(f))
+        except (ValueError, TypeError):
+            pass
     return str(value)
 
 

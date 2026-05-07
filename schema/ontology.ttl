@@ -1527,31 +1527,31 @@ nf:datasetSizeInBytes a owl:DatatypeProperty ;
     rdfs:label "datasetSizeInBytes" ;
     rdfs:comment "Total size of the dataset in bytes." ;
     rdfs:domain nf:Dataset ;
-    rdfs:range xsd:string .
+    rdfs:range xsd:long .
 
 nf:datasetItemCount a owl:DatatypeProperty ;
     rdfs:label "datasetItemCount" ;
     rdfs:comment "Number of items (files) in the dataset." ;
     rdfs:domain nf:Dataset ;
-    rdfs:range xsd:string .
+    rdfs:range xsd:integer .
 
 nf:individualCount a owl:DatatypeProperty ;
     rdfs:label "individualCount" ;
     rdfs:comment "Number of individuals represented in the dataset." ;
     rdfs:domain nf:Dataset ;
-    rdfs:range xsd:string .
+    rdfs:range xsd:integer .
 
 nf:specimenCount a owl:DatatypeProperty ;
     rdfs:label "specimenCount" ;
     rdfs:comment "Number of specimens represented in the dataset." ;
     rdfs:domain nf:Dataset ;
-    rdfs:range xsd:string .
+    rdfs:range xsd:integer .
 
 nf:yearPublished a owl:DatatypeProperty ;
     rdfs:label "yearPublished" ;
     rdfs:comment "Year the dataset was published or released." ;
     rdfs:domain nf:Dataset ;
-    rdfs:range xsd:string .
+    rdfs:range xsd:integer .
 
 nf:visualizeDataOn a owl:DatatypeProperty ;
     rdfs:label "visualizeDataOn" ;

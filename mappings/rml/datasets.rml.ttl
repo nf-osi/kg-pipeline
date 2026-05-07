@@ -37,11 +37,11 @@ map:DatasetCore a rr:TriplesMap ;
     rr:predicateObjectMap [ rr:predicate nf:license ; rr:objectMap [ rml:reference "license" ; rr:termType rr:IRI ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:conditionsOfAccess ; rr:objectMap [ rml:reference "conditionsOfAccess" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:modelSystemName ; rr:objectMap [ rml:reference "modelSystemName" ; rr:datatype xsd:string ] ] ;
-    rr:predicateObjectMap [ rr:predicate nf:datasetSizeInBytes ; rr:objectMap [ rml:reference "datasetSizeInBytes" ; rr:datatype xsd:string ] ] ;
-    rr:predicateObjectMap [ rr:predicate nf:datasetItemCount ; rr:objectMap [ rml:reference "datasetItemCount" ; rr:datatype xsd:string ] ] ;
-    rr:predicateObjectMap [ rr:predicate nf:individualCount ; rr:objectMap [ rml:reference "individualCount" ; rr:datatype xsd:string ] ] ;
-    rr:predicateObjectMap [ rr:predicate nf:specimenCount ; rr:objectMap [ rml:reference "specimenCount" ; rr:datatype xsd:string ] ] ;
-    rr:predicateObjectMap [ rr:predicate nf:yearPublished ; rr:objectMap [ rml:reference "yearPublished" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:datasetSizeInBytes ; rr:objectMap [ rml:reference "datasetSizeInBytes" ; rr:datatype xsd:long ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:datasetItemCount ; rr:objectMap [ rml:reference "datasetItemCount" ; rr:datatype xsd:integer ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:individualCount ; rr:objectMap [ rml:reference "individualCount" ; rr:datatype xsd:integer ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:specimenCount ; rr:objectMap [ rml:reference "specimenCount" ; rr:datatype xsd:integer ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:yearPublished ; rr:objectMap [ rml:reference "yearPublished" ; rr:datatype xsd:integer ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:alternateName ; rr:objectMap [ rml:reference "alternateName" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:versionLabel ; rr:objectMap [ rml:reference "versionLabel" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:externalRepositoryUri ; rr:objectMap [ rml:reference "externalRepositoryUri" ; rr:termType rr:IRI ] ] .
