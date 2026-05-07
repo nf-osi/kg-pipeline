@@ -1,0 +1,4 @@
+patientDerivedModelId,modelSystemType,patientDiagnosis,hostStrain,passageNumber,tumorType,engraftmentSite,establishmentRate,molecularCharacterization,clinicalData,validationMethods,donorId
+pdm-001,PDX,NF1-associated MPNST,NSG,P3,MPNST,Subcutaneous,75%,WGS|RNA-seq,Available,IHC|Drug response,donor-001
+pdm-002,Organoid,NF1 plexiform neurofibroma,,P5,Plexiform Neurofibroma,,60%,Exome sequencing,,IHC|Western blot,
+pdm-003,PDX,Schwannoma,NOD-SCID,P2,Schwannoma,Subcutaneous,50%,WGS,,Drug response|IHC,donor-002

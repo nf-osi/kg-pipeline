@@ -1,0 +1,115 @@
+@prefix rr:   <http://www.w3.org/ns/r2rml#> .
+@prefix rml:  <http://semweb.mmlab.be/ns/rml#> .
+@prefix fnml: <http://semweb.mmlab.be/ns/fnml#> .
+@prefix fno:  <https://w3id.org/function/ontology#> .
+@prefix ql:   <http://semweb.mmlab.be/ns/ql#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix grel: <http://users.ugent.be/~bjdmeest/function/grel.ttl#> .
+@prefix nf:   <http://nf-osi.github.com/terms#> .
+@prefix map:  <http://nf-osi.github.com/mappings/initiatives#> .
+
+################################################################################
+# Logical source
+################################################################################
+
+map:InitiativesSource a rml:LogicalSource ;
+    rml:source "data/csv/initiatives.csv" ;
+    rml:referenceFormulation ql:CSV .
+
+################################################################################
+# Initiative core facts
+#
+# IRIs use the `initiativeKey` column (derived by prepare_portal_tables.py as
+# the initiative name with spaces replaced by underscores).  This matches the
+# IRI scheme produced in studies.rml.ttl where "%20" (URL-encoded space) is
+# replaced with "_" via grel:string_replace, so Study → nf:initiative links
+# resolve to the Initiative instances defined here.
+################################################################################
+
+map:InitiativeCore a rr:TriplesMap ;
+    rdfs:label "Initiative Core" ;
+    rml:logicalSource map:InitiativesSource ;
+    rr:subjectMap [ rr:template "http://nf-osi.github.com/terms#{initiativeKey}" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [ rr:predicate rdf:type ; rr:objectMap [ rr:constant nf:Initiative ; rr:termType rr:IRI ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:name ; rr:objectMap [ rml:reference "initiative" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:abbreviation ; rr:objectMap [ rml:reference "abbreviation" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:description ; rr:objectMap [ rml:reference "summary" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:website ; rr:objectMap [ rml:reference "website" ; rr:termType rr:IRI ] ] .
+
+################################################################################
+# Multi-valued fields (StringList)
+################################################################################
+
+map:InitiativeFundingAgency a rr:TriplesMap ;
+    rdfs:label "Initiative Funding Agency" ;
+    rml:logicalSource map:InitiativesSource ;
+    rr:subjectMap [ rr:template "http://nf-osi.github.com/terms#{initiativeKey}" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:hasFunder ;
+        rr:objectMap [
+            a fnml:FunctionTermMap ;
+            rr:termType rr:IRI ;
+            fnml:functionValue [
+                a fno:Execution ;
+                rml:logicalSource map:InitiativesSource ;
+                rr:predicateObjectMap [
+                    rr:predicate fno:executes ;
+                    rr:objectMap [ rr:constant grel:string_split ; rr:termType rr:IRI ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:valueParameter ;
+                    rr:objectMap [
+                        a fnml:FunctionTermMap ;
+                        fnml:functionValue [
+                            a fno:Execution ;
+                            rml:logicalSource map:InitiativesSource ;
+                            rr:predicateObjectMap [
+                                rr:predicate fno:executes ;
+                                rr:objectMap [ rr:constant grel:string_replace ; rr:termType rr:IRI ]
+                            ] ;
+                            rr:predicateObjectMap [
+                                rr:predicate grel:valueParameter ;
+                                rr:objectMap [
+                                    a fnml:FunctionTermMap ;
+                                    fnml:functionValue [
+                                        a fno:Execution ;
+                                        rml:logicalSource map:InitiativesSource ;
+                                        rr:predicateObjectMap [
+                                            rr:predicate fno:executes ;
+                                            rr:objectMap [ rr:constant grel:string_replace ; rr:termType rr:IRI ]
+                                        ] ;
+                                        rr:predicateObjectMap [
+                                            rr:predicate grel:valueParameter ;
+                                            rr:objectMap [ rr:template "http://nf-osi.github.com/terms#{fundingAgency}" ]
+                                        ] ;
+                                        rr:predicateObjectMap [
+                                            rr:predicate grel:p_string_find ;
+                                            rr:objectMap [ rr:constant "%20" ; rr:termType rr:Literal ]
+                                        ] ;
+                                        rr:predicateObjectMap [
+                                            rr:predicate grel:p_string_replace ;
+                                            rr:objectMap [ rr:constant "_" ; rr:termType rr:Literal ]
+                                        ]
+                                    ]
+                                ]
+                            ] ;
+                            rr:predicateObjectMap [
+                                rr:predicate grel:p_string_find ;
+                                rr:objectMap [ rr:constant "%7C" ; rr:termType rr:Literal ]
+                            ] ;
+                            rr:predicateObjectMap [
+                                rr:predicate grel:p_string_replace ;
+                                rr:objectMap [ rr:constant "%7Chttp://nf-osi.github.com/terms#" ; rr:termType rr:Literal ]
+                            ]
+                        ]
+                    ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:p_string_sep ;
+                    rr:objectMap [ rr:constant "%7C" ; rr:termType rr:Literal ]
+                ]
+            ]
+        ]
+    ] .

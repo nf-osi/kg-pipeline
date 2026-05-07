@@ -1,0 +1,79 @@
+@prefix rr:   <http://www.w3.org/ns/r2rml#> .
+@prefix rml:  <http://semweb.mmlab.be/ns/rml#> .
+@prefix fnml: <http://semweb.mmlab.be/ns/fnml#> .
+@prefix fno:  <https://w3id.org/function/ontology#> .
+@prefix ql:   <http://semweb.mmlab.be/ns/ql#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix grel: <http://users.ugent.be/~bjdmeest/function/grel.ttl#> .
+@prefix nf:   <http://nf-osi.github.com/terms#> .
+@prefix map:  <http://nf-osi.github.com/mappings/clinical-assessment-tools#> .
+
+################################################################################
+# Logical source
+################################################################################
+
+map:ClinicalAssessmentToolsSource a rml:LogicalSource ;
+    rml:source "data/csv/clinical_assessment_tools.csv" ;
+    rml:referenceFormulation ql:CSV .
+
+################################################################################
+# Clinical Assessment Tool core facts
+################################################################################
+
+map:ClinicalAssessmentToolCore a rr:TriplesMap ;
+    rdfs:label "Clinical Assessment Tool Core" ;
+    rml:logicalSource map:ClinicalAssessmentToolsSource ;
+    rr:subjectMap [
+        rr:template "http://nf-osi.github.com/terms#clinicalAssessmentTool/{clinicalAssessmentToolId}" ;
+        rr:termType rr:IRI
+    ] ;
+    rr:predicateObjectMap [ rr:predicate rdf:type ; rr:objectMap [ rr:constant nf:ClinicalAssessmentTool ; rr:termType rr:IRI ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:clinicalAssessmentToolId ; rr:objectMap [ rml:reference "clinicalAssessmentToolId" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:assessmentName ; rr:objectMap [ rml:reference "assessmentName" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:assessmentType ; rr:objectMap [ rml:reference "assessmentType" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:targetPopulation ; rr:objectMap [ rml:reference "targetPopulation" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:diseaseSpecific ; rr:objectMap [ rml:reference "diseaseSpecific" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:numberOfItems ; rr:objectMap [ rml:reference "numberOfItems" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:scoringMethod ; rr:objectMap [ rml:reference "scoringMethod" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:psychometricProperties ; rr:objectMap [ rml:reference "psychometricProperties" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:administrationTime ; rr:objectMap [ rml:reference "administrationTime" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:availabilityStatus ; rr:objectMap [ rml:reference "availabilityStatus" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:licensingRequirements ; rr:objectMap [ rml:reference "licensingRequirements" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:digitalVersion ; rr:objectMap [ rml:reference "digitalVersion" ; rr:datatype xsd:string ] ] .
+
+################################################################################
+# Multi-valued fields (StringList)
+################################################################################
+
+map:ClinicalAssessmentToolValidatedLanguages a rr:TriplesMap ;
+    rdfs:label "Clinical Assessment Tool Validated Languages" ;
+    rml:logicalSource map:ClinicalAssessmentToolsSource ;
+    rr:subjectMap [
+        rr:template "http://nf-osi.github.com/terms#clinicalAssessmentTool/{clinicalAssessmentToolId}" ;
+        rr:termType rr:IRI
+    ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:validatedLanguages ;
+        rr:objectMap [
+            a fnml:FunctionTermMap ;
+            rr:datatype xsd:string ;
+            fnml:functionValue [
+                a fno:Execution ;
+                rml:logicalSource map:ClinicalAssessmentToolsSource ;
+                rr:predicateObjectMap [
+                    rr:predicate fno:executes ;
+                    rr:objectMap [ rr:constant grel:string_split ; rr:termType rr:IRI ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:valueParameter ;
+                    rr:objectMap [ rml:reference "validatedLanguages" ; rr:termType rr:Literal ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:p_string_sep ;
+                    rr:objectMap [ rr:constant "\\|" ; rr:termType rr:Literal ]
+                ]
+            ]
+        ]
+    ] .

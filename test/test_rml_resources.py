@@ -261,7 +261,11 @@ class TestResourcesDataQuality:
     def test_all_resources_use_tool_specific_iris(self, resources_graph, namespaces):
         """All Tool entities should use tool-specific IRIs, not generic resource/ IRIs"""
         NF = namespaces["nf"]
-        tool_prefixes = ("cellLine/", "antibody/", "animalModel/", "geneticReagent/", "biobank/")
+        tool_prefixes = (
+            "cellLine/", "antibody/", "animalModel/", "geneticReagent/", "biobank/",
+            "computationalTool/", "organoidProtocol/", "patientDerivedModel/",
+            "clinicalAssessmentTool/",
+        )
 
         tools = list(resources_graph.subjects(RDF.type, NF.Tool))
         assert len(tools) > 0, "No tools found"

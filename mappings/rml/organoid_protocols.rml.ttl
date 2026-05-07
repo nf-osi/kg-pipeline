@@ -1,0 +1,139 @@
+@prefix rr:   <http://www.w3.org/ns/r2rml#> .
+@prefix rml:  <http://semweb.mmlab.be/ns/rml#> .
+@prefix fnml: <http://semweb.mmlab.be/ns/fnml#> .
+@prefix fno:  <https://w3id.org/function/ontology#> .
+@prefix ql:   <http://semweb.mmlab.be/ns/ql#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix grel: <http://users.ugent.be/~bjdmeest/function/grel.ttl#> .
+@prefix nf:   <http://nf-osi.github.com/terms#> .
+@prefix map:  <http://nf-osi.github.com/mappings/organoid-protocols#> .
+
+################################################################################
+# Logical source
+################################################################################
+
+map:OrganoidProtocolsSource a rml:LogicalSource ;
+    rml:source "data/csv/organoid_protocols.csv" ;
+    rml:referenceFormulation ql:CSV .
+
+################################################################################
+# Organoid Protocol core facts
+################################################################################
+
+map:OrganoidProtocolCore a rr:TriplesMap ;
+    rdfs:label "Organoid Protocol Core" ;
+    rml:logicalSource map:OrganoidProtocolsSource ;
+    rr:subjectMap [
+        rr:template "http://nf-osi.github.com/terms#organoidProtocol/{organoidProtocolId}" ;
+        rr:termType rr:IRI
+    ] ;
+    rr:predicateObjectMap [ rr:predicate rdf:type ; rr:objectMap [ rr:constant nf:OrganoidProtocol ; rr:termType rr:IRI ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:organoidProtocolId ; rr:objectMap [ rml:reference "organoidProtocolId" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:modelType ; rr:objectMap [ rml:reference "modelType" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:derivationSource ; rr:objectMap [ rml:reference "derivationSource" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:organoidType ; rr:objectMap [ rml:reference "organoidType" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:matrixType ; rr:objectMap [ rml:reference "matrixType" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:cultureSystem ; rr:objectMap [ rml:reference "cultureSystem" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:maturationTime ; rr:objectMap [ rml:reference "maturationTime" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:passageNumber ; rr:objectMap [ rml:reference "passageNumber" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:cryopreservationProtocol ; rr:objectMap [ rml:reference "cryopreservationProtocol" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:cultureMedia ; rr:objectMap [ rml:reference "cultureMedia" ; rr:datatype xsd:string ] ] .
+
+################################################################################
+# Multi-valued fields (StringList)
+################################################################################
+
+map:OrganoidProtocolCellTypes a rr:TriplesMap ;
+    rdfs:label "Organoid Protocol Cell Types" ;
+    rml:logicalSource map:OrganoidProtocolsSource ;
+    rr:subjectMap [
+        rr:template "http://nf-osi.github.com/terms#organoidProtocol/{organoidProtocolId}" ;
+        rr:termType rr:IRI
+    ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:cellTypes ;
+        rr:objectMap [
+            a fnml:FunctionTermMap ;
+            rr:datatype xsd:string ;
+            fnml:functionValue [
+                a fno:Execution ;
+                rml:logicalSource map:OrganoidProtocolsSource ;
+                rr:predicateObjectMap [
+                    rr:predicate fno:executes ;
+                    rr:objectMap [ rr:constant grel:string_split ; rr:termType rr:IRI ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:valueParameter ;
+                    rr:objectMap [ rml:reference "cellTypes" ; rr:termType rr:Literal ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:p_string_sep ;
+                    rr:objectMap [ rr:constant "\\|" ; rr:termType rr:Literal ]
+                ]
+            ]
+        ]
+    ] .
+
+map:OrganoidProtocolCharacterizationMethods a rr:TriplesMap ;
+    rdfs:label "Organoid Protocol Characterization Methods" ;
+    rml:logicalSource map:OrganoidProtocolsSource ;
+    rr:subjectMap [
+        rr:template "http://nf-osi.github.com/terms#organoidProtocol/{organoidProtocolId}" ;
+        rr:termType rr:IRI
+    ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:characterizationMethods ;
+        rr:objectMap [
+            a fnml:FunctionTermMap ;
+            rr:datatype xsd:string ;
+            fnml:functionValue [
+                a fno:Execution ;
+                rml:logicalSource map:OrganoidProtocolsSource ;
+                rr:predicateObjectMap [
+                    rr:predicate fno:executes ;
+                    rr:objectMap [ rr:constant grel:string_split ; rr:termType rr:IRI ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:valueParameter ;
+                    rr:objectMap [ rml:reference "characterizationMethods" ; rr:termType rr:Literal ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:p_string_sep ;
+                    rr:objectMap [ rr:constant "\\|" ; rr:termType rr:Literal ]
+                ]
+            ]
+        ]
+    ] .
+
+map:OrganoidProtocolQualityControlMetrics a rr:TriplesMap ;
+    rdfs:label "Organoid Protocol Quality Control Metrics" ;
+    rml:logicalSource map:OrganoidProtocolsSource ;
+    rr:subjectMap [
+        rr:template "http://nf-osi.github.com/terms#organoidProtocol/{organoidProtocolId}" ;
+        rr:termType rr:IRI
+    ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:qualityControlMetrics ;
+        rr:objectMap [
+            a fnml:FunctionTermMap ;
+            rr:datatype xsd:string ;
+            fnml:functionValue [
+                a fno:Execution ;
+                rml:logicalSource map:OrganoidProtocolsSource ;
+                rr:predicateObjectMap [
+                    rr:predicate fno:executes ;
+                    rr:objectMap [ rr:constant grel:string_split ; rr:termType rr:IRI ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:valueParameter ;
+                    rr:objectMap [ rml:reference "qualityControlMetrics" ; rr:termType rr:Literal ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:p_string_sep ;
+                    rr:objectMap [ rr:constant "\\|" ; rr:termType rr:Literal ]
+                ]
+            ]
+        ]
+    ] .
