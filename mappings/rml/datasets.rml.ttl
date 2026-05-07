@@ -1,0 +1,332 @@
+@prefix rr:   <http://www.w3.org/ns/r2rml#> .
+@prefix rml:  <http://semweb.mmlab.be/ns/rml#> .
+@prefix fnml: <http://semweb.mmlab.be/ns/fnml#> .
+@prefix fno:  <https://w3id.org/function/ontology#> .
+@prefix ql:   <http://semweb.mmlab.be/ns/ql#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix grel: <http://users.ugent.be/~bjdmeest/function/grel.ttl#> .
+@prefix nf:   <http://nf-osi.github.com/terms#> .
+@prefix map:  <http://nf-osi.github.com/mappings/datasets#> .
+
+################################################################################
+# Logical source
+################################################################################
+
+map:DatasetsSource a rml:LogicalSource ;
+    rml:source "data/csv/datasets.csv" ;
+    rml:referenceFormulation ql:CSV .
+
+################################################################################
+# Dataset core facts
+################################################################################
+
+map:DatasetCore a rr:TriplesMap ;
+    rdfs:label "Dataset Core" ;
+    rml:logicalSource map:DatasetsSource ;
+    rr:subjectMap [ rr:template "https://www.synapse.org/Synapse:{id}" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [ rr:predicate rdf:type ; rr:objectMap [ rr:constant nf:Dataset ; rr:termType rr:IRI ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:name ; rr:objectMap [ rml:reference "title" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:description ; rr:objectMap [ rml:reference "description" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:parentStudy ; rr:objectMap [ rr:template "https://www.synapse.org/Synapse:{studyId}" ; rr:termType rr:IRI ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:diseaseFocus ; rr:objectMap [ rml:reference "diseaseFocus" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:assay ; rr:objectMap [ rml:reference "assay" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:doi ; rr:objectMap [ rml:reference "doi" ; rr:termType rr:IRI ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:accessType ; rr:objectMap [ rml:reference "accessType" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:license ; rr:objectMap [ rml:reference "license" ; rr:termType rr:IRI ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:conditionsOfAccess ; rr:objectMap [ rml:reference "conditionsOfAccess" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:modelSystemName ; rr:objectMap [ rml:reference "modelSystemName" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:datasetSizeInBytes ; rr:objectMap [ rml:reference "datasetSizeInBytes" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:datasetItemCount ; rr:objectMap [ rml:reference "datasetItemCount" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:individualCount ; rr:objectMap [ rml:reference "individualCount" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:specimenCount ; rr:objectMap [ rml:reference "specimenCount" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:yearPublished ; rr:objectMap [ rml:reference "yearPublished" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:alternateName ; rr:objectMap [ rml:reference "alternateName" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:versionLabel ; rr:objectMap [ rml:reference "versionLabel" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:externalRepositoryUri ; rr:objectMap [ rml:reference "externalRepositoryUri" ; rr:termType rr:IRI ] ] .
+
+################################################################################
+# Multi-valued fields (StringList)
+################################################################################
+
+map:DatasetDataType a rr:TriplesMap ;
+    rdfs:label "Dataset Data Type" ;
+    rml:logicalSource map:DatasetsSource ;
+    rr:subjectMap [ rr:template "https://www.synapse.org/Synapse:{id}" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:dataType ;
+        rr:objectMap [
+            a fnml:FunctionTermMap ;
+            rr:datatype xsd:string ;
+            fnml:functionValue [
+                a fno:Execution ;
+                rml:logicalSource map:DatasetsSource ;
+                rr:predicateObjectMap [ rr:predicate fno:executes ; rr:objectMap [ rr:constant grel:string_split ; rr:termType rr:IRI ] ] ;
+                rr:predicateObjectMap [ rr:predicate grel:valueParameter ; rr:objectMap [ rml:reference "dataType" ; rr:termType rr:Literal ] ] ;
+                rr:predicateObjectMap [ rr:predicate grel:p_string_sep ; rr:objectMap [ rr:constant "\\|" ; rr:termType rr:Literal ] ]
+            ]
+        ]
+    ] .
+
+map:DatasetManifestation a rr:TriplesMap ;
+    rdfs:label "Dataset Manifestation" ;
+    rml:logicalSource map:DatasetsSource ;
+    rr:subjectMap [ rr:template "https://www.synapse.org/Synapse:{id}" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:manifestation ;
+        rr:objectMap [
+            a fnml:FunctionTermMap ;
+            rr:datatype xsd:string ;
+            fnml:functionValue [
+                a fno:Execution ;
+                rml:logicalSource map:DatasetsSource ;
+                rr:predicateObjectMap [ rr:predicate fno:executes ; rr:objectMap [ rr:constant grel:string_split ; rr:termType rr:IRI ] ] ;
+                rr:predicateObjectMap [ rr:predicate grel:valueParameter ; rr:objectMap [ rml:reference "manifestation" ; rr:termType rr:Literal ] ] ;
+                rr:predicateObjectMap [ rr:predicate grel:p_string_sep ; rr:objectMap [ rr:constant "\\|" ; rr:termType rr:Literal ] ]
+            ]
+        ]
+    ] .
+
+map:DatasetFundingAgency a rr:TriplesMap ;
+    rdfs:label "Dataset Funding Agency" ;
+    rml:logicalSource map:DatasetsSource ;
+    rr:subjectMap [ rr:template "https://www.synapse.org/Synapse:{id}" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:hasFunder ;
+        rr:objectMap [
+            a fnml:FunctionTermMap ;
+            rr:termType rr:IRI ;
+            fnml:functionValue [
+                a fno:Execution ;
+                rml:logicalSource map:DatasetsSource ;
+                rr:predicateObjectMap [
+                    rr:predicate fno:executes ;
+                    rr:objectMap [ rr:constant grel:string_split ; rr:termType rr:IRI ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:valueParameter ;
+                    rr:objectMap [
+                        a fnml:FunctionTermMap ;
+                        fnml:functionValue [
+                            a fno:Execution ;
+                            rml:logicalSource map:DatasetsSource ;
+                            rr:predicateObjectMap [
+                                rr:predicate fno:executes ;
+                                rr:objectMap [ rr:constant grel:string_replace ; rr:termType rr:IRI ]
+                            ] ;
+                            rr:predicateObjectMap [
+                                rr:predicate grel:valueParameter ;
+                                rr:objectMap [
+                                    a fnml:FunctionTermMap ;
+                                    fnml:functionValue [
+                                        a fno:Execution ;
+                                        rml:logicalSource map:DatasetsSource ;
+                                        rr:predicateObjectMap [
+                                            rr:predicate fno:executes ;
+                                            rr:objectMap [ rr:constant grel:string_replace ; rr:termType rr:IRI ]
+                                        ] ;
+                                        rr:predicateObjectMap [
+                                            rr:predicate grel:valueParameter ;
+                                            rr:objectMap [ rr:template "http://nf-osi.github.com/terms#{fundingAgency}" ]
+                                        ] ;
+                                        rr:predicateObjectMap [
+                                            rr:predicate grel:p_string_find ;
+                                            rr:objectMap [ rr:constant "%20" ; rr:termType rr:Literal ]
+                                        ] ;
+                                        rr:predicateObjectMap [
+                                            rr:predicate grel:p_string_replace ;
+                                            rr:objectMap [ rr:constant "_" ; rr:termType rr:Literal ]
+                                        ]
+                                    ]
+                                ]
+                            ] ;
+                            rr:predicateObjectMap [
+                                rr:predicate grel:p_string_find ;
+                                rr:objectMap [ rr:constant "%7C" ; rr:termType rr:Literal ]
+                            ] ;
+                            rr:predicateObjectMap [
+                                rr:predicate grel:p_string_replace ;
+                                rr:objectMap [ rr:constant "%7Chttp://nf-osi.github.com/terms#" ; rr:termType rr:Literal ]
+                            ]
+                        ]
+                    ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:p_string_sep ;
+                    rr:objectMap [ rr:constant "%7C" ; rr:termType rr:Literal ]
+                ]
+            ]
+        ]
+    ] .
+
+map:DatasetSpecies a rr:TriplesMap ;
+    rdfs:label "Dataset Species" ;
+    rml:logicalSource map:DatasetsSource ;
+    rr:subjectMap [ rr:template "https://www.synapse.org/Synapse:{id}" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:species ;
+        rr:objectMap [
+            a fnml:FunctionTermMap ;
+            rr:datatype xsd:string ;
+            fnml:functionValue [
+                a fno:Execution ;
+                rml:logicalSource map:DatasetsSource ;
+                rr:predicateObjectMap [ rr:predicate fno:executes ; rr:objectMap [ rr:constant grel:string_split ; rr:termType rr:IRI ] ] ;
+                rr:predicateObjectMap [ rr:predicate grel:valueParameter ; rr:objectMap [ rml:reference "species" ; rr:termType rr:Literal ] ] ;
+                rr:predicateObjectMap [ rr:predicate grel:p_string_sep ; rr:objectMap [ rr:constant "\\|" ; rr:termType rr:Literal ] ]
+            ]
+        ]
+    ] .
+
+map:DatasetCreator a rr:TriplesMap ;
+    rdfs:label "Dataset Creator" ;
+    rml:logicalSource map:DatasetsSource ;
+    rr:subjectMap [ rr:template "https://www.synapse.org/Synapse:{id}" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:creator ;
+        rr:objectMap [
+            a fnml:FunctionTermMap ;
+            rr:datatype xsd:string ;
+            fnml:functionValue [
+                a fno:Execution ;
+                rml:logicalSource map:DatasetsSource ;
+                rr:predicateObjectMap [ rr:predicate fno:executes ; rr:objectMap [ rr:constant grel:string_split ; rr:termType rr:IRI ] ] ;
+                rr:predicateObjectMap [ rr:predicate grel:valueParameter ; rr:objectMap [ rml:reference "creator" ; rr:termType rr:Literal ] ] ;
+                rr:predicateObjectMap [ rr:predicate grel:p_string_sep ; rr:objectMap [ rr:constant "\\|" ; rr:termType rr:Literal ] ]
+            ]
+        ]
+    ] .
+
+map:DatasetContributor a rr:TriplesMap ;
+    rdfs:label "Dataset Contributor" ;
+    rml:logicalSource map:DatasetsSource ;
+    rr:subjectMap [ rr:template "https://www.synapse.org/Synapse:{id}" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:contributor ;
+        rr:objectMap [
+            a fnml:FunctionTermMap ;
+            rr:datatype xsd:string ;
+            fnml:functionValue [
+                a fno:Execution ;
+                rml:logicalSource map:DatasetsSource ;
+                rr:predicateObjectMap [ rr:predicate fno:executes ; rr:objectMap [ rr:constant grel:string_split ; rr:termType rr:IRI ] ] ;
+                rr:predicateObjectMap [ rr:predicate grel:valueParameter ; rr:objectMap [ rml:reference "contributor" ; rr:termType rr:Literal ] ] ;
+                rr:predicateObjectMap [ rr:predicate grel:p_string_sep ; rr:objectMap [ rr:constant "\\|" ; rr:termType rr:Literal ] ]
+            ]
+        ]
+    ] .
+
+map:DatasetKeywords a rr:TriplesMap ;
+    rdfs:label "Dataset Keywords" ;
+    rml:logicalSource map:DatasetsSource ;
+    rr:subjectMap [ rr:template "https://www.synapse.org/Synapse:{id}" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:keywords ;
+        rr:objectMap [
+            a fnml:FunctionTermMap ;
+            rr:datatype xsd:string ;
+            fnml:functionValue [
+                a fno:Execution ;
+                rml:logicalSource map:DatasetsSource ;
+                rr:predicateObjectMap [ rr:predicate fno:executes ; rr:objectMap [ rr:constant grel:string_split ; rr:termType rr:IRI ] ] ;
+                rr:predicateObjectMap [ rr:predicate grel:valueParameter ; rr:objectMap [ rml:reference "keywords" ; rr:termType rr:Literal ] ] ;
+                rr:predicateObjectMap [ rr:predicate grel:p_string_sep ; rr:objectMap [ rr:constant "\\|" ; rr:termType rr:Literal ] ]
+            ]
+        ]
+    ] .
+
+map:DatasetMeasurementTechnique a rr:TriplesMap ;
+    rdfs:label "Dataset Measurement Technique" ;
+    rml:logicalSource map:DatasetsSource ;
+    rr:subjectMap [ rr:template "https://www.synapse.org/Synapse:{id}" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:measurementTechnique ;
+        rr:objectMap [
+            a fnml:FunctionTermMap ;
+            rr:datatype xsd:string ;
+            fnml:functionValue [
+                a fno:Execution ;
+                rml:logicalSource map:DatasetsSource ;
+                rr:predicateObjectMap [ rr:predicate fno:executes ; rr:objectMap [ rr:constant grel:string_split ; rr:termType rr:IRI ] ] ;
+                rr:predicateObjectMap [ rr:predicate grel:valueParameter ; rr:objectMap [ rml:reference "measurementTechnique" ; rr:termType rr:Literal ] ] ;
+                rr:predicateObjectMap [ rr:predicate grel:p_string_sep ; rr:objectMap [ rr:constant "\\|" ; rr:termType rr:Literal ] ]
+            ]
+        ]
+    ] .
+
+map:DatasetAgeGroup a rr:TriplesMap ;
+    rdfs:label "Dataset Age Group" ;
+    rml:logicalSource map:DatasetsSource ;
+    rr:subjectMap [ rr:template "https://www.synapse.org/Synapse:{id}" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:ageGroup ;
+        rr:objectMap [
+            a fnml:FunctionTermMap ;
+            rr:datatype xsd:string ;
+            fnml:functionValue [
+                a fno:Execution ;
+                rml:logicalSource map:DatasetsSource ;
+                rr:predicateObjectMap [ rr:predicate fno:executes ; rr:objectMap [ rr:constant grel:string_split ; rr:termType rr:IRI ] ] ;
+                rr:predicateObjectMap [ rr:predicate grel:valueParameter ; rr:objectMap [ rml:reference "ageGroup" ; rr:termType rr:Literal ] ] ;
+                rr:predicateObjectMap [ rr:predicate grel:p_string_sep ; rr:objectMap [ rr:constant "\\|" ; rr:termType rr:Literal ] ]
+            ]
+        ]
+    ] .
+
+map:DatasetDataUseModifiers a rr:TriplesMap ;
+    rdfs:label "Dataset Data Use Modifiers" ;
+    rml:logicalSource map:DatasetsSource ;
+    rr:subjectMap [ rr:template "https://www.synapse.org/Synapse:{id}" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:dataUseModifiers ;
+        rr:objectMap [
+            a fnml:FunctionTermMap ;
+            rr:datatype xsd:string ;
+            fnml:functionValue [
+                a fno:Execution ;
+                rml:logicalSource map:DatasetsSource ;
+                rr:predicateObjectMap [ rr:predicate fno:executes ; rr:objectMap [ rr:constant grel:string_split ; rr:termType rr:IRI ] ] ;
+                rr:predicateObjectMap [ rr:predicate grel:valueParameter ; rr:objectMap [ rml:reference "dataUseModifiers" ; rr:termType rr:Literal ] ] ;
+                rr:predicateObjectMap [ rr:predicate grel:p_string_sep ; rr:objectMap [ rr:constant "\\|" ; rr:termType rr:Literal ] ]
+            ]
+        ]
+    ] .
+
+map:DatasetCountryOfOrigin a rr:TriplesMap ;
+    rdfs:label "Dataset Country of Origin" ;
+    rml:logicalSource map:DatasetsSource ;
+    rr:subjectMap [ rr:template "https://www.synapse.org/Synapse:{id}" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:countryOfOrigin ;
+        rr:objectMap [
+            a fnml:FunctionTermMap ;
+            rr:datatype xsd:string ;
+            fnml:functionValue [
+                a fno:Execution ;
+                rml:logicalSource map:DatasetsSource ;
+                rr:predicateObjectMap [ rr:predicate fno:executes ; rr:objectMap [ rr:constant grel:string_split ; rr:termType rr:IRI ] ] ;
+                rr:predicateObjectMap [ rr:predicate grel:valueParameter ; rr:objectMap [ rml:reference "countryOfOrigin" ; rr:termType rr:Literal ] ] ;
+                rr:predicateObjectMap [ rr:predicate grel:p_string_sep ; rr:objectMap [ rr:constant "\\|" ; rr:termType rr:Literal ] ]
+            ]
+        ]
+    ] .
+
+map:DatasetVisualizeDataOn a rr:TriplesMap ;
+    rdfs:label "Dataset Visualize Data On" ;
+    rml:logicalSource map:DatasetsSource ;
+    rr:subjectMap [ rr:template "https://www.synapse.org/Synapse:{id}" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:visualizeDataOn ;
+        rr:objectMap [
+            a fnml:FunctionTermMap ;
+            rr:datatype xsd:string ;
+            fnml:functionValue [
+                a fno:Execution ;
+                rml:logicalSource map:DatasetsSource ;
+                rr:predicateObjectMap [ rr:predicate fno:executes ; rr:objectMap [ rr:constant grel:string_split ; rr:termType rr:IRI ] ] ;
+                rr:predicateObjectMap [ rr:predicate grel:valueParameter ; rr:objectMap [ rml:reference "visualizeDataOn" ; rr:termType rr:Literal ] ] ;
+                rr:predicateObjectMap [ rr:predicate grel:p_string_sep ; rr:objectMap [ rr:constant "\\|" ; rr:termType rr:Literal ] ]
+            ]
+        ]
+    ] .

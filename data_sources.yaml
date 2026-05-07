@@ -191,6 +191,59 @@ profiles:
         source_version_comment: Pinned source table/view versions before base KG image
           v1.1 build
         source_version_date: 2026-03-19 23:03:24 UTC
+      clinical_assessment_tools:
+        synapse_id: syn73709229
+        concrete_type: TableEntity
+        note: Clinical assessment tool details (assessment type, scoring, validated languages,
+          psychometric properties, etc.)
+        source_version: 9
+        source_version_label: null
+        source_version_comment: Pinned at latest snapshot on first pipeline inclusion
+        source_version_date: 2026-04-29 14:24:07 UTC
+      patient_derived_models:
+        synapse_id: syn73709228
+        concrete_type: TableEntity
+        note: Patient derived model details (PDX, model system type, tumor type, molecular
+          characterization, donor link, etc.)
+        source_version: 10
+        source_version_label: null
+        source_version_comment: Pinned at latest snapshot on first pipeline inclusion
+        source_version_date: 2026-05-05 21:00:23 UTC
+      organoid_protocols:
+        synapse_id: syn73709227
+        concrete_type: TableEntity
+        note: Organoid protocol details (model type, derivation source, culture system,
+          cell types, etc.)
+        source_version: 8
+        source_version_label: null
+        source_version_comment: Pinned at latest snapshot on first pipeline inclusion
+        source_version_date: 2026-04-29 15:16:58 UTC
+      computational_tools:
+        synapse_id: syn73709226
+        concrete_type: TableEntity
+        note: Computational tool details (software name, type, version, programming
+          language, repository, license, etc.)
+        source_version: 8
+        source_version_label: null
+        source_version_comment: Pinned at latest snapshot on first pipeline inclusion
+        source_version_date: 2026-04-29 14:23:48 UTC
+      initiatives:
+        synapse_id: syn24189696
+        concrete_type: TableEntity
+        note: Portal initiatives (name, abbreviation, summary, website, funding agency)
+        source_version: 2
+        source_version_label: null
+        source_version_comment: Pinned at latest snapshot on first pipeline inclusion
+        source_version_date: 2023-06-21 12:21:38 UTC
+      datasets:
+        synapse_id: syn50913342
+        concrete_type: TableEntity
+        note: Portal datasets with rich metadata (data type, species, assay, disease
+          focus, access type, etc.); links to studies
+        source_version: 15
+        source_version_label: null
+        source_version_comment: Pinned at latest snapshot on first pipeline inclusion
+        source_version_date: 2026-04-27 23:36:44 UTC
   evaluation:
     version: KG v0.1-eval
     date: '2025-02-10'
@@ -345,3 +398,45 @@ profiles:
         source_version_comment: Pinned source table/view versions before base KG image
           v1.1 build
         source_version_date: 2026-03-19 23:03:24 UTC
+      clinical_assessment_tools:
+        synapse_id: syn73709229
+        concrete_type: TableEntity
+        source_version: 9
+        source_version_label: null
+        source_version_comment: Pinned at latest snapshot on first pipeline inclusion
+        source_version_date: 2026-04-29 14:24:07 UTC
+      patient_derived_models:
+        synapse_id: syn73709228
+        concrete_type: TableEntity
+        source_version: 10
+        source_version_label: null
+        source_version_comment: Pinned at latest snapshot on first pipeline inclusion
+        source_version_date: 2026-05-05 21:00:23 UTC
+      organoid_protocols:
+        synapse_id: syn73709227
+        concrete_type: TableEntity
+        source_version: 8
+        source_version_label: null
+        source_version_comment: Pinned at latest snapshot on first pipeline inclusion
+        source_version_date: 2026-04-29 15:16:58 UTC
+      computational_tools:
+        synapse_id: syn73709226
+        concrete_type: TableEntity
+        source_version: 8
+        source_version_label: null
+        source_version_comment: Pinned at latest snapshot on first pipeline inclusion
+        source_version_date: 2026-04-29 14:23:48 UTC
+      initiatives:
+        synapse_id: syn24189696
+        concrete_type: TableEntity
+        source_version: 2
+        source_version_label: null
+        source_version_comment: Pinned at latest snapshot on first pipeline inclusion
+        source_version_date: 2023-06-21 12:21:38 UTC
+      datasets:
+        synapse_id: syn50913342
+        concrete_type: TableEntity
+        source_version: 15
+        source_version_label: null
+        source_version_comment: Pinned at latest snapshot on first pipeline inclusion
+        source_version_date: 2026-04-27 23:36:44 UTC

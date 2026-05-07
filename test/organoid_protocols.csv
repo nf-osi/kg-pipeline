@@ -1,0 +1,4 @@
+organoidProtocolId,modelType,derivationSource,cellTypes,organoidType,matrixType,cultureSystem,maturationTime,characterizationMethods,passageNumber,cryopreservationProtocol,qualityControlMetrics,cultureMedia
+op-001,Tumor organoid,Patient biopsy,Schwann cells|Fibroblasts,Neurofibroma organoid,Matrigel,Embedded,14 days,Immunostaining|qPCR|Brightfield,P8,Standard DMSO-based,Viability|Morphology,DMEM/F12 + supplements
+op-002,Normal organoid,iPSC-derived,Neural stem cells,Neural organoid,Matrigel,Suspension,28 days,RNA-seq|Immunostaining,P3,,Cell viability,Neurobasal + supplements
+op-003,Tumor organoid,Surgical resection,Mixed tumor cells|Stromal cells,MPNST organoid,Cultrex,Embedded,10 days,H&E|IHC,P6,Cryostor CS10,Morphology|Cell viability|Marker expression,Advanced DMEM + EGF + FGF

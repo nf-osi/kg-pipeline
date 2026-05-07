@@ -223,6 +223,113 @@ specimenTissueType as specimenTissueType,
 contact as contact
 """
 
+CLINICAL_ASSESSMENT_TOOLS_SELECT = """
+clinicalAssessmentToolId as clinicalAssessmentToolId,
+assessmentName as assessmentName,
+assessmentType as assessmentType,
+targetPopulation as targetPopulation,
+diseaseSpecific as diseaseSpecific,
+numberOfItems as numberOfItems,
+scoringMethod as scoringMethod,
+validatedLanguages as validatedLanguages,
+psychometricProperties as psychometricProperties,
+administrationTime as administrationTime,
+availabilityStatus as availabilityStatus,
+licensingRequirements as licensingRequirements,
+digitalVersion as digitalVersion
+"""
+
+PATIENT_DERIVED_MODELS_SELECT = """
+patientDerivedModelId as patientDerivedModelId,
+modelSystemType as modelSystemType,
+patientDiagnosis as patientDiagnosis,
+hostStrain as hostStrain,
+passageNumber as passageNumber,
+tumorType as tumorType,
+engraftmentSite as engraftmentSite,
+establishmentRate as establishmentRate,
+molecularCharacterization as molecularCharacterization,
+clinicalData as clinicalData,
+validationMethods as validationMethods,
+donorId as donorId
+"""
+
+ORGANOID_PROTOCOLS_SELECT = """
+organoidProtocolId as organoidProtocolId,
+modelType as modelType,
+derivationSource as derivationSource,
+cellTypes as cellTypes,
+organoidType as organoidType,
+matrixType as matrixType,
+cultureSystem as cultureSystem,
+maturationTime as maturationTime,
+characterizationMethods as characterizationMethods,
+passageNumber as passageNumber,
+cryopreservationProtocol as cryopreservationProtocol,
+qualityControlMetrics as qualityControlMetrics,
+cultureMedia as cultureMedia
+"""
+
+COMPUTATIONAL_TOOLS_SELECT = """
+computationalToolId as computationalToolId,
+softwareName as softwareName,
+softwareType as softwareType,
+softwareVersion as softwareVersion,
+programmingLanguage as programmingLanguage,
+sourceRepository as sourceRepository,
+documentation as documentation,
+licenseType as licenseType,
+containerized as containerized,
+dependencies as dependencies,
+systemRequirements as systemRequirements,
+lastUpdate as lastUpdate,
+maintainer as maintainer,
+licenseDetails as licenseDetails,
+analyticalPlatformSupport as analyticalPlatformSupport
+"""
+
+INITIATIVES_SELECT = """
+initiative as initiative,
+abbreviation as abbreviation,
+summary as summary,
+website as website,
+fundingAgency as fundingAgency
+"""
+
+DATASETS_SELECT = """
+id as id,
+title as title,
+studyId as studyId,
+dataType as dataType,
+manifestation as manifestation,
+diseaseFocus as diseaseFocus,
+fundingAgency as fundingAgency,
+species as species,
+assay as assay,
+doi as doi,
+description as description,
+accessType as accessType,
+license as license,
+conditionsOfAccess as conditionsOfAccess,
+creator as creator,
+contributor as contributor,
+keywords as keywords,
+measurementTechnique as measurementTechnique,
+ageGroup as ageGroup,
+dataUseModifiers as dataUseModifiers,
+countryOfOrigin as countryOfOrigin,
+modelSystemName as modelSystemName,
+datasetSizeInBytes as datasetSizeInBytes,
+datasetItemCount as datasetItemCount,
+individualCount as individualCount,
+specimenCount as specimenCount,
+yearPublished as yearPublished,
+visualizeDataOn as visualizeDataOn,
+alternateName as alternateName,
+versionLabel as versionLabel,
+externalRepositoryUri as externalRepositoryUri
+"""
+
 OBSERVATIONS_SELECT = """
 observationId as observationId,
 resourceId as resourceId,
@@ -254,7 +361,11 @@ dateModified as dateModified,
 rrid as rrid,
 description as description,
 dateAdded as dateAdded,
-howToAcquire as howToAcquire
+howToAcquire as howToAcquire,
+computationalToolId as computationalToolId,
+organoidProtocolId as organoidProtocolId,
+patientDerivedModelId as patientDerivedModelId,
+clinicalAssessmentToolId as clinicalAssessmentToolId
 """
 
 # Short name aliases for convenience
@@ -276,6 +387,12 @@ TABLE_ALIASES = {
     "donor_tool": "donor_tool",
     "mutation_model": "mutation_model",
     "biobank": "biobanks",
+    "clinical_assessment": "clinical_assessment_tools",
+    "pdm": "patient_derived_models",
+    "organoid": "organoid_protocols",
+    "computational": "computational_tools",
+    "initiative": "initiatives",
+    "dataset": "datasets",
 }
 
 TABLES: Dict[str, Dict[str, Any]] = {
@@ -488,6 +605,10 @@ TABLES: Dict[str, Dict[str, Any]] = {
             {"target": "cellLineId", "source": "cellLineId", "type": "iri", "references": {"table": "cell_lines", "column": "cellLineId"}},
             {"target": "animalModelId", "source": "animalModelId", "type": "iri", "references": {"table": "animal_models", "column": "animalModelId"}},
             {"target": "biobankId", "source": "biobankId", "type": "iri", "references": {"table": "biobanks", "column": "biobankId"}},
+            {"target": "computationalToolId", "source": "computationalToolId", "type": "iri", "references": {"table": "computational_tools", "column": "computationalToolId"}},
+            {"target": "organoidProtocolId", "source": "organoidProtocolId", "type": "iri", "references": {"table": "organoid_protocols", "column": "organoidProtocolId"}},
+            {"target": "patientDerivedModelId", "source": "patientDerivedModelId", "type": "iri", "references": {"table": "patient_derived_models", "column": "patientDerivedModelId"}},
+            {"target": "clinicalAssessmentToolId", "source": "clinicalAssessmentToolId", "type": "iri", "references": {"table": "clinical_assessment_tools", "column": "clinicalAssessmentToolId"}},
             {"target": "usageRequirements", "source": "usageRequirements", "type": "text"},
             {"target": "resourceName", "source": "resourceName", "type": "text"},
             {"target": "resourceType", "source": "resourceType", "type": "text"},
@@ -612,6 +733,144 @@ TABLES: Dict[str, Dict[str, Any]] = {
             {"target": "specimenFormat", "source": "specimenFormat", "type": "text+", "transform": "string_list"},
             {"target": "specimenTissueType", "source": "specimenTissueType", "type": "text+", "transform": "string_list"},
             {"target": "contact", "source": "contact", "type": "text"},
+        ],
+    },
+    "clinical_assessment_tools": {
+        "synapse_id": "syn73709229",
+        "csv_path": Path("data/csv/clinical_assessment_tools.csv"),
+        "raw_filename": "clinical_assessment_tools_raw.csv",
+        "select_clause": CLINICAL_ASSESSMENT_TOOLS_SELECT,
+        "columns": [
+            {"target": "clinicalAssessmentToolId", "source": "clinicalAssessmentToolId", "type": "iri"},
+            {"target": "assessmentName", "source": "assessmentName", "type": "text"},
+            {"target": "assessmentType", "source": "assessmentType", "type": "text"},
+            {"target": "targetPopulation", "source": "targetPopulation", "type": "text"},
+            {"target": "diseaseSpecific", "source": "diseaseSpecific", "type": "text"},
+            {"target": "numberOfItems", "source": "numberOfItems", "type": "text"},
+            {"target": "scoringMethod", "source": "scoringMethod", "type": "text"},
+            {"target": "validatedLanguages", "source": "validatedLanguages", "type": "text+", "transform": "string_list"},
+            {"target": "psychometricProperties", "source": "psychometricProperties", "type": "text"},
+            {"target": "administrationTime", "source": "administrationTime", "type": "text"},
+            {"target": "availabilityStatus", "source": "availabilityStatus", "type": "text"},
+            {"target": "licensingRequirements", "source": "licensingRequirements", "type": "text"},
+            {"target": "digitalVersion", "source": "digitalVersion", "type": "text"},
+        ],
+    },
+    "patient_derived_models": {
+        "synapse_id": "syn73709228",
+        "csv_path": Path("data/csv/patient_derived_models.csv"),
+        "raw_filename": "patient_derived_models_raw.csv",
+        "select_clause": PATIENT_DERIVED_MODELS_SELECT,
+        "columns": [
+            {"target": "patientDerivedModelId", "source": "patientDerivedModelId", "type": "iri"},
+            {"target": "modelSystemType", "source": "modelSystemType", "type": "text"},
+            {"target": "patientDiagnosis", "source": "patientDiagnosis", "type": "text"},
+            {"target": "hostStrain", "source": "hostStrain", "type": "text"},
+            {"target": "passageNumber", "source": "passageNumber", "type": "text"},
+            {"target": "tumorType", "source": "tumorType", "type": "text"},
+            {"target": "engraftmentSite", "source": "engraftmentSite", "type": "text"},
+            {"target": "establishmentRate", "source": "establishmentRate", "type": "text"},
+            {"target": "molecularCharacterization", "source": "molecularCharacterization", "type": "text+", "transform": "string_list"},
+            {"target": "clinicalData", "source": "clinicalData", "type": "text"},
+            {"target": "validationMethods", "source": "validationMethods", "type": "text+", "transform": "string_list"},
+            {"target": "donorId", "source": "donorId", "type": "iri", "references": {"table": "donors", "column": "donorId"}},
+        ],
+    },
+    "organoid_protocols": {
+        "synapse_id": "syn73709227",
+        "csv_path": Path("data/csv/organoid_protocols.csv"),
+        "raw_filename": "organoid_protocols_raw.csv",
+        "select_clause": ORGANOID_PROTOCOLS_SELECT,
+        "columns": [
+            {"target": "organoidProtocolId", "source": "organoidProtocolId", "type": "iri"},
+            {"target": "modelType", "source": "modelType", "type": "text"},
+            {"target": "derivationSource", "source": "derivationSource", "type": "text"},
+            {"target": "cellTypes", "source": "cellTypes", "type": "text+", "transform": "string_list"},
+            {"target": "organoidType", "source": "organoidType", "type": "text"},
+            {"target": "matrixType", "source": "matrixType", "type": "text"},
+            {"target": "cultureSystem", "source": "cultureSystem", "type": "text"},
+            {"target": "maturationTime", "source": "maturationTime", "type": "text"},
+            {"target": "characterizationMethods", "source": "characterizationMethods", "type": "text+", "transform": "string_list"},
+            {"target": "passageNumber", "source": "passageNumber", "type": "text"},
+            {"target": "cryopreservationProtocol", "source": "cryopreservationProtocol", "type": "text"},
+            {"target": "qualityControlMetrics", "source": "qualityControlMetrics", "type": "text+", "transform": "string_list"},
+            {"target": "cultureMedia", "source": "cultureMedia", "type": "text"},
+        ],
+    },
+    "computational_tools": {
+        "synapse_id": "syn73709226",
+        "csv_path": Path("data/csv/computational_tools.csv"),
+        "raw_filename": "computational_tools_raw.csv",
+        "select_clause": COMPUTATIONAL_TOOLS_SELECT,
+        "columns": [
+            {"target": "computationalToolId", "source": "computationalToolId", "type": "iri"},
+            {"target": "softwareName", "source": "softwareName", "type": "text"},
+            {"target": "softwareType", "source": "softwareType", "type": "text"},
+            {"target": "softwareVersion", "source": "softwareVersion", "type": "text"},
+            {"target": "programmingLanguage", "source": "programmingLanguage", "type": "text+", "transform": "string_list"},
+            {"target": "sourceRepository", "source": "sourceRepository", "type": "iri"},
+            {"target": "documentation", "source": "documentation", "type": "iri"},
+            {"target": "licenseType", "source": "licenseType", "type": "text"},
+            {"target": "containerized", "source": "containerized", "type": "text"},
+            {"target": "dependencies", "source": "dependencies", "type": "text+", "transform": "string_list"},
+            {"target": "systemRequirements", "source": "systemRequirements", "type": "text"},
+            {"target": "lastUpdate", "source": "lastUpdate", "type": "text"},
+            {"target": "maintainer", "source": "maintainer", "type": "text"},
+            {"target": "licenseDetails", "source": "licenseDetails", "type": "text"},
+            {"target": "analyticalPlatformSupport", "source": "analyticalPlatformSupport", "type": "text"},
+        ],
+    },
+    "initiatives": {
+        "synapse_id": "syn24189696",
+        "csv_path": Path("data/csv/initiatives.csv"),
+        "raw_filename": "initiatives_raw.csv",
+        "select_clause": INITIATIVES_SELECT,
+        "columns": [
+            {"target": "initiative", "source": "initiative", "type": "text"},
+            {"target": "initiativeKey", "source": "initiativeKey", "type": "text"},
+            {"target": "abbreviation", "source": "abbreviation", "type": "text"},
+            {"target": "summary", "source": "summary", "type": "text"},
+            {"target": "website", "source": "website", "type": "iri"},
+            {"target": "fundingAgency", "source": "fundingAgency", "type": "text+", "transform": "string_list"},
+        ],
+    },
+    "datasets": {
+        "synapse_id": "syn50913342",
+        "csv_path": Path("data/csv/datasets.csv"),
+        "raw_filename": "datasets_raw.csv",
+        "select_clause": DATASETS_SELECT,
+        "columns": [
+            {"target": "id", "source": "id", "type": "iri", "transform": "synapse_id"},
+            {"target": "title", "source": "title", "type": "text"},
+            {"target": "studyId", "source": "studyId", "type": "iri", "transform": "synapse_id"},
+            {"target": "dataType", "source": "dataType", "type": "text+", "transform": "string_list"},
+            {"target": "manifestation", "source": "manifestation", "type": "text+", "transform": "string_list"},
+            {"target": "diseaseFocus", "source": "diseaseFocus", "type": "text"},
+            {"target": "fundingAgency", "source": "fundingAgency", "type": "text+", "transform": "string_list"},
+            {"target": "species", "source": "species", "type": "text+", "transform": "string_list"},
+            {"target": "assay", "source": "assay", "type": "text"},
+            {"target": "doi", "source": "doi", "type": "iri", "transform": "doi"},
+            {"target": "description", "source": "description", "type": "text"},
+            {"target": "accessType", "source": "accessType", "type": "text"},
+            {"target": "license", "source": "license", "type": "iri"},
+            {"target": "conditionsOfAccess", "source": "conditionsOfAccess", "type": "text"},
+            {"target": "creator", "source": "creator", "type": "text+", "transform": "string_list"},
+            {"target": "contributor", "source": "contributor", "type": "text+", "transform": "string_list"},
+            {"target": "keywords", "source": "keywords", "type": "text+", "transform": "string_list"},
+            {"target": "measurementTechnique", "source": "measurementTechnique", "type": "text+", "transform": "string_list"},
+            {"target": "ageGroup", "source": "ageGroup", "type": "text+", "transform": "string_list"},
+            {"target": "dataUseModifiers", "source": "dataUseModifiers", "type": "text+", "transform": "string_list"},
+            {"target": "countryOfOrigin", "source": "countryOfOrigin", "type": "text+", "transform": "string_list"},
+            {"target": "modelSystemName", "source": "modelSystemName", "type": "text"},
+            {"target": "datasetSizeInBytes", "source": "datasetSizeInBytes", "type": "text"},
+            {"target": "datasetItemCount", "source": "datasetItemCount", "type": "text"},
+            {"target": "individualCount", "source": "individualCount", "type": "text"},
+            {"target": "specimenCount", "source": "specimenCount", "type": "text"},
+            {"target": "yearPublished", "source": "yearPublished", "type": "text"},
+            {"target": "visualizeDataOn", "source": "visualizeDataOn", "type": "text+", "transform": "string_list"},
+            {"target": "alternateName", "source": "alternateName", "type": "text"},
+            {"target": "versionLabel", "source": "versionLabel", "type": "text"},
+            {"target": "externalRepositoryUri", "source": "externalRepositoryUri", "type": "iri"},
         ],
     },
 }
@@ -884,6 +1143,14 @@ def apply_derived_columns(
         )
         return df.merge(donor_race, on="donorId", how="left")
 
+    if table_name == "initiatives":
+        if "initiativeKey" not in df.columns and "initiative" in df.columns:
+            # Derive a URL-safe IRI key: replace spaces with underscores.
+            # This matches the IRI scheme used in studies.rml.ttl where %20 is replaced with _.
+            df = df.copy()
+            df["initiativeKey"] = df["initiative"].str.replace(" ", "_", regex=False)
+        return df
+
     return df
 
 
@@ -975,7 +1242,8 @@ def main(argv: List[str] | None = None) -> int:
         description=__doc__,
         epilog="Table names: study, file, mutation, reagent, animal, cell, donor, antibody, "
                "resource, observation, dev, funder, investigator, publication, "
-               "donor_tool, mutation_model, biobank"
+               "donor_tool, mutation_model, biobank, clinical_assessment, pdm, organoid, "
+               "computational, initiative, dataset"
     )
     parser.add_argument(
         "tables",

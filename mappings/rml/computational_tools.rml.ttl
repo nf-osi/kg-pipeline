@@ -1,0 +1,111 @@
+@prefix rr:   <http://www.w3.org/ns/r2rml#> .
+@prefix rml:  <http://semweb.mmlab.be/ns/rml#> .
+@prefix fnml: <http://semweb.mmlab.be/ns/fnml#> .
+@prefix fno:  <https://w3id.org/function/ontology#> .
+@prefix ql:   <http://semweb.mmlab.be/ns/ql#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix grel: <http://users.ugent.be/~bjdmeest/function/grel.ttl#> .
+@prefix nf:   <http://nf-osi.github.com/terms#> .
+@prefix map:  <http://nf-osi.github.com/mappings/computational-tools#> .
+
+################################################################################
+# Logical source
+################################################################################
+
+map:ComputationalToolsSource a rml:LogicalSource ;
+    rml:source "data/csv/computational_tools.csv" ;
+    rml:referenceFormulation ql:CSV .
+
+################################################################################
+# Computational Tool core facts
+################################################################################
+
+map:ComputationalToolCore a rr:TriplesMap ;
+    rdfs:label "Computational Tool Core" ;
+    rml:logicalSource map:ComputationalToolsSource ;
+    rr:subjectMap [
+        rr:template "http://nf-osi.github.com/terms#computationalTool/{computationalToolId}" ;
+        rr:termType rr:IRI
+    ] ;
+    rr:predicateObjectMap [ rr:predicate rdf:type ; rr:objectMap [ rr:constant nf:ComputationalTool ; rr:termType rr:IRI ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:computationalToolId ; rr:objectMap [ rml:reference "computationalToolId" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:softwareName ; rr:objectMap [ rml:reference "softwareName" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:softwareType ; rr:objectMap [ rml:reference "softwareType" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:softwareVersion ; rr:objectMap [ rml:reference "softwareVersion" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:sourceRepository ; rr:objectMap [ rml:reference "sourceRepository" ; rr:termType rr:IRI ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:documentation ; rr:objectMap [ rml:reference "documentation" ; rr:termType rr:IRI ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:licenseType ; rr:objectMap [ rml:reference "licenseType" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:containerized ; rr:objectMap [ rml:reference "containerized" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:systemRequirements ; rr:objectMap [ rml:reference "systemRequirements" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:lastUpdate ; rr:objectMap [ rml:reference "lastUpdate" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:maintainer ; rr:objectMap [ rml:reference "maintainer" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:licenseDetails ; rr:objectMap [ rml:reference "licenseDetails" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:analyticalPlatformSupport ; rr:objectMap [ rml:reference "analyticalPlatformSupport" ; rr:datatype xsd:string ] ] .
+
+################################################################################
+# Multi-valued fields (StringList)
+################################################################################
+
+map:ComputationalToolProgrammingLanguage a rr:TriplesMap ;
+    rdfs:label "Computational Tool Programming Language" ;
+    rml:logicalSource map:ComputationalToolsSource ;
+    rr:subjectMap [
+        rr:template "http://nf-osi.github.com/terms#computationalTool/{computationalToolId}" ;
+        rr:termType rr:IRI
+    ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:programmingLanguage ;
+        rr:objectMap [
+            a fnml:FunctionTermMap ;
+            rr:datatype xsd:string ;
+            fnml:functionValue [
+                a fno:Execution ;
+                rml:logicalSource map:ComputationalToolsSource ;
+                rr:predicateObjectMap [
+                    rr:predicate fno:executes ;
+                    rr:objectMap [ rr:constant grel:string_split ; rr:termType rr:IRI ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:valueParameter ;
+                    rr:objectMap [ rml:reference "programmingLanguage" ; rr:termType rr:Literal ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:p_string_sep ;
+                    rr:objectMap [ rr:constant "\\|" ; rr:termType rr:Literal ]
+                ]
+            ]
+        ]
+    ] .
+
+map:ComputationalToolDependencies a rr:TriplesMap ;
+    rdfs:label "Computational Tool Dependencies" ;
+    rml:logicalSource map:ComputationalToolsSource ;
+    rr:subjectMap [
+        rr:template "http://nf-osi.github.com/terms#computationalTool/{computationalToolId}" ;
+        rr:termType rr:IRI
+    ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:dependencies ;
+        rr:objectMap [
+            a fnml:FunctionTermMap ;
+            rr:datatype xsd:string ;
+            fnml:functionValue [
+                a fno:Execution ;
+                rml:logicalSource map:ComputationalToolsSource ;
+                rr:predicateObjectMap [
+                    rr:predicate fno:executes ;
+                    rr:objectMap [ rr:constant grel:string_split ; rr:termType rr:IRI ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:valueParameter ;
+                    rr:objectMap [ rml:reference "dependencies" ; rr:termType rr:Literal ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:p_string_sep ;
+                    rr:objectMap [ rr:constant "\\|" ; rr:termType rr:Literal ]
+                ]
+            ]
+        ]
+    ] .

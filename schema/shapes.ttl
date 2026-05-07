@@ -987,6 +987,506 @@ shapes:ObservationShape a sh:NodeShape ;
     ] .
 
 ################################################################################
+# Clinical Assessment Tool
+################################################################################
+
+shapes:ClinicalAssessmentToolShape a sh:NodeShape ;
+    sh:targetClass nf:ClinicalAssessmentTool ;
+    rdfs:label "Clinical Assessment Tool shape" ;
+    rdfs:comment "Expected properties for ClinicalAssessmentTool instances." ;
+    sh:property [
+        sh:path nf:resourceId ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:clinicalAssessmentToolId ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:assessmentName ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:assessmentType ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:targetPopulation ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:diseaseSpecific ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:numberOfItems ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:scoringMethod ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:validatedLanguages ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nf:psychometricProperties ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:administrationTime ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:availabilityStatus ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:licensingRequirements ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:digitalVersion ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] .
+
+################################################################################
+# Patient Derived Model
+################################################################################
+
+shapes:PatientDerivedModelShape a sh:NodeShape ;
+    sh:targetClass nf:PatientDerivedModel ;
+    rdfs:label "Patient Derived Model shape" ;
+    rdfs:comment "Expected properties for PatientDerivedModel instances." ;
+    sh:property [
+        sh:path nf:resourceId ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:patientDerivedModelId ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:modelSystemType ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:patientDiagnosis ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:hostStrain ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:passageNumber ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:tumorType ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:engraftmentSite ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:establishmentRate ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:molecularCharacterization ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nf:clinicalData ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:validationMethods ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nf:donorId ;
+        sh:nodeKind sh:IRI ;
+        sh:class nf:Donor ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:fromDonor ;
+        sh:nodeKind sh:IRI ;
+        sh:class nf:Donor ;
+        sh:maxCount 1 ;
+    ] .
+
+################################################################################
+# Organoid Protocol
+################################################################################
+
+shapes:OrganoidProtocolShape a sh:NodeShape ;
+    sh:targetClass nf:OrganoidProtocol ;
+    rdfs:label "Organoid Protocol shape" ;
+    rdfs:comment "Expected properties for OrganoidProtocol instances." ;
+    sh:property [
+        sh:path nf:resourceId ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:organoidProtocolId ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:modelType ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:derivationSource ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:cellTypes ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nf:organoidType ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:matrixType ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:cultureSystem ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:maturationTime ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:characterizationMethods ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nf:passageNumber ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:cryopreservationProtocol ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:qualityControlMetrics ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nf:cultureMedia ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] .
+
+################################################################################
+# Computational Tool
+################################################################################
+
+shapes:ComputationalToolShape a sh:NodeShape ;
+    sh:targetClass nf:ComputationalTool ;
+    rdfs:label "Computational Tool shape" ;
+    rdfs:comment "Expected properties for ComputationalTool instances." ;
+    sh:property [
+        sh:path nf:resourceId ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:computationalToolId ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:softwareName ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:softwareType ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:softwareVersion ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:programmingLanguage ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nf:sourceRepository ;
+        sh:nodeKind sh:IRI ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:documentation ;
+        sh:nodeKind sh:IRI ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:licenseType ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:containerized ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:dependencies ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nf:systemRequirements ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:lastUpdate ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:maintainer ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:licenseDetails ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:analyticalPlatformSupport ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] .
+
+################################################################################
+# Initiative
+################################################################################
+
+shapes:InitiativeShape a sh:NodeShape ;
+    sh:targetClass nf:Initiative ;
+    rdfs:label "Initiative shape" ;
+    rdfs:comment "Expected properties for Initiative instances." ;
+    sh:property [
+        sh:path nf:name ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:abbreviation ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:description ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:website ;
+        sh:nodeKind sh:IRI ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:hasFunder ;
+        sh:nodeKind sh:IRI ;
+    ] .
+
+################################################################################
+# Dataset
+################################################################################
+
+shapes:DatasetShape a sh:NodeShape ;
+    sh:targetClass nf:Dataset ;
+    rdfs:label "Dataset shape" ;
+    rdfs:comment "Expected properties for Dataset instances." ;
+    sh:property [
+        sh:path nf:name ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:description ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:parentStudy ;
+        sh:nodeKind sh:IRI ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:dataType ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nf:manifestation ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nf:diseaseFocus ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:hasFunder ;
+        sh:nodeKind sh:IRI ;
+    ] ;
+    sh:property [
+        sh:path nf:species ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nf:assay ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:doi ;
+        sh:nodeKind sh:IRI ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:accessType ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:license ;
+        sh:nodeKind sh:IRI ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:conditionsOfAccess ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:creator ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nf:contributor ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nf:keywords ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nf:measurementTechnique ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nf:ageGroup ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nf:dataUseModifiers ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nf:countryOfOrigin ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nf:modelSystemName ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:datasetSizeInBytes ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:datasetItemCount ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:individualCount ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:specimenCount ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:yearPublished ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:visualizeDataOn ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nf:alternateName ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:versionLabel ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:externalRepositoryUri ;
+        sh:nodeKind sh:IRI ;
+        sh:maxCount 1 ;
+    ] .
+
+################################################################################
 # Tool (Resource)
 ################################################################################
 

@@ -1,0 +1,109 @@
+@prefix rr:   <http://www.w3.org/ns/r2rml#> .
+@prefix rml:  <http://semweb.mmlab.be/ns/rml#> .
+@prefix fnml: <http://semweb.mmlab.be/ns/fnml#> .
+@prefix fno:  <https://w3id.org/function/ontology#> .
+@prefix ql:   <http://semweb.mmlab.be/ns/ql#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix grel: <http://users.ugent.be/~bjdmeest/function/grel.ttl#> .
+@prefix nf:   <http://nf-osi.github.com/terms#> .
+@prefix map:  <http://nf-osi.github.com/mappings/patient-derived-models#> .
+
+################################################################################
+# Logical source
+################################################################################
+
+map:PatientDerivedModelsSource a rml:LogicalSource ;
+    rml:source "data/csv/patient_derived_models.csv" ;
+    rml:referenceFormulation ql:CSV .
+
+################################################################################
+# Patient Derived Model core facts
+################################################################################
+
+map:PatientDerivedModelCore a rr:TriplesMap ;
+    rdfs:label "Patient Derived Model Core" ;
+    rml:logicalSource map:PatientDerivedModelsSource ;
+    rr:subjectMap [
+        rr:template "http://nf-osi.github.com/terms#patientDerivedModel/{patientDerivedModelId}" ;
+        rr:termType rr:IRI
+    ] ;
+    rr:predicateObjectMap [ rr:predicate rdf:type ; rr:objectMap [ rr:constant nf:PatientDerivedModel ; rr:termType rr:IRI ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:patientDerivedModelId ; rr:objectMap [ rml:reference "patientDerivedModelId" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:modelSystemType ; rr:objectMap [ rml:reference "modelSystemType" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:patientDiagnosis ; rr:objectMap [ rml:reference "patientDiagnosis" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:hostStrain ; rr:objectMap [ rml:reference "hostStrain" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:passageNumber ; rr:objectMap [ rml:reference "passageNumber" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:tumorType ; rr:objectMap [ rml:reference "tumorType" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:engraftmentSite ; rr:objectMap [ rml:reference "engraftmentSite" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:establishmentRate ; rr:objectMap [ rml:reference "establishmentRate" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:clinicalData ; rr:objectMap [ rml:reference "clinicalData" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:donorId ; rr:objectMap [ rr:template "http://nf-osi.github.com/terms#donor/{donorId}" ; rr:termType rr:IRI ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:fromDonor ; rr:objectMap [ rr:template "http://nf-osi.github.com/terms#donor/{donorId}" ; rr:termType rr:IRI ] ] .
+
+################################################################################
+# Multi-valued fields (StringList)
+################################################################################
+
+map:PatientDerivedModelMolecularCharacterization a rr:TriplesMap ;
+    rdfs:label "Patient Derived Model Molecular Characterization" ;
+    rml:logicalSource map:PatientDerivedModelsSource ;
+    rr:subjectMap [
+        rr:template "http://nf-osi.github.com/terms#patientDerivedModel/{patientDerivedModelId}" ;
+        rr:termType rr:IRI
+    ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:molecularCharacterization ;
+        rr:objectMap [
+            a fnml:FunctionTermMap ;
+            rr:datatype xsd:string ;
+            fnml:functionValue [
+                a fno:Execution ;
+                rml:logicalSource map:PatientDerivedModelsSource ;
+                rr:predicateObjectMap [
+                    rr:predicate fno:executes ;
+                    rr:objectMap [ rr:constant grel:string_split ; rr:termType rr:IRI ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:valueParameter ;
+                    rr:objectMap [ rml:reference "molecularCharacterization" ; rr:termType rr:Literal ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:p_string_sep ;
+                    rr:objectMap [ rr:constant "\\|" ; rr:termType rr:Literal ]
+                ]
+            ]
+        ]
+    ] .
+
+map:PatientDerivedModelValidationMethods a rr:TriplesMap ;
+    rdfs:label "Patient Derived Model Validation Methods" ;
+    rml:logicalSource map:PatientDerivedModelsSource ;
+    rr:subjectMap [
+        rr:template "http://nf-osi.github.com/terms#patientDerivedModel/{patientDerivedModelId}" ;
+        rr:termType rr:IRI
+    ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:validationMethods ;
+        rr:objectMap [
+            a fnml:FunctionTermMap ;
+            rr:datatype xsd:string ;
+            fnml:functionValue [
+                a fno:Execution ;
+                rml:logicalSource map:PatientDerivedModelsSource ;
+                rr:predicateObjectMap [
+                    rr:predicate fno:executes ;
+                    rr:objectMap [ rr:constant grel:string_split ; rr:termType rr:IRI ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:valueParameter ;
+                    rr:objectMap [ rml:reference "validationMethods" ; rr:termType rr:Literal ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:p_string_sep ;
+                    rr:objectMap [ rr:constant "\\|" ; rr:termType rr:Literal ]
+                ]
+            ]
+        ]
+    ] .

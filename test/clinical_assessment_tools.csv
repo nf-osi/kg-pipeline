@@ -1,0 +1,4 @@
+clinicalAssessmentToolId,assessmentName,assessmentType,targetPopulation,diseaseSpecific,numberOfItems,scoringMethod,validatedLanguages,psychometricProperties,administrationTime,availabilityStatus,licensingRequirements,digitalVersion
+cat-001,NF1 Quality of Life Scale,Patient-reported,Children and adolescents,Yes,25,Likert scale,English|French,Good reliability and validity,15 minutes,Freely available,No license required,Yes
+cat-002,Symptom Burden Assessment,Clinician-rated,Adults,Yes,40,Numeric rating,English,,20 minutes,Licensed,,No
+cat-003,Neurofibroma Burden Scale,Patient-reported,Adults,Yes,30,Composite score,English|Spanish|German,,10 minutes,Freely available,Attribution required,Yes

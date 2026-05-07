@@ -338,6 +338,34 @@ nf:Biobank a owl:Class ;
     rdfs:label "Biobank" ;
     rdfs:comment "A biobank that stores and provides biospecimens for research." .
 
+nf:ClinicalAssessmentTool a owl:Class ;
+    rdfs:subClassOf nf:Tool ;
+    rdfs:label "Clinical Assessment Tool" ;
+    rdfs:comment "A standardized instrument for evaluating patient-reported or clinician-rated outcomes, such as quality of life, functional status, or symptom severity." .
+
+nf:PatientDerivedModel a owl:Class ;
+    rdfs:subClassOf nf:Tool ;
+    rdfs:label "Patient Derived Model" ;
+    rdfs:comment "A research model established from patient tissue, such as a patient-derived xenograft (PDX) or organoid, used to study disease biology and test therapeutics." .
+
+nf:OrganoidProtocol a owl:Class ;
+    rdfs:subClassOf nf:Tool ;
+    rdfs:label "Organoid Protocol" ;
+    rdfs:comment "A protocol for deriving and maintaining three-dimensional organoid cultures from patient or model tissue." .
+
+nf:ComputationalTool a owl:Class ;
+    rdfs:subClassOf nf:Tool ;
+    rdfs:label "Computational Tool" ;
+    rdfs:comment "A software tool or pipeline used for data analysis, bioinformatics, or computational modeling in NF research." .
+
+nf:Initiative a owl:Class ;
+    rdfs:label "Initiative" ;
+    rdfs:comment "A research funding initiative that supports studies, data generation, and tool development in the NF-OSI ecosystem." .
+
+nf:Dataset a owl:Class ;
+    rdfs:label "Dataset" ;
+    rdfs:comment "A curated collection of data files from one or more studies, exposed through the NF-OSI portal with structured metadata." .
+
 nf:Development a owl:Class ;
     rdfs:label "Development" ;
     rdfs:comment "Development context linking a resource to funders, investigators, and publications." .
@@ -426,8 +454,8 @@ nf:name a owl:DatatypeProperty ;
 
 nf:parentStudy a owl:ObjectProperty ;
     rdfs:label "parentStudy" ;
-    rdfs:comment "The study a file belongs to." ;
-    rdfs:domain nf:File ;
+    rdfs:comment "The study a file or dataset belongs to." ;
+    rdfs:domain [ a owl:Class ; owl:unionOf (nf:File nf:Dataset) ] ;
     rdfs:range nf:Study .
 
 nf:assay a owl:DatatypeProperty ;
@@ -1116,6 +1144,437 @@ nf:dateModified a owl:DatatypeProperty ;
     rdfs:label "dateModified" ;
     rdfs:comment "Date the resource was last modified." ;
     rdfs:range xsd:string .
+
+################################################################################
+# Properties - Clinical Assessment Tool
+################################################################################
+
+nf:clinicalAssessmentToolId a owl:DatatypeProperty ;
+    rdfs:domain nf:ClinicalAssessmentTool ;
+    rdfs:range xsd:string .
+
+nf:assessmentName a owl:DatatypeProperty ;
+    rdfs:label "assessmentName" ;
+    rdfs:comment "Name of the clinical assessment instrument." ;
+    rdfs:domain nf:ClinicalAssessmentTool ;
+    rdfs:range xsd:string .
+
+nf:assessmentType a owl:DatatypeProperty ;
+    rdfs:label "assessmentType" ;
+    rdfs:comment "Type or category of clinical assessment (e.g. patient-reported, clinician-rated)." ;
+    rdfs:domain nf:ClinicalAssessmentTool ;
+    rdfs:range xsd:string .
+
+nf:targetPopulation a owl:DatatypeProperty ;
+    rdfs:label "targetPopulation" ;
+    rdfs:comment "The patient or subject population the assessment is designed for." ;
+    rdfs:domain nf:ClinicalAssessmentTool ;
+    rdfs:range xsd:string .
+
+nf:diseaseSpecific a owl:DatatypeProperty ;
+    rdfs:label "diseaseSpecific" ;
+    rdfs:comment "Whether the assessment is specific to a particular disease." ;
+    rdfs:domain nf:ClinicalAssessmentTool ;
+    rdfs:range xsd:string .
+
+nf:numberOfItems a owl:DatatypeProperty ;
+    rdfs:label "numberOfItems" ;
+    rdfs:comment "Number of items or questions in the assessment instrument." ;
+    rdfs:domain nf:ClinicalAssessmentTool ;
+    rdfs:range xsd:string .
+
+nf:scoringMethod a owl:DatatypeProperty ;
+    rdfs:label "scoringMethod" ;
+    rdfs:comment "Method used to score or interpret the assessment results." ;
+    rdfs:domain nf:ClinicalAssessmentTool ;
+    rdfs:range xsd:string .
+
+nf:validatedLanguages a owl:DatatypeProperty ;
+    rdfs:label "validatedLanguages" ;
+    rdfs:comment "Languages in which the assessment has been validated." ;
+    rdfs:domain nf:ClinicalAssessmentTool ;
+    rdfs:range xsd:string .
+
+nf:psychometricProperties a owl:DatatypeProperty ;
+    rdfs:label "psychometricProperties" ;
+    rdfs:comment "Summary of psychometric properties (reliability, validity, etc.)." ;
+    rdfs:domain nf:ClinicalAssessmentTool ;
+    rdfs:range xsd:string .
+
+nf:administrationTime a owl:DatatypeProperty ;
+    rdfs:label "administrationTime" ;
+    rdfs:comment "Estimated time required to administer the assessment." ;
+    rdfs:domain nf:ClinicalAssessmentTool ;
+    rdfs:range xsd:string .
+
+nf:availabilityStatus a owl:DatatypeProperty ;
+    rdfs:label "availabilityStatus" ;
+    rdfs:comment "Availability status of the tool (e.g. freely available, licensed)." ;
+    rdfs:domain nf:ClinicalAssessmentTool ;
+    rdfs:range xsd:string .
+
+nf:licensingRequirements a owl:DatatypeProperty ;
+    rdfs:label "licensingRequirements" ;
+    rdfs:comment "Licensing or permission requirements for using the tool." ;
+    rdfs:domain nf:ClinicalAssessmentTool ;
+    rdfs:range xsd:string .
+
+nf:digitalVersion a owl:DatatypeProperty ;
+    rdfs:label "digitalVersion" ;
+    rdfs:comment "Whether a digital or electronic version of the assessment exists." ;
+    rdfs:domain nf:ClinicalAssessmentTool ;
+    rdfs:range xsd:string .
+
+################################################################################
+# Properties - Patient Derived Model
+################################################################################
+
+nf:patientDerivedModelId a owl:DatatypeProperty ;
+    rdfs:domain nf:PatientDerivedModel ;
+    rdfs:range xsd:string .
+
+nf:modelSystemType a owl:DatatypeProperty ;
+    rdfs:label "modelSystemType" ;
+    rdfs:comment "Type of patient-derived model system (e.g. PDX, organoid, cell line)." ;
+    rdfs:domain [ a owl:Class ; owl:unionOf (nf:PatientDerivedModel nf:OrganoidProtocol) ] ;
+    rdfs:range xsd:string .
+
+nf:patientDiagnosis a owl:DatatypeProperty ;
+    rdfs:label "patientDiagnosis" ;
+    rdfs:comment "Clinical diagnosis of the patient from whom the model was derived." ;
+    rdfs:domain nf:PatientDerivedModel ;
+    rdfs:range xsd:string .
+
+nf:hostStrain a owl:DatatypeProperty ;
+    rdfs:label "hostStrain" ;
+    rdfs:comment "Host animal strain used for PDX engraftment." ;
+    rdfs:domain nf:PatientDerivedModel ;
+    rdfs:range xsd:string .
+
+nf:passageNumber a owl:DatatypeProperty ;
+    rdfs:label "passageNumber" ;
+    rdfs:comment "Number of passages the model has undergone in culture or in vivo." ;
+    rdfs:domain [ a owl:Class ; owl:unionOf (nf:PatientDerivedModel nf:OrganoidProtocol) ] ;
+    rdfs:range xsd:string .
+
+nf:engraftmentSite a owl:DatatypeProperty ;
+    rdfs:label "engraftmentSite" ;
+    rdfs:comment "Anatomical site of tumor engraftment in the host animal." ;
+    rdfs:domain nf:PatientDerivedModel ;
+    rdfs:range xsd:string .
+
+nf:establishmentRate a owl:DatatypeProperty ;
+    rdfs:label "establishmentRate" ;
+    rdfs:comment "Rate at which the patient-derived model was successfully established." ;
+    rdfs:domain nf:PatientDerivedModel ;
+    rdfs:range xsd:string .
+
+nf:molecularCharacterization a owl:DatatypeProperty ;
+    rdfs:label "molecularCharacterization" ;
+    rdfs:comment "Molecular characterization methods applied to the model (e.g. WGS, RNA-seq, proteomics)." ;
+    rdfs:domain nf:PatientDerivedModel ;
+    rdfs:range xsd:string .
+
+nf:clinicalData a owl:DatatypeProperty ;
+    rdfs:label "clinicalData" ;
+    rdfs:comment "Available clinical data accompanying the patient-derived model." ;
+    rdfs:domain nf:PatientDerivedModel ;
+    rdfs:range xsd:string .
+
+nf:validationMethods a owl:DatatypeProperty ;
+    rdfs:label "validationMethods" ;
+    rdfs:comment "Methods used to validate the model (e.g. histology, marker expression, drug response)." ;
+    rdfs:domain [ a owl:Class ; owl:unionOf (nf:PatientDerivedModel nf:OrganoidProtocol) ] ;
+    rdfs:range xsd:string .
+
+################################################################################
+# Properties - Organoid Protocol
+################################################################################
+
+nf:organoidProtocolId a owl:DatatypeProperty ;
+    rdfs:domain nf:OrganoidProtocol ;
+    rdfs:range xsd:string .
+
+nf:derivationSource a owl:DatatypeProperty ;
+    rdfs:label "derivationSource" ;
+    rdfs:comment "Source tissue or material from which the organoid is derived." ;
+    rdfs:domain nf:OrganoidProtocol ;
+    rdfs:range xsd:string .
+
+nf:cellTypes a owl:DatatypeProperty ;
+    rdfs:label "cellTypes" ;
+    rdfs:comment "Cell types present in or targeted by the organoid culture." ;
+    rdfs:domain nf:OrganoidProtocol ;
+    rdfs:range xsd:string .
+
+nf:organoidType a owl:DatatypeProperty ;
+    rdfs:label "organoidType" ;
+    rdfs:comment "Type of organoid (e.g. intestinal, brain, tumor)." ;
+    rdfs:domain nf:OrganoidProtocol ;
+    rdfs:range xsd:string .
+
+nf:matrixType a owl:DatatypeProperty ;
+    rdfs:label "matrixType" ;
+    rdfs:comment "Extracellular matrix or scaffold type used in the organoid culture." ;
+    rdfs:domain nf:OrganoidProtocol ;
+    rdfs:range xsd:string .
+
+nf:cultureSystem a owl:DatatypeProperty ;
+    rdfs:label "cultureSystem" ;
+    rdfs:comment "Culture system format (e.g. embedded, suspension, air-liquid interface)." ;
+    rdfs:domain nf:OrganoidProtocol ;
+    rdfs:range xsd:string .
+
+nf:maturationTime a owl:DatatypeProperty ;
+    rdfs:label "maturationTime" ;
+    rdfs:comment "Time required for organoid maturation." ;
+    rdfs:domain nf:OrganoidProtocol ;
+    rdfs:range xsd:string .
+
+nf:characterizationMethods a owl:DatatypeProperty ;
+    rdfs:label "characterizationMethods" ;
+    rdfs:comment "Methods used to characterize the organoid (e.g. immunostaining, RNA-seq, imaging)." ;
+    rdfs:domain nf:OrganoidProtocol ;
+    rdfs:range xsd:string .
+
+nf:cryopreservationProtocol a owl:DatatypeProperty ;
+    rdfs:label "cryopreservationProtocol" ;
+    rdfs:comment "Protocol for cryopreserving the organoid." ;
+    rdfs:domain nf:OrganoidProtocol ;
+    rdfs:range xsd:string .
+
+nf:qualityControlMetrics a owl:DatatypeProperty ;
+    rdfs:label "qualityControlMetrics" ;
+    rdfs:comment "Quality control metrics applied to assess organoid integrity and function." ;
+    rdfs:domain nf:OrganoidProtocol ;
+    rdfs:range xsd:string .
+
+nf:cultureMedia a owl:DatatypeProperty ;
+    rdfs:label "cultureMedia" ;
+    rdfs:comment "Composition of the culture media used to maintain the organoid." ;
+    rdfs:domain nf:OrganoidProtocol ;
+    rdfs:range xsd:string .
+
+################################################################################
+# Properties - Computational Tool
+################################################################################
+
+nf:computationalToolId a owl:DatatypeProperty ;
+    rdfs:domain nf:ComputationalTool ;
+    rdfs:range xsd:string .
+
+nf:softwareName a owl:DatatypeProperty ;
+    rdfs:label "softwareName" ;
+    rdfs:comment "Name of the software package or tool." ;
+    rdfs:domain nf:ComputationalTool ;
+    rdfs:range xsd:string .
+
+nf:softwareType a owl:DatatypeProperty ;
+    rdfs:label "softwareType" ;
+    rdfs:comment "Category of software (e.g. pipeline, library, standalone application)." ;
+    rdfs:domain nf:ComputationalTool ;
+    rdfs:range xsd:string .
+
+nf:softwareVersion a owl:DatatypeProperty ;
+    rdfs:label "softwareVersion" ;
+    rdfs:comment "Version of the software." ;
+    rdfs:domain nf:ComputationalTool ;
+    rdfs:range xsd:string .
+
+nf:programmingLanguage a owl:DatatypeProperty ;
+    rdfs:label "programmingLanguage" ;
+    rdfs:comment "Programming language(s) used to implement the tool." ;
+    rdfs:domain nf:ComputationalTool ;
+    rdfs:range xsd:string .
+
+nf:sourceRepository a owl:ObjectProperty ;
+    rdfs:label "sourceRepository" ;
+    rdfs:comment "Link to the source code repository (e.g. GitHub, GitLab)." ;
+    rdfs:domain nf:ComputationalTool .
+
+nf:documentation a owl:ObjectProperty ;
+    rdfs:label "documentation" ;
+    rdfs:comment "Link to the tool's documentation." ;
+    rdfs:domain nf:ComputationalTool .
+
+nf:licenseType a owl:DatatypeProperty ;
+    rdfs:label "licenseType" ;
+    rdfs:comment "Type of open-source or proprietary license." ;
+    rdfs:domain nf:ComputationalTool ;
+    rdfs:range xsd:string .
+
+nf:containerized a owl:DatatypeProperty ;
+    rdfs:label "containerized" ;
+    rdfs:comment "Whether the tool is available as a container (e.g. Docker, Singularity)." ;
+    rdfs:domain nf:ComputationalTool ;
+    rdfs:range xsd:string .
+
+nf:dependencies a owl:DatatypeProperty ;
+    rdfs:label "dependencies" ;
+    rdfs:comment "Software dependencies required to run the tool." ;
+    rdfs:domain nf:ComputationalTool ;
+    rdfs:range xsd:string .
+
+nf:systemRequirements a owl:DatatypeProperty ;
+    rdfs:label "systemRequirements" ;
+    rdfs:comment "Hardware or OS requirements for running the tool." ;
+    rdfs:domain nf:ComputationalTool ;
+    rdfs:range xsd:string .
+
+nf:lastUpdate a owl:DatatypeProperty ;
+    rdfs:label "lastUpdate" ;
+    rdfs:comment "Date the tool was last updated." ;
+    rdfs:domain nf:ComputationalTool ;
+    rdfs:range xsd:string .
+
+nf:maintainer a owl:DatatypeProperty ;
+    rdfs:label "maintainer" ;
+    rdfs:comment "Name or contact for the tool maintainer." ;
+    rdfs:domain nf:ComputationalTool ;
+    rdfs:range xsd:string .
+
+nf:licenseDetails a owl:DatatypeProperty ;
+    rdfs:label "licenseDetails" ;
+    rdfs:comment "Full text or detailed description of the license terms." ;
+    rdfs:domain nf:ComputationalTool ;
+    rdfs:range xsd:string .
+
+nf:analyticalPlatformSupport a owl:DatatypeProperty ;
+    rdfs:label "analyticalPlatformSupport" ;
+    rdfs:comment "Analytical platforms or workflows the tool integrates with." ;
+    rdfs:domain nf:ComputationalTool ;
+    rdfs:range xsd:string .
+
+################################################################################
+# Properties - Initiative
+################################################################################
+
+nf:abbreviation a owl:DatatypeProperty ;
+    rdfs:label "abbreviation" ;
+    rdfs:comment "Short abbreviation or acronym for the initiative." ;
+    rdfs:domain nf:Initiative ;
+    rdfs:range xsd:string .
+
+nf:website a owl:ObjectProperty ;
+    rdfs:label "website" ;
+    rdfs:comment "URL of the initiative or resource website." ;
+    rdfs:domain nf:Initiative .
+
+################################################################################
+# Properties - Dataset
+################################################################################
+
+nf:creator a owl:DatatypeProperty ;
+    rdfs:label "creator" ;
+    rdfs:comment "Individual(s) who created the dataset." ;
+    rdfs:domain nf:Dataset ;
+    rdfs:range xsd:string .
+
+nf:contributor a owl:DatatypeProperty ;
+    rdfs:label "contributor" ;
+    rdfs:comment "Individual(s) who contributed to the dataset." ;
+    rdfs:domain nf:Dataset ;
+    rdfs:range xsd:string .
+
+nf:accessType a owl:DatatypeProperty ;
+    rdfs:label "accessType" ;
+    rdfs:comment "Access level for the dataset (e.g. Public Access, Controlled Access)." ;
+    rdfs:domain nf:Dataset ;
+    rdfs:range xsd:string .
+
+nf:license a owl:ObjectProperty ;
+    rdfs:label "license" ;
+    rdfs:comment "License URL governing use of the dataset." ;
+    rdfs:domain nf:Dataset .
+
+nf:conditionsOfAccess a owl:DatatypeProperty ;
+    rdfs:label "conditionsOfAccess" ;
+    rdfs:comment "Conditions or requirements for accessing the dataset." ;
+    rdfs:domain nf:Dataset ;
+    rdfs:range xsd:string .
+
+nf:keywords a owl:DatatypeProperty ;
+    rdfs:label "keywords" ;
+    rdfs:comment "Keywords describing the dataset content." ;
+    rdfs:domain nf:Dataset ;
+    rdfs:range xsd:string .
+
+nf:measurementTechnique a owl:DatatypeProperty ;
+    rdfs:label "measurementTechnique" ;
+    rdfs:comment "Measurement or assay technique used to generate the dataset." ;
+    rdfs:domain nf:Dataset ;
+    rdfs:range xsd:string .
+
+nf:ageGroup a owl:DatatypeProperty ;
+    rdfs:label "ageGroup" ;
+    rdfs:comment "Age group(s) of the subjects in the dataset (e.g. pediatric, adult)." ;
+    rdfs:domain nf:Dataset ;
+    rdfs:range xsd:string .
+
+nf:dataUseModifiers a owl:DatatypeProperty ;
+    rdfs:label "dataUseModifiers" ;
+    rdfs:comment "Data use conditions or modifiers applicable to the dataset (GA4GH DUO terms)." ;
+    rdfs:domain nf:Dataset ;
+    rdfs:range xsd:string .
+
+nf:countryOfOrigin a owl:DatatypeProperty ;
+    rdfs:label "countryOfOrigin" ;
+    rdfs:comment "Country where the data was collected." ;
+    rdfs:domain nf:Dataset ;
+    rdfs:range xsd:string .
+
+nf:datasetSizeInBytes a owl:DatatypeProperty ;
+    rdfs:label "datasetSizeInBytes" ;
+    rdfs:comment "Total size of the dataset in bytes." ;
+    rdfs:domain nf:Dataset ;
+    rdfs:range xsd:string .
+
+nf:datasetItemCount a owl:DatatypeProperty ;
+    rdfs:label "datasetItemCount" ;
+    rdfs:comment "Number of items (files) in the dataset." ;
+    rdfs:domain nf:Dataset ;
+    rdfs:range xsd:string .
+
+nf:individualCount a owl:DatatypeProperty ;
+    rdfs:label "individualCount" ;
+    rdfs:comment "Number of individuals represented in the dataset." ;
+    rdfs:domain nf:Dataset ;
+    rdfs:range xsd:string .
+
+nf:specimenCount a owl:DatatypeProperty ;
+    rdfs:label "specimenCount" ;
+    rdfs:comment "Number of specimens represented in the dataset." ;
+    rdfs:domain nf:Dataset ;
+    rdfs:range xsd:string .
+
+nf:yearPublished a owl:DatatypeProperty ;
+    rdfs:label "yearPublished" ;
+    rdfs:comment "Year the dataset was published or released." ;
+    rdfs:domain nf:Dataset ;
+    rdfs:range xsd:string .
+
+nf:visualizeDataOn a owl:DatatypeProperty ;
+    rdfs:label "visualizeDataOn" ;
+    rdfs:comment "External platform(s) where the dataset can be visualized." ;
+    rdfs:domain nf:Dataset ;
+    rdfs:range xsd:string .
+
+nf:alternateName a owl:DatatypeProperty ;
+    rdfs:label "alternateName" ;
+    rdfs:comment "Alternative name or title for the dataset." ;
+    rdfs:domain nf:Dataset ;
+    rdfs:range xsd:string .
+
+nf:versionLabel a owl:DatatypeProperty ;
+    rdfs:label "versionLabel" ;
+    rdfs:comment "Human-readable label for the dataset version." ;
+    rdfs:domain nf:Dataset ;
+    rdfs:range xsd:string .
+
+nf:externalRepositoryUri a owl:ObjectProperty ;
+    rdfs:label "externalRepositoryUri" ;
+    rdfs:comment "URI of an external repository where the dataset is also deposited." ;
+    rdfs:domain nf:Dataset .
 
 ################################################################################
 # Properties - Development related

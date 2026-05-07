@@ -1,0 +1,4 @@
+computationalToolId,softwareName,softwareType,softwareVersion,programmingLanguage,sourceRepository,documentation,licenseType,containerized,dependencies,systemRequirements,lastUpdate,maintainer,licenseDetails,analyticalPlatformSupport
+ct-001,NF-Classifier,Pipeline,1.2.0,Python|R,https://github.com/nf-osi/nf-classifier,https://nf-osi.github.io/nf-classifier,MIT,Yes,scikit-learn|pandas|rpy2,Linux/MacOS 8GB RAM,2025-01-15,NF-OSI Team,,Galaxy|Nextflow
+ct-002,NF-Explorer,Web application,2.0.1,JavaScript,https://github.com/nf-osi/nf-explorer,https://nf-explorer.docs.io,Apache-2.0,No,React|D3.js,Modern web browser,2025-03-20,,,
+ct-003,NF-Variants,R package,0.9.1,R,,https://nf-osi.github.io/nf-variants,GPL-3.0,Yes,Bioconductor|VariantAnnotation,R 4.0+,2024-11-10,Jane Smith,,Bioconductor
