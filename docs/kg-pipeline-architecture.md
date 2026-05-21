@@ -364,18 +364,24 @@ Derived assets are declared with explicit upstream dependencies, so the full gra
 
 ## Quality Assurance
 
-The pipeline includes several quality gates:
+The pipeline includes several quality gates. Note that there is intentionally little data validation before the transformation stage — portal metadata is presumed to be relatively clean, having already passed through the portal's own curation and submission processes. Validation effort is therefore concentrated on the transformation output (RML correctness, graph structure) rather than the input data.
 
 | Check | When | Blocking? |
 |---|---|---|
 | Foreign key validation | After Extract | No (logged only) |
 | RML unit tests (pytest + SPARQL) | After Map | Yes |
 | SPARQL output validation | After Map | Yes |
+| SHACL validation | After Map | No (logged only) |
+| End-to-end use case queries | After graph is loaded | Recommended |
 | RDF archive + diff generation | After all stages | No |
 
-**FK validation** checks referential integrity across 22 declared constraints (e.g., `cell_lines.donorId` must exist in `donors.donorId`). Violations are non-blocking because they often reflect upstream data quality issues in Synapse, not pipeline bugs. They are logged and tracked.
+**FK validation** checks referential integrity across declared constraints (e.g., `cell_lines.donorId` must exist in `donors.donorId`). Violations are non-blocking because they often reflect upstream data quality issues in Synapse, not pipeline bugs. They are logged and tracked.
 
-**RML unit tests** use `pytest` + `rdflib` to run SPARQL queries against the output of individual RML mappings and assert expected triple counts and structure. These are fast and catch mapping regressions early.
+**RML unit tests** use `pytest` + SPARQL queries against the output of individual RML mappings to assert expected triple counts and structure. These are fast and catch mapping regressions early.
+
+**SHACL validation** checks the output RDF against shape constraints declared in `schema/shapes.ttl` — required properties, cardinality, and IRI patterns. Currently non-blocking and coverage is incomplete; expanding shapes is a planned improvement.
+
+**End-to-end use case queries** run the agreed query use cases (see Scoping section) against the loaded graph and verify that results are correct and complete. This is the most direct validation that the graph meets its intended purpose and should be performed before any handoff or release. In the NF pipeline, this is implemented via an agentic evaluation suite (AstaBench) that poses natural-language questions to an AI agent backed by the graph and scores recall against ground-truth answers.
 
 ---
 
@@ -426,9 +432,11 @@ This pipeline was built for the NF Research Tools Portal but is designed with ge
 
 These estimates assume one (human) engineer with familiarity with RDF/SPARQL and Python. Each additional table adds roughly 2–8 hours of RML mapping work depending on complexity, plus separate effort for harmonization if the table has controlled vocabulary fields. Ontology alignment work benefits significantly from a domain expert collaborating on vocabulary decisions.
 
+Agent tooling can significantly reduce mechanical implementation time — writing RML mappings, extraction config, and unit tests — but **is not expected to proportionally reduce** the design, alignment, and validation effort. Scoping with the portal owner, ontology design decisions, and SSSOM curation still require domain expertise and stakeholder input regardless of automation.
+
 ---
 
-## Future Directions
+## Future Development
 
 This is an evolving pipeline. The following are known limitations and ideas for improvement, in rough priority order.
 
