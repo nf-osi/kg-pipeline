@@ -102,7 +102,7 @@ For most implementations, this layer is deferred until the core graph is operati
 
 ### Layer 5 — Experimental Data Extraction (Optional, **Not Implemented**)
 
-This layer brings actual experimental measurements and findings from portal data files into the graph — not just metadata about them. Where Layer 1 captures that a study exists and what assays it used, Layer 5 captures what those assays found: gene expression values, drug sensitivity measurements, variant calls, phenotypic observations, and similar structured results.
+This layer brings actual experimental measurements and findings from portal data files into the graph, not only metadata about them. Where Layer 1 captures that a study or data file exists and what assays were used, Layer 5 captures what those assays found: gene expression values, drug sensitivity measurements, variant calls, phenotypic observations, and similar structured results.
 
 This layer is the primary enabler of scientific reasoning use cases. For example, answering "which cell lines have shown sensitivity to HDAC inhibitors?" requires not just knowing which cell lines exist and which studies involved them, but extracting the actual sensitivity measurements from the underlying data files. A drug sensitivity table might look like:
 
@@ -131,7 +131,7 @@ Example questions enabled by this layer:
 
 > If variant calls are extracted from an NF1 cohort and another rare-disease cohort, one can also ask: *"Which mutations are shared between NF1 patients and patients with [other rare disease], and which are disease-specific?"*
 
-Key challenges: portal files are heterogeneous in format and schema, extraction logic is dataset-specific, and result interpretation may require domain expertise. We want to target standardized files first, but implementation will likely involve per-dataset extraction pipeline and close collaboration with data contributors to understand data formats and semantics.
+**Key challenges: portal files are heterogeneous in format and schema, extraction logic is dataset-specific, and result interpretation may require domain expertise.** We want to target standardized files first, but implementation will likely involve per-dataset extraction pipeline and close collaboration with data contributors to understand data formats and semantics.
 
 ---
 
