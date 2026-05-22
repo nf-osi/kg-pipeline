@@ -453,7 +453,7 @@ This is an evolving pipeline. The following are known limitations and ideas for 
 
 **SHACL validation.** `schema/shapes.ttl` exists but coverage is incomplete. Expanding SHACL shapes to validate required properties, cardinality constraints, and IRI patterns would catch data quality issues earlier in the pipeline.
 
-**Faster RML mapping engine.** RMLMapper is the reference tool but is slow for large tables (the NF files table has 400k+ rows). [Morph-KGC](https://github.com/morph-kgc/morph-kgc) (Python-based, significantly faster) has been evaluated as a candidate replacement. Any replacement must support GREL function maps for multi-value splitting and maintain compatibility with RML 8.x mappings.
+**Faster RML mapping engine.** RMLMapper is the reference tool but is slow for large tables (the NF files table has 400k+ rows). [Morph-KGC](https://github.com/morph-kgc/morph-kgc) has been evaluated as a candidate replacement. Any replacement must support GREL function maps for multi-value splitting and maintain compatibility with RML 8.x mappings.
 
 ---
 
