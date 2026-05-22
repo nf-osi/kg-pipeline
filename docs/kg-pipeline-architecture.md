@@ -30,26 +30,26 @@ Layer 1 requires two inputs: the **data sources** (Synapse tables declared in a 
 For the NF graph, representative use cases that have driven design and prioritization:
 
 **Resource discovery: Tools shopping** — finding tools or models that match specific experimental criteria:
-- *"Which cell lines carry NF1 mutations and have associated RNA-seq data?"*
-- *"What genetic reagents target genes studied in schwannoma models?"*
+- *"Which cell lines carry NF1 mutations and have associated RNA-seq data❌"*
+- *"What genetic reagents target genes studied in schwannoma models❌"*
 
 **Resource discovery: Data reuse** — finding existing studies or datasets relevant to a research question:
-- *"Which studies have RNA-seq data for NF1 schwannoma samples?"*
-- *"What datasets are available for a specific disease focus and assay type?"*
+- *"Which studies have RNA-seq data for NF1 schwannoma samples❌"*
+- *"What datasets are available for a specific disease focus and assay type❌"*
 
 **Landscape and coverage analysis** — portfolio-level questions about the state of NF research resources, useful to program officers and community stakeholders:
-- *"What NF disease manifestations have animal models but no corresponding cell lines?"*
-- *"Which genes are targeted by the most tools on the portal?"*
-- *"Which disease focus areas are data-rich vs. data-sparse across studies and datasets?"*
+- *"What NF disease manifestations have animal models but no corresponding cell lines❌"*
+- *"Which genes are targeted by the most tools on the portal❌"*
+- *"Which disease focus areas are data-rich vs. data-sparse across studies and datasets❌"*
 
 **Scientific reasoning** — linking observational or experimental outcomes to resources:
-- *"Which cell lines have shown sensitivity to HDAC inhibitors?"*
+- *"Which cell lines have shown sensitivity to HDAC inhibitors❌"*
 
 > Note: For the NF graph, scientific reasoning is currently supported by integrating associations extracted from publications (Layer 3) and external ontologies (Layer 4). Other efforts may also want to include experimental data file extraction (Layer 5) to directly surface measured outcomes such as drug sensitivities or variant calls.
 
 **Networking** — understanding the network, finding collaborators or the resources they have produced:
-- *"How large is the community working on manifestation topic A vs manifestation topic B?"*
-- *"How is Contributor A connected to Contributor B?"* — e.g., through other contributors, shared disease focus, co-participation in the same initiative
+- *"How large is the community working on manifestation topic A vs manifestation topic B❌"*
+- *"How is Contributor A connected to Contributor B❌"* — e.g., through other contributors, shared disease focus, co-participation in the same initiative
 
 > Note: Potential collabs could be considered a highly valuable resource, thus this may also be considered resource discovery.
 
@@ -57,17 +57,16 @@ These questions share a common structure: they require traversing relationships 
 
 **Versioning and maintenance.** Data sources must be versioned and treated as a maintained configuration artifact. `data_sources.yaml` is the canonical record of which Synapse tables are included and at which version. Each table entry should record its Synapse ID, `concrete_type`, and a pinned `source_version` (snapshot version for `TableEntity` and `EntityView` tables). This ensures that the graph is reproducible — two pipeline runs against the same `data_sources.yaml` will produce the same output — and that changes to source tables are deliberate and tracked. When a portal owner updates a table, the pipeline maintainer should review the change, update the pinned version, and re-run affected assets.
 
-Different portals surface different entity types. The table below illustrates which entity types appear across several Synapse-based portals (representative, not exhaustive):
+Different portals surface different entity types. The table below illustrates differences in entity type coverage across several Synapse-based portals (not exhaustive matrix, last reviewed as of May 20, 2026):
 
-| Entity Type | NF | ALS | CCKP | ADKP | EL |
+| Entity | [NF](https://nf.synapse.org) | [ALS](https://ampals.synapse.org) | [CCKP](https://cancercomplexity.synapse.org) | [ADKP](https://adknowledgeportal.synapse.org) | [EL](https://eliteportal.synapse.org) |
 |---|:---:|:---:|:---:|:---:|:---:|
-| Study | Yes | ? | ? | ? | ? |
-| Dataset | Yes | ? | ? | ? | ? |
-| File | Yes | ? | ? | ? | ? |
-| Publication | Yes | ? | ? | ? | ? |
-| Computational Tool | Yes | ? | ? | ? | ? |
-| Model System (Cell Line / Animal Model) | Yes | ? | ? | ? | ? |
-| Funder / Initiative | Yes | ? | ? | ? | ? |
+| Study | ✅ | ❌ | ❌ | ✅ | ✅ |
+| Dataset | ✅ | ✅ | ✅ | ❌ | ❌ |
+| File (Data) | ✅ | ✅ | ❌ | ✅ | ✅ |
+| Publication | ✅ | ❌ | ✅ | ✅ | ✅ |
+| Computational Tool | ✅ | ❌ | ✅ | ✅ | ✅ |
+| Model System (Cell Line or Animal Model) | ✅ | ❌ | ❌ | ✅| ❌ |
 
 > **Note on table types:** `data_sources.yaml` records each table's `concrete_type` (TableEntity, EntityView, MaterializedView). Only `TableEntity` and `EntityView` support snapshot versioning in Synapse; `MaterializedView` tables are live and not versionable. This affects reproducibility: pipeline runs against a `MaterializedView` may produce different output at different times.
 
@@ -92,7 +91,7 @@ In the NF pipeline, this layer:
 - Annotates passages with NCBI Gene, MeSH, OMIM, Cellosaurus, and NCBITaxon entities
 - Links publications back to studies and datasets in the core graph
 
-This layer requires additional infrastructure (QLever's text indexing feature) and increases the build complexity and image size. It is optional for initial deployments. For graph engines without SPARQL+Text capability, extracted entity annotations (genes, diseases, cell lines, etc.) can still be loaded as standard RDF triples, enabling structured queries such as "what drugs were mentioned alongside gene X in NF publications?" via regular SPARQL — without free-text passage retrieval.
+This layer requires additional infrastructure (QLever's text indexing feature) and increases the build complexity and image size. It is optional for initial deployments. For graph engines without SPARQL+Text capability, extracted entity annotations (genes, diseases, cell lines, etc.) can still be loaded as standard RDF triples, enabling structured queries such as "what drugs were mentioned alongside gene X in NF publications❌" via regular SPARQL — without free-text passage retrieval.
 
 ### Layer 4 — External Ontologies and Datasets (Optional)
 
@@ -104,7 +103,7 @@ For most implementations, this layer is deferred until the core graph is operati
 
 This layer brings actual experimental measurements and findings from portal data files into the graph, not only metadata about them. Where Layer 1 captures that a study or data file exists and what assays were used, Layer 5 captures what those assays found: gene expression values, drug sensitivity measurements, variant calls, phenotypic observations, and similar structured results.
 
-This layer is the primary enabler of scientific reasoning use cases. For example, answering "which cell lines have shown sensitivity to HDAC inhibitors?" requires not just knowing which cell lines exist and which studies involved them, but extracting the actual sensitivity measurements from the underlying data files. A drug sensitivity table might look like:
+This layer is the primary enabler of scientific reasoning use cases. For example, answering "which cell lines have shown sensitivity to HDAC inhibitors❌" requires not just knowing which cell lines exist and which studies involved them, but extracting the actual sensitivity measurements from the underlying data files. A drug sensitivity table might look like:
 
 | cellLineId | drug | ic50 | assay | studyId |
 |---|---|---|---|---|
@@ -123,13 +122,13 @@ When such tabular data files are available, RML mappings can be applied directly
 Example questions enabled by this layer:
 
 *Drug sensitivity:*
-- *"Which cell lines show the lowest IC50 for HDAC inhibitors, and how do NF1 vs. NF2 cell lines compare?"*
-- *"Which drugs have consistent sensitivity (IC50 < 1 µM) across multiple NF1 cell lines?"*
+- *"Which cell lines show the lowest IC50 for HDAC inhibitors, and how do NF1 vs. NF2 cell lines compare❌"*
+- *"Which drugs have consistent sensitivity (IC50 < 1 µM) across multiple NF1 cell lines❌"*
 
 *Variant calls:*
-- *"Which genes have the highest mutation burden across sequenced NF1 patient samples?"*
+- *"Which genes have the highest mutation burden across sequenced NF1 patient samples❌"*
 
-> If variant calls are extracted from an NF1 cohort and another rare-disease cohort, one can also ask: *"Which mutations are shared between NF1 patients and patients with [other rare disease], and which are disease-specific?"*
+> If variant calls are extracted from an NF1 cohort and another rare-disease cohort, one can also ask: *"Which mutations are shared between NF1 patients and patients with [other rare disease], and which are disease-specific❌"*
 
 **Key challenges: portal files are heterogeneous in format and schema, extraction logic is dataset-specific, and result interpretation may require domain expertise.** We want to target standardized files first, but implementation will likely involve per-dataset extraction pipeline and close collaboration with data contributors to understand data formats and semantics.
 
@@ -200,7 +199,7 @@ Each stage is described below with expected effort for initial implementation an
 - SSSOM (Simple Standard for Sharing Ontology Mappings) is the standard format for the lookup tables; see [SSSOM specification](https://mapping-commons.github.io/sssom/)
 - Unmapped values are logged and passed through as-is; no data is silently dropped
 
-**Which tables need harmonization?**  
+**Which tables need harmonization❌**  
 Any table where field values are user-supplied enumerated labels that correspond to ontology classes. In the NF pipeline:
 - `cell_lines` → `cellLineCategory` → `nf:CancerCellLine`, `nf:NormalCellLine`, etc.
 - `animal_models` → `species` → `nf:MouseModel`, `nf:ZebrafishModel`, etc.
@@ -304,7 +303,7 @@ SSSOM files are TSV tables that record how each portal label maps to an ontology
 
 **Practical guidance:**
 - Start with a survey of all distinct values in controlled vocabulary fields
-- Decide which values map to ontology classes vs. literal data (e.g., is `"Zebrafish"` a class, or just a string label on `nf:species`?)
+- Decide which values map to ontology classes vs. literal data (e.g., is `"Zebrafish"` a class, or just a string label on `nf:species`❌)
 - Where external ontologies exist (e.g., NCBITaxon for species, EFO for experimental factors), prefer reusing their IRIs over minting custom ones
 - Document unmappable or ambiguous values — these are candidates for data quality feedback to upstream curators
 
@@ -366,11 +365,11 @@ Derived assets are declared with explicit upstream dependencies, so the full gra
 
 The pipeline includes several quality gates. Note that there is intentionally little data validation before the transformation stage — portal metadata is presumed to be relatively clean, having already passed through the portal's own curation and submission processes. Validation effort is therefore concentrated on the transformation output (RML correctness, graph structure) rather than the input data.
 
-| Check | When | Blocking? |
+| Check | When | Blocking❌ |
 |---|---|---|
 | Foreign key validation | After Extract | No (logged only) |
-| RML unit tests (pytest + SPARQL) | After Map | Yes |
-| SPARQL output validation | After Map | Yes |
+| RML unit tests (pytest + SPARQL) | After Map | ✅ |
+| SPARQL output validation | After Map | ✅ |
 | SHACL validation | After Map | No (logged only) |
 | End-to-end use case queries | After graph is loaded | Recommended |
 | RDF archive + diff generation | After all stages | No |
@@ -387,7 +386,7 @@ The pipeline includes several quality gates. Note that there is intentionally li
 
 ## Optional Components Summary
 
-| Component | Required? | When to include |
+| Component | Required❌ | When to include |
 |---|---|---|
 | Harmonization step (per table) | Optional (per table) | When table has controlled vocabulary fields needing IRI resolution |
 | Derived RDF materialization | Optional | When cross-table relationships matter for your use case |
