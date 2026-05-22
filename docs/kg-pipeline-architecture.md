@@ -30,26 +30,26 @@ Layer 1 requires two inputs: the **data sources** (Synapse tables declared in a 
 For the NF graph, representative use cases that have driven design and prioritization:
 
 **Resource discovery: Tools shopping** — finding tools or models that match specific experimental criteria:
-- *"Which cell lines carry NF1 mutations and have associated RNA-seq data❌"*
-- *"What genetic reagents target genes studied in schwannoma models❌"*
+- *"Which cell lines carry NF1 mutations and have associated RNA-seq data?"*
+- *"What genetic reagents target genes studied in schwannoma models?"*
 
 **Resource discovery: Data reuse** — finding existing studies or datasets relevant to a research question:
-- *"Which studies have RNA-seq data for NF1 schwannoma samples❌"*
-- *"What datasets are available for a specific disease focus and assay type❌"*
+- *"Which studies have RNA-seq data for NF1 schwannoma samples?"*
+- *"What datasets are available for a specific disease focus and assay type?"*
 
 **Landscape and coverage analysis** — portfolio-level questions about the state of NF research resources, useful to program officers and community stakeholders:
-- *"What NF disease manifestations have animal models but no corresponding cell lines❌"*
-- *"Which genes are targeted by the most tools on the portal❌"*
-- *"Which disease focus areas are data-rich vs. data-sparse across studies and datasets❌"*
+- *"What NF disease manifestations have animal models but no corresponding cell lines?"*
+- *"Which genes are targeted by the most tools on the portal?"*
+- *"Which disease focus areas are data-rich vs. data-sparse across studies and datasets?"*
 
 **Scientific reasoning** — linking observational or experimental outcomes to resources:
-- *"Which cell lines have shown sensitivity to HDAC inhibitors❌"*
+- *"Which cell lines have shown sensitivity to HDAC inhibitors?"*
 
 > Note: For the NF graph, scientific reasoning is currently supported by integrating associations extracted from publications (Layer 3) and external ontologies (Layer 4). Other efforts may also want to include experimental data file extraction (Layer 5) to directly surface measured outcomes such as drug sensitivities or variant calls.
 
 **Networking** — understanding the network, finding collaborators or the resources they have produced:
-- *"How large is the community working on manifestation topic A vs manifestation topic B❌"*
-- *"How is Contributor A connected to Contributor B❌"* — e.g., through other contributors, shared disease focus, co-participation in the same initiative
+- *"How large is the community working on manifestation topic A vs manifestation topic B?"*
+- *"How is Contributor A connected to Contributor B?"* — e.g., through other contributors, shared disease focus, co-participation in the same initiative
 
 > Note: Potential collabs could be considered a highly valuable resource, thus this may also be considered resource discovery.
 
@@ -91,7 +91,7 @@ In the NF pipeline, this layer:
 - Annotates passages with NCBI Gene, MeSH, OMIM, Cellosaurus, and NCBITaxon entities
 - Links publications back to studies and datasets in the core graph
 
-This layer requires additional infrastructure (QLever's text indexing feature) and increases the build complexity and image size. It is optional for initial deployments. For graph engines without SPARQL+Text capability, extracted entity annotations (genes, diseases, cell lines, etc.) can still be loaded as standard RDF triples, enabling structured queries such as "what drugs were mentioned alongside gene X in NF publications❌" via regular SPARQL — without free-text passage retrieval.
+This layer requires additional infrastructure (QLever's text indexing feature) and increases the build complexity and image size. It is optional for initial deployments. For graph engines without SPARQL+Text capability, extracted entity annotations (genes, diseases, cell lines, etc.) can still be loaded as standard RDF triples, enabling structured queries such as "what drugs were mentioned alongside gene X in NF publications?" via regular SPARQL — without free-text passage retrieval.
 
 ### Layer 4 — External Ontologies and Datasets (Optional)
 
@@ -103,7 +103,7 @@ For most implementations, this layer is deferred until the core graph is operati
 
 This layer brings actual experimental measurements and findings from portal data files into the graph, not only metadata about them. Where Layer 1 captures that a study or data file exists and what assays were used, Layer 5 captures what those assays found: gene expression values, drug sensitivity measurements, variant calls, phenotypic observations, and similar structured results.
 
-This layer is the primary enabler of scientific reasoning use cases. For example, answering "which cell lines have shown sensitivity to HDAC inhibitors❌" requires not just knowing which cell lines exist and which studies involved them, but extracting the actual sensitivity measurements from the underlying data files. A drug sensitivity table might look like:
+This layer is the primary enabler of scientific reasoning use cases. For example, answering "which cell lines have shown sensitivity to HDAC inhibitors?" requires not just knowing which cell lines exist and which studies involved them, but extracting the actual sensitivity measurements from the underlying data files. A drug sensitivity table might look like:
 
 | cellLineId | drug | ic50 | assay | studyId |
 |---|---|---|---|---|
@@ -122,13 +122,13 @@ When such tabular data files are available, RML mappings can be applied directly
 Example questions enabled by this layer:
 
 *Drug sensitivity:*
-- *"Which cell lines show the lowest IC50 for HDAC inhibitors, and how do NF1 vs. NF2 cell lines compare❌"*
-- *"Which drugs have consistent sensitivity (IC50 < 1 µM) across multiple NF1 cell lines❌"*
+- *"Which cell lines show the lowest IC50 for HDAC inhibitors, and how do NF1 vs. NF2 cell lines compare?"*
+- *"Which drugs have consistent sensitivity (IC50 < 1 µM) across multiple NF1 cell lines?"*
 
 *Variant calls:*
-- *"Which genes have the highest mutation burden across sequenced NF1 patient samples❌"*
+- *"Which genes have the highest mutation burden across sequenced NF1 patient samples?"*
 
-> If variant calls are extracted from an NF1 cohort and another rare-disease cohort, one can also ask: *"Which mutations are shared between NF1 patients and patients with [other rare disease], and which are disease-specific❌"*
+> If variant calls are extracted from an NF1 cohort and another rare-disease cohort, one can also ask: *"Which mutations are shared between NF1 patients and patients with [other rare disease], and which are disease-specific?"*
 
 **Key challenges: portal files are heterogeneous in format and schema, extraction logic is dataset-specific, and result interpretation may require domain expertise.** We want to target standardized files first, but implementation will likely involve per-dataset extraction pipeline and close collaboration with data contributors to understand data formats and semantics.
 
