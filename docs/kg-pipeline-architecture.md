@@ -199,7 +199,7 @@ Each stage is described below with expected effort for initial implementation an
 - SSSOM (Simple Standard for Sharing Ontology Mappings) is the standard format for the lookup tables; see [SSSOM specification](https://mapping-commons.github.io/sssom/)
 - Unmapped values are logged and passed through as-is; no data is silently dropped
 
-**Which tables need harmonization❌**  
+**Which tables need harmonization?**  
 Any table where field values are user-supplied enumerated labels that correspond to ontology classes. In the NF pipeline:
 - `cell_lines` → `cellLineCategory` → `nf:CancerCellLine`, `nf:NormalCellLine`, etc.
 - `animal_models` → `species` → `nf:MouseModel`, `nf:ZebrafishModel`, etc.
@@ -303,7 +303,7 @@ SSSOM files are TSV tables that record how each portal label maps to an ontology
 
 **Practical guidance:**
 - Start with a survey of all distinct values in controlled vocabulary fields
-- Decide which values map to ontology classes vs. literal data (e.g., is `"Zebrafish"` a class, or just a string label on `nf:species`❌)
+- Decide which values map to ontology classes vs. literal data (e.g., is `"Zebrafish"` a class, or just a string label on `nf:species`)
 - Where external ontologies exist (e.g., NCBITaxon for species, EFO for experimental factors), prefer reusing their IRIs over minting custom ones
 - Document unmappable or ambiguous values — these are candidates for data quality feedback to upstream curators
 
@@ -365,7 +365,7 @@ Derived assets are declared with explicit upstream dependencies, so the full gra
 
 The pipeline includes several quality gates. Note that there is intentionally little data validation before the transformation stage — portal metadata is presumed to be relatively clean, having already passed through the portal's own curation and submission processes. Validation effort is therefore concentrated on the transformation output (RML correctness, graph structure) rather than the input data.
 
-| Check | When | Blocking❌ |
+| Check | When | Blocking? |
 |---|---|---|
 | Foreign key validation | After Extract | No (logged only) |
 | RML unit tests (pytest + SPARQL) | After Map | ✅ |
@@ -386,7 +386,7 @@ The pipeline includes several quality gates. Note that there is intentionally li
 
 ## Optional Components Summary
 
-| Component | Required❌ | When to include |
+| Component | Required? | When to include |
 |---|---|---|
 | Harmonization step (per table) | Optional (per table) | When table has controlled vocabulary fields needing IRI resolution |
 | Derived RDF materialization | Optional | When cross-table relationships matter for your use case |
