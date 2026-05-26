@@ -1,11 +1,10 @@
 # Archive RDF snapshot to Synapse and generate incremental diff after a successful build.
-# Runs as a separate workflow so Synapse failures never block image publishing.
+# Runs as a separate workflow so Synapse failures never block image publishing. 
+# This can support V1/Strategy A described in internal docs [here](https://sagebionetworks.jira.com/wiki/spaces/SageBrain/pages/4667113475/Neptune+Loading+Strategy#Strategy-A-%E2%80%94-Incremental-Delta-via-SPARQL-UPDATE-LOAD%2FUNLOAD) 
 name: Archive and diff RDF
 
 on:
-  workflow_run:
-    workflows: ["Build image"]
-    types: [completed]
+  workflow_dispatch:  # disabled; restore workflow_run trigger once we confirm we want snapshots and diffs
 
 jobs:
   archive-diff:
@@ -26,7 +25,7 @@ jobs:
           python-version: "3.12"
 
       - name: Install Python dependencies
-        run: pip install -e ./orchestration numpy pyyaml
+        run: pip install -e ./orchestration numpy pyyaml pyoxigraph
 
       - name: Download RDF artifacts from build
         uses: actions/download-artifact@v7
