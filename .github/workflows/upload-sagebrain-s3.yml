@@ -1,0 +1,57 @@
+# Upload RDF graph data to SageBrain S3 after a successful build.
+# Implements the S3 upload step per:
+#   https://github.com/Sage-Bionetworks-IT/sagebrain-infra#2-upload-data-to-s3
+#
+# Data is stored under a portal-scoped, date-partitioned prefix:
+#   s3://<bucket>/{portal}/YYYY-MM-DD/schema/
+#   s3://<bucket>/{portal}/YYYY-MM-DD/data/rdf/
+#
+# Runs as a separate workflow so upload failures never block Synapse archiving.
+# Requires secret: SAGEBRAIN_ROLE_ARN (IAM role in sagebrain-prod for OIDC auth)
+# Bucket name is stable (CDK-generated suffix) and set directly in NEPTUNE_BUCKET env var.
+
+name: Upload to SageBrain S3
+
+on:
+  workflow_run:
+    workflows: ["Build image"]
+    types: [completed]
+
+env:
+  AWS_REGION: us-east-1
+  NEPTUNE_BUCKET: app-prod-neptune-neptunedatabucketb8719d9a-jfo3bsfisgfn
+  PORTAL: nf
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  upload:
+    if: github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+      actions: read
+
+    steps:
+      - name: Download RDF artifacts from build
+        uses: actions/download-artifact@v7
+        with:
+          name: kg-data
+          path: .
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v5
+        with:
+          role-to-assume: ${{ secrets.SAGEBRAIN_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Upload to S3
+        # Note: if two builds run on the same day, the second overwrites the first.
+        # This is acceptable — Neptune loads the latest data for a given date.
+        run: |
+          DATE=$(date +%Y-%m-%d)
+          PREFIX=s3://${{ env.NEPTUNE_BUCKET }}/${{ env.PORTAL }}/$DATE
+          aws s3 cp schema/   $PREFIX/schema/   --recursive
+          aws s3 cp data/rdf/ $PREFIX/data/rdf/ --recursive
