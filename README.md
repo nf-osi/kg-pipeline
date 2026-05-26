@@ -157,6 +157,10 @@ python scripts/archive_rdf.py --comment "Build v1.2.0"
 Both steps run automatically in CI after `make all` and RDF validation.
 The archive requires `SYNAPSE_AUTH_TOKEN` to be set.
 
+### SageBrain / Neptune Distribution
+
+After each successful build, RDF graph data (`schema/` and `data/rdf/`) is uploaded to the SageBrain Neptune S3 bucket under a date-partitioned prefix (`nf/YYYY-MM-DD/`). This requires the `SAGEBRAIN_ROLE_ARN` secret to be set for OIDC authentication.
+
 ### Build and Release
 
 Pre-built [QLever](https://github.com/ad-freiburg/qlever) images with indexed data
