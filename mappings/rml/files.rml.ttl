@@ -28,6 +28,7 @@ map:FileCore a rr:TriplesMap ;
     rr:subjectMap [ rr:template "https://www.synapse.org/Synapse:{id}" ; rr:termType rr:IRI ] ;
     rr:predicateObjectMap [ rr:predicate rdf:type ; rr:objectMap [ rr:constant nf:File ; rr:termType rr:IRI ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:name ; rr:objectMap [ rml:reference "name" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate rdfs:label ; rr:objectMap [ rml:reference "name" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:parentStudy ; rr:objectMap [ rr:template "https://www.synapse.org/Synapse:{studyId}" ; rr:termType rr:IRI ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:assay ; rr:objectMap [ rml:reference "assay" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:platform ; rr:objectMap [ rml:reference "platform" ; rr:datatype xsd:string ] ] ;
