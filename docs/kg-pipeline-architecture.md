@@ -289,7 +289,7 @@ Each portal should define an OWL ontology covering its entity types and properti
 
 Both BioLink and domain ontologies provide alignment; the difference is pace and granularity. BioLink alignment is faster to adopt and immediately enables cross-portal schema-level queries. Domain ontology alignment is a slower path that requires more curation effort but yields greater semantic precision for scientific reasoning use cases. Portals can start with BioLink and layer in domain ontology alignments incrementally.
 
-For the NF portal, the current ontology uses a custom `nf:` namespace throughout, predating this recommendation. Migration to BioLink where applicable is a planned improvement.
+For the NF portal, BioLink alignment was implemented in [#61](https://github.com/nf-osi/kg-pipeline/issues/61). See [docs/biolink-alignment.md](biolink-alignment.md) for the specific decisions and rationale.
 
 The ontology should also declare datatype and object properties with `rdfs:domain`, `rdfs:range`, and cardinality constraints, and subclass hierarchies for typed entities.
 
