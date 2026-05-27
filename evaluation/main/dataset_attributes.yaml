@@ -59,8 +59,9 @@
 #   ✓ Can be explained clearly in <30 seconds
 
 metadata:
-  version: v1.1
-  data_archive: syn73695746
+  version: v1.2
+  data_sources_profile: evaluation
+  data_sources_version: KG v0.2-eval
 
 components:
   - name: "Discovery via Mutation of Interest"
@@ -552,3 +553,71 @@ components:
         note: "Tests agent calibration on a specific cell line. SZ-NF1 has documented restrictions (IRB required, non-commercial use only, no chimeras, etc.) but no explicit MTA mention. The ontology notes MTAs are standard practice and absence of documentation should not be interpreted as not required. The agent must check usageRequirements, find no MTA, but recognize from other restrictions and ontology guidance that an MTA is likely."
         demo_priority: high
         demo_rationale: "Common practical question for material acquisition; tests overconfidence and hallucination"
+
+  - name: "Study Discovery"
+    description: "Finding studies and their associated data files via study metadata and file-level annotations"
+    questions:
+      - id: ST-001
+        question: "Find studies focused on schwannoma"
+        user_story: "As a researcher, I want to find all NF-related studies that focus on schwannoma to survey the research landscape"
+        level: baseline
+        complexity: 1-hop
+        facet_answerable: yes
+        facet_note: "Portal study table can be filtered by manifestation"
+        text_search_answerable: partial
+        text_search_note: "Searching 'schwannoma' returns some studies but may miss those with alternate terminology"
+        user_frustration: low
+        demo_priority: medium
+        demo_rationale: "Simple study-level filter, establishes baseline study retrieval"
+
+      - id: ST-002
+        question: "What studies for MPNST have RNA-seq data?"
+        user_story: "As a bioinformatician, I want to find MPNST studies with RNA-seq data to plan a meta-analysis"
+        level: advanced
+        complexity: 2-hop
+        facet_answerable: no
+        facet_note: "Requires joining study manifestation with file-level assay; no cross-entity filtering in portal"
+        text_search_answerable: no
+        text_search_note: "Cannot combine study-level disease focus with file-level assay type"
+        user_frustration: high
+        demo_priority: high
+        demo_rationale: "Core use case from issue #62; realistic multi-hop query joining study metadata with file annotations"
+
+      - id: ST-003
+        question: "Which studies have whole genome sequencing data from human female subjects?"
+        user_story: "As a genomics researcher, I want to find studies with WGS data from human female subjects to investigate sex-specific genomic variation in NF"
+        level: advanced
+        complexity: 2-hop
+        facet_answerable: no
+        facet_note: "Requires joining study with file-level assay, species, and sex; no cross-entity filter"
+        text_search_answerable: no
+        text_search_note: "Cannot filter files by multiple attributes and aggregate to parent studies"
+        user_frustration: very_high
+        demo_priority: high
+        demo_rationale: "Multi-attribute file filter aggregated to study level; showcases complex graph traversal"
+
+      - id: ST-004
+        question: "Which schwannomatosis studies have data available for download?"
+        user_story: "As a researcher new to schwannomatosis, I want to find studies with data I can access immediately"
+        level: baseline
+        complexity: 1-hop
+        facet_answerable: yes
+        facet_note: "Portal study table can be filtered by disease focus and data status"
+        text_search_answerable: partial
+        text_search_note: "Searching 'schwannomatosis' returns studies but data status filtering requires UI facets"
+        user_frustration: low
+        demo_priority: medium
+        demo_rationale: "Two study-level attribute filters; common practical question for data access"
+
+      - id: ST-005
+        question: "What studies on plexiform neurofibroma have drug screening data?"
+        user_story: "As a pharmacologist, I want to find pNF studies with drug screening data to survey existing compound evaluations"
+        level: advanced
+        complexity: 2-hop
+        facet_answerable: no
+        facet_note: "Requires joining study manifestation with file-level dataType; no cross-entity filter in portal"
+        text_search_answerable: no
+        text_search_note: "Cannot combine study manifestation with file data type"
+        user_frustration: high
+        demo_priority: high
+        demo_rationale: "Study-to-file join for drug discovery; practical for preclinical pipeline planning"

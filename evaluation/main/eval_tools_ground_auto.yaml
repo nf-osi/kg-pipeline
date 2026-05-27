@@ -1,12 +1,12 @@
 metadata:
-  generated_at: '2026-04-17T10:58:20.001669'
+  generated_at: '2026-05-26T22:36:55.737788'
   skipped_questions:
   - AM-004
   - CL-003
   - CR-001
   - CR-004
-  total_questions: 35
-  generated_questions: 31
+  total_questions: 40
+  generated_questions: 36
 ground_truth:
   AB-001:
     question: Find drosophila neurofibromin antibodies
@@ -352,3 +352,77 @@ ground_truth:
   PI-002:
     question: How many tools have been funded by GFF?
     results: 4
+  ST-001:
+    question: Find studies focused on schwannoma
+    results:
+    - syn2343195
+    - syn23532273
+    - syn24875850
+    - syn26238842
+    - syn26383473
+    - syn27261816
+    - syn27261829
+    - syn27761862
+    - syn53130024
+    - syn53183718
+    - syn53183744
+    - syn5562324
+    - syn61391891
+    - syn61778589
+    - syn61831970
+    - syn62012031
+    - syn62809145
+    - syn63992357
+    - syn69071607
+    - syn70366165
+    - syn74287077
+    - syn74287631
+    - syn74315329
+    - syn9727752
+  ST-002:
+    question: What studies for MPNST have RNA-seq data?
+    results:
+    - syn11638893
+    - syn11681835
+    - syn21984813
+    - syn23639889
+    - syn25999248
+    - syn26241781
+    - syn32128792
+    - syn4939902
+    - syn4939910
+    - syn51133929
+    - syn53604892
+    - syn63944395
+  ST-003:
+    question: Which studies have whole genome sequencing data from human female subjects?
+    results:
+    - syn11374339
+    - syn11638893
+    - syn22392179
+    - syn32128792
+    - syn4939902
+    - syn4984604
+    - syn53604892
+    - syn5698493
+    - syn6633069
+    - syn9727752
+  ST-004:
+    question: Which schwannomatosis studies have data available for download?
+    results:
+    - syn22268689
+    - syn24875850
+    - syn28545963
+    - syn9727752
+  ST-005:
+    question: What studies on plexiform neurofibroma have drug screening data?
+    results:
+    - syn4939874
+    - syn4939876
+    - syn4939906
+    - syn4939916
+    - syn51133914
+    - syn52740594
+    - syn7217928
+    - syn8016635
+    - syn8016650
