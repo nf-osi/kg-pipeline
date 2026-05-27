@@ -498,6 +498,62 @@ def run_queries(data):
             winners = stats[stats == max_diverse].index.tolist()
             results['CR-002'] = ensure_resource_id(winners)
 
+    # --- Study Discovery ---
+
+    # ST-001: Schwannoma studies
+    if not data['studies'].empty:
+        schwannoma = data['studies'][
+            data['studies']['manifestation'].str.contains('Schwannoma', case=False, na=False)
+        ]
+        ids = schwannoma['studyId'].dropna().tolist()
+        if ids:
+            results['ST-001'] = sorted(set(ids))
+
+    # ST-002: MPNST studies with RNA-seq data (study manifestation + file assay)
+    if not data['studies'].empty and not data['files'].empty:
+        mpnst_ids = set(data['studies'][
+            data['studies']['manifestation'].str.contains('MPNST', case=False, na=False)
+        ]['studyId'].dropna())
+        rnaseq_study_ids = set(data['files'][
+            data['files']['assay'].str.contains('^RNA-seq$', case=False, na=False, regex=True)
+        ]['studyId'].dropna())
+        overlap = mpnst_ids & rnaseq_study_ids
+        if overlap:
+            results['ST-002'] = sorted(overlap)
+
+    # ST-003: Studies with WGS data from human female subjects (multi-attribute file filter)
+    if not data['files'].empty:
+        wgs_human_female = data['files'][
+            (data['files']['assay'].str.contains('whole genome sequencing', case=False, na=False)) &
+            (data['files']['species'].str.contains('Homo sapiens|Human', case=False, na=False)) &
+            (data['files']['sex'].str.contains('Female', case=False, na=False))
+        ]
+        ids = sorted(set(wgs_human_female['studyId'].dropna()))
+        if ids:
+            results['ST-003'] = ids
+
+    # ST-004: Schwannomatosis studies with data available
+    if not data['studies'].empty:
+        schwan_avail = data['studies'][
+            (data['studies']['diseaseFocus'].str.contains('Schwannomatosis', case=False, na=False)) &
+            (data['studies']['dataStatus'].str.contains('Available', case=False, na=False))
+        ]
+        ids = schwan_avail['studyId'].dropna().tolist()
+        if ids:
+            results['ST-004'] = sorted(set(ids))
+
+    # ST-005: pNF studies with drug screening data (study manifestation + file dataType)
+    if not data['studies'].empty and not data['files'].empty:
+        pnf_ids = set(data['studies'][
+            data['studies']['manifestation'].str.contains('Plexiform Neurofibroma', case=False, na=False)
+        ]['studyId'].dropna())
+        drug_study_ids = set(data['files'][
+            data['files']['dataType'].str.contains('drug.?screen', case=False, na=False, regex=True)
+        ]['studyId'].dropna())
+        overlap = pnf_ids & drug_study_ids
+        if overlap:
+            results['ST-005'] = sorted(overlap)
+
     # CR-003: matched model systems (same-donor)
     if not data['models'].empty and not data['cell_lines'].empty:
         # 1. Direct donorId match
@@ -530,25 +586,25 @@ def main():
     data = load_data()
     all_questions = get_all_questions()
     all_ids = list(all_questions.keys())
-    
+
     print("Running queries...")
     query_results = run_queries(data)
-    
+
     generated_ids = set(query_results.keys())
     skipped_ids = [qid for qid in all_ids if qid not in generated_ids]
-    
+
     ground_truth = {}
     for qid in sorted(all_ids):
         if qid in query_results:
             res = query_results[qid]
             if isinstance(res, list):
                 res = sorted(list(res))
-            
+
             ground_truth[qid] = {
                 'question': all_questions.get(qid, ""),
                 'results': res
             }
-    
+
     output = {
         'metadata': {
             'generated_at': datetime.now().isoformat(),
@@ -558,7 +614,7 @@ def main():
         },
         'ground_truth': ground_truth
     }
-    
+
     print(f"Writing results to {OUTPUT_FILE}...")
     with open(OUTPUT_FILE, 'w') as f:
         yaml.dump(output, f, default_flow_style=False, sort_keys=False)
