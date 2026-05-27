@@ -53,16 +53,16 @@ OPENAI_MODELS = ["openai/gpt-5.4"]
 # Data preparation
 # ---------------------------------------------------------------------------
 
-def get_dataset_version(attributes_file: Path) -> str:
-    """Load dataset version from dataset_attributes.yaml, defaulting to 'draft'."""
+def get_dataset_metadata(attributes_file: Path) -> dict:
+    """Load dataset metadata from dataset_attributes.yaml."""
     if not attributes_file.exists():
-        return 'draft'
+        return {"version": "draft"}
     try:
         with open(attributes_file) as f:
             config = yaml.safe_load(f)
-            return config.get('metadata', {}).get('version', 'draft')
+            return config.get("metadata", {"version": "draft"})
     except Exception:
-        return 'draft'
+        return {"version": "draft"}
 
 
 def prepare_data(dataset: str) -> int:
@@ -72,9 +72,9 @@ def prepare_data(dataset: str) -> int:
         print(f"Error: dataset directory not found: {dataset_dir}", file=sys.stderr)
         return 1
 
-    # Load dataset version
+    # Load dataset metadata
     attributes_file = dataset_dir / "dataset_attributes.yaml"
-    dataset_version = get_dataset_version(attributes_file)
+    dataset_metadata = get_dataset_metadata(attributes_file)
 
     ground_files = sorted(dataset_dir.glob("*_ground*.yaml"))
     if not ground_files:
@@ -91,8 +91,8 @@ def prepare_data(dataset: str) -> int:
 
     output = {
         "metadata": {
-            "version": dataset_version,
-            "total_questions": len(merged)
+            **dataset_metadata,
+            "total_questions": len(merged),
         },
         "ground_truth": merged
     }
@@ -101,6 +101,7 @@ def prepare_data(dataset: str) -> int:
     with open(output_path, "w") as f:
         yaml.dump(output, f, default_flow_style=False, sort_keys=False, allow_unicode=True)
 
+    dataset_version = dataset_metadata.get("version", "draft")
     print(f"Wrote {len(merged)} entries to {output_path} (version: {dataset_version})")
     return 0
 
