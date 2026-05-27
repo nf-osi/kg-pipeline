@@ -30,13 +30,35 @@ query "Instance counts by type" \
 # 4. Entity type counts
 query "Entity type counts" \
   "PREFIX nf: <http://nf-osi.github.com/terms#>
+  PREFIX biolink: <https://w3id.org/biolink/vocab/>
   PREFIX obo: <http://purl.obolibrary.org/obo/>
   SELECT ?type (COUNT(?e) AS ?count) WHERE {
-    VALUES ?type { nf:Gene nf:DiseaseAnnotation nf:Chemical obo:NCBITaxon_species nf:CellLine nf:Variant }
+    VALUES ?type { nf:Gene nf:DiseaseAnnotation biolink:ChemicalEntity obo:NCBITaxon_species nf:CellLine nf:Variant }
     ?e a ?type
   }
   GROUP BY ?type
   ORDER BY DESC(?count)"
+
+# ============================================================
+# BioLink alignment (#61)
+# ============================================================
+
+# 5. BioLink-typed text entities — Chemical is now biolink:ChemicalEntity
+query "BioLink text entity: biolink:ChemicalEntity count" \
+  "PREFIX biolink: <https://w3id.org/biolink/vocab/>
+  SELECT (COUNT(?e) AS ?count) WHERE {
+    ?e a biolink:ChemicalEntity
+  }"
+
+# 6. Subclass traversal for text entities — nf:Gene subClassOf biolink:Gene
+query "Subclass traversal: biolink:Gene text entities" \
+  "PREFIX nf: <http://nf-osi.github.com/terms#>
+  PREFIX biolink: <https://w3id.org/biolink/vocab/>
+  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+  SELECT ?type (COUNT(?e) AS ?count) WHERE {
+    ?type rdfs:subClassOf biolink:Gene .
+    ?e a ?type .
+  } GROUP BY ?type"
 
 # ============================================================
 # Text queries
@@ -45,40 +67,40 @@ query "Entity type counts" \
 echo "=== SPARQL+Text queries ==="
 echo
 
-# 5. Word search
+# 7. Word search
 query "Text search: neurofibromatosis" \
   "SELECT (COUNT(?text) AS ?count) WHERE {
     ?text ql:contains-word \"neurofibromatosis\"
   }"
 
-# 6. Prefix search
+# 8. Prefix search
 query "Prefix search: schwann*" \
   "SELECT ?text WHERE {
     ?text ql:contains-word \"schwann*\"
   } LIMIT 5"
 
-# 7. Entity + word — passages mentioning NF1 gene with "mutation"
+# 9. Entity + word — passages mentioning NF1 gene with "mutation"
 query "Entity + word: NF1 gene + mutation" \
   "SELECT (COUNT(?text) AS ?count) WHERE {
     ?text ql:contains-entity <https://www.ncbi.nlm.nih.gov/gene/4763> .
     ?text ql:contains-word \"mutation*\"
   }"
 
-# 8. Entity + word — MeSH disease with "treatment"
+# 10. Entity + word — MeSH disease with "treatment"
 query "Entity + word: neurofibromatosis MeSH + treatment" \
   "SELECT ?text WHERE {
     ?text ql:contains-entity <http://id.nlm.nih.gov/mesh/D009456> .
     ?text ql:contains-word \"treatment\"
   } LIMIT 5"
 
-# 9. Word + entity co-occurrence — tumor near NF1 gene
+# 11. Word + entity co-occurrence — tumor near NF1 gene
 query "Co-occurrence: tumor + NF1 gene" \
   "SELECT ?text WHERE {
     ?text ql:contains-word \"tumor\" .
     ?text ql:contains-entity <https://www.ncbi.nlm.nih.gov/gene/4763>
   } LIMIT 5"
 
-# 10. Text + graph join
+# 12. Text + graph join
 query "Text + graph join: genes mentioned with neurofibromatosis" \
   "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
   SELECT ?entity ?label (COUNT(?text) AS ?mentions) WHERE {
@@ -91,13 +113,13 @@ query "Text + graph join: genes mentioned with neurofibromatosis" \
   ORDER BY DESC(?mentions)
   LIMIT 10"
 
-# 11. Multi-word search — passages containing both "clinical" and "trial"
+# 13. Multi-word search — passages containing both "clinical" and "trial"
 query "Multi-word search: clinical trial*" \
   "SELECT (COUNT(?text) AS ?count) WHERE {
     ?text ql:contains-word \"clinical trial*\"
   }"
 
-# 12. Publication passage count — entity-only via wildcard trick
+# 14. Publication passage count — entity-only via wildcard trick
 query "Publication passages: PMID 16822308" \
   "SELECT (COUNT(DISTINCT ?text) AS ?passages) WHERE {
     ?text ql:contains-entity <https://pubmed.ncbi.nlm.nih.gov/16822308> .
