@@ -29,9 +29,9 @@ These `nf:` classes carried `owl:equivalentClass` links to external ontologies t
 | `nf:Gene` | `rdfs:subClassOf biolink:Gene` | `owl:equivalentClass <uniprot:Gene>` | BioLink maps to SO:0000704, not UniProt |
 | `nf:Variant` | `rdfs:subClassOf biolink:SequenceVariant` | `owl:equivalentClass obo:SO_0001564` | BioLink has SO:0001060 (close), not SO:0001564 (exact) |
 
-## Superclassed under BioLink (NF-specific subclasses)
+## Subclassed under BioLink (NF-specific classes)
 
-These `nf:` classes are NF-specific specializations. They gain a BioLink parent via `rdfs:subClassOf`, and their own subclasses inherit through the NF class hierarchy.
+These `nf:` classes are NF-specific specializations with no external mappings to preserve. They gain a BioLink parent via `rdfs:subClassOf`, and their own subclasses inherit through the NF class hierarchy.
 
 | Class | Added | Inheriting subclasses |
 |---|---|---|
