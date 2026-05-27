@@ -14,6 +14,7 @@ import os
 
 # Define namespaces
 NF = Namespace("http://nf-osi.github.com/terms#")
+BIOLINK = Namespace("https://w3id.org/biolink/vocab/")
 SYN = Namespace("https://www.synapse.org/#!Synapse:")
 
 # Project paths
@@ -43,6 +44,7 @@ def namespaces():
     """Provide RDF namespaces to all tests"""
     return {
         "nf": NF,
+        "biolink": BIOLINK,
         "syn": SYN,
     }
 
@@ -117,6 +119,7 @@ def rml_runner(project_paths):
 
             # Bind namespaces for prettier SPARQL queries
             g.bind("nf", NF)
+            g.bind("biolink", BIOLINK)
             g.bind("syn", SYN)
 
             return g

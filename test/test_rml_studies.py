@@ -27,13 +27,13 @@ class TestStudiesCore:
     """Test core study properties"""
 
     def test_study_has_correct_type(self, studies_graph, namespaces):
-        """All studies should have type nf:Study"""
-        studies = list(studies_graph.subjects(RDF.type, namespaces["nf"].Study))
+        """All studies should have type biolink:Study"""
+        studies = list(studies_graph.subjects(RDF.type, namespaces["biolink"].Study))
         assert len(studies) > 0
 
     def test_study_id_is_iri(self, studies_graph, namespaces):
         """Study subjects should be Synapse URL IRIs"""
-        studies = list(studies_graph.subjects(RDF.type, namespaces["nf"].Study))
+        studies = list(studies_graph.subjects(RDF.type, namespaces["biolink"].Study))
         for study in studies:
             assert isinstance(study, URIRef)
             assert str(study).startswith(SYN_BASE), \
@@ -41,11 +41,11 @@ class TestStudiesCore:
 
     def test_studies_exist(self, studies_graph, namespaces):
         """Should have at least 4 studies"""
-        NF = namespaces["nf"]
+        BIOLINK = namespaces["biolink"]
         query = """
-        SELECT ?study WHERE { ?study a nf:Study . }
+        SELECT ?study WHERE { ?study a biolink:Study . }
         """
-        results = list(studies_graph.query(query, initNs={"nf": NF}))
+        results = list(studies_graph.query(query, initNs={"biolink": BIOLINK}))
         assert len(results) >= 4
 
 

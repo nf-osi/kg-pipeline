@@ -157,9 +157,9 @@ class TestPublication:
         )
 
     def test_publications_have_correct_type(self, publication_graph, namespaces):
-        """Publications should have type nf:Publication"""
-        NF = namespaces["nf"]
-        publications = list(publication_graph.subjects(RDF.type, NF.Publication))
+        """Publications should have type biolink:Publication"""
+        BIOLINK = namespaces["biolink"]
+        publications = list(publication_graph.subjects(RDF.type, BIOLINK.Publication))
         assert len(publications) > 0, "No publications found in graph"
         assert len(publications) >= 2, f"Expected at least 2 publications, got {len(publications)}"
 
@@ -170,11 +170,11 @@ class TestPublication:
         query = """
         SELECT ?publication ?title
         WHERE {
-            ?publication a nf:Publication ;
+            ?publication a biolink:Publication ;
                         nf:publicationTitle ?title .
         }
         """
-        results = list(publication_graph.query(query, initNs={"nf": NF}))
+        results = list(publication_graph.query(query, initNs={"nf": NF, "biolink": namespaces["biolink"]}))
         assert len(results) > 0, "No publications with titles found"
 
         titles = [str(row.title) for row in results]
@@ -188,11 +188,11 @@ class TestPublication:
         query = """
         SELECT ?publication ?abstract
         WHERE {
-            ?publication a nf:Publication ;
+            ?publication a biolink:Publication ;
                         nf:abstract ?abstract .
         }
         """
-        results = list(publication_graph.query(query, initNs={"nf": NF}))
+        results = list(publication_graph.query(query, initNs={"nf": NF, "biolink": namespaces["biolink"]}))
         assert len(results) > 0, "No publications with abstracts found"
 
     def test_publications_have_doi(self, publication_graph, namespaces):
@@ -202,11 +202,11 @@ class TestPublication:
         query = """
         SELECT ?publication ?doi
         WHERE {
-            ?publication a nf:Publication ;
+            ?publication a biolink:Publication ;
                         nf:doi ?doi .
         }
         """
-        results = list(publication_graph.query(query, initNs={"nf": NF}))
+        results = list(publication_graph.query(query, initNs={"nf": NF, "biolink": namespaces["biolink"]}))
         assert len(results) > 0, "No publications with DOI found"
 
         # DOIs should be IRIs
@@ -221,11 +221,11 @@ class TestPublication:
         query = """
         SELECT ?publication ?pmid
         WHERE {
-            ?publication a nf:Publication ;
+            ?publication a biolink:Publication ;
                         nf:pmid ?pmid .
         }
         """
-        results = list(publication_graph.query(query, initNs={"nf": NF}))
+        results = list(publication_graph.query(query, initNs={"nf": NF, "biolink": namespaces["biolink"]}))
         assert len(results) > 0, "No publications with PMID found"
 
         # PMIDs should be IRIs
@@ -240,11 +240,11 @@ class TestPublication:
         query = """
         SELECT ?publication ?journal
         WHERE {
-            ?publication a nf:Publication ;
+            ?publication a biolink:Publication ;
                         nf:journal ?journal .
         }
         """
-        results = list(publication_graph.query(query, initNs={"nf": NF}))
+        results = list(publication_graph.query(query, initNs={"nf": NF, "biolink": namespaces["biolink"]}))
         assert len(results) > 0, "No publications with journal found"
 
         journals = [str(row.journal) for row in results]
@@ -257,11 +257,11 @@ class TestPublication:
         query = """
         SELECT ?publication ?author
         WHERE {
-            ?publication a nf:Publication ;
+            ?publication a biolink:Publication ;
                         nf:authors ?author .
         }
         """
-        results = publication_graph.query(query, initNs={"nf": NF})
+        results = publication_graph.query(query, initNs={"nf": NF, "biolink": namespaces["biolink"]})
         authors = [str(row.author) for row in results]
 
         # Should have multiple values from pipe-delimited list
