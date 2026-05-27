@@ -34,6 +34,7 @@ map:InitiativeCore a rr:TriplesMap ;
     rr:subjectMap [ rr:template "http://nf-osi.github.com/terms#{initiativeKey}" ; rr:termType rr:IRI ] ;
     rr:predicateObjectMap [ rr:predicate rdf:type ; rr:objectMap [ rr:constant nf:Initiative ; rr:termType rr:IRI ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:name ; rr:objectMap [ rml:reference "initiative" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate rdfs:label ; rr:objectMap [ rml:reference "initiative" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:abbreviation ; rr:objectMap [ rml:reference "abbreviation" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:description ; rr:objectMap [ rml:reference "summary" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:website ; rr:objectMap [ rml:reference "website" ; rr:termType rr:IRI ] ] .

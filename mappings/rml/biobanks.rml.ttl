@@ -28,6 +28,7 @@ map:BiobankCore a rr:TriplesMap ;
     rr:subjectMap [ rr:template "http://nf-osi.github.com/terms#biobank/{biobankId}" ; rr:termType rr:IRI ] ;
     rr:predicateObjectMap [ rr:predicate rdf:type ; rr:objectMap [ rr:constant nf:Biobank ; rr:termType rr:IRI ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:name ; rr:objectMap [ rml:reference "biobankName" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate rdfs:label ; rr:objectMap [ rml:reference "biobankName" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:biobankURL ; rr:objectMap [ rml:reference "biobankURL" ; rr:termType rr:IRI ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:contact ; rr:objectMap [ rml:reference "contact" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:resourceId ; rr:objectMap [ rml:reference "resourceId" ; rr:datatype xsd:string ] ] .
