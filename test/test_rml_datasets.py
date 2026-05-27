@@ -10,6 +10,7 @@ from rdflib.namespace import RDF
 
 
 NF = Namespace("http://nf-osi.github.com/terms#")
+BIOLINK = Namespace("https://w3id.org/biolink/vocab/")
 SYN = Namespace("https://www.synapse.org/Synapse:")
 
 
@@ -29,19 +30,19 @@ class TestDatasetCore:
     """Test core dataset properties"""
 
     def test_has_correct_type(self, datasets_graph, namespaces):
-        """All entries should have type nf:Dataset"""
-        datasets = list(datasets_graph.subjects(RDF.type, NF.Dataset))
+        """All entries should have type biolink:Dataset"""
+        datasets = list(datasets_graph.subjects(RDF.type, BIOLINK.Dataset))
         assert len(datasets) == 3, f"Expected 3 datasets, got {len(datasets)}"
 
     def test_subject_is_iri(self, datasets_graph, namespaces):
         """Subjects should be IRIs"""
-        datasets = list(datasets_graph.subjects(RDF.type, NF.Dataset))
+        datasets = list(datasets_graph.subjects(RDF.type, BIOLINK.Dataset))
         for ds in datasets:
             assert isinstance(ds, URIRef), f"Subject should be IRI, got {type(ds)}"
 
     def test_iri_uses_synapse_pattern(self, datasets_graph, namespaces):
         """IRI should use https://www.synapse.org/Synapse:{id} pattern"""
-        datasets = list(datasets_graph.subjects(RDF.type, NF.Dataset))
+        datasets = list(datasets_graph.subjects(RDF.type, BIOLINK.Dataset))
         iris = [str(ds) for ds in datasets]
         assert any("Synapse:syn29654184" in iri for iri in iris), \
             f"Expected Synapse IRI pattern, got: {iris}"
@@ -51,12 +52,12 @@ class TestDatasetCore:
         query = """
         SELECT ?name
         WHERE {
-            ?ds a nf:Dataset ;
+            ?ds a biolink:Dataset ;
                 nf:name ?name .
             FILTER(CONTAINS(STR(?ds), "syn29654184"))
         }
         """
-        results = list(datasets_graph.query(query, initNs={"nf": NF}))
+        results = list(datasets_graph.query(query, initNs={"nf": NF, "biolink": BIOLINK}))
         assert len(results) == 1
         assert str(results[0].name) == "Patient-derived cNF RNA-seq Counts"
 
@@ -65,12 +66,12 @@ class TestDatasetCore:
         query = """
         SELECT ?study
         WHERE {
-            ?ds a nf:Dataset ;
+            ?ds a biolink:Dataset ;
                 nf:parentStudy ?study .
             FILTER(CONTAINS(STR(?ds), "syn29654184"))
         }
         """
-        results = list(datasets_graph.query(query, initNs={"nf": NF}))
+        results = list(datasets_graph.query(query, initNs={"nf": NF, "biolink": BIOLINK}))
         assert len(results) == 1
         assert isinstance(results[0].study, URIRef)
         assert "syn11374339" in str(results[0].study)
@@ -80,12 +81,12 @@ class TestDatasetCore:
         query = """
         SELECT ?focus
         WHERE {
-            ?ds a nf:Dataset ;
+            ?ds a biolink:Dataset ;
                 nf:diseaseFocus ?focus .
             FILTER(CONTAINS(STR(?ds), "syn29654184"))
         }
         """
-        results = list(datasets_graph.query(query, initNs={"nf": NF}))
+        results = list(datasets_graph.query(query, initNs={"nf": NF, "biolink": BIOLINK}))
         assert len(results) == 1
         assert str(results[0].focus) == "Neurofibromatosis type 1"
 
@@ -94,12 +95,12 @@ class TestDatasetCore:
         query = """
         SELECT ?access
         WHERE {
-            ?ds a nf:Dataset ;
+            ?ds a biolink:Dataset ;
                 nf:accessType ?access .
             FILTER(CONTAINS(STR(?ds), "syn29654184"))
         }
         """
-        results = list(datasets_graph.query(query, initNs={"nf": NF}))
+        results = list(datasets_graph.query(query, initNs={"nf": NF, "biolink": BIOLINK}))
         assert len(results) == 1
         assert str(results[0].access) == "Public Access"
 
@@ -108,12 +109,12 @@ class TestDatasetCore:
         query = """
         SELECT ?lic
         WHERE {
-            ?ds a nf:Dataset ;
+            ?ds a biolink:Dataset ;
                 nf:license ?lic .
             FILTER(CONTAINS(STR(?ds), "syn29654184"))
         }
         """
-        results = list(datasets_graph.query(query, initNs={"nf": NF}))
+        results = list(datasets_graph.query(query, initNs={"nf": NF, "biolink": BIOLINK}))
         assert len(results) == 1
         assert isinstance(results[0].lic, URIRef)
         assert "creativecommons" in str(results[0].lic)
@@ -123,12 +124,12 @@ class TestDatasetCore:
         query = """
         SELECT ?doi
         WHERE {
-            ?ds a nf:Dataset ;
+            ?ds a biolink:Dataset ;
                 nf:doi ?doi .
             FILTER(CONTAINS(STR(?ds), "syn29783617"))
         }
         """
-        results = list(datasets_graph.query(query, initNs={"nf": NF}))
+        results = list(datasets_graph.query(query, initNs={"nf": NF, "biolink": BIOLINK}))
         assert len(results) == 1
         assert isinstance(results[0].doi, URIRef)
 
@@ -137,12 +138,12 @@ class TestDatasetCore:
         query = """
         SELECT ?doi
         WHERE {
-            ?ds a nf:Dataset ;
+            ?ds a biolink:Dataset ;
                 nf:doi ?doi .
             FILTER(CONTAINS(STR(?ds), "syn29654184"))
         }
         """
-        results = list(datasets_graph.query(query, initNs={"nf": NF}))
+        results = list(datasets_graph.query(query, initNs={"nf": NF, "biolink": BIOLINK}))
         assert len(results) == 0, "Empty doi should produce no triple"
 
     def test_external_repository_is_iri(self, datasets_graph, namespaces):
@@ -150,12 +151,12 @@ class TestDatasetCore:
         query = """
         SELECT ?repo
         WHERE {
-            ?ds a nf:Dataset ;
+            ?ds a biolink:Dataset ;
                 nf:externalRepositoryUri ?repo .
             FILTER(CONTAINS(STR(?ds), "syn12345678"))
         }
         """
-        results = list(datasets_graph.query(query, initNs={"nf": NF}))
+        results = list(datasets_graph.query(query, initNs={"nf": NF, "biolink": BIOLINK}))
         assert len(results) == 1
         assert isinstance(results[0].repo, URIRef)
         assert "zenodo" in str(results[0].repo)
@@ -165,14 +166,14 @@ class TestDatasetCore:
         query = """
         SELECT ?itemCount ?indCount ?year
         WHERE {
-            ?ds a nf:Dataset ;
+            ?ds a biolink:Dataset ;
                 nf:datasetItemCount ?itemCount ;
                 nf:individualCount ?indCount ;
                 nf:yearPublished ?year .
             FILTER(CONTAINS(STR(?ds), "syn29654184"))
         }
         """
-        results = list(datasets_graph.query(query, initNs={"nf": NF}))
+        results = list(datasets_graph.query(query, initNs={"nf": NF, "biolink": BIOLINK}))
         assert len(results) == 1, "Expected one result for syn29654184"
         row = results[0]
         assert isinstance(row.itemCount, Literal), "datasetItemCount should be Literal"
@@ -189,12 +190,12 @@ class TestDatasetCore:
         query = """
         SELECT ?size
         WHERE {
-            ?ds a nf:Dataset ;
+            ?ds a biolink:Dataset ;
                 nf:datasetSizeInBytes ?size .
             FILTER(CONTAINS(STR(?ds), "syn29654184"))
         }
         """
-        results = list(datasets_graph.query(query, initNs={"nf": NF}))
+        results = list(datasets_graph.query(query, initNs={"nf": NF, "biolink": BIOLINK}))
         assert len(results) == 1
         row = results[0]
         assert isinstance(row.size, Literal)
@@ -211,12 +212,12 @@ class TestDatasetMultiValue:
         query = """
         SELECT ?dt
         WHERE {
-            ?ds a nf:Dataset ;
+            ?ds a biolink:Dataset ;
                 nf:dataType ?dt .
             FILTER(CONTAINS(STR(?ds), "syn29654184"))
         }
         """
-        results = list(datasets_graph.query(query, initNs={"nf": NF}))
+        results = list(datasets_graph.query(query, initNs={"nf": NF, "biolink": BIOLINK}))
         values = [str(r.dt) for r in results]
         assert "count matrix" in values
         assert "gene expression" in values
@@ -227,12 +228,12 @@ class TestDatasetMultiValue:
         query = """
         SELECT ?m
         WHERE {
-            ?ds a nf:Dataset ;
+            ?ds a biolink:Dataset ;
                 nf:manifestation ?m .
             FILTER(CONTAINS(STR(?ds), "syn29654184"))
         }
         """
-        results = list(datasets_graph.query(query, initNs={"nf": NF}))
+        results = list(datasets_graph.query(query, initNs={"nf": NF, "biolink": BIOLINK}))
         values = [str(r.m) for r in results]
         assert "Cutaneous Neurofibroma" in values
         assert "Plexiform Neurofibroma" in values
@@ -242,12 +243,12 @@ class TestDatasetMultiValue:
         query = """
         SELECT ?sp
         WHERE {
-            ?ds a nf:Dataset ;
+            ?ds a biolink:Dataset ;
                 nf:species ?sp .
             FILTER(CONTAINS(STR(?ds), "syn29783617"))
         }
         """
-        results = list(datasets_graph.query(query, initNs={"nf": NF}))
+        results = list(datasets_graph.query(query, initNs={"nf": NF, "biolink": BIOLINK}))
         values = [str(r.sp) for r in results]
         assert "Homo sapiens" in values
         assert "Mus musculus" in values
@@ -257,12 +258,12 @@ class TestDatasetMultiValue:
         query = """
         SELECT ?contrib
         WHERE {
-            ?ds a nf:Dataset ;
+            ?ds a biolink:Dataset ;
                 nf:contributor ?contrib .
             FILTER(CONTAINS(STR(?ds), "syn29654184"))
         }
         """
-        results = list(datasets_graph.query(query, initNs={"nf": NF}))
+        results = list(datasets_graph.query(query, initNs={"nf": NF, "biolink": BIOLINK}))
         values = [str(r.contrib) for r in results]
         assert "Jane Smith" in values
         assert "Bob Jones" in values
@@ -273,12 +274,12 @@ class TestDatasetMultiValue:
         query = """
         SELECT ?funder
         WHERE {
-            ?ds a nf:Dataset ;
+            ?ds a biolink:Dataset ;
                 nf:hasFunder ?funder .
             FILTER(CONTAINS(STR(?ds), "syn29654184"))
         }
         """
-        results = list(datasets_graph.query(query, initNs={"nf": NF}))
+        results = list(datasets_graph.query(query, initNs={"nf": NF, "biolink": BIOLINK}))
         assert len(results) == 1
         assert isinstance(results[0].funder, URIRef)
 

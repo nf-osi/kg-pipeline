@@ -7,7 +7,8 @@
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
 @prefix grel: <http://users.ugent.be/~bjdmeest/function/grel.ttl#> .
-@prefix nf:   <http://nf-osi.github.com/terms#> .
+@prefix nf:      <http://nf-osi.github.com/terms#> .
+@prefix biolink: <https://w3id.org/biolink/vocab/> .
 @prefix map:  <http://nf-osi.github.com/mappings/publications#> .
 
 ################################################################################
@@ -26,7 +27,7 @@ map:PublicationCore a rr:TriplesMap ;
     rdfs:label "Publication Core" ;
     rml:logicalSource map:PublicationsSource ;
     rr:subjectMap [ rr:template "http://nf-osi.github.com/terms#publication/{publicationId}" ; rr:termType rr:IRI ] ;
-    rr:predicateObjectMap [ rr:predicate rdf:type ; rr:objectMap [ rr:constant nf:Publication ; rr:termType rr:IRI ] ] ;
+    rr:predicateObjectMap [ rr:predicate rdf:type ; rr:objectMap [ rr:constant biolink:Publication ; rr:termType rr:IRI ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:publicationId ; rr:objectMap [ rml:reference "publicationId" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:publicationTitle ; rr:objectMap [ rml:reference "publicationTitle" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:abstract ; rr:objectMap [ rml:reference "abstract" ; rr:datatype xsd:string ] ] ;

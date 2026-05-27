@@ -25,7 +25,7 @@ NF = "http://nf-osi.github.com/terms#"
 TYPE_CLASSES = {
     "Gene": ("nf:Gene", "Gene"),
     "Disease": ("nf:DiseaseAnnotation", "Disease Annotation"),
-    "Chemical": ("nf:Chemical", "Chemical"),
+    "Chemical": ("biolink:ChemicalEntity", "Chemical Entity"),
     "Species": ("obo:NCBITaxon_species", "Species"),
     "CellLine": ("nf:CellLine", "Cell Line"),
     "Variant": ("nf:Variant", "Variant"),
@@ -126,10 +126,11 @@ def write_ttl(
     entities: {iri: (entity_type, label)}
     """
     with open(output_path, "w", encoding="utf-8") as f:
-        f.write("@prefix owl:  <http://www.w3.org/2002/07/owl#> .\n")
-        f.write("@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .\n")
-        f.write("@prefix obo:  <http://purl.obolibrary.org/obo/> .\n")
-        f.write(f"@prefix nf:   <{NF}> .\n")
+        f.write("@prefix owl:     <http://www.w3.org/2002/07/owl#> .\n")
+        f.write("@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .\n")
+        f.write("@prefix obo:     <http://purl.obolibrary.org/obo/> .\n")
+        f.write(f"@prefix nf:      <{NF}> .\n")
+        f.write("@prefix biolink: <https://w3id.org/biolink/vocab/> .\n")
         f.write("\n")
 
         # Entity instances (classes are declared in schema/ontology.ttl)
