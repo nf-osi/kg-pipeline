@@ -343,10 +343,14 @@ code{
 
 .demo-grid{
   display:grid;
-  grid-template-columns:1.2fr .8fr;
+  grid-template-columns:1.6fr .7fr;
   gap:1.2rem;
   margin-top:1rem;
   align-items:start;
+}
+
+.slide[data-slide="3"] .demo-grid{
+  margin-top:4.2rem;
 }
 
 .prompt-stack{
@@ -462,9 +466,50 @@ code{
   color:var(--text);
 }
 
+.prompt-card-body{
+  display:grid;
+  grid-template-columns:1fr 1.35fr;
+  gap:.9rem;
+  align-items:start;
+}
+
+.persona-col{
+  padding-right:.9rem;
+  border-right:1px solid rgba(44,94,148,.08);
+}
+
+.persona-label{
+  font-size:.62rem;
+  font-weight:700;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--dim);
+  margin-bottom:.42rem;
+}
+
+.persona-name{
+  font-size:.92rem;
+  font-weight:600;
+  color:var(--text);
+  line-height:1.3;
+  margin-bottom:.42rem;
+}
+
+.persona-why{
+  font-size:.82rem;
+  line-height:1.52;
+  color:var(--muted);
+}
+
+.prompt-col{
+  display:flex;
+  flex-direction:column;
+  gap:.5rem;
+}
+
 .evidence-grid{
   display:grid;
-  grid-template-columns:1.15fr .85fr;
+  grid-template-columns:1.5fr .5fr;
   gap:1.15rem;
   margin-top:1rem;
   align-items:start;
@@ -472,6 +517,7 @@ code{
 
 .evidence-figure{
   margin:0;
+  width:92%;
 }
 
 .evidence-figure img{
@@ -495,19 +541,64 @@ code{
 }
 
 .evidence-note p{
-  font-size:.93rem;
+  font-size:1.04rem;
   line-height:1.55;
   color:var(--muted);
 }
 
 .evidence-quote{
   margin-top:.8rem;
+  margin-bottom:1.2rem;
   padding:.8rem .9rem;
   border-left:3px solid rgba(47,115,214,.28);
   background:rgba(248,251,255,.88);
   color:#2c4058;
-  font-size:.92rem;
+  font-size:1.03rem;
   line-height:1.5;
+}
+
+.sage-grid{
+  display:grid;
+  grid-template-columns:repeat(3, minmax(0, 1fr));
+  gap:1.15rem;
+  margin-top:1rem;
+  align-items:stretch;
+}
+
+.sage-grid > *{
+  height:100%;
+}
+
+.sage-summary-main{
+  display:flex;
+  flex-direction:column;
+}
+
+.sage-summary-main .badge{
+  align-self:flex-start;
+  width:max-content;
+}
+
+.sage-points{
+  list-style:none;
+  display:grid;
+  gap:.65rem;
+  margin-top:.75rem;
+}
+
+.sage-points li{
+  padding:.72rem .78rem;
+  border-radius:14px;
+  border:1px solid rgba(44,94,148,.08);
+  background:rgba(248,251,255,.82);
+  color:#2d4766;
+  font-size:.9rem;
+  line-height:1.45;
+}
+
+.sage-points strong,
+.sage-summary-main strong{
+  color:var(--text);
 }
 
 .type.quick{background:rgba(99,183,255,.14);color:var(--sky)}
@@ -673,6 +764,18 @@ code{
   border-radius:0;
 }
 
+.implementation-title-shot{
+  margin-top:3rem;
+}
+
+.implementation-title-shot img{
+  display:block;
+  width:45%;
+  margin-left:auto;
+  margin-right:auto;
+  height:auto;
+}
+
 .implementation-note{
   margin-top:.75rem;
   padding:0;
@@ -696,6 +799,10 @@ code{
   border-radius:24px;
   border:1px solid var(--line);
   background:linear-gradient(180deg, rgba(255,255,255,.98), rgba(245,249,253,.98));
+}
+
+.slide[data-slide="0"] .timeline-shell{
+  margin-top:5.0rem;
 }
 
 .timeline-track{
@@ -943,11 +1050,14 @@ code{
   .arch-grid,
   .query-strip,
   .demo-grid,
+  .sage-grid,
   .evidence-grid,
   .timeline-track{grid-template-columns:1fr}
   .subgrid,
   .refs-grid,
-  .ref-bottom{grid-template-columns:1fr}
+  .ref-bottom,
+  .prompt-card-body{grid-template-columns:1fr}
+  .persona-col{border-right:none;padding-right:0;border-bottom:1px solid rgba(44,94,148,.08);padding-bottom:.75rem}
   .timeline-track{min-height:0}
   .timeline-track::before,
   .time-card::after{display:none}
@@ -1025,8 +1135,8 @@ code{
       <div class="hero">
         <div class="hero-copy">
           <div class="eyebrow"><span class="dot"></span>Portal Copilot: NF-specific Implementation</div>
-          <h2>NF Portal Assistant implementation provides example details - Part I</h2>
-          <p class="lead">The portal UI selects a registered assistant, while Synapse manages chat sessions, access level, and prompt forwarding to the custom Bedrock-backed agent. The result is a portal assistant that can orchestrate retrieval, reasoning, and portal-aware actions across multiple data sources.</p>
+          <h2>NF Portal Assistant implementation provides example details</h2>
+          
         </div>
       </div>
 
@@ -1045,8 +1155,7 @@ code{
             <h4>Portal wiring and UI component</h4>
             <p>Frontend sources showing the NF portal chat configuration and the shared dialog component that wraps <code>SynapseChat</code>.</p>
             <ul class="ref-links">
-              <li><a href="https://github.com/nf-osi/synapse-web-monorepo/blob/f041368d6ba7d6e73a81e1f2ddf76207d5df75b5/apps/portals/nf/src/config/synapseChatConfig.ts" target="_blank" rel="noopener noreferrer">NF portal chat config</a></li>
-              <li><a href="https://github.com/Sage-Bionetworks/synapse-web-monorepo/blob/main/packages/synapse-react-client/src/components/SynapseChat/SynapsePortalChatDialog.tsx" target="_blank" rel="noopener noreferrer">Portal chat dialog component</a></li>
+              <li><a href="https://github.com/nf-osi/synapse-web-monorepo/blob/f041368d6ba7d6e73a81e1f2ddf76207d5df75b5/apps/portals/nf/src/config/synapseChatConfig.ts" target="_blank" rel="noopener noreferrer">NF portal chat config</a> + <a href="https://github.com/Sage-Bionetworks/synapse-web-monorepo/blob/main/packages/synapse-react-client/src/components/SynapseChat/SynapsePortalChatDialog.tsx" target="_blank" rel="noopener noreferrer">Portal chat dialog component</a></li>
             </ul>
           </div>
         </div>
@@ -1071,6 +1180,20 @@ code{
     <div class="frame">
       <div class="hero">
         <div class="hero-copy">
+          <div class="eyebrow"><span class="dot"></span>Portal Copilot: NF-specific Implementation</div>
+          <h2>NF Portal Assistant implementation provides example details</h2>
+        </div>
+      </div>
+      <figure class="implementation-title-shot">
+        <img src="screenshot.png" alt="Screenshot illustrating NF Portal Assistant implementation details">
+      </figure>
+    </div>
+  </section>
+
+  <section class="slide" data-slide="3">
+    <div class="frame">
+      <div class="hero">
+        <div class="hero-copy">
           <div class="eyebrow"><span class="dot"></span>Live Demo</div>
           <h2>Questions for the Portal Assistant</h2>
           <p class="lead">These prompts emphasize the portal assistant's strengths and special features. They ask for synthesis, deeper evidence, and guided next steps across multiple information sources.</p>
@@ -1084,7 +1207,16 @@ code{
               <span class="prompt-tag">Prompt 1</span>
               <button class="copy-btn" type="button">Copy</button>
             </div>
-            <code>Which mpnst cell lines are suitable for drug screen?</code>
+            <div class="prompt-card-body">
+              <div class="persona-col">
+                <div class="persona-label">Persona</div>
+                <div class="persona-name">Drug Discovery Researcher</div>
+                <div class="persona-why">Searching for validated resources to begin a screening campaign</div>
+              </div>
+              <div class="prompt-col">
+                <code>Which mpnst cell lines are suitable for drug screen?</code>
+              </div>
+            </div>
           </div>
 
           <div class="prompt-card">
@@ -1092,7 +1224,16 @@ code{
               <span class="prompt-tag">Prompt 2</span>
               <button class="copy-btn" type="button">Copy</button>
             </div>
-            <code>I need isogenic cell line pairs that differ only in NF1 status</code>
+            <div class="prompt-card-body">
+              <div class="persona-col">
+                <div class="persona-label">Persona</div>
+                <div class="persona-name">Bench Scientist</div>
+                <div class="persona-why">Finding matched pairs to isolate a single genetic variable</div>
+              </div>
+              <div class="prompt-col">
+                <code>I need isogenic cell line pairs that differ only in NF1 status</code>
+              </div>
+            </div>
           </div>
 
           <div class="prompt-card">
@@ -1100,7 +1241,16 @@ code{
               <span class="prompt-tag">Prompt 3</span>
               <button class="copy-btn" type="button">Copy</button>
             </div>
-            <code>I work on exon skipping therapy, what models are relevant for me?</code>
+            <div class="prompt-card-body">
+              <div class="persona-col">
+                <div class="persona-label">Persona</div>
+                <div class="persona-name">Gene Therapy Developer</div>
+                <div class="persona-why">Connecting their approach to relevant biological models</div>
+              </div>
+              <div class="prompt-col">
+                <code>I work on exon skipping therapy, what models are relevant for me?</code>
+              </div>
+            </div>
           </div>
 
         </div>
@@ -1110,10 +1260,10 @@ code{
             <h3>Why these do not work with OpenSearch</h3>
             <p>Each prompt depends on assistant behaviors that go beyond fast ranked retrieval over indexed metadata.</p>
             <ul class="note-list">
-              <li><strong>Cross-source synthesis:</strong> the answer needs information to be connected across different sources.</li>
-              <li><strong>Deeper evidence:</strong> asks for comparative judgment, not a list of matching records.</li>
-              <li><strong>Guided action:</strong> the expected output includes navigation help and suggested next steps.</li>
-              <li><strong>Reasoned ranking:</strong> the assistant has to explain why one starting point is better than another.</li>
+              <li><strong>Cross-source synthesis:</strong> the answer needs information to be connected across entities and to other sources like literature.</li>
+              <li><strong>Personalization and domain understanding:</strong> needs implict interpretation of question and results, comparative judgment.</li>
+              <li><strong>Reasoning:</strong> the assistant has to "do research" to find the right answer, which requires analytical steps.</li>
+              <li><strong>Guided action:</strong> useful output includes explanation and suggested next steps.</li>
             </ul>
           </div>
         </div>
@@ -1121,13 +1271,13 @@ code{
     </div>
   </section>
 
-  <section class="slide" data-slide="3">
+  <section class="slide" data-slide="4">
     <div class="frame">
       <div class="hero">
         <div class="hero-copy">
           <div class="eyebrow"><span class="dot"></span>Funder Guidance</div>
           <h2>External funder guidance reinforces the need for reasoning, synthesis, and deeper data</h2>
-          <p class="lead">These notes were provided to us by the external funder (Gilbert Family Foundation). The screenshot highlights example search and discovery questions that are not simple search or filter tasks and instead require interpretation across sources and concepts.</p>
+          <p class="lead">These notes were provided to us by the external funder to highlight complex search questions.</p>
         </div>
       </div>
 
@@ -1139,19 +1289,19 @@ code{
         <div class="evidence-note">
           <h3>Why this matters</h3>
           <div class="evidence-quote">“nor was it easy for me to answer these questions from a filtering or grouping perspective”</div>
-          <p>The examples in these notes are strong evidence that <strong>the expected user experience goes beyond what search can do</strong>. They ask for answers that need synthesis, interpretation, judgment, and access to scientific evidence (e.g. from publications) or other deeper data sources.</p>
+          <p>The examples in these notes are strong evidence that <strong>the expected user experience goes beyond what search can do</strong>. They ask for answers that need synthesis, interpretation, judgment, and access to scientific evidence (e.g. from publications) or the ability to dig into other data sources.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <section class="slide" data-slide="4">
+  <section class="slide" data-slide="5">
     <div class="frame">
       <div class="hero">
         <div class="hero-copy">
           <div class="eyebrow"><span class="dot"></span>Portal Search & Discovery Strategy</div>
           <h1>OpenSearch and an AI Portal Copilot solve different classes of questions</h1>
-          <p class="lead">The search box should stay fast, cheap, and familiar. The assistant should step in when the user needs synthesis across multiple sources, deeper retrieval than indexed metadata, or a guided next action.</p>
+          <p class="lead">The search box should stay fast, cheap, and familiar. The assistant should step in when the user needs synthesis across multiple sources, deeper retrieval from sources like publications, or a guided next action.</p>
         </div>
       </div>
 
@@ -1193,6 +1343,53 @@ code{
       </div>
 
       
+    </div>
+  </section>
+
+  <section class="slide" data-slide="6">
+    <div class="frame">
+      <div class="hero">
+        <div class="hero-copy">
+          <div class="eyebrow"><span class="dot"></span>Sage Brain</div>
+          <h2>The same Portal Copilot interface can also power Sage Brain</h2>
+          <p class="lead">The NF Portal Assistant demonstrates the interface pattern. `Sage Brain` can use the same Portal Copilot experience, but with a much more sophisticated knowledge graph and both a broader and deeper scientific knowledge base behind it.</p>
+        </div>
+      </div>
+
+      <div class="sage-grid">
+        <article class="panel search">
+          <div class="panel-tag">Same Interface</div>
+          <h3>Portal Copilot can stay consistent while the underlying knowledge becomes far richer</h3>
+          <ul class="feature-list">
+            <li>Reuse the Portal Copilot interaction model for search, explanation, and next-step guidance</li>
+            <li>Apply the same chat-driven pattern across program boundaries instead of limiting it to one disease portal</li>
+            <li>Support scientific question answering, exploratory analysis, and hypothesis generation in one interface</li>
+          </ul>
+        </article>
+
+        <article class="panel agent">
+          <div class="panel-tag">What Sage Brain Adds</div>
+          <h3>A larger and more connected graph-backed scientific substrate than the NF portal alone</h3>
+          <ul class="feature-list">
+            <li>Much more sophisticated knowledge graph structure</li>
+            <li><strong>Adds (re)processed data</strong>, not only metadata</li>
+            <li>Additional ontologies and curated <strong>cross-program connections</strong></li>
+            <li>All publications, computational tools, governance, and policy context</li>
+            <li>Scientific reasoning across genes, clinical traits, and other entities</li>
+          </ul>
+        </article>
+
+        <article class="panel search sage-summary-main">
+          <span class="badge front" style="margin-bottom:.9rem">Science Workstream</span>
+          <h3>How a scientific user might use Sage Brain</h3>
+          <ul class="sage-points">
+            <li><strong>Generate new hypotheses</strong> by connecting signals across genes, traits, diseases, and analytical results.</li>
+            <li><strong>Understand new knowledge gaps</strong> by seeing where evidence is thin, inconsistent, or missing across programs.</li>
+            <li><strong>Find the most relevant processed data and literature</strong> without starting from raw metadata alone.</li>
+            <li><strong>Ask broader scientific questions</strong> that cut across program boundaries instead of staying inside one portal or disease area.</li>
+          </ul>
+        </article>
+      </div>
     </div>
   </section>
 
