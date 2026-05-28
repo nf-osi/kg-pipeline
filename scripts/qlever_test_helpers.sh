@@ -4,7 +4,7 @@
 #   SERVER_SERVICE  — docker compose service name
 #
 # Provides:
-#   ENDPOINT, query(), server lifecycle (start/wait/stop via trap)
+#   ENDPOINT, query(), query_expect_nonzero_count(), server lifecycle (start/wait/stop via trap)
 #   LOG_FILE — all output is tee'd here for review
 
 set -euo pipefail
@@ -72,6 +72,28 @@ query() {
     return 1
   fi
   echo "$body"
+  echo
+}
+
+query_expect_nonzero_count() {
+  local description="$1" sparql="$2"
+  echo "--- $description ---"
+  response=$(curl -s -w "\n%{http_code}" "$ENDPOINT" \
+    --data-urlencode "query=$sparql" \
+    --data-urlencode "action=tsv_export")
+  http_code=$(echo "$response" | tail -1)
+  body=$(echo "$response" | sed '$d')
+  if [ "$http_code" -ne 200 ]; then
+    echo "FAIL (HTTP $http_code)"
+    echo "$body" | head -5
+    return 1
+  fi
+  echo "$body"
+  count=$(echo "$body" | awk 'NR==2 {print $1}')
+  if ! [[ "$count" =~ ^[0-9]+$ ]] || [ "$count" -eq 0 ]; then
+    echo "FAIL: expected non-zero count, got '${count:-<empty>}'"
+    return 1
+  fi
   echo
 }
 

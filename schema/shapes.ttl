@@ -3,6 +3,7 @@
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
 @prefix nf:   <http://nf-osi.github.com/terms#> .
+@prefix biolink: <https://w3id.org/biolink/vocab/> .
 @prefix shapes: <http://nf-osi.github.com/shapes#> .
 
 ################################################################################
@@ -15,6 +16,11 @@ shapes:FileShape a sh:NodeShape ;
     rdfs:comment "Expected properties for File instances." ;
     sh:property [
         sh:path nf:name ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path rdfs:label ;
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
     ] ;
@@ -151,6 +157,11 @@ shapes:StudyShape a sh:NodeShape ;
     rdfs:comment "Expected properties for Study instances." ;
     sh:property [
         sh:path nf:name ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path rdfs:label ;
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
     ] ;
@@ -742,6 +753,11 @@ shapes:BiobankShape a sh:NodeShape ;
         sh:maxCount 1 ;
     ] ;
     sh:property [
+        sh:path rdfs:label ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
         sh:path nf:biobankURL ;
         sh:nodeKind sh:IRI ;
         sh:maxCount 1 ;
@@ -786,7 +802,7 @@ shapes:BiobankShape a sh:NodeShape ;
 ################################################################################
 
 shapes:PublicationShape a sh:NodeShape ;
-    sh:targetClass nf:Publication ;
+    sh:targetClass biolink:Publication ;
     rdfs:label "Publication shape" ;
     rdfs:comment "Expected properties for Publication instances." ;
     sh:property [
@@ -837,6 +853,11 @@ shapes:PublicationShape a sh:NodeShape ;
     sh:property [
         sh:path nf:authors ;
         sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nf:inFullTextIndex ;
+        sh:datatype xsd:boolean ;
+        sh:maxCount 1 ;
     ] .
 
 ################################################################################
@@ -854,6 +875,11 @@ shapes:InvestigatorShape a sh:NodeShape ;
     ] ;
     sh:property [
         sh:path nf:name ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path rdfs:label ;
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
     ] ;
@@ -888,6 +914,11 @@ shapes:FunderShape a sh:NodeShape ;
     ] ;
     sh:property [
         sh:path nf:name ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path rdfs:label ;
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
     ] .
@@ -1313,6 +1344,11 @@ shapes:InitiativeShape a sh:NodeShape ;
         sh:maxCount 1 ;
     ] ;
     sh:property [
+        sh:path rdfs:label ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
         sh:path nf:abbreviation ;
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
@@ -1342,6 +1378,11 @@ shapes:DatasetShape a sh:NodeShape ;
     rdfs:comment "Expected properties for Dataset instances." ;
     sh:property [
         sh:path nf:name ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path rdfs:label ;
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
     ] ;
@@ -1494,6 +1535,11 @@ shapes:ToolShape a sh:NodeShape ;
     ] ;
     sh:property [
         sh:path nf:name ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path rdfs:label ;
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
     ] ;

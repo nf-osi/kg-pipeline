@@ -447,7 +447,7 @@ nf:ObservationExtraction a prov:Activity ;
 
 nf:name a owl:DatatypeProperty ;
     rdfs:label "name" ;
-    rdfs:comment "Name of a resource." ;
+    rdfs:comment "Name of a resource. For RDF-friendly systems, the same data is available in rdfs:label." ;
     rdfs:range xsd:string .
 
 nf:parentStudy a owl:ObjectProperty ;
@@ -1676,6 +1676,12 @@ nf:authors a owl:DatatypeProperty ;
     rdfs:comment "Authors of the publication." ;
     rdfs:domain biolink:Publication ;
     rdfs:range xsd:string .
+
+nf:inFullTextIndex a owl:DatatypeProperty ;
+    rdfs:label "inFullTextIndex" ;
+    rdfs:comment "Whether the publication is included in the project full-text index." ;
+    rdfs:domain biolink:Publication ;
+    rdfs:range xsd:boolean .
 
 nf:hasPublication a owl:ObjectProperty ;
     rdfs:label "hasPublication" ;

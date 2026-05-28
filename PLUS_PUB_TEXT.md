@@ -7,6 +7,10 @@ annotations from 139 NF-related publications (sourced via PubTator 3.0) so
 that the KG endpoint can answer queries like "which genes are mentioned
 together in neurofibromatosis treatment?"
 
+> [!IMPORTANT]
+> The current full-text index is built from `subsets/tools-portal-pmc-derivatives-ok.tsv`.
+> In other words, publications considered "in the full-text index" correspond to the `--derivatives-ok` set, not the narrower `--permissive` set.
+
 ## Pipeline overview
 
 ```
@@ -79,10 +83,12 @@ record_id	[PMID{pmid}-{passage_num}-{section_type}] passage_text
 
 ## Companion RDF
 
-`text_entities.ttl` provides entity instance triples (type + label) so that
-entities referenced in the wordsfile exist in the RDF graph for joins:
+`text_entities.ttl` provides entity instance triples (type + label), plus
+publication membership in the full-text index, so that entities referenced in
+the wordsfile exist in the RDF graph for joins:
 
 ```turtle
+<https://pubmed.ncbi.nlm.nih.gov/16822308> nf:inFullTextIndex true .
 <https://www.ncbi.nlm.nih.gov/gene/4763> a nf:Gene ; rdfs:label "NF1" .
 <http://id.nlm.nih.gov/mesh/D009456> a nf:DiseaseAnnotation ; rdfs:label "Neurofibromatosis 1" .
 <http://purl.obolibrary.org/obo/NCBITaxon_9606> a obo:NCBITaxon_species ; rdfs:label "Homo sapiens" .
