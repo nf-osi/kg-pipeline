@@ -145,6 +145,10 @@ CC-BY-NC-ND is excluded from both sets (no derivatives allowed).
 
 **`scripts/select_pubs.py`** filters publications by license set:
 
+> [!IMPORTANT]
+> The current full-text index is built from `subsets/tools-portal-pmc-derivatives-ok.tsv`.
+> In other words, publications considered "in the full-text index" correspond to the `--derivatives-ok` set, not the narrower `--permissive` set.
+
 ```bash
 python scripts/select_pubs.py --permissive      # CC-BY, CC-BY-4.0, Public Domain (124 papers)
 python scripts/select_pubs.py --derivatives-ok  # + CC-BY-NC, CC-BY-NC-SA (139 papers)

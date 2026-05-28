@@ -119,6 +119,7 @@ def escape_ttl(s: str) -> str:
 
 def write_ttl(
     entities: dict[str, tuple[str, str]],
+    publication_iris: set[str],
     output_path: Path,
 ) -> None:
     """Write companion RDF as Turtle.
@@ -132,6 +133,12 @@ def write_ttl(
         f.write(f"@prefix nf:      <{NF}> .\n")
         f.write("@prefix biolink: <https://w3id.org/biolink/vocab/> .\n")
         f.write("\n")
+
+        for pub_iri in sorted(publication_iris):
+            f.write(f"<{pub_iri}> nf:inFullTextIndex true .\n")
+
+        if publication_iris:
+            f.write("\n")
 
         # Entity instances (classes are declared in schema/ontology.ttl)
         for iri in sorted(entities):
@@ -193,8 +200,9 @@ def main():
     docs_path = out_dir / "docsfile.tsv"
     ttl_path = out_dir / "text_entities.ttl"
 
-    # Collect unique entities for TTL: {iri: (type, label)}
+    # Collect unique entities for TTL: {iri: (entity_type, label)}
     all_entities: dict[str, tuple[str, str]] = {}
+    indexed_publications: set[str] = set()
 
     record_id = 0
     total_words = 0
@@ -222,6 +230,7 @@ def main():
                 if not pmid:
                     continue
                 pub_iri = f"https://pubmed.ncbi.nlm.nih.gov/{pmid}"
+                indexed_publications.add(pub_iri)
 
                 for passage_idx, passage in enumerate(pub.get("passages", [])):
                     infons = passage.get("infons", {})
@@ -293,7 +302,7 @@ def main():
                             all_entities[iri] = (entity_type, label)
 
     # Write companion RDF
-    write_ttl(all_entities, ttl_path)
+    write_ttl(all_entities, indexed_publications, ttl_path)
 
     # Summary
     print(f"Files processed:    {files_processed}")
