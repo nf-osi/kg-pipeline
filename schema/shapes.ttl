@@ -3,6 +3,7 @@
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
 @prefix nf:   <http://nf-osi.github.com/terms#> .
+@prefix biolink: <https://w3id.org/biolink/vocab/> .
 @prefix shapes: <http://nf-osi.github.com/shapes#> .
 
 ################################################################################
@@ -801,7 +802,7 @@ shapes:BiobankShape a sh:NodeShape ;
 ################################################################################
 
 shapes:PublicationShape a sh:NodeShape ;
-    sh:targetClass nf:Publication ;
+    sh:targetClass biolink:Publication ;
     rdfs:label "Publication shape" ;
     rdfs:comment "Expected properties for Publication instances." ;
     sh:property [
@@ -852,6 +853,11 @@ shapes:PublicationShape a sh:NodeShape ;
     sh:property [
         sh:path nf:authors ;
         sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path nf:inFullTextIndex ;
+        sh:datatype xsd:boolean ;
+        sh:maxCount 1 ;
     ] .
 
 ################################################################################

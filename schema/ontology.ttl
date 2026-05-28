@@ -1677,6 +1677,12 @@ nf:authors a owl:DatatypeProperty ;
     rdfs:domain biolink:Publication ;
     rdfs:range xsd:string .
 
+nf:inFullTextIndex a owl:DatatypeProperty ;
+    rdfs:label "inFullTextIndex" ;
+    rdfs:comment "Whether the publication is included in the project full-text index." ;
+    rdfs:domain biolink:Publication ;
+    rdfs:range xsd:boolean .
+
 nf:hasPublication a owl:ObjectProperty ;
     rdfs:label "hasPublication" ;
     rdfs:comment "Links a development record to a publication." ;

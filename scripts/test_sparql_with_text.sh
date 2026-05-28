@@ -113,13 +113,20 @@ query "Text + graph join: genes mentioned with neurofibromatosis" \
   ORDER BY DESC(?mentions)
   LIMIT 10"
 
-# 13. Multi-word search — passages containing both "clinical" and "trial"
+# 13. Indexed publications are marked in RDF
+query_expect_nonzero_count "Indexed publications: nf:inFullTextIndex true" \
+  "PREFIX nf: <http://nf-osi.github.com/terms#>
+  SELECT (COUNT(?pub) AS ?count) WHERE {
+    ?pub nf:inFullTextIndex true
+  }"
+
+# 14. Multi-word search — passages containing both "clinical" and "trial"
 query "Multi-word search: clinical trial*" \
   "SELECT (COUNT(?text) AS ?count) WHERE {
     ?text ql:contains-word \"clinical trial*\"
   }"
 
-# 14. Publication passage count — entity-only via wildcard trick
+# 15. Publication passage count — entity-only via wildcard trick
 query "Publication passages: PMID 16822308" \
   "SELECT (COUNT(DISTINCT ?text) AS ?passages) WHERE {
     ?text ql:contains-entity <https://pubmed.ncbi.nlm.nih.gov/16822308> .
