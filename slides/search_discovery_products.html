@@ -1,0 +1,1290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>NF Portal Assistant</title>
+<style>
+*,
+*::before,
+*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:#f8fafc;
+  --bg-deep:#eef4fb;
+  --panel:#ffffff;
+  --panel-2:#f6f9fc;
+  --panel-3:#edf3f9;
+  --line:rgba(44,94,148,.16);
+  --line-strong:rgba(44,94,148,.28);
+  --text:#182433;
+  --muted:#4f647b;
+  --dim:#77889d;
+  --sky:#2f73d6;
+  --teal:#138f7a;
+  --gold:#9a6a00;
+  --rose:#be5874;
+  --shadow:0 24px 80px rgba(25,50,80,.10);
+}
+
+html,body{
+  height:100%;
+  overflow:hidden;
+  font-family:"Avenir Next","Trebuchet MS","Segoe UI",sans-serif;
+  background:
+    radial-gradient(circle at top left, rgba(47,115,214,.12), transparent 28%),
+    radial-gradient(circle at 82% 18%, rgba(19,143,122,.10), transparent 26%),
+    radial-gradient(circle at 50% 120%, rgba(190,88,116,.08), transparent 36%),
+    linear-gradient(180deg, #fbfdff 0%, #f4f8fc 54%, #edf3f9 100%);
+  color:var(--text);
+}
+
+body::before,
+body::after{
+  content:"";
+  position:fixed;
+  inset:auto;
+  border-radius:999px;
+  pointer-events:none;
+  filter:blur(16px);
+  opacity:.75;
+}
+
+body::before{
+  width:22rem;
+  height:22rem;
+  right:-6rem;
+  top:-5rem;
+  background:radial-gradient(circle, rgba(47,115,214,.14), transparent 70%);
+}
+
+body::after{
+  width:24rem;
+  height:24rem;
+  left:-7rem;
+  bottom:-8rem;
+  background:radial-gradient(circle, rgba(19,143,122,.10), transparent 70%);
+}
+
+.deck{position:relative;width:100%;height:100%}
+.slide{
+  position:absolute;
+  inset:0;
+  padding:3.25rem 4rem 4.25rem;
+  display:flex;
+  flex-direction:column;
+  gap:1.5rem;
+  opacity:0;
+  pointer-events:none;
+  transform:translateX(42px);
+  transition:opacity .45s ease,transform .45s ease;
+}
+
+.slide.active{
+  opacity:1;
+  pointer-events:auto;
+  transform:translateX(0);
+}
+
+.slide.exit{
+  opacity:0;
+  transform:translateX(-42px);
+}
+
+.frame{
+  position:relative;
+  width:100%;
+  height:100%;
+  border:1px solid rgba(44,94,148,.12);
+  border-radius:28px;
+  padding:2.2rem 2.4rem;
+  background:linear-gradient(180deg, rgba(255,255,255,.94), rgba(248,251,255,.96));
+  box-shadow:var(--shadow);
+  overflow:hidden;
+}
+
+.frame::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:
+    linear-gradient(90deg, rgba(34,76,120,.03) 1px, transparent 1px),
+    linear-gradient(rgba(34,76,120,.03) 1px, transparent 1px);
+  background-size:32px 32px;
+  mask-image:linear-gradient(180deg, rgba(255,255,255,.8), transparent 90%);
+  pointer-events:none;
+}
+
+.frame::after{
+  content:"";
+  position:absolute;
+  inset:1rem;
+  border:1px solid rgba(44,94,148,.08);
+  border-radius:22px;
+  pointer-events:none;
+}
+
+.slide.architecture-slide .frame{
+  background:#ffffff;
+}
+
+.eyebrow{
+  display:inline-flex;
+  align-items:center;
+  gap:.55rem;
+  width:max-content;
+  font-size:.72rem;
+  font-weight:700;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  color:var(--sky);
+  padding:.42rem .78rem;
+  border:1px solid rgba(47,115,214,.16);
+  border-radius:999px;
+  background:rgba(255,255,255,.78);
+}
+
+.eyebrow .dot{
+  width:.42rem;
+  height:.42rem;
+  border-radius:999px;
+  background:var(--teal);
+  box-shadow:0 0 10px rgba(19,143,122,.20);
+}
+
+.hero{
+  display:flex;
+  justify-content:space-between;
+  gap:2rem;
+  align-items:flex-start;
+  margin-bottom:.35rem;
+}
+
+.hero-copy{max-width:48rem}
+
+h1{
+  font-family:"Iowan Old Style","Palatino Linotype","Book Antiqua",serif;
+  font-size:3.2rem;
+  line-height:1.02;
+  letter-spacing:-.04em;
+  margin-top:.9rem;
+  margin-bottom:.7rem;
+}
+
+h2{
+  font-family:"Iowan Old Style","Palatino Linotype","Book Antiqua",serif;
+  font-size:2.7rem;
+  line-height:1.04;
+  letter-spacing:-.04em;
+  margin-top:.85rem;
+  margin-bottom:.55rem;
+}
+
+.lead{
+  font-size:1.08rem;
+  line-height:1.7;
+  color:var(--muted);
+  max-width:54rem;
+}
+
+code{
+  font-family:"SFMono-Regular","Consolas","Liberation Mono",monospace;
+  font-size:.92em;
+  color:#244b7c;
+}
+
+.comparison-grid{
+  display:grid;
+  grid-template-columns:1fr 1.15fr;
+  gap:1.35rem;
+  margin-top:.6rem;
+}
+
+.panel{
+  position:relative;
+  padding:1.45rem 1.5rem 1.35rem;
+  border-radius:24px;
+  border:1px solid var(--line);
+  background:linear-gradient(180deg, rgba(255,255,255,.98), rgba(243,248,253,.98));
+  overflow:hidden;
+}
+
+.panel::before{
+  content:"";
+  position:absolute;
+  inset:0 auto auto 0;
+  width:100%;
+  height:3px;
+  background:linear-gradient(90deg, transparent, rgba(47,115,214,.18), transparent);
+}
+
+.panel.search{box-shadow:inset 0 0 0 1px rgba(47,115,214,.06)}
+.panel.agent{box-shadow:inset 0 0 0 1px rgba(19,143,122,.08)}
+
+.panel-tag{
+  display:inline-flex;
+  align-items:center;
+  gap:.45rem;
+  font-size:.68rem;
+  font-weight:700;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  padding:.38rem .7rem;
+  border-radius:999px;
+  margin-bottom:.9rem;
+}
+
+.search .panel-tag{
+  color:var(--sky);
+  background:rgba(99,183,255,.12);
+  border:1px solid rgba(99,183,255,.18);
+}
+
+.agent .panel-tag{
+  color:var(--teal);
+  background:rgba(85,224,195,.12);
+  border:1px solid rgba(85,224,195,.18);
+}
+
+.panel h3{
+  font-size:1.5rem;
+  line-height:1.15;
+  margin-bottom:.55rem;
+}
+
+.panel-copy{
+  color:var(--muted);
+  font-size:1rem;
+  line-height:1.62;
+  margin-bottom:1rem;
+}
+
+.feature-list{
+  list-style:none;
+  display:grid;
+  gap:.62rem;
+  margin-bottom:1rem;
+}
+
+.feature-list li{
+  position:relative;
+  padding-left:1.35rem;
+  color:#2c4058;
+  font-size:1rem;
+  line-height:1.45;
+}
+
+.feature-list li::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:.56rem;
+  width:.45rem;
+  height:.45rem;
+  border-radius:999px;
+  background:currentColor;
+}
+
+.search .feature-list li{color:#31527e}
+.agent .feature-list li{color:#1c5f58}
+
+.mini-note{
+  padding:.9rem 1rem;
+  border-radius:16px;
+  border:1px solid rgba(44,94,148,.10);
+  background:rgba(243,248,253,.88);
+}
+
+.mini-label{
+  font-size:.68rem;
+  font-weight:700;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--dim);
+  margin-bottom:.38rem;
+}
+
+.mini-note p{
+  font-size:.94rem;
+  line-height:1.5;
+  color:var(--muted);
+}
+
+.query-strip{
+  display:grid;
+  grid-template-columns:repeat(4, 1fr);
+  gap:1rem;
+  margin-top:1.25rem;
+}
+
+.query-card{
+  padding:1rem 1rem 1.05rem;
+  border-radius:18px;
+  background:linear-gradient(180deg, rgba(255,255,255,.96), rgba(243,248,253,.96));
+  border:1px solid rgba(44,94,148,.10);
+}
+
+.query-card .type{
+  display:inline-block;
+  margin-bottom:.55rem;
+  padding:.28rem .55rem;
+  border-radius:999px;
+  font-size:.66rem;
+  font-weight:700;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+}
+
+.query-card p{
+  font-size:.94rem;
+  line-height:1.45;
+  color:#2a3d55;
+}
+
+.demo-grid{
+  display:grid;
+  grid-template-columns:1.2fr .8fr;
+  gap:1.2rem;
+  margin-top:1rem;
+  align-items:start;
+}
+
+.prompt-stack{
+  display:grid;
+  gap:.85rem;
+}
+
+.prompt-card{
+  padding:1rem 1.05rem;
+  border-radius:18px;
+  border:1px solid rgba(44,94,148,.10);
+  background:linear-gradient(180deg, rgba(255,255,255,.98), rgba(243,248,253,.96));
+}
+
+.prompt-top{
+  display:flex;
+  justify-content:space-between;
+  gap:1rem;
+  align-items:center;
+  margin-bottom:.55rem;
+}
+
+.prompt-tag{
+  display:inline-flex;
+  align-items:center;
+  gap:.4rem;
+  padding:.28rem .55rem;
+  border-radius:999px;
+  font-size:.66rem;
+  font-weight:700;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--teal);
+  background:rgba(85,224,195,.14);
+}
+
+.prompt-copy{
+  font-size:.68rem;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  color:var(--dim);
+}
+
+.copy-btn{
+  appearance:none;
+  border:1px solid rgba(44,94,148,.12);
+  background:rgba(255,255,255,.86);
+  color:var(--sky);
+  border-radius:999px;
+  padding:.34rem .6rem;
+  font-size:.66rem;
+  font-weight:700;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  cursor:pointer;
+  transition:background .15s ease,color .15s ease,border-color .15s ease;
+}
+
+.copy-btn:hover{
+  background:rgba(237,243,249,.96);
+  border-color:rgba(44,94,148,.18);
+}
+
+.prompt-card code{
+  display:block;
+  white-space:normal;
+  font-size:1rem;
+  line-height:1.5;
+  color:#22466f;
+}
+
+.note-side{
+  display:grid;
+  gap:.85rem;
+}
+
+.note-panel-side{
+  padding:1rem 1.05rem;
+  border-radius:20px;
+  border:1px solid rgba(44,94,148,.10);
+  background:linear-gradient(180deg, rgba(238,244,251,.98), rgba(229,238,248,.98));
+}
+
+.note-panel-side h3{
+  font-size:1.1rem;
+  margin-bottom:.45rem;
+}
+
+.note-panel-side p{
+  font-size:.92rem;
+  line-height:1.55;
+  color:var(--muted);
+}
+
+.note-list{
+  list-style:none;
+  display:grid;
+  gap:.7rem;
+  margin-top:.75rem;
+}
+
+.note-list li{
+  padding:.78rem .82rem;
+  border-radius:14px;
+  border:1px solid rgba(44,94,148,.08);
+  background:rgba(255,255,255,.72);
+  color:#2e4765;
+  font-size:.9rem;
+  line-height:1.48;
+}
+
+.note-list strong{
+  color:var(--text);
+}
+
+.evidence-grid{
+  display:grid;
+  grid-template-columns:1.15fr .85fr;
+  gap:1.15rem;
+  margin-top:1rem;
+  align-items:start;
+}
+
+.evidence-figure{
+  margin:0;
+}
+
+.evidence-figure img{
+  display:block;
+  width:100%;
+  height:auto;
+  border-radius:12px;
+  border:1px solid rgba(44,94,148,.10);
+}
+
+.evidence-note{
+  padding:1rem 1.05rem;
+  border-radius:18px;
+  border:1px solid rgba(44,94,148,.10);
+  background:linear-gradient(180deg, rgba(255,255,255,.98), rgba(243,248,253,.96));
+}
+
+.evidence-note h3{
+  font-size:1.12rem;
+  margin-bottom:.45rem;
+}
+
+.evidence-note p{
+  font-size:.93rem;
+  line-height:1.55;
+  color:var(--muted);
+}
+
+.evidence-quote{
+  margin-top:.8rem;
+  padding:.8rem .9rem;
+  border-left:3px solid rgba(47,115,214,.28);
+  background:rgba(248,251,255,.88);
+  color:#2c4058;
+  font-size:.92rem;
+  line-height:1.5;
+}
+
+.type.quick{background:rgba(99,183,255,.14);color:var(--sky)}
+.type.syn{background:rgba(255,203,107,.14);color:var(--gold)}
+.type.deep{background:rgba(85,224,195,.14);color:var(--teal)}
+.type.action{background:rgba(255,140,168,.14);color:var(--rose)}
+
+.bottom-line{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:1rem;
+  margin-top:1.15rem;
+  padding-top:.95rem;
+  border-top:1px solid rgba(44,94,148,.10);
+  color:var(--muted);
+  font-size:.94rem;
+}
+
+.bottom-line strong{color:var(--text)}
+
+.arch-grid{
+  display:grid;
+  grid-template-columns:1.05fr .95fr;
+  gap:1.35rem;
+  margin-top:.75rem;
+  align-items:start;
+}
+
+.arch-stack{
+  display:grid;
+  gap:1rem;
+}
+
+.tier{
+  position:relative;
+  padding:1.1rem 1.15rem 1.15rem;
+  border-radius:22px;
+  border:1px solid var(--line);
+  background:linear-gradient(180deg, rgba(255,255,255,.98), rgba(243,248,253,.98));
+}
+
+.tier::after{
+  content:"";
+  position:absolute;
+  left:1.15rem;
+  right:1.15rem;
+  bottom:-.55rem;
+  height:.55rem;
+  border-left:1px dashed rgba(44,94,148,.14);
+  border-right:1px dashed rgba(44,94,148,.14);
+  opacity:.55;
+}
+
+.tier:last-child::after{display:none}
+
+.tier-label{
+  display:flex;
+  justify-content:space-between;
+  gap:1rem;
+  align-items:center;
+  margin-bottom:.7rem;
+}
+
+.tier-label h3{
+  font-size:1.22rem;
+}
+
+.badge{
+  font-size:.68rem;
+  font-weight:700;
+  letter-spacing:.11em;
+  text-transform:uppercase;
+  padding:.34rem .58rem;
+  border-radius:999px;
+}
+
+.badge.front{color:var(--sky);background:rgba(99,183,255,.13)}
+.badge.back{color:var(--gold);background:rgba(255,203,107,.12)}
+.badge.data{color:var(--teal);background:rgba(85,224,195,.12)}
+
+.tier p{
+  color:var(--muted);
+  line-height:1.55;
+  font-size:.96rem;
+}
+
+.inline-code{
+  display:inline-block;
+  margin-top:.65rem;
+  padding:.45rem .62rem;
+  border-radius:10px;
+  border:1px solid rgba(44,94,148,.10);
+  background:rgba(237,243,249,.95);
+  color:#244b7c;
+  font-family:"SFMono-Regular","Consolas","Liberation Mono",monospace;
+  font-size:.86rem;
+}
+
+.subgrid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:.75rem;
+  margin-top:.8rem;
+}
+
+.subcard{
+  padding:.8rem .85rem;
+  border-radius:15px;
+  background:rgba(237,243,249,.86);
+  border:1px solid rgba(44,94,148,.08);
+}
+
+.subcard h4{
+  font-size:.82rem;
+  color:var(--text);
+  margin-bottom:.35rem;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+}
+
+.subcard p{
+  font-size:.86rem;
+  line-height:1.45;
+}
+
+.flow-panel{
+  padding:1.25rem 1.25rem 1.2rem;
+  border-radius:24px;
+  border:none;
+  background:transparent;
+}
+
+.flow-head{
+  display:flex;
+  justify-content:space-between;
+  gap:1rem;
+  align-items:flex-end;
+  margin-bottom:1rem;
+}
+
+.flow-head h3{
+  font-size:1.45rem;
+}
+
+.flow-head p{
+  color:var(--muted);
+  font-size:.96rem;
+  line-height:1.5;
+  max-width:20rem;
+}
+
+.implementation-figure{
+  margin:0;
+}
+
+.implementation-figure img{
+  display:block;
+  width:70%;
+  margin-left:auto;
+  margin-right:auto;
+  height:auto;
+  border-radius:0;
+}
+
+.implementation-note{
+  margin-top:.75rem;
+  padding:0;
+  color:var(--muted);
+  font-size:.84rem;
+  line-height:1.45;
+}
+
+.implementation-note a{
+  color:var(--sky);
+  text-decoration:none;
+}
+
+.implementation-note a:hover{
+  text-decoration:underline;
+}
+
+.timeline-shell{
+  margin-top:1rem;
+  padding:1.1rem 1.1rem 1.2rem;
+  border-radius:24px;
+  border:1px solid var(--line);
+  background:linear-gradient(180deg, rgba(255,255,255,.98), rgba(245,249,253,.98));
+}
+
+.timeline-track{
+  display:grid;
+  grid-template-columns:repeat(5, 1fr);
+  gap:.95rem;
+  align-items:start;
+  position:relative;
+  min-height:23rem;
+}
+
+.timeline-track::before{
+  content:"";
+  position:absolute;
+  left:0;
+  right:0;
+  top:1.15rem;
+  height:2px;
+  background:linear-gradient(90deg, rgba(31,70,116,.42), rgba(31,70,116,.62), rgba(31,70,116,.42));
+}
+
+.time-card{
+  position:relative;
+  padding-top:2rem;
+  --offset:0rem;
+}
+
+.time-card::before{
+  content:"";
+  position:absolute;
+  top:.76rem;
+  left:0;
+  width:.82rem;
+  height:.82rem;
+  border-radius:999px;
+  background:linear-gradient(180deg, var(--sky), var(--teal));
+  box-shadow:0 0 0 5px rgba(47,115,214,.08);
+  z-index:1;
+}
+
+.time-card::after{
+  content:"";
+  position:absolute;
+  left:.39rem;
+  top:1.58rem;
+  width:1px;
+  height:calc(var(--offset) + .6rem);
+  background:linear-gradient(180deg, rgba(31,70,116,.60), rgba(31,70,116,.18));
+}
+
+.time-card .stamp{
+  display:inline-block;
+  margin-top:var(--offset);
+  margin-left:1.15rem;
+  margin-bottom:.65rem;
+  padding:.32rem .56rem;
+  border-radius:999px;
+  font-size:.66rem;
+  font-weight:700;
+  letter-spacing:.11em;
+  text-transform:uppercase;
+  color:var(--gold);
+  background:rgba(255,203,107,.10);
+  border:1px solid rgba(255,203,107,.14);
+}
+
+.time-card .event{
+  padding:1rem .95rem;
+  border-radius:18px;
+  border:1px solid rgba(44,94,148,.12);
+  background:linear-gradient(180deg, rgba(241,246,252,.98), rgba(231,239,248,.98));
+  min-height:12.5rem;
+  width:88%;
+}
+
+.time-card h3{
+  font-size:1rem;
+  line-height:1.28;
+  margin-bottom:.5rem;
+}
+
+.time-card p{
+  font-size:.88rem;
+  line-height:1.52;
+  color:var(--muted);
+}
+
+.time-card a{
+  color:var(--sky);
+  text-decoration:none;
+}
+
+.time-card a:hover{
+  text-decoration:underline;
+}
+
+.time-card:nth-child(1){--offset:.35rem}
+.time-card:nth-child(2){--offset:4.4rem}
+.time-card:nth-child(3){--offset:1.6rem}
+.time-card:nth-child(4){--offset:6.1rem}
+.time-card:nth-child(5){--offset:2.9rem}
+
+.refs-section{
+  display:grid;
+  gap:.8rem;
+  margin-top:1rem;
+}
+
+.refs-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:.8rem;
+  align-items:stretch;
+}
+
+.ref-card{
+  padding:.9rem 1rem;
+  border-radius:16px;
+  border:1px solid rgba(44,94,148,.08);
+  background:linear-gradient(180deg, rgba(255,255,255,.98), rgba(243,248,253,.98));
+}
+
+.ref-card.backend{
+  border-color:rgba(154,106,0,.18);
+  background:linear-gradient(180deg, rgba(255,250,240,.98), rgba(249,241,220,.96));
+}
+
+.ref-card.frontend{
+  border-color:rgba(47,115,214,.16);
+  background:linear-gradient(180deg, rgba(244,249,255,.98), rgba(231,240,252,.96));
+}
+
+.ref-stack{
+  display:grid;
+  gap:.8rem;
+}
+
+.ref-bottom{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:.8rem;
+  align-items:start;
+}
+
+.ref-spacer{
+  min-height:1px;
+}
+
+.ref-label{
+  font-size:.66rem;
+  font-weight:700;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--dim);
+  margin-bottom:.32rem;
+}
+
+.ref-card h4{
+  font-size:.94rem;
+  margin-bottom:.3rem;
+}
+
+.ref-card p{
+  font-size:.84rem;
+  line-height:1.45;
+  color:var(--muted);
+}
+
+.ref-links{
+  list-style:none;
+  display:grid;
+  gap:.4rem;
+  margin-top:.55rem;
+}
+
+.ref-links li{
+  position:relative;
+  padding-left:1rem;
+  color:#2d4766;
+  font-size:.84rem;
+  line-height:1.4;
+}
+
+.ref-links li::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:.46rem;
+  width:.36rem;
+  height:.36rem;
+  border-radius:999px;
+  background:currentColor;
+}
+
+.ref-card a{
+  color:var(--sky);
+  text-decoration:none;
+}
+
+.ref-card a:hover{
+  text-decoration:underline;
+}
+
+.ref-figure{
+  margin:0;
+}
+
+.ref-figure img{
+  display:block;
+  width:78%;
+  margin-left:0;
+  margin-right:auto;
+  height:auto;
+  border-radius:12px;
+}
+
+#progress{
+  position:fixed;
+  bottom:0;
+  left:0;
+  height:3px;
+  background:linear-gradient(90deg, var(--teal), var(--sky));
+  transition:width .35s ease;
+  z-index:50;
+}
+
+#slide-num{
+  position:fixed;
+  right:1.25rem;
+  bottom:1rem;
+  font-size:.82rem;
+  color:var(--dim);
+  z-index:50;
+  font-variant-numeric:tabular-nums;
+}
+
+@media (max-width: 1100px){
+  html,body{overflow:auto}
+  .slide{position:relative;min-height:100vh;opacity:1;pointer-events:auto;transform:none}
+  .slide + .slide{margin-top:1rem}
+  .hero,
+  .bottom-line,
+  .flow-head{flex-direction:column;align-items:flex-start}
+  .comparison-grid,
+  .arch-grid,
+  .query-strip,
+  .demo-grid,
+  .evidence-grid,
+  .timeline-track{grid-template-columns:1fr}
+  .subgrid,
+  .refs-grid,
+  .ref-bottom{grid-template-columns:1fr}
+  .timeline-track{min-height:0}
+  .timeline-track::before,
+  .time-card::after{display:none}
+  .time-card{--offset:0rem}
+  .time-card .stamp{margin-left:0}
+  #progress,#slide-num{display:none}
+}
+
+@media (max-width: 720px){
+  .slide{padding:1rem}
+  .frame{padding:1.25rem}
+  h1{font-size:2.35rem}
+  h2{font-size:2.05rem}
+}
+</style>
+</head>
+<body>
+<div class="deck" id="deck">
+
+  <section class="slide active" data-slide="0">
+    <div class="frame">
+      <div class="hero">
+        <div class="hero-copy">
+          <div class="eyebrow"><span class="dot"></span>From Framework To Portal Copilot</div>
+          <h2>Synapse Custom Agent translation and impact over time</h2>
+          <p class="lead">The NF Portal Assistant (and any other Portal Copilots) is built on top of the Synapse Custom Agent framework. This timeline shows how the platform, benchmarking work, collaboration prototypes, and hackathon deployments have built toward the current product.</p>
+        </div>
+      </div>
+
+      <div class="timeline-shell">
+        <div class="timeline-track">
+          <div class="time-card">
+            <span class="stamp">Nov 2024</span>
+            <div class="event">
+              <h3>Synapse Custom Agent design doc available</h3>
+              <p>The platform-level design for custom agents, chat sessions, worker invocation, and Bedrock-backed orchestration becomes concrete and shareable. <a href="https://sagebionetworks.jira.com/wiki/spaces/PLFM/pages/3711303683/Adding+Custom+Agents+to+Synapse" target="_blank" rel="noopener noreferrer">Design doc</a>.</p>
+            </div>
+          </div>
+          <div class="time-card">
+            <span class="stamp">Feb 2025</span>
+            <div class="event">
+              <h3>Planning and benchmarking data prep start in <code>nf-osi/portal-chatbot</code></h3>
+              <p>Portal-specific work begins with planning, evaluation design, and benchmark creation to measure assistant quality against realistic research questions.</p>
+            </div>
+          </div>
+          <div class="time-card">
+            <span class="stamp">May 2025</span>
+            <div class="event">
+              <h3>Netrias custom agent implemented for BDF collaboration prototype</h3>
+              <p>A concrete collaboration prototype demonstrates Custom Agent usage beyond design documentation and helps validate cross-team delivery patterns.</p>
+            </div>
+          </div>
+          <div class="time-card">
+            <span class="stamp">Dec 2025</span>
+            <div class="event">
+              <h3>Hackathon deployment of the NF Portal Assistant</h3>
+              <p>The NF Portal Assistant reaches the portal with a new UI component and a new navigation feature, shifting from internal development into user-facing experience work.</p>
+            </div>
+          </div>
+          <div class="time-card">
+            <span class="stamp">Mar 2026</span>
+            <div class="event">
+              <h3>Assistant expands to graph KB, publications, and <code>&lt;guideprompt&gt;</code></h3>
+              <p>The assistant gains deeper retrieval by integrating the graph knowledge base and publication content, while the <code>&lt;guideprompt&gt;</code> feature adds more structured guidance for the next user step.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <section class="slide architecture-slide" data-slide="1">
+    <div class="frame">
+      <div class="hero">
+        <div class="hero-copy">
+          <div class="eyebrow"><span class="dot"></span>Portal Copilot: NF-specific Implementation</div>
+          <h2>NF Portal Assistant implementation provides example details - Part I</h2>
+          <p class="lead">The portal UI selects a registered assistant, while Synapse manages chat sessions, access level, and prompt forwarding to the custom Bedrock-backed agent. The result is a portal assistant that can orchestrate retrieval, reasoning, and portal-aware actions across multiple data sources.</p>
+        </div>
+      </div>
+
+      <div class="refs-section">
+        <div class="refs-grid">
+          <div class="ref-card backend">
+            <div class="ref-label">Backend Reference</div>
+            <h4>Design and registration</h4>
+            <p>Key backend references for the Synapse chat worker, agent sessions, <code>agentRegistrationId</code>, and the custom Bedrock-backed agent framework.</p>
+            <ul class="ref-links">
+              <li><a href="https://sagebionetworks.jira.com/wiki/spaces/PLFM/pages/3711303683/Adding+Custom+Agents+to+Synapse" target="_blank" rel="noopener noreferrer">Custom agent design doc</a></li>
+            </ul>
+          </div>
+          <div class="ref-card frontend">
+            <div class="ref-label">Frontend Reference</div>
+            <h4>Portal wiring and UI component</h4>
+            <p>Frontend sources showing the NF portal chat configuration and the shared dialog component that wraps <code>SynapseChat</code>.</p>
+            <ul class="ref-links">
+              <li><a href="https://github.com/nf-osi/synapse-web-monorepo/blob/f041368d6ba7d6e73a81e1f2ddf76207d5df75b5/apps/portals/nf/src/config/synapseChatConfig.ts" target="_blank" rel="noopener noreferrer">NF portal chat config</a></li>
+              <li><a href="https://github.com/Sage-Bionetworks/synapse-web-monorepo/blob/main/packages/synapse-react-client/src/components/SynapseChat/SynapsePortalChatDialog.tsx" target="_blank" rel="noopener noreferrer">Portal chat dialog component</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="ref-bottom">
+          <aside class="flow-panel">
+            <figure class="implementation-figure">
+              <img src="basic_agent_dev.png" alt="Basic agent development workflow diagram from the portal-chatbot repository">
+            </figure>
+            <div class="implementation-note">
+              From <a href="https://github.com/nf-osi/portal-chatbot/commit/3f9ef08f2c0c9c26122596ab966fecc053d415b3" target="_blank" rel="noopener noreferrer">portal-chatbot commit 3f9ef08</a> in February 2025. The data-source portion is outdated, but the rest of the workflow still applies.
+            </div>
+          </aside>
+          <figure class="ref-figure">
+            <img src="synapsechatconfig_example.png" alt="Example screenshot of the Synapse chat config wiring in the NF portal frontend">
+          </figure>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-slide="2">
+    <div class="frame">
+      <div class="hero">
+        <div class="hero-copy">
+          <div class="eyebrow"><span class="dot"></span>Live Demo</div>
+          <h2>Questions for the Portal Assistant</h2>
+          <p class="lead">These prompts emphasize the portal assistant's strengths and special features. They ask for synthesis, deeper evidence, and guided next steps across multiple information sources.</p>
+        </div>
+      </div>
+
+      <div class="demo-grid">
+        <div class="prompt-stack">
+          <div class="prompt-card">
+            <div class="prompt-top">
+              <span class="prompt-tag">Prompt 1</span>
+              <button class="copy-btn" type="button">Copy</button>
+            </div>
+            <code>Which mpnst cell lines are suitable for drug screen?</code>
+          </div>
+
+          <div class="prompt-card">
+            <div class="prompt-top">
+              <span class="prompt-tag">Prompt 2</span>
+              <button class="copy-btn" type="button">Copy</button>
+            </div>
+            <code>I need isogenic cell line pairs that differ only in NF1 status</code>
+          </div>
+
+          <div class="prompt-card">
+            <div class="prompt-top">
+              <span class="prompt-tag">Prompt 3</span>
+              <button class="copy-btn" type="button">Copy</button>
+            </div>
+            <code>I work on exon skipping therapy, what models are relevant for me?</code>
+          </div>
+
+        </div>
+
+        <div class="note-side">
+          <div class="note-panel-side">
+            <h3>Why these do not work with OpenSearch</h3>
+            <p>Each prompt depends on assistant behaviors that go beyond fast ranked retrieval over indexed metadata.</p>
+            <ul class="note-list">
+              <li><strong>Cross-source synthesis:</strong> the answer needs information to be connected across different sources.</li>
+              <li><strong>Deeper evidence:</strong> asks for comparative judgment, not a list of matching records.</li>
+              <li><strong>Guided action:</strong> the expected output includes navigation help and suggested next steps.</li>
+              <li><strong>Reasoned ranking:</strong> the assistant has to explain why one starting point is better than another.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-slide="3">
+    <div class="frame">
+      <div class="hero">
+        <div class="hero-copy">
+          <div class="eyebrow"><span class="dot"></span>Funder Guidance</div>
+          <h2>External funder guidance reinforces the need for reasoning, synthesis, and deeper data</h2>
+          <p class="lead">These notes were provided to us by the external funder (Gilbert Family Foundation). The screenshot highlights example search and discovery questions that are not simple search or filter tasks and instead require interpretation across sources and concepts.</p>
+        </div>
+      </div>
+
+      <div class="evidence-grid">
+        <figure class="evidence-figure">
+          <img src="tech_specs.png" alt="Screenshot of external funder technical notes describing question expectations for the portal assistant">
+        </figure>
+
+        <div class="evidence-note">
+          <h3>Why this matters</h3>
+          <div class="evidence-quote">“nor was it easy for me to answer these questions from a filtering or grouping perspective”</div>
+          <p>The examples in these notes are strong evidence that <strong>the expected user experience goes beyond what search can do</strong>. They ask for answers that need synthesis, interpretation, judgment, and access to scientific evidence (e.g. from publications) or other deeper data sources.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-slide="4">
+    <div class="frame">
+      <div class="hero">
+        <div class="hero-copy">
+          <div class="eyebrow"><span class="dot"></span>Portal Search & Discovery Strategy</div>
+          <h1>OpenSearch and an AI Portal Copilot solve different classes of questions</h1>
+          <p class="lead">The search box should stay fast, cheap, and familiar. The assistant should step in when the user needs synthesis across multiple sources, deeper retrieval than indexed metadata, or a guided next action.</p>
+        </div>
+      </div>
+
+      <div class="comparison-grid">
+        <article class="panel search">
+          <div class="panel-tag">OpenSearch</div>
+          <h3>Best at high-speed discovery over what is already indexed</h3>
+          <p class="panel-copy">Use OpenSearch for the first pass: fast matching, autosuggest from current portal phrases, lightweight semantics via synonym configuration, and low operating cost.</p>
+          <ul class="feature-list">
+            <li>Fast response time for common lookups and filtering</li>
+            <li>Autosuggest can reflect current portal vocabulary and phrases</li>
+            <li>Some semantic flexibility through synonym and ranking configuration</li>
+            <li>Cheaper path for broad everyday search traffic</li>
+          </ul>
+          <div class="mini-note">
+            <div class="mini-label">Best Fit</div>
+            <p>Known-item search, simple metadata lookups, faceted browsing, and "get me to the right page quickly" interactions.</p>
+          </div>
+        </article>
+
+        <article class="panel agent">
+          <div class="panel-tag">AI Portal Assistant</div>
+          <h3>Best when the answer has to be assembled, compared, explained, or acted on</h3>
+          <p class="panel-copy">The assistant can pull from multiple knowledge bases at once, including the knowledge graph and publication content that is not available in OpenSearch, then recommend what the user should do next.</p>
+          <ul class="feature-list">
+            <li>Combines multiple knowledge bases, including the knowledge graph</li>
+            <li>Can use publication content that is not indexed in OpenSearch</li>
+            <li>Stronger on analytical questions and multi-step reasoning</li>
+            <li>Can retrieve deeper data, not only surface-level metadata</li>
+            <li>Can integrate external knowledge sources when portal context is not enough</li>
+            <li>Can take actions such as navigating on the user's behalf</li>
+            <li>Can suggest sensible next steps after answering the question</li>
+          </ul>
+          <div class="mini-note">
+            <div class="mini-label">Best Fit</div>
+            <p>Cross-source synthesis, comparisons, explanation-heavy workflows, exploratory analysis, and guided task completion inside the portal.</p>
+          </div>
+        </article>
+      </div>
+
+      
+    </div>
+  </section>
+
+</div>
+
+<div id="progress"></div>
+<div id="slide-num"></div>
+
+<script>
+(function () {
+  var slides = document.querySelectorAll(".slide");
+  var total = slides.length;
+  var cur = 0;
+
+  function copyText(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(text);
+    }
+    return new Promise(function(resolve, reject) {
+      var ta = document.createElement("textarea");
+      ta.value = text;
+      ta.setAttribute("readonly", "");
+      ta.style.position = "absolute";
+      ta.style.left = "-9999px";
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand("copy");
+        document.body.removeChild(ta);
+        resolve();
+      } catch (err) {
+        document.body.removeChild(ta);
+        reject(err);
+      }
+    });
+  }
+
+  function updateStatus() {
+    document.getElementById("slide-num").textContent = (cur + 1) + " / " + total;
+    document.getElementById("progress").style.width = ((cur / (total - 1)) * 100) + "%";
+  }
+
+  function go(n) {
+    if (n < 0 || n >= total || n === cur) return;
+    var prev = cur;
+    slides[prev].classList.remove("active");
+    slides[prev].classList.add("exit");
+    cur = n;
+    slides[cur].classList.add("active");
+    setTimeout(function () {
+      slides[prev].classList.remove("exit");
+    }, 460);
+    updateStatus();
+  }
+
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "ArrowRight" || e.key === " ") {
+      e.preventDefault();
+      go(cur + 1);
+    }
+    if (e.key === "ArrowLeft") {
+      e.preventDefault();
+      go(cur - 1);
+    }
+    if (e.key === "Home") {
+      e.preventDefault();
+      go(0);
+    }
+    if (e.key === "End") {
+      e.preventDefault();
+      go(total - 1);
+    }
+  });
+
+  document.querySelectorAll(".copy-btn").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var card = btn.closest(".prompt-card");
+      var code = card ? card.querySelector("code") : null;
+      if (!code) return;
+      var original = btn.textContent;
+      copyText(code.textContent.trim()).then(function () {
+        btn.textContent = "Copied";
+        setTimeout(function () { btn.textContent = original; }, 1200);
+      }).catch(function () {
+        btn.textContent = "Failed";
+        setTimeout(function () { btn.textContent = original; }, 1200);
+      });
+    });
+  });
+
+  updateStatus();
+})();
+</script>
+</body>
+</html>
