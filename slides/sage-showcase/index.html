@@ -101,8 +101,21 @@ ul.checks li::before{content:'✓';background:none;color:#4ade80;font-size:.9rem
     <h2 style="margin:0">Context</h2>
   </div>
   <div style="width:100%;max-width:64rem">
-    <img src="../images/deliverable.png" alt="Jira deliverable" style="width:100%;border-radius:10px;border:1px solid #334155;display:block;margin-bottom:1.2rem">
+    <div style="display:flex;gap:1rem;margin-bottom:1.2rem">
+      <img src="../images/tools_portal.png" alt="NF Tools Portal" style="flex:1;width:0;border-radius:10px;border:1px solid #334155;object-fit:cover">
+      <img src="../images/portal_2.png" alt="NF Tools Portal 2" style="flex:1;width:0;border-radius:10px;border:1px solid #334155;object-fit:cover;object-position:left top">
+    </div>
     <p style="font-size:.95rem"><strong style="color:#f1f5f9">Gilbert Family Foundation</strong> is interested in a <span class="accent">portal copilot</span> for a more engaging and helpful user experience with the NF research tools portal</p>
+  </div>
+</div>
+
+<!-- ════════════════════ SLIDE: Context Continued ════════════════════ -->
+<div class="slide" data-slide="1">
+  <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.2rem">
+    <h2 style="margin:0">Context Continued</h2>
+  </div>
+  <div style="width:100%;max-width:64rem">
+    <img src="../images/deliverable.png" alt="Jira deliverable" style="width:100%;border-radius:10px;border:1px solid #334155;display:block">
   </div>
 </div>
 
@@ -396,10 +409,70 @@ ul.checks li::before{content:'✓';background:none;color:#4ade80;font-size:.9rem
   </div>
 </div>
 
+<!-- ════════════════════ SLIDE: Portal Copilot (copy) ════════════════════ -->
+<div class="slide" data-slide="2">
+  <h2 style="margin-bottom:1.4rem">Portal Copilot &mdash; How RAG System Works</h2>
+  <svg viewBox="0 0 800 230" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:62rem;height:auto">
+    <defs>
+      <marker id="arr2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+        <path d="M0,0 L0,6 L8,3 z" fill="#475569"/>
+      </marker>
+      <marker id="arr-blue2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+        <path d="M0,0 L0,6 L8,3 z" fill="#38bdf8"/>
+      </marker>
+      <marker id="arr-green2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+        <path d="M0,0 L0,6 L8,3 z" fill="#469285"/>
+      </marker>
+    </defs>
+    <!-- ── User icon + box ── -->
+    <circle cx="75" cy="38" r="13" fill="none" stroke="#e2e8f0" stroke-width="1.5"/>
+    <path d="M48,68 Q48,52 75,52 Q102,52 102,68" fill="none" stroke="#e2e8f0" stroke-width="1.5"/>
+    <rect x="10" y="100" width="130" height="70" rx="10" fill="#1e293b" stroke="#e2e8f0" stroke-width="1.5"/>
+    <text x="75" y="133" text-anchor="middle" fill="#f1f5f9" font-family="'Segoe UI',system-ui,sans-serif" font-size="13" font-weight="600">Researcher</text>
+    <text x="75" y="152" text-anchor="middle" fill="#94a3b8" font-family="'Segoe UI',system-ui,sans-serif" font-size="11">natural language</text>
+    <!-- ── AI Agent icon: robot ── -->
+    <line x1="290" y1="14" x2="290" y2="21" stroke="#38bdf8" stroke-width="1.5"/>
+    <circle cx="290" cy="12" r="3" fill="none" stroke="#38bdf8" stroke-width="1.5"/>
+    <rect x="272" y="21" width="36" height="30" rx="5" fill="none" stroke="#38bdf8" stroke-width="1.5"/>
+    <circle cx="282" cy="32" r="4" fill="#0c2a3d" stroke="#38bdf8" stroke-width="1.5"/>
+    <circle cx="298" cy="32" r="4" fill="#0c2a3d" stroke="#38bdf8" stroke-width="1.5"/>
+    <circle cx="284" cy="30" r="1" fill="#38bdf8"/>
+    <circle cx="300" cy="30" r="1" fill="#38bdf8"/>
+    <line x1="281" y1="43" x2="285" y2="43" stroke="#38bdf8" stroke-width="1.5"/>
+    <line x1="288" y1="43" x2="292" y2="43" stroke="#38bdf8" stroke-width="1.5"/>
+    <line x1="295" y1="43" x2="299" y2="43" stroke="#38bdf8" stroke-width="1.5"/>
+    <rect x="268" y="28" width="4" height="8" rx="2" fill="none" stroke="#38bdf8" stroke-width="1.5"/>
+    <rect x="308" y="28" width="4" height="8" rx="2" fill="none" stroke="#38bdf8" stroke-width="1.5"/>
+    <rect x="220" y="100" width="140" height="70" rx="10" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5"/>
+    <text x="290" y="133" text-anchor="middle" fill="#38bdf8" font-family="'Segoe UI',system-ui,sans-serif" font-size="13" font-weight="700">AI Agent</text>
+    <text x="290" y="152" text-anchor="middle" fill="#7dd3fc" font-family="'Segoe UI',system-ui,sans-serif" font-size="11">LLM + tool calling</text>
+    <!-- ── DB icon + box ── -->
+    <ellipse cx="640" cy="22" rx="28" ry="8" fill="none" stroke="#469285" stroke-width="1.5"/>
+    <line x1="612" y1="22" x2="612" y2="46" stroke="#469285" stroke-width="1.5"/>
+    <line x1="668" y1="22" x2="668" y2="46" stroke="#469285" stroke-width="1.5"/>
+    <ellipse cx="640" cy="46" rx="28" ry="8" fill="none" stroke="#469285" stroke-width="1.5"/>
+    <path d="M612,34 Q640,42 668,34" fill="none" stroke="#469285" stroke-width="1" opacity="0.5"/>
+    <rect x="520" y="100" width="260" height="110" rx="10" fill="#0f2a1a" stroke="#469285" stroke-width="1.5"/>
+    <text x="650" y="130" text-anchor="middle" fill="#4ade80" font-family="'Segoe UI',system-ui,sans-serif" font-size="13" font-weight="700">Knowledge Graph</text>
+    <text x="650" y="149" text-anchor="middle" fill="#6ee7b7" font-family="'Segoe UI',system-ui,sans-serif" font-size="11">SPARQL+Text endpoint</text>
+    <line x1="540" y1="158" x2="760" y2="158" stroke="#166534" stroke-width="1"/>
+    <text x="650" y="175" text-anchor="middle" fill="#6ee7b7" font-family="'Segoe UI',system-ui,sans-serif" font-size="10">Portal entities &amp; publications</text>
+    <text x="650" y="191" text-anchor="middle" fill="#6ee7b7" font-family="'Segoe UI',system-ui,sans-serif" font-size="10">Full-text passage index</text>
+    <text x="650" y="203" text-anchor="middle" fill="#64748b" font-family="'Segoe UI',system-ui,sans-serif" font-size="10" font-style="italic">single endpoint</text>
+    <!-- ── Arrows: user ↔ agent ── -->
+    <line x1="142" y1="128" x2="218" y2="128" stroke="#38bdf8" stroke-width="1.5" marker-end="url(#arr-blue2)"/>
+    <line x1="218" y1="145" x2="142" y2="145" stroke="#475569" stroke-width="1.5" marker-end="url(#arr2)"/>
+    <!-- ── Arrows: agent ↔ KG ── -->
+    <line x1="362" y1="128" x2="518" y2="128" stroke="#469285" stroke-width="1.5" marker-end="url(#arr-green2)"/>
+    <line x1="518" y1="145" x2="362" y2="145" stroke="#475569" stroke-width="1.5" marker-end="url(#arr2)"/>
+    <text x="440" y="113" text-anchor="middle" fill="#469285" font-family="'Segoe UI',system-ui,sans-serif" font-size="9.5">SPARQL / SPARQL+Text</text>
+  </svg>
+</div>
+
 <!-- ════════════════════ SLIDE 3: Let's talk about evals ════════════════════ -->
 <div class="slide" data-slide="2">
   <div class="center" style="margin-bottom:1.2rem">
-    <h1>Real evals</h1>
+    <h1>Evaluation of System</h1>
   </div>
   <div style="width:100%;max-width:58rem">
     <img src="../images/eval_advice.png" alt="Eval advice" style="width:100%;border-radius:10px;border:1px solid #334155;margin-bottom:1rem">
@@ -453,11 +526,7 @@ ul.checks li::before{content:'✓';background:none;color:#4ade80;font-size:.9rem
       <div style="font-size:.68rem;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.45rem">AM-005 &middot; Advanced &middot; 2-hop &middot; Frustration: Very High</div>
       <p style="font-size:.98rem;color:#f1f5f9;font-weight:600;margin:0 0 .4rem">"Find transplantation mouse models (xenografts) and related donor cell lines"</p>
       <p style="font-size:.8rem;color:#7dd3fc;margin:0 0 .7rem;font-style:italic">Xenograft-to-cell-line donor traversal: understand tumor source and plan matched in vitro experiments</p>
-      <ul style="margin:.4rem 0 .7rem;font-size:.82rem">
-        <li>Facets: <span class="amber">no</span> &mdash; no facet linking xenografts to donor cell lines</li>
-        <li>KG: traverses <span class="accent">transplantationDonorId &rarr; cellLineId</span></li>
-      </ul>
-      <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#38bdf8;margin-bottom:.35rem">Expected answer</div>
+      <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#38bdf8;margin-top:2rem;margin-bottom:.35rem">Expected answer</div>
       <div style="display:flex;flex-wrap:wrap;gap:.35rem">
         <code style="font-size:.68rem;color:#4ade80;padding:.18rem 0">1b604846-d41c-4969-a79a-9660c04e585c</code>
         <code style="font-size:.68rem;color:#4ade80;padding:.18rem 0">c8a807e4-502b-461c-a60f-fd10b3cde70e</code>
@@ -469,11 +538,7 @@ ul.checks li::before{content:'✓';background:none;color:#4ade80;font-size:.9rem
       <div style="font-size:.68rem;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.45rem">CR-002 &middot; Advanced &middot; 2-hop &middot; Frustration: Very High</div>
       <p style="font-size:.98rem;color:#f1f5f9;font-weight:600;margin:0 0 .4rem">"Find human cell lines with the most diverse data types available on the portal"</p>
       <p style="font-size:.8rem;color:#7dd3fc;margin:0 0 .7rem;font-style:italic">Bioinformatics &amp; multi-omics analysis; existing characterization data may inform model selection for future experiments</p>
-      <ul style="margin:.4rem 0 .7rem;font-size:.82rem">
-        <li>Facets: <span class="amber">no</span> &mdash; no aggregation across data types per resource</li>
-        <li>KG: joins Files &rarr; CellLine, groups by <span class="accent">dataType</span>, ranks by count</li>
-      </ul>
-      <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#38bdf8;margin-bottom:.35rem">Expected answer</div>
+      <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#38bdf8;margin-top:2rem;margin-bottom:.35rem">Expected answer</div>
       <div style="display:flex;flex-wrap:wrap;gap:.35rem">
         <code style="font-size:.68rem;color:#4ade80;padding:.18rem 0">5502caf5-4cf1-418f-bf50-164cfa316b0f</code>
         <code style="font-size:.68rem;color:#4ade80;padding:.18rem 0">b44361f2-9021-4920-901a-b1a1f9143f97</code>
@@ -500,6 +565,7 @@ ul.checks li::before{content:'✓';background:none;color:#4ade80;font-size:.9rem
     <div class="metric"><div class="num" style="color:#74aa9c">40.6%</div><div class="lbl">Best Recall<br>GPT-5.2</div></div>
   </div>
   <p style="margin-top:1rem;font-size:.8rem;text-align:center"><a href="https://nf-osi.github.io/kg-pipeline/main.html" target="_blank" style="color:#38bdf8;text-decoration:none">&#x1F517; nf-osi.github.io/kg-pipeline/main.html</a></p>
+  <p style="margin-top:.8rem;font-size:.72rem;color:#475569"><strong style="color:#64748b">Recall</strong> — of all the correct answers that exist, how many did the model find? Higher is better.</p>
 </div>
 
 <!-- ════════════════════ SLIDE 7: QA Eval Example ════════════════════ -->
@@ -557,6 +623,7 @@ ul.checks li::before{content:'✓';background:none;color:#4ade80;font-size:.9rem
       <div class="metric"><div class="num" style="color:#74aa9c">0.73</div><div class="lbl">Citation F1<br>GPT-5.4</div></div>
     </div>
     <p style="margin-top:1rem;font-size:.8rem;text-align:center"><a href="https://nf-osi.github.io/kg-pipeline/pubs.html" target="_blank" style="color:#38bdf8;text-decoration:none">&#x1F517; nf-osi.github.io/kg-pipeline/pubs.html</a></p>
+    <p style="margin-top:.8rem;font-size:.72rem;color:#475569"><strong style="color:#64748b">Accuracy</strong> — did the model pick the right answer? &nbsp;<strong style="color:#64748b">Citation F1</strong> — did it also point to the right passage in the paper? Balances over- and under-citing.</p>
   </div>
 </div>
 
