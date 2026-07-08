@@ -35,7 +35,7 @@ profiles:
         concrete_type: EntityView
         note: File-level annotations (assay, platform, data type, diagnosis, species,
           tissue, etc.)
-        source_version: 241
+        source_version: 259
       mutations:
         synapse_id: syn26486835
         concrete_type: TableEntity
@@ -105,7 +105,7 @@ profiles:
         concrete_type: TableEntity
         note: Publication details (title, DOI, PMID, abstract, journal, authors, date);
           linked from development table via publicationId
-        source_version: 4
+        source_version: 9
       donor_tool:
         synapse_id: syn51735419
         concrete_type: MaterializedView
@@ -182,7 +182,7 @@ profiles:
       files:
         synapse_id: syn16858331
         concrete_type: EntityView
-        source_version: 241
+        source_version: 259
       mutations:
         synapse_id: syn26486835
         concrete_type: TableEntity
@@ -230,7 +230,7 @@ profiles:
       publications:
         synapse_id: syn26486839
         concrete_type: TableEntity
-        source_version: 4
+        source_version: 9
       donor_tool:
         synapse_id: syn51735419
         concrete_type: MaterializedView
