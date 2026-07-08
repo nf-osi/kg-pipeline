@@ -35,7 +35,7 @@ profiles:
         concrete_type: EntityView
         note: File-level annotations (assay, platform, data type, diagnosis, species,
           tissue, etc.)
-        source_version: 241
+        source_version: 259
       mutations:
         synapse_id: syn26486835
         concrete_type: TableEntity
@@ -182,7 +182,7 @@ profiles:
       files:
         synapse_id: syn16858331
         concrete_type: EntityView
-        source_version: 241
+        source_version: 259
       mutations:
         synapse_id: syn26486835
         concrete_type: TableEntity
