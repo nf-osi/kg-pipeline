@@ -7,6 +7,7 @@
 @prefix efo:      <http://www.ebi.ac.uk/efo/> .
 @prefix obo:      <http://purl.obolibrary.org/obo/> .
 @prefix prov:     <http://www.w3.org/ns/prov#> .
+@prefix void:     <http://rdfs.org/ns/void#> .
 
 
 nf:KGOntology a owl:Ontology ;
@@ -440,6 +441,10 @@ nf:AIAgent a owl:Class ;
 nf:ObservationExtraction a prov:Activity ;
     rdfs:label "Observation Extraction" ;
     rdfs:comment "An activity in which structured observations are extracted from unstructured text." .
+
+nf:KGBuild a void:Dataset ;
+    rdfs:label "NF-OSI Knowledge Graph" ;
+    rdfs:comment "The individual representing this build of the knowledge graph. Annotated at build time with dcterms:hasVersion and prov:generatedAtTime for the graph build version and datetime, and prov:wasDerivedFrom the source Synapse tables/views/materialized views used to construct it." .
 
 ################################################################################
 # Properties - File related
