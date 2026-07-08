@@ -105,7 +105,7 @@ profiles:
         concrete_type: TableEntity
         note: Publication details (title, DOI, PMID, abstract, journal, authors, date);
           linked from development table via publicationId
-        source_version: 4
+        source_version: 9
       donor_tool:
         synapse_id: syn51735419
         concrete_type: MaterializedView
@@ -230,7 +230,7 @@ profiles:
       publications:
         synapse_id: syn26486839
         concrete_type: TableEntity
-        source_version: 4
+        source_version: 9
       donor_tool:
         synapse_id: syn51735419
         concrete_type: MaterializedView
