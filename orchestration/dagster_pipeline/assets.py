@@ -342,6 +342,43 @@ def nf1_mutation_sets_asset(context: AssetExecutionContext) -> Path:
     return output_file
 
 
+def create_build_metadata_asset(rdf_asset_keys: list):
+    """Create a Dagster asset that writes graph build metadata (build datetime as
+    graph build version, source table versions from data_sources.yaml) after all
+    RDF has been generated.
+    """
+
+    @asset(
+        name="build_metadata",
+        key_prefix=["portal", "rdf"],
+        compute_kind="python",
+        group_name="relationships",
+        deps=rdf_asset_keys + [["portal", "rdf", "shared_donor_links"], ["portal", "rdf", "nf1_mutation_sets"]],
+    )
+    def _build_metadata_asset(context: AssetExecutionContext) -> Path:
+        """Generate graph-level VoID/PROV build metadata TTL."""
+        from scripts.build_metadata import write_metadata_ttl
+
+        project_root = Path(__file__).parent.parent.parent
+        output_file = project_root / "data" / "rdf" / "build_metadata.ttl"
+
+        write_metadata_ttl(
+            data_sources_path=project_root / "data_sources.yaml",
+            profile_name="release",
+            output_path=output_file,
+        )
+
+        size_mb = output_file.stat().st_size / (1024 * 1024)
+        context.add_output_metadata({
+            "path": str(output_file.relative_to(project_root)),
+            "size_mb": round(size_mb, 4),
+        })
+
+        return output_file
+
+    return _build_metadata_asset
+
+
 # =============================================================================
 # Generate all assets
 # =============================================================================
@@ -351,6 +388,7 @@ def generate_portal_assets() -> List:
     """Generate all portal table assets."""
     assets = []
     csv_asset_keys = []
+    rdf_asset_keys = []
 
     for table_name, config in TABLE_CONFIGS.items():
         # Create CSV download asset
@@ -367,12 +405,14 @@ def generate_portal_assets() -> List:
         # Create RDF generation asset
         rdf_asset = create_rdf_asset(table_name, config)
         assets.append(rdf_asset)
+        rdf_asset_keys.append(["portal", "rdf", table_name])
 
     # Add FK validation asset (depends on all CSV assets)
     validation_asset = create_validation_asset(csv_asset_keys)
     assets.append(validation_asset)
     assets.append(shared_donor_links_asset)
     assets.append(nf1_mutation_sets_asset)
+    assets.append(create_build_metadata_asset(rdf_asset_keys))
 
     return assets
 
