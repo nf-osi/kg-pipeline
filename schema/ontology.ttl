@@ -390,6 +390,10 @@ nf:UnknownDataType a owl:Class ;
     rdfs:label "Unknown Data Type" ;
     rdfs:comment "Represents a data type that is not recognized or classified." .
 
+nf:UnknownOrNA a owl:Class ;
+    rdfs:label "Unknown or Not Applicable" ;
+    rdfs:comment "A placeholder used when a source field's value (e.g. 'NA', 'N/A', 'None', 'nan', 'Unknown') could mean either that the value is genuinely unrecorded, or that it does not apply to this resource (e.g. no single physical specimen or individual underlies the file), and the two cannot be reliably distinguished from the source data." .
+
 nf:Observation a owl:Class ;
     rdfs:label "Observation" ;
     rdfs:comment "An observation for a resource" .
@@ -500,6 +504,12 @@ nf:individualID a owl:DatatypeProperty ;
     rdfs:domain nf:File ;
     rdfs:range xsd:string .
 
+nf:hasIndividualIdStatus a owl:ObjectProperty ;
+    rdfs:label "hasIndividualIdStatus" ;
+    rdfs:comment "Links a file to nf:UnknownOrNA when its individualID source value could not be resolved to a real identifier (e.g. 'NA', 'n/a', 'none', 'unknown'). Mutually exclusive with nf:individualID on the same file: a real identifier is asserted via nf:individualID, an unresolved one via this property, never both." ;
+    rdfs:domain nf:File ;
+    rdfs:range nf:UnknownOrNA .
+
 nf:nf1Genotype a owl:DatatypeProperty ;
     rdfs:label "nf1Genotype" ;
     rdfs:comment "NF1 genotype of the source biospecimen." ;
@@ -581,6 +591,12 @@ nf:specimenID a owl:DatatypeProperty ;
     rdfs:comment "Non-PII identifier for the source specimen." ;
     rdfs:domain nf:File ;
     rdfs:range xsd:string .
+
+nf:hasSpecimenIdStatus a owl:ObjectProperty ;
+    rdfs:label "hasSpecimenIdStatus" ;
+    rdfs:comment "Links a file to nf:UnknownOrNA when its specimenID source value could not be resolved to a real identifier (e.g. 'NA', 'n/a', 'none', 'unknown'). Mutually exclusive with nf:specimenID on the same file: a real identifier is asserted via nf:specimenID, an unresolved one via this property, never both." ;
+    rdfs:domain nf:File ;
+    rdfs:range nf:UnknownOrNA .
 
 nf:tumorType a owl:DatatypeProperty ;
     rdfs:label "tumorType" ;

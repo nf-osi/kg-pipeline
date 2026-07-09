@@ -226,6 +226,113 @@ class TestFilesMultiValue:
         assert "Schwannoma" in types
 
 
+class TestFilesPlaceholderValues:
+    """Test normalization of placeholder tokens (NA/nan/n-a/none/unknown).
+
+    A diagnosis of "NA" can mean the specimen is from a healthy/control
+    individual, not that the field is missing -- these values must be
+    normalized to a clear, real value (or a structured status class for
+    identifier fields), never silently dropped as if the data were absent.
+    """
+
+    def test_diagnosis_na_normalized_to_not_applicable(self, files_graph, namespaces):
+        """diagnosis 'NA' should normalize to 'Not Applicable', not be dropped"""
+        NF = namespaces["nf"]
+        query = """
+        SELECT ?diagnosis WHERE {
+            <https://www.synapse.org/Synapse:syn9999994> nf:diagnosis ?diagnosis .
+        }
+        """
+        diagnoses = [str(r.diagnosis) for r in files_graph.query(query, initNs={"nf": NF})]
+        assert diagnoses == ["Not Applicable"]
+
+    def test_diagnosis_unknown_preserved_untouched(self, files_graph, namespaces):
+        """diagnosis 'Unknown' is a distinct, legitimate value and must not be
+        conflated with 'NA'/'None' or normalized away"""
+        NF = namespaces["nf"]
+        query = """
+        SELECT ?diagnosis WHERE {
+            <https://www.synapse.org/Synapse:syn9999995> nf:diagnosis ?diagnosis .
+        }
+        """
+        diagnoses = [str(r.diagnosis) for r in files_graph.query(query, initNs={"nf": NF})]
+        assert diagnoses == ["Unknown"]
+
+    def test_compound_name_none_normalized_casing(self, files_graph, namespaces):
+        """compoundName 'none' should normalize casing to 'None'"""
+        NF = namespaces["nf"]
+        query = """
+        SELECT ?c WHERE {
+            <https://www.synapse.org/Synapse:syn9999994> nf:compoundName ?c .
+        }
+        """
+        compounds = [str(r.c) for r in files_graph.query(query, initNs={"nf": NF})]
+        assert compounds == ["None"]
+
+    def test_individual_id_placeholder_becomes_status_class(self, files_graph, namespaces):
+        """individualID 'unknown' should not produce nf:individualID; instead
+        the file should link to nf:UnknownOrNA via nf:hasIndividualIdStatus"""
+        NF = namespaces["nf"]
+        no_literal = list(files_graph.query(
+            """
+            SELECT ?iid WHERE {
+                <https://www.synapse.org/Synapse:syn9999994> nf:individualID ?iid .
+            }
+            """,
+            initNs={"nf": NF},
+        ))
+        assert len(no_literal) == 0
+
+        status = list(files_graph.query(
+            """
+            SELECT ?status WHERE {
+                <https://www.synapse.org/Synapse:syn9999994> nf:hasIndividualIdStatus ?status .
+            }
+            """,
+            initNs={"nf": NF},
+        ))
+        assert len(status) == 1
+        assert str(status[0].status) == "http://nf-osi.github.com/terms#UnknownOrNA"
+
+    def test_specimen_id_placeholder_becomes_status_class(self, files_graph, namespaces):
+        """specimenID 'n/a' should not produce nf:specimenID; instead the file
+        should link to nf:UnknownOrNA via nf:hasSpecimenIdStatus"""
+        NF = namespaces["nf"]
+        no_literal = list(files_graph.query(
+            """
+            SELECT ?sid WHERE {
+                <https://www.synapse.org/Synapse:syn9999994> nf:specimenID ?sid .
+            }
+            """,
+            initNs={"nf": NF},
+        ))
+        assert len(no_literal) == 0
+
+        status = list(files_graph.query(
+            """
+            SELECT ?status WHERE {
+                <https://www.synapse.org/Synapse:syn9999994> nf:hasSpecimenIdStatus ?status .
+            }
+            """,
+            initNs={"nf": NF},
+        ))
+        assert len(status) == 1
+        assert str(status[0].status) == "http://nf-osi.github.com/terms#UnknownOrNA"
+
+    def test_real_specimen_and_individual_ids_unaffected(self, files_graph, namespaces):
+        """Files with real specimenID/individualID values should not get a status class"""
+        NF = namespaces["nf"]
+        status = list(files_graph.query(
+            """
+            SELECT ?status WHERE {
+                <https://www.synapse.org/Synapse:syn9999991> nf:hasSpecimenIdStatus ?status .
+            }
+            """,
+            initNs={"nf": NF},
+        ))
+        assert len(status) == 0
+
+
 class TestFilesIRIFields:
     """Test IRI-valued fields"""
 
