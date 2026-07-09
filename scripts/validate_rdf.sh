@@ -63,3 +63,9 @@ if [ "$bad" -gt 0 ]; then
 fi
 
 echo "No malformed placeholder IRIs found"
+
+# Check for schema drift: rdf:type values not declared as owl:Class in
+# schema/ontology.ttl (e.g. a typo'd class IRI, or a new value introduced in
+# an RML mapping / SSSOM lookup without a matching ontology update).
+echo ""
+python3 scripts/validate_schema_drift.py --rdf-dir "${RDF_DIR}"
