@@ -150,7 +150,97 @@ map:FileDiagnosis a rr:TriplesMap ;
                 ] ;
                 rr:predicateObjectMap [
                     rr:predicate grel:valueParameter ;
+                    rr:objectMap [
+            a fnml:FunctionTermMap ;
+            fnml:functionValue [
+                a fno:Execution ;
+                rml:logicalSource map:PortalFilesSource ;
+                rr:predicateObjectMap [
+                    rr:predicate fno:executes ;
+                    rr:objectMap [ rr:constant grel:controls_if ; rr:termType rr:IRI ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:bool_b ;
+                    rr:objectMap [
+                        a fnml:FunctionTermMap ;
+                        fnml:functionValue [
+                            a fno:Execution ;
+                            rml:logicalSource map:PortalFilesSource ;
+                            rr:predicateObjectMap [
+                                rr:predicate fno:executes ;
+                                rr:objectMap [ rr:constant grel:string_contains ; rr:termType rr:IRI ]
+                            ] ;
+                            rr:predicateObjectMap [
+                                rr:predicate grel:valueParameter ;
+                                rr:objectMap [ rr:constant "|na|nan|n/a|none|" ; rr:termType rr:Literal ]
+                            ] ;
+                            rr:predicateObjectMap [
+                                rr:predicate grel:string_sub ;
+                                rr:objectMap [
+                                    a fnml:FunctionTermMap ;
+                                    fnml:functionValue [
+                                        a fno:Execution ;
+                                        rml:logicalSource map:PortalFilesSource ;
+                                        rr:predicateObjectMap [
+                                            rr:predicate fno:executes ;
+                                            rr:objectMap [ rr:constant grel:string_replace ; rr:termType rr:IRI ]
+                                        ] ;
+                                        rr:predicateObjectMap [
+                                            rr:predicate grel:valueParameter ;
+                                            rr:objectMap [ rr:constant "|PLACEHOLDER|" ; rr:termType rr:Literal ]
+                                        ] ;
+                                        rr:predicateObjectMap [
+                                            rr:predicate grel:p_string_find ;
+                                            rr:objectMap [ rr:constant "PLACEHOLDER" ; rr:termType rr:Literal ]
+                                        ] ;
+                                        rr:predicateObjectMap [
+                                            rr:predicate grel:p_string_replace ;
+                                            rr:objectMap [
+                                                a fnml:FunctionTermMap ;
+                                                fnml:functionValue [
+                                                    a fno:Execution ;
+                                                    rml:logicalSource map:PortalFilesSource ;
+                                                    rr:predicateObjectMap [
+                                                        rr:predicate fno:executes ;
+                                                        rr:objectMap [ rr:constant grel:toLowerCase ; rr:termType rr:IRI ]
+                                                    ] ;
+                                                    rr:predicateObjectMap [
+                                                        rr:predicate grel:valueParameter ;
+                                                        rr:objectMap [
+                                                            a fnml:FunctionTermMap ;
+                                                            fnml:functionValue [
+                                                                a fno:Execution ;
+                                                                rml:logicalSource map:PortalFilesSource ;
+                                                                rr:predicateObjectMap [
+                                                                    rr:predicate fno:executes ;
+                                                                    rr:objectMap [ rr:constant grel:string_trim ; rr:termType rr:IRI ]
+                                                                ] ;
+                                                                rr:predicateObjectMap [
+                                                                    rr:predicate grel:valueParameter ;
+                                                                    rr:objectMap [ rml:reference "diagnosis" ; rr:termType rr:Literal ]
+                                                                ]
+                                                            ]
+                                                        ]
+                                                    ]
+                                                ]
+                                            ]
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:any_true ;
+                    rr:objectMap [ rr:constant "Not Applicable" ; rr:termType rr:Literal ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:any_false ;
                     rr:objectMap [ rml:reference "diagnosis" ; rr:termType rr:Literal ]
+                ]
+            ]
+                    ]
                 ] ;
                 rr:predicateObjectMap [
                     rr:predicate grel:p_string_sep ;
@@ -178,11 +268,196 @@ map:FileSpecimenID a rr:TriplesMap ;
                 ] ;
                 rr:predicateObjectMap [
                     rr:predicate grel:valueParameter ;
+                    rr:objectMap [
+            a fnml:FunctionTermMap ;
+            fnml:functionValue [
+                a fno:Execution ;
+                rml:logicalSource map:PortalFilesSource ;
+                rr:predicateObjectMap [
+                    rr:predicate fno:executes ;
+                    rr:objectMap [ rr:constant grel:controls_if ; rr:termType rr:IRI ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:bool_b ;
+                    rr:objectMap [
+                        a fnml:FunctionTermMap ;
+                        fnml:functionValue [
+                            a fno:Execution ;
+                            rml:logicalSource map:PortalFilesSource ;
+                            rr:predicateObjectMap [
+                                rr:predicate fno:executes ;
+                                rr:objectMap [ rr:constant grel:string_contains ; rr:termType rr:IRI ]
+                            ] ;
+                            rr:predicateObjectMap [
+                                rr:predicate grel:valueParameter ;
+                                rr:objectMap [ rr:constant "|na|nan|n/a|none|unknown|" ; rr:termType rr:Literal ]
+                            ] ;
+                            rr:predicateObjectMap [
+                                rr:predicate grel:string_sub ;
+                                rr:objectMap [
+                                    a fnml:FunctionTermMap ;
+                                    fnml:functionValue [
+                                        a fno:Execution ;
+                                        rml:logicalSource map:PortalFilesSource ;
+                                        rr:predicateObjectMap [
+                                            rr:predicate fno:executes ;
+                                            rr:objectMap [ rr:constant grel:string_replace ; rr:termType rr:IRI ]
+                                        ] ;
+                                        rr:predicateObjectMap [
+                                            rr:predicate grel:valueParameter ;
+                                            rr:objectMap [ rr:constant "|PLACEHOLDER|" ; rr:termType rr:Literal ]
+                                        ] ;
+                                        rr:predicateObjectMap [
+                                            rr:predicate grel:p_string_find ;
+                                            rr:objectMap [ rr:constant "PLACEHOLDER" ; rr:termType rr:Literal ]
+                                        ] ;
+                                        rr:predicateObjectMap [
+                                            rr:predicate grel:p_string_replace ;
+                                            rr:objectMap [
+                                                a fnml:FunctionTermMap ;
+                                                fnml:functionValue [
+                                                    a fno:Execution ;
+                                                    rml:logicalSource map:PortalFilesSource ;
+                                                    rr:predicateObjectMap [
+                                                        rr:predicate fno:executes ;
+                                                        rr:objectMap [ rr:constant grel:toLowerCase ; rr:termType rr:IRI ]
+                                                    ] ;
+                                                    rr:predicateObjectMap [
+                                                        rr:predicate grel:valueParameter ;
+                                                        rr:objectMap [
+                                                            a fnml:FunctionTermMap ;
+                                                            fnml:functionValue [
+                                                                a fno:Execution ;
+                                                                rml:logicalSource map:PortalFilesSource ;
+                                                                rr:predicateObjectMap [
+                                                                    rr:predicate fno:executes ;
+                                                                    rr:objectMap [ rr:constant grel:string_trim ; rr:termType rr:IRI ]
+                                                                ] ;
+                                                                rr:predicateObjectMap [
+                                                                    rr:predicate grel:valueParameter ;
+                                                                    rr:objectMap [ rml:reference "specimenID" ; rr:termType rr:Literal ]
+                                                                ]
+                                                            ]
+                                                        ]
+                                                    ]
+                                                ]
+                                            ]
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:any_true ;
+                    rr:objectMap [ rml:reference "_no_valid_specimen_id" ; rr:termType rr:Literal ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:any_false ;
                     rr:objectMap [ rml:reference "specimenID" ; rr:termType rr:Literal ]
+                ]
+            ]
+                    ]
                 ] ;
                 rr:predicateObjectMap [
                     rr:predicate grel:p_string_sep ;
                     rr:objectMap [ rr:constant "\\|" ; rr:termType rr:Literal ]
+                ]
+            ]
+        ]
+    ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:hasSpecimenIdStatus ;
+        rr:objectMap [
+            a fnml:FunctionTermMap ;
+            rr:termType rr:IRI ;
+            fnml:functionValue [
+                a fno:Execution ;
+                rml:logicalSource map:PortalFilesSource ;
+                rr:predicateObjectMap [
+                    rr:predicate fno:executes ;
+                    rr:objectMap [ rr:constant grel:controls_if ; rr:termType rr:IRI ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:bool_b ;
+                    rr:objectMap [
+                        a fnml:FunctionTermMap ;
+                        fnml:functionValue [
+                            a fno:Execution ;
+                            rml:logicalSource map:PortalFilesSource ;
+                            rr:predicateObjectMap [
+                                rr:predicate fno:executes ;
+                                rr:objectMap [ rr:constant grel:string_contains ; rr:termType rr:IRI ]
+                            ] ;
+                            rr:predicateObjectMap [
+                                rr:predicate grel:valueParameter ;
+                                rr:objectMap [ rr:constant "|na|nan|n/a|none|unknown|" ; rr:termType rr:Literal ]
+                            ] ;
+                            rr:predicateObjectMap [
+                                rr:predicate grel:string_sub ;
+                                rr:objectMap [
+                                    a fnml:FunctionTermMap ;
+                                    fnml:functionValue [
+                                        a fno:Execution ;
+                                        rml:logicalSource map:PortalFilesSource ;
+                                        rr:predicateObjectMap [
+                                            rr:predicate fno:executes ;
+                                            rr:objectMap [ rr:constant grel:string_replace ; rr:termType rr:IRI ]
+                                        ] ;
+                                        rr:predicateObjectMap [
+                                            rr:predicate grel:valueParameter ;
+                                            rr:objectMap [ rr:constant "|PLACEHOLDER|" ; rr:termType rr:Literal ]
+                                        ] ;
+                                        rr:predicateObjectMap [
+                                            rr:predicate grel:p_string_find ;
+                                            rr:objectMap [ rr:constant "PLACEHOLDER" ; rr:termType rr:Literal ]
+                                        ] ;
+                                        rr:predicateObjectMap [
+                                            rr:predicate grel:p_string_replace ;
+                                            rr:objectMap [
+                                                a fnml:FunctionTermMap ;
+                                                fnml:functionValue [
+                                                    a fno:Execution ;
+                                                    rml:logicalSource map:PortalFilesSource ;
+                                                    rr:predicateObjectMap [
+                                                        rr:predicate fno:executes ;
+                                                        rr:objectMap [ rr:constant grel:toLowerCase ; rr:termType rr:IRI ]
+                                                    ] ;
+                                                    rr:predicateObjectMap [
+                                                        rr:predicate grel:valueParameter ;
+                                                        rr:objectMap [
+                                                            a fnml:FunctionTermMap ;
+                                                            fnml:functionValue [
+                                                                a fno:Execution ;
+                                                                rml:logicalSource map:PortalFilesSource ;
+                                                                rr:predicateObjectMap [
+                                                                    rr:predicate fno:executes ;
+                                                                    rr:objectMap [ rr:constant grel:string_trim ; rr:termType rr:IRI ]
+                                                                ] ;
+                                                                rr:predicateObjectMap [
+                                                                    rr:predicate grel:valueParameter ;
+                                                                    rr:objectMap [ rml:reference "specimenID" ; rr:termType rr:Literal ]
+                                                                ]
+                                                            ]
+                                                        ]
+                                                    ]
+                                                ]
+                                            ]
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:any_true ;
+                    rr:objectMap [ rr:constant "http://nf-osi.github.com/terms#UnknownOrNA" ; rr:termType rr:IRI ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:any_false ;
+                    rr:objectMap [ rml:reference "_no_valid_specimen_id" ; rr:termType rr:Literal ]
                 ]
             ]
         ]
@@ -234,11 +509,196 @@ map:FileIndividualID a rr:TriplesMap ;
                 ] ;
                 rr:predicateObjectMap [
                     rr:predicate grel:valueParameter ;
+                    rr:objectMap [
+            a fnml:FunctionTermMap ;
+            fnml:functionValue [
+                a fno:Execution ;
+                rml:logicalSource map:PortalFilesSource ;
+                rr:predicateObjectMap [
+                    rr:predicate fno:executes ;
+                    rr:objectMap [ rr:constant grel:controls_if ; rr:termType rr:IRI ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:bool_b ;
+                    rr:objectMap [
+                        a fnml:FunctionTermMap ;
+                        fnml:functionValue [
+                            a fno:Execution ;
+                            rml:logicalSource map:PortalFilesSource ;
+                            rr:predicateObjectMap [
+                                rr:predicate fno:executes ;
+                                rr:objectMap [ rr:constant grel:string_contains ; rr:termType rr:IRI ]
+                            ] ;
+                            rr:predicateObjectMap [
+                                rr:predicate grel:valueParameter ;
+                                rr:objectMap [ rr:constant "|na|nan|n/a|none|unknown|" ; rr:termType rr:Literal ]
+                            ] ;
+                            rr:predicateObjectMap [
+                                rr:predicate grel:string_sub ;
+                                rr:objectMap [
+                                    a fnml:FunctionTermMap ;
+                                    fnml:functionValue [
+                                        a fno:Execution ;
+                                        rml:logicalSource map:PortalFilesSource ;
+                                        rr:predicateObjectMap [
+                                            rr:predicate fno:executes ;
+                                            rr:objectMap [ rr:constant grel:string_replace ; rr:termType rr:IRI ]
+                                        ] ;
+                                        rr:predicateObjectMap [
+                                            rr:predicate grel:valueParameter ;
+                                            rr:objectMap [ rr:constant "|PLACEHOLDER|" ; rr:termType rr:Literal ]
+                                        ] ;
+                                        rr:predicateObjectMap [
+                                            rr:predicate grel:p_string_find ;
+                                            rr:objectMap [ rr:constant "PLACEHOLDER" ; rr:termType rr:Literal ]
+                                        ] ;
+                                        rr:predicateObjectMap [
+                                            rr:predicate grel:p_string_replace ;
+                                            rr:objectMap [
+                                                a fnml:FunctionTermMap ;
+                                                fnml:functionValue [
+                                                    a fno:Execution ;
+                                                    rml:logicalSource map:PortalFilesSource ;
+                                                    rr:predicateObjectMap [
+                                                        rr:predicate fno:executes ;
+                                                        rr:objectMap [ rr:constant grel:toLowerCase ; rr:termType rr:IRI ]
+                                                    ] ;
+                                                    rr:predicateObjectMap [
+                                                        rr:predicate grel:valueParameter ;
+                                                        rr:objectMap [
+                                                            a fnml:FunctionTermMap ;
+                                                            fnml:functionValue [
+                                                                a fno:Execution ;
+                                                                rml:logicalSource map:PortalFilesSource ;
+                                                                rr:predicateObjectMap [
+                                                                    rr:predicate fno:executes ;
+                                                                    rr:objectMap [ rr:constant grel:string_trim ; rr:termType rr:IRI ]
+                                                                ] ;
+                                                                rr:predicateObjectMap [
+                                                                    rr:predicate grel:valueParameter ;
+                                                                    rr:objectMap [ rml:reference "individualID" ; rr:termType rr:Literal ]
+                                                                ]
+                                                            ]
+                                                        ]
+                                                    ]
+                                                ]
+                                            ]
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:any_true ;
+                    rr:objectMap [ rml:reference "_no_valid_individual_id" ; rr:termType rr:Literal ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:any_false ;
                     rr:objectMap [ rml:reference "individualID" ; rr:termType rr:Literal ]
+                ]
+            ]
+                    ]
                 ] ;
                 rr:predicateObjectMap [
                     rr:predicate grel:p_string_sep ;
                     rr:objectMap [ rr:constant "\\|" ; rr:termType rr:Literal ]
+                ]
+            ]
+        ]
+    ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:hasIndividualIdStatus ;
+        rr:objectMap [
+            a fnml:FunctionTermMap ;
+            rr:termType rr:IRI ;
+            fnml:functionValue [
+                a fno:Execution ;
+                rml:logicalSource map:PortalFilesSource ;
+                rr:predicateObjectMap [
+                    rr:predicate fno:executes ;
+                    rr:objectMap [ rr:constant grel:controls_if ; rr:termType rr:IRI ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:bool_b ;
+                    rr:objectMap [
+                        a fnml:FunctionTermMap ;
+                        fnml:functionValue [
+                            a fno:Execution ;
+                            rml:logicalSource map:PortalFilesSource ;
+                            rr:predicateObjectMap [
+                                rr:predicate fno:executes ;
+                                rr:objectMap [ rr:constant grel:string_contains ; rr:termType rr:IRI ]
+                            ] ;
+                            rr:predicateObjectMap [
+                                rr:predicate grel:valueParameter ;
+                                rr:objectMap [ rr:constant "|na|nan|n/a|none|unknown|" ; rr:termType rr:Literal ]
+                            ] ;
+                            rr:predicateObjectMap [
+                                rr:predicate grel:string_sub ;
+                                rr:objectMap [
+                                    a fnml:FunctionTermMap ;
+                                    fnml:functionValue [
+                                        a fno:Execution ;
+                                        rml:logicalSource map:PortalFilesSource ;
+                                        rr:predicateObjectMap [
+                                            rr:predicate fno:executes ;
+                                            rr:objectMap [ rr:constant grel:string_replace ; rr:termType rr:IRI ]
+                                        ] ;
+                                        rr:predicateObjectMap [
+                                            rr:predicate grel:valueParameter ;
+                                            rr:objectMap [ rr:constant "|PLACEHOLDER|" ; rr:termType rr:Literal ]
+                                        ] ;
+                                        rr:predicateObjectMap [
+                                            rr:predicate grel:p_string_find ;
+                                            rr:objectMap [ rr:constant "PLACEHOLDER" ; rr:termType rr:Literal ]
+                                        ] ;
+                                        rr:predicateObjectMap [
+                                            rr:predicate grel:p_string_replace ;
+                                            rr:objectMap [
+                                                a fnml:FunctionTermMap ;
+                                                fnml:functionValue [
+                                                    a fno:Execution ;
+                                                    rml:logicalSource map:PortalFilesSource ;
+                                                    rr:predicateObjectMap [
+                                                        rr:predicate fno:executes ;
+                                                        rr:objectMap [ rr:constant grel:toLowerCase ; rr:termType rr:IRI ]
+                                                    ] ;
+                                                    rr:predicateObjectMap [
+                                                        rr:predicate grel:valueParameter ;
+                                                        rr:objectMap [
+                                                            a fnml:FunctionTermMap ;
+                                                            fnml:functionValue [
+                                                                a fno:Execution ;
+                                                                rml:logicalSource map:PortalFilesSource ;
+                                                                rr:predicateObjectMap [
+                                                                    rr:predicate fno:executes ;
+                                                                    rr:objectMap [ rr:constant grel:string_trim ; rr:termType rr:IRI ]
+                                                                ] ;
+                                                                rr:predicateObjectMap [
+                                                                    rr:predicate grel:valueParameter ;
+                                                                    rr:objectMap [ rml:reference "individualID" ; rr:termType rr:Literal ]
+                                                                ]
+                                                            ]
+                                                        ]
+                                                    ]
+                                                ]
+                                            ]
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:any_true ;
+                    rr:objectMap [ rr:constant "http://nf-osi.github.com/terms#UnknownOrNA" ; rr:termType rr:IRI ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:any_false ;
+                    rr:objectMap [ rml:reference "_no_valid_individual_id" ; rr:termType rr:Literal ]
                 ]
             ]
         ]
@@ -420,7 +880,97 @@ map:FileCompoundName a rr:TriplesMap ;
                 ] ;
                 rr:predicateObjectMap [
                     rr:predicate grel:valueParameter ;
+                    rr:objectMap [
+            a fnml:FunctionTermMap ;
+            fnml:functionValue [
+                a fno:Execution ;
+                rml:logicalSource map:PortalFilesSource ;
+                rr:predicateObjectMap [
+                    rr:predicate fno:executes ;
+                    rr:objectMap [ rr:constant grel:controls_if ; rr:termType rr:IRI ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:bool_b ;
+                    rr:objectMap [
+                        a fnml:FunctionTermMap ;
+                        fnml:functionValue [
+                            a fno:Execution ;
+                            rml:logicalSource map:PortalFilesSource ;
+                            rr:predicateObjectMap [
+                                rr:predicate fno:executes ;
+                                rr:objectMap [ rr:constant grel:string_contains ; rr:termType rr:IRI ]
+                            ] ;
+                            rr:predicateObjectMap [
+                                rr:predicate grel:valueParameter ;
+                                rr:objectMap [ rr:constant "|none|" ; rr:termType rr:Literal ]
+                            ] ;
+                            rr:predicateObjectMap [
+                                rr:predicate grel:string_sub ;
+                                rr:objectMap [
+                                    a fnml:FunctionTermMap ;
+                                    fnml:functionValue [
+                                        a fno:Execution ;
+                                        rml:logicalSource map:PortalFilesSource ;
+                                        rr:predicateObjectMap [
+                                            rr:predicate fno:executes ;
+                                            rr:objectMap [ rr:constant grel:string_replace ; rr:termType rr:IRI ]
+                                        ] ;
+                                        rr:predicateObjectMap [
+                                            rr:predicate grel:valueParameter ;
+                                            rr:objectMap [ rr:constant "|PLACEHOLDER|" ; rr:termType rr:Literal ]
+                                        ] ;
+                                        rr:predicateObjectMap [
+                                            rr:predicate grel:p_string_find ;
+                                            rr:objectMap [ rr:constant "PLACEHOLDER" ; rr:termType rr:Literal ]
+                                        ] ;
+                                        rr:predicateObjectMap [
+                                            rr:predicate grel:p_string_replace ;
+                                            rr:objectMap [
+                                                a fnml:FunctionTermMap ;
+                                                fnml:functionValue [
+                                                    a fno:Execution ;
+                                                    rml:logicalSource map:PortalFilesSource ;
+                                                    rr:predicateObjectMap [
+                                                        rr:predicate fno:executes ;
+                                                        rr:objectMap [ rr:constant grel:toLowerCase ; rr:termType rr:IRI ]
+                                                    ] ;
+                                                    rr:predicateObjectMap [
+                                                        rr:predicate grel:valueParameter ;
+                                                        rr:objectMap [
+                                                            a fnml:FunctionTermMap ;
+                                                            fnml:functionValue [
+                                                                a fno:Execution ;
+                                                                rml:logicalSource map:PortalFilesSource ;
+                                                                rr:predicateObjectMap [
+                                                                    rr:predicate fno:executes ;
+                                                                    rr:objectMap [ rr:constant grel:string_trim ; rr:termType rr:IRI ]
+                                                                ] ;
+                                                                rr:predicateObjectMap [
+                                                                    rr:predicate grel:valueParameter ;
+                                                                    rr:objectMap [ rml:reference "compoundName" ; rr:termType rr:Literal ]
+                                                                ]
+                                                            ]
+                                                        ]
+                                                    ]
+                                                ]
+                                            ]
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:any_true ;
+                    rr:objectMap [ rr:constant "None" ; rr:termType rr:Literal ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:any_false ;
                     rr:objectMap [ rml:reference "compoundName" ; rr:termType rr:Literal ]
+                ]
+            ]
+                    ]
                 ] ;
                 rr:predicateObjectMap [
                     rr:predicate grel:p_string_sep ;
