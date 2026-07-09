@@ -32,7 +32,7 @@ class TestDatasetCore:
     def test_has_correct_type(self, datasets_graph, namespaces):
         """All entries should have type biolink:Dataset"""
         datasets = list(datasets_graph.subjects(RDF.type, BIOLINK.Dataset))
-        assert len(datasets) == 3, f"Expected 3 datasets, got {len(datasets)}"
+        assert len(datasets) == 4, f"Expected 4 datasets, got {len(datasets)}"
 
     def test_subject_is_iri(self, datasets_graph, namespaces):
         """Subjects should be IRIs"""
@@ -132,6 +132,7 @@ class TestDatasetCore:
         results = list(datasets_graph.query(query, initNs={"nf": NF, "biolink": BIOLINK}))
         assert len(results) == 1
         assert isinstance(results[0].doi, URIRef)
+        assert str(results[0].doi) == "https://doi.org/10.1000/xyz"
 
     def test_empty_doi_produces_no_triple(self, datasets_graph, namespaces):
         """Empty doi should not produce a triple"""
@@ -145,6 +146,19 @@ class TestDatasetCore:
         """
         results = list(datasets_graph.query(query, initNs={"nf": NF, "biolink": BIOLINK}))
         assert len(results) == 0, "Empty doi should produce no triple"
+
+    def test_license_placeholder_produces_no_triple(self, datasets_graph, namespaces):
+        """A non-URL license placeholder (e.g. 'UNKNOWN') should not produce a license triple"""
+        query = """
+        SELECT ?lic
+        WHERE {
+            ?ds a biolink:Dataset ;
+                nf:license ?lic .
+            FILTER(CONTAINS(STR(?ds), "syn55566677"))
+        }
+        """
+        results = list(datasets_graph.query(query, initNs={"nf": NF, "biolink": BIOLINK}))
+        assert len(results) == 0, "Non-URL license placeholder should produce no triple"
 
     def test_external_repository_is_iri(self, datasets_graph, namespaces):
         """externalRepositoryUri should be an IRI when set"""
