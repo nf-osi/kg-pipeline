@@ -34,9 +34,79 @@ map:DatasetCore a rr:TriplesMap ;
     rr:predicateObjectMap [ rr:predicate nf:parentStudy ; rr:objectMap [ rr:template "https://www.synapse.org/Synapse:{studyId}" ; rr:termType rr:IRI ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:diseaseFocus ; rr:objectMap [ rml:reference "diseaseFocus" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:assay ; rr:objectMap [ rml:reference "assay" ; rr:datatype xsd:string ] ] ;
-    rr:predicateObjectMap [ rr:predicate nf:doi ; rr:objectMap [ rml:reference "doi" ; rr:termType rr:IRI ] ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:doi ;
+        rr:objectMap [
+            a fnml:FunctionTermMap ;
+            rr:termType rr:IRI ;
+            fnml:functionValue [
+                a fno:Execution ;
+                rml:logicalSource map:DatasetsSource ;
+                rr:predicateObjectMap [
+                    rr:predicate fno:executes ;
+                    rr:objectMap [ rr:constant grel:string_replace ; rr:termType rr:IRI ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:valueParameter ;
+                    rr:objectMap [ rr:constant "https://doi.org/PLACEHOLDER" ; rr:termType rr:Literal ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:p_string_find ;
+                    rr:objectMap [ rr:constant "PLACEHOLDER" ; rr:termType rr:Literal ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:p_string_replace ;
+                    rr:objectMap [ rml:reference "doi" ; rr:termType rr:Literal ]
+                ]
+            ]
+        ]
+    ] ;
     rr:predicateObjectMap [ rr:predicate nf:accessType ; rr:objectMap [ rml:reference "accessType" ; rr:datatype xsd:string ] ] ;
-    rr:predicateObjectMap [ rr:predicate nf:license ; rr:objectMap [ rml:reference "license" ; rr:termType rr:IRI ] ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:license ;
+        rr:objectMap [
+            a fnml:FunctionTermMap ;
+            rr:termType rr:IRI ;
+            fnml:functionValue [
+                a fno:Execution ;
+                rml:logicalSource map:DatasetsSource ;
+                rr:predicateObjectMap [
+                    rr:predicate fno:executes ;
+                    rr:objectMap [ rr:constant grel:controls_if ; rr:termType rr:IRI ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:bool_b ;
+                    rr:objectMap [
+                        a fnml:FunctionTermMap ;
+                        fnml:functionValue [
+                            a fno:Execution ;
+                            rml:logicalSource map:DatasetsSource ;
+                            rr:predicateObjectMap [
+                                rr:predicate fno:executes ;
+                                rr:objectMap [ rr:constant grel:string_contains ; rr:termType rr:IRI ]
+                            ] ;
+                            rr:predicateObjectMap [
+                                rr:predicate grel:valueParameter ;
+                                rr:objectMap [ rml:reference "license" ; rr:termType rr:Literal ]
+                            ] ;
+                            rr:predicateObjectMap [
+                                rr:predicate grel:string_sub ;
+                                rr:objectMap [ rr:constant "://" ; rr:termType rr:Literal ]
+                            ]
+                        ]
+                    ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:any_true ;
+                    rr:objectMap [ rml:reference "license" ; rr:termType rr:Literal ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:any_false ;
+                    rr:objectMap [ rml:reference "_no_valid_license_uri" ; rr:termType rr:Literal ]
+                ]
+            ]
+        ]
+    ] ;
     rr:predicateObjectMap [ rr:predicate nf:conditionsOfAccess ; rr:objectMap [ rml:reference "conditionsOfAccess" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:modelSystemName ; rr:objectMap [ rml:reference "modelSystemName" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:datasetSizeInBytes ; rr:objectMap [ rml:reference "datasetSizeInBytes" ; rr:datatype xsd:long ] ] ;

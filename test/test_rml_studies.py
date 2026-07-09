@@ -126,8 +126,8 @@ class TestStudiesIRIFields:
         """
         iris = [str(r.rs) for r in studies_graph.query(query, initNs={"nf": NF})]
         assert len(iris) == 2
-        assert any("syn0000001" in i for i in iris)
-        assert any("syn0000002" in i for i in iris)
+        assert "https://www.synapse.org/Synapse:syn0000001" in iris
+        assert "https://www.synapse.org/Synapse:syn0000002" in iris
 
     def test_grant_doi_iri(self, studies_graph, namespaces):
         """grantDOI should emit DOI IRI"""
@@ -140,6 +140,17 @@ class TestStudiesIRIFields:
         results = list(studies_graph.query(query, initNs={"nf": NF}))
         assert len(results) > 0
         assert "https://doi.org/10.1234/test1" in [str(r.doi) for r in results]
+
+    def test_grant_doi_placeholder_produces_no_triple(self, studies_graph, namespaces):
+        """A non-URL placeholder value (e.g. 'N/A') should not produce a grantDOI triple"""
+        NF = namespaces["nf"]
+        query = """
+        SELECT ?doi WHERE {
+            <https://www.synapse.org/Synapse:syn0000005> nf:grantDOI ?doi .
+        }
+        """
+        results = list(studies_graph.query(query, initNs={"nf": NF}))
+        assert len(results) == 0
 
     def test_initiative_iri(self, studies_graph, namespaces):
         """Initiative should be an IRI with spaces replaced"""
