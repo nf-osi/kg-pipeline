@@ -3,3 +3,4 @@ syn0000001,Test Study One,A test study for validation,Cutaneous Neurofibroma Ini
 syn0000002,Test Study Two,Another test study,Cell Culture Initiative,John Smith|Alice Brown,University A|University B,Plexiform Neurofibroma,Neurofibromatosis type 2,Completed,Available,Gilbert Family Foundation,Restricted,Acknowledge us.,genomicVariants,,syn1000002,,http://nf-osi.github.com/terms#GenomicVariants
 syn0000003,Test Study Three,Third test study,Synodos,Bob Wilson,Institute C,Schwannoma|Meningioma,Neurofibromatosis type 1|Neurofibromatosis type 2,Active,Data Not Expected,NTAP,Open access,,analysis,syn0000001|syn0000002,syn1000003,,
 syn0000004,Test Study Four,Minimal study with empty lists,Synodos,,,,,Planning,Data Not Expected,,Open access,,,,,
+syn0000005,Test Study Five,Study with placeholder grant DOI,Synodos,,,,,Planning,Data Not Expected,,Open access,,,,N/A,
