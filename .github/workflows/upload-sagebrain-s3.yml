@@ -25,7 +25,21 @@ env:
 
 jobs:
   upload:
-    if: github.event.workflow_run.conclusion == 'success'
+    # Tag pushes (the normal release path) are always trusted since they require
+    # push access; workflow_dispatch runs are restricted to main/develop so ad hoc
+    # test builds from feature branches can't overwrite the prod S3 prefix.
+    if: >
+      github.event.workflow_run.conclusion == 'success' &&
+      (
+        github.event.workflow_run.event == 'push' ||
+        (
+          github.event.workflow_run.event == 'workflow_dispatch' &&
+          (
+            github.event.workflow_run.head_branch == 'main' ||
+            github.event.workflow_run.head_branch == 'develop'
+          )
+        )
+      )
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -47,11 +61,38 @@ jobs:
           role-to-assume: ${{ secrets.SAGEBRAIN_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
 
+      - name: Generate build manifest
+        run: |
+          DATE=$(date +%Y-%m-%d)
+          TIMESTAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          cat > manifest.ttl <<EOF
+          @prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+          @prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+          @prefix prov: <http://www.w3.org/ns/prov#> .
+          @prefix void: <http://rdfs.org/ns/void#> .
+          @prefix nf:   <http://nf-osi.github.com/terms#> .
+
+          nf:kgBuild_${{ github.event.workflow_run.id }}
+              a prov:Activity, void:Dataset ;
+              prov:generatedAtTime "$TIMESTAMP"^^xsd:dateTime ;
+              prov:wasAssociatedWith <${{ github.event.workflow_run.html_url }}> ;
+              prov:used <https://github.com/${{ github.repository }}/commit/${{ github.event.workflow_run.head_sha }}> ;
+              nf:portal "${{ env.PORTAL }}" ;
+              nf:gitRef "${{ github.event.workflow_run.head_branch }}" ;
+              nf:gitCommit "${{ github.event.workflow_run.head_sha }}" ;
+              nf:buildRunId "${{ github.event.workflow_run.id }}" ;
+              nf:buildTriggerEvent "${{ github.event.workflow_run.event }}" ;
+              void:dataDump <s3://${{ env.NEPTUNE_BUCKET }}/${{ env.PORTAL }}/$DATE/> .
+          EOF
+
       - name: Upload to S3
-        # Note: if two builds run on the same day, the second overwrites the first.
-        # This is acceptable — Neptune loads the latest data for a given date.
+        # Uses sync --delete (not cp --recursive) so that if two builds run on the
+        # same day, the second upload fully replaces the first, including files
+        # removed/renamed since — cp alone would leave stale files behind.
+        # Neptune loads the latest data for a given date.
         run: |
           DATE=$(date +%Y-%m-%d)
           PREFIX=s3://${{ env.NEPTUNE_BUCKET }}/${{ env.PORTAL }}/$DATE
-          aws s3 cp schema/   $PREFIX/schema/   --recursive
-          aws s3 cp data/rdf/ $PREFIX/data/rdf/ --recursive
+          aws s3 sync schema/   $PREFIX/schema/   --delete
+          aws s3 sync data/rdf/ $PREFIX/data/rdf/ --delete
+          aws s3 cp manifest.ttl $PREFIX/manifest.ttl
