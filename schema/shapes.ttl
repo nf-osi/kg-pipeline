@@ -2,6 +2,7 @@
 @prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
 @prefix nf:   <http://nf-osi.github.com/terms#> .
 @prefix biolink: <https://w3id.org/biolink/vocab/> .
 @prefix shapes: <http://nf-osi.github.com/shapes#> .
@@ -895,6 +896,20 @@ shapes:InvestigatorShape a sh:NodeShape ;
     ] ;
     sh:property [
         sh:path nf:investigatorSynapseId ;
+        sh:nodeKind sh:IRI ;
+        sh:maxCount 1 ;
+    ] .
+
+################################################################################
+# Person
+################################################################################
+
+shapes:PersonShape a sh:NodeShape ;
+    sh:targetClass biolink:Person ;
+    rdfs:label "Person shape" ;
+    rdfs:comment "Expected properties for generic Person instances (Synapse profiles with a known ORCID)." ;
+    sh:property [
+        sh:path owl:sameAs ;
         sh:nodeKind sh:IRI ;
         sh:maxCount 1 ;
     ] .
