@@ -1,0 +1,60 @@
+@prefix rr:   <http://www.w3.org/ns/r2rml#> .
+@prefix rml:  <http://semweb.mmlab.be/ns/rml#> .
+@prefix fnml: <http://semweb.mmlab.be/ns/fnml#> .
+@prefix fno:  <https://w3id.org/function/ontology#> .
+@prefix ql:   <http://semweb.mmlab.be/ns/ql#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix grel: <http://users.ugent.be/~bjdmeest/function/grel.ttl#> .
+@prefix nf:   <http://nf-osi.github.com/terms#> .
+@prefix map:  <http://nf-osi.github.com/mappings/publication_author_orcids#> .
+
+################################################################################
+# Logical source
+################################################################################
+
+map:PublicationAuthorOrcidsSource a rml:LogicalSource ;
+    rml:source "data/csv/publication_author_orcids.csv" ;
+    rml:referenceFormulation ql:CSV .
+
+################################################################################
+# Publication author ORCID links
+#
+# Subject is the DOI IRI (same template used for the publications.doi object
+# value), so this ingest attaches author ORCID facts to the same node the
+# Publication entity already points to via nf:doi, without requiring a join
+# on the internal publicationId. Coverage of DOIs here is broader than the
+# curated publications table, since it is sourced from a separate
+# publication-mining pipeline.
+################################################################################
+
+map:PublicationAuthorOrcid a rr:TriplesMap ;
+    rdfs:label "Publication Author ORCID" ;
+    rml:logicalSource map:PublicationAuthorOrcidsSource ;
+    rr:subjectMap [
+        a fnml:FunctionTermMap ;
+        rr:termType rr:IRI ;
+        fnml:functionValue [
+            a fno:Execution ;
+            rml:logicalSource map:PublicationAuthorOrcidsSource ;
+            rr:predicateObjectMap [
+                rr:predicate fno:executes ;
+                rr:objectMap [ rr:constant grel:string_replace ; rr:termType rr:IRI ]
+            ] ;
+            rr:predicateObjectMap [
+                rr:predicate grel:valueParameter ;
+                rr:objectMap [ rr:constant "https://doi.org/PLACEHOLDER" ; rr:termType rr:Literal ]
+            ] ;
+            rr:predicateObjectMap [
+                rr:predicate grel:p_string_find ;
+                rr:objectMap [ rr:constant "PLACEHOLDER" ; rr:termType rr:Literal ]
+            ] ;
+            rr:predicateObjectMap [
+                rr:predicate grel:p_string_replace ;
+                rr:objectMap [ rml:reference "doi" ; rr:termType rr:Literal ]
+            ]
+        ]
+    ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:hasAuthorOrcid ;
+        rr:objectMap [ rr:template "https://orcid.org/{orcid}" ; rr:termType rr:IRI ]
+    ] .
