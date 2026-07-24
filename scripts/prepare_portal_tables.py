@@ -330,6 +330,16 @@ versionLabel as versionLabel,
 externalRepositoryUri as externalRepositoryUri
 """
 
+PEOPLE_SELECT = """
+ownerID as ownerID,
+hasORCID as orcid
+"""
+
+PUBLICATION_AUTHOR_ORCIDS_SELECT = """
+doi as doi,
+orcid as orcid
+"""
+
 OBSERVATIONS_SELECT = """
 observationId as observationId,
 resourceId as resourceId,
@@ -393,6 +403,8 @@ TABLE_ALIASES = {
     "computational": "computational_tools",
     "initiative": "initiatives",
     "dataset": "datasets",
+    "person": "people",
+    "pub_author_orcid": "publication_author_orcids",
 }
 
 TABLES: Dict[str, Dict[str, Any]] = {
@@ -873,6 +885,26 @@ TABLES: Dict[str, Dict[str, Any]] = {
             {"target": "externalRepositoryUri", "source": "externalRepositoryUri", "type": "iri"},
         ],
     },
+    "people": {
+        "synapse_id": "syn23564971",
+        "csv_path": Path("data/csv/people.csv"),
+        "raw_filename": "people_raw.csv",
+        "select_clause": PEOPLE_SELECT,
+        "columns": [
+            {"target": "ownerID", "source": "ownerID", "type": "iri", "transform": "synapse_id"},
+            {"target": "orcid", "source": "orcid", "type": "iri", "transform": "orcid"},
+        ],
+    },
+    "publication_author_orcids": {
+        "synapse_id": "syn76406574",
+        "csv_path": Path("data/csv/publication_author_orcids.csv"),
+        "raw_filename": "publication_author_orcids_raw.csv",
+        "select_clause": PUBLICATION_AUTHOR_ORCIDS_SELECT,
+        "columns": [
+            {"target": "doi", "source": "doi", "type": "iri", "transform": "doi"},
+            {"target": "orcid", "source": "orcid", "type": "iri", "transform": "orcid"},
+        ],
+    },
 }
 
 
@@ -984,6 +1016,14 @@ def format_doi(value: Any) -> str:
     return s
 
 
+def format_orcid(value: Any) -> str:
+    """Strip ``orcid:`` prefix so the bare ORCID iD can be used in IRI templates."""
+    s = format_string(value)
+    if s.startswith("orcid:"):
+        return s[len("orcid:"):]
+    return s
+
+
 def format_iri_list(value: Any) -> str:
     cleaned: List[str] = []
     for entry in ensure_list(value):
@@ -1008,6 +1048,7 @@ TRANSFORMS = {
     "number": format_number,
     "pmid": format_pmid,
     "doi": format_doi,
+    "orcid": format_orcid,
 }
 
 
@@ -1149,6 +1190,11 @@ def apply_derived_columns(
             keep="first",
         )
         return df.merge(donor_race, on="donorId", how="left")
+
+    if table_name == "people":
+        if "orcid" not in df.columns:
+            return df
+        return df[df["orcid"].apply(lambda v: not is_missing(v) and str(v).strip() != "")]
 
     if table_name == "initiatives":
         if "initiativeKey" not in df.columns and "initiative" in df.columns:
