@@ -890,14 +890,9 @@ shapes:InvestigatorShape a sh:NodeShape ;
         sh:maxCount 1 ;
     ] ;
     sh:property [
-        sh:path nf:orcid ;
+        sh:path owl:sameAs ;
         sh:nodeKind sh:IRI ;
-        sh:maxCount 1 ;
-    ] ;
-    sh:property [
-        sh:path nf:investigatorSynapseId ;
-        sh:nodeKind sh:IRI ;
-        sh:maxCount 1 ;
+        sh:maxCount 2 ;
     ] .
 
 ################################################################################

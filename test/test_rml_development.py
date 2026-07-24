@@ -123,24 +123,38 @@ class TestInvestigator:
         institutions = [str(row.institution) for row in results]
         assert "Johns Hopkins University" in institutions, "Expected JHU from test data"
 
-    def test_investigators_have_orcid(self, investigator_graph, namespaces):
-        """Investigators should have ORCID IRI property"""
+    def test_investigators_have_same_as_orcid_and_profile(self, investigator_graph, namespaces):
+        """Investigators should have owl:sameAs links to both their ORCID and Synapse profile IRIs"""
         NF = namespaces["nf"]
+        OWL = namespaces["owl"]
 
         query = """
-        SELECT ?investigator ?orcid
+        SELECT ?investigator ?sameAs
         WHERE {
             ?investigator a nf:Investigator ;
-                         nf:orcid ?orcid .
+                         owl:sameAs ?sameAs .
         }
         """
-        results = list(investigator_graph.query(query, initNs={"nf": NF}))
-        assert len(results) > 0, "No investigators with ORCID found"
+        results = list(investigator_graph.query(query, initNs={"nf": NF, "owl": OWL}))
+        assert len(results) > 0, "No investigators with owl:sameAs found"
 
-        # ORCIDs should be IRIs
+        # owl:sameAs objects should be IRIs
         for row in results:
-            assert isinstance(row.orcid, URIRef), \
-                f"ORCID {row.orcid} should be IRI, not literal"
+            assert isinstance(row.sameAs, URIRef), \
+                f"owl:sameAs target {row.sameAs} should be IRI, not literal"
+
+        # Each investigator should have exactly one orcid.org and one Synapse Profile sameAs
+        by_investigator = {}
+        for row in results:
+            by_investigator.setdefault(row.investigator, []).append(str(row.sameAs))
+
+        for investigator, targets in by_investigator.items():
+            orcid_targets = [t for t in targets if t.startswith("https://orcid.org/")]
+            profile_targets = [t for t in targets if t.startswith("https://www.synapse.org/Profile:")]
+            assert len(orcid_targets) == 1, \
+                f"Expected exactly 1 orcid.org sameAs for {investigator}, got {orcid_targets}"
+            assert len(profile_targets) == 1, \
+                f"Expected exactly 1 Synapse Profile sameAs for {investigator}, got {profile_targets}"
 
 
 class TestPublication:

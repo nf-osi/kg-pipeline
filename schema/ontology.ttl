@@ -1615,21 +1615,12 @@ nf:hasFunder a owl:ObjectProperty ;
     rdfs:range nf:Funder .
 
 # Investigator
-nf:investigatorSynapseId a owl:DatatypeProperty ;
-    rdfs:label "investigatorSynapseId" ;
-    rdfs:comment "Synapse user ID of the investigator." ;
-    rdfs:domain nf:Investigator ;
-    rdfs:range xsd:string .
+#
+# ORCID and Synapse profiles linked via owl:sameAs
 
 nf:institution a owl:DatatypeProperty ;
     rdfs:label "institution" ;
     rdfs:comment "Affiliated institution." ;
-    rdfs:domain nf:Investigator ;
-    rdfs:range xsd:string .
-
-nf:orcid a owl:DatatypeProperty ;
-    rdfs:label "orcid" ;
-    rdfs:comment "ORCID identifier for an investigator." ;
     rdfs:domain nf:Investigator ;
     rdfs:range xsd:string .
 
@@ -1760,6 +1751,12 @@ nf:observationLink a owl:ObjectProperty ;
     rdfs:label "observationLink" ;
     rdfs:comment "Link to supporting material." ;
     rdfs:domain nf:Observation .
+
+nf:investigatorSynapseId a owl:DatatypeProperty ;
+    rdfs:label "investigatorSynapseId" ;
+    rdfs:comment "Synapse user ID of the observation's submitter." ;
+    rdfs:domain nf:Observation ;
+    rdfs:range xsd:string .
 
 nf:reliabilityRating a owl:DatatypeProperty ;
     rdfs:label "reliabilityRating" ;

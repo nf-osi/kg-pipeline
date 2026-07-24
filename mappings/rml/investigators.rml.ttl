@@ -4,6 +4,7 @@
 @prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
 @prefix nf:   <http://nf-osi.github.com/terms#> .
 @prefix map:  <http://nf-osi.github.com/mappings/investigators#> .
 
@@ -28,5 +29,5 @@ map:InvestigatorCore a rr:TriplesMap ;
     rr:predicateObjectMap [ rr:predicate nf:name ; rr:objectMap [ rml:reference "investigatorName" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [ rr:predicate rdfs:label ; rr:objectMap [ rml:reference "investigatorName" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:institution ; rr:objectMap [ rml:reference "institution" ; rr:datatype xsd:string ] ] ;
-    rr:predicateObjectMap [ rr:predicate nf:orcid ; rr:objectMap [ rr:template "https://orcid.org/{orcid}" ; rr:termType rr:IRI ] ] ;
-    rr:predicateObjectMap [ rr:predicate nf:investigatorSynapseId ; rr:objectMap [ rr:template "https://www.synapse.org/Profile:{investigatorSynapseId}" ; rr:termType rr:IRI ] ] .
+    rr:predicateObjectMap [ rr:predicate owl:sameAs ; rr:objectMap [ rr:template "https://orcid.org/{orcid}" ; rr:termType rr:IRI ] ] ;
+    rr:predicateObjectMap [ rr:predicate owl:sameAs ; rr:objectMap [ rr:template "https://www.synapse.org/Profile:{investigatorSynapseId}" ; rr:termType rr:IRI ] ] .
