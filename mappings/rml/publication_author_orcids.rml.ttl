@@ -55,6 +55,6 @@ map:PublicationAuthorOrcid a rr:TriplesMap ;
         ]
     ] ;
     rr:predicateObjectMap [
-        rr:predicate nf:hasAuthorOrcid ;
+        rr:predicate nf:authorOrcid ;
         rr:objectMap [ rr:template "https://orcid.org/{orcid}" ; rr:termType rr:IRI ]
     ] .
