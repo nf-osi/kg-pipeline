@@ -35,7 +35,33 @@ map:PublicationCore a rr:TriplesMap ;
     rr:predicateObjectMap [ rr:predicate nf:publicationDate ; rr:objectMap [ rml:reference "publicationDate" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:publicationDateUnix ; rr:objectMap [ rml:reference "publicationDateUnix" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:journal ; rr:objectMap [ rml:reference "journal" ; rr:datatype xsd:string ] ] ;
-    rr:predicateObjectMap [ rr:predicate nf:doi ; rr:objectMap [ rr:template "https://doi.org/{doi}" ; rr:termType rr:IRI ] ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:doi ;
+        rr:objectMap [
+            a fnml:FunctionTermMap ;
+            rr:termType rr:IRI ;
+            fnml:functionValue [
+                a fno:Execution ;
+                rml:logicalSource map:PublicationsSource ;
+                rr:predicateObjectMap [
+                    rr:predicate fno:executes ;
+                    rr:objectMap [ rr:constant grel:string_replace ; rr:termType rr:IRI ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:valueParameter ;
+                    rr:objectMap [ rr:constant "https://doi.org/PLACEHOLDER" ; rr:termType rr:Literal ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:p_string_find ;
+                    rr:objectMap [ rr:constant "PLACEHOLDER" ; rr:termType rr:Literal ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:p_string_replace ;
+                    rr:objectMap [ rml:reference "doi" ; rr:termType rr:Literal ]
+                ]
+            ]
+        ]
+    ] ;
     rr:predicateObjectMap [ rr:predicate nf:pmid ; rr:objectMap [ rr:template "https://pubmed.ncbi.nlm.nih.gov/{pmid}" ; rr:termType rr:IRI ] ] .
 
 ################################################################################
