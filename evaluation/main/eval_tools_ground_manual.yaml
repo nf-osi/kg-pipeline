@@ -10,6 +10,7 @@ metadata:
     - CL-003
     - CR-001
     - CR-004
+    - PUB-001
 
 ground_truth:
   AM-004:
@@ -112,6 +113,28 @@ ground_truth:
         usage constraints and investigator-contact acquisition model, reads
         the ontology guidance, and correctly hedges with "Not explicitly
         documented but likely"
+
+  PUB-001:
+    question: "How many authors are on 'Genetically engineered minipigs model the major clinical features of human neurofibromatosis type 1' (DOI: 10.1038/s42003-018-0163-y)?"
+    results:
+      - 22
+
+    methodology: |
+      1. Find the publication by DOI (10.1038/s42003-018-0163-y, PMID 30302402)
+      2. Count authors from nf:authors — the pipe-delimited literal author name
+         list on the publication itself — NOT from nf:authorOrcid triples
+      3. nf:authors lists 22 names; only 19 have a corresponding nf:authorOrcid
+         link (3 authors have no ORCID on record: Sara H Isakson, Anthony E
+         Rizzardi, and James Fisher)
+
+    notes: |
+      This question tests whether an agent respects the ontology guidance on
+      nf:authorOrcid: ORCID is not available for all authors, so authorOrcid
+      is a partial subset of authorship, while nf:authors is the complete list.
+      - A naive agent may count distinct nf:authorOrcid values (or people/
+        investigator entities reachable via ORCID) and answer 19, undercounting.
+      - A well-calibrated agent uses nf:authors as the authoritative, complete
+        author list and answers 22.
 
   CR-001:
     question: "Which cell lines have shown sensitivity to HDAC inhibitors?"
