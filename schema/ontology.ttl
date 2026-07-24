@@ -1714,7 +1714,7 @@ nf:hasPublication a owl:ObjectProperty ;
 
 nf:authorOrcid a owl:ObjectProperty ;
     rdfs:label "authorOrcid" ;
-    rdfs:comment "Links a DOI-identified publication to an author's ORCID identifier, enabling linkage between publication authors and person/investigator entities via shared ORCID IRIs." .
+    rdfs:comment "Links a DOI-identified publication to an author's ORCID identifier, enabling linkage between publication authors and person/investigator entities via shared ORCID IRIs. Note: ORCID may not be available for all authors, so authorOrcid values can be a partial subset of a publication's authorship. nf:authors (literal author names) is the complete author list; do not assume every author in nf:authors has a corresponding authorOrcid, and do not use the count of authorOrcid values as the author count." .
 
 ################################################################################
 # Properties - Observation related
