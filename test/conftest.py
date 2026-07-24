@@ -16,6 +16,7 @@ import os
 NF = Namespace("http://nf-osi.github.com/terms#")
 BIOLINK = Namespace("https://w3id.org/biolink/vocab/")
 SYN = Namespace("https://www.synapse.org/#!Synapse:")
+OWL = Namespace("http://www.w3.org/2002/07/owl#")
 
 # Project paths
 PROJECT_DIR = Path(__file__).parent.parent
@@ -46,6 +47,7 @@ def namespaces():
         "nf": NF,
         "biolink": BIOLINK,
         "syn": SYN,
+        "owl": OWL,
     }
 
 
@@ -121,6 +123,7 @@ def rml_runner(project_paths):
             g.bind("nf", NF)
             g.bind("biolink", BIOLINK)
             g.bind("syn", SYN)
+            g.bind("owl", OWL)
 
             return g
 
