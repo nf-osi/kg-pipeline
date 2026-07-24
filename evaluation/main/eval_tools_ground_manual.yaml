@@ -11,6 +11,7 @@ metadata:
     - CR-001
     - CR-004
     - PUB-001
+    - PUB-002
 
 ground_truth:
   AM-004:
@@ -135,6 +136,44 @@ ground_truth:
         investigator entities reachable via ORCID) and answer 19, undercounting.
       - A well-calibrated agent uses nf:authors as the authoritative, complete
         author list and answers 22.
+
+  PUB-002:
+    question: "Which authors for 'Genetically engineered minipigs model the major clinical features of human neurofibromatosis type 1' (DOI: 10.1038/s42003-018-0163-y) are Synapse users? (provide author names)"
+    results:
+      - "Nancy Ratner"
+      - "Eva Dombi"
+      - "Mark N Kirstein"
+      - "David H Gutmann"
+      - "Adrienne L Watson"
+
+    methodology: |
+      1. Find the publication by DOI and get its nf:authorOrcid links (19 ORCID
+         IRIs; see PUB-001)
+      2. For each ORCID IRI, check both routes to a Synapse identity, since
+         neither alone covers every match:
+         - biolink:Person owl:sameAs <ORCID IRI> — a generic Synapse profile
+           (from the people ingest), subject IRI is https://www.synapse.org/Profile:{id}
+         - nf:Investigator owl:sameAs <ORCID IRI> — a curated investigator
+           record, which also has a second owl:sameAs to its Synapse profile IRI
+      3. Matches found:
+         - Mark N Kirstein  (0000-0002-3486-083X) -> Profile:3335866 (People only)
+         - Eva Dombi         (0000-0002-5323-6995) -> Profile:3340245 (People only)
+         - Nancy Ratner      (0000-0001-5030-9354) -> Profile:3341049 (Investigators only)
+         - David H Gutmann   (0000-0002-3127-5045) -> Profile:3357732 (both People and Investigators)
+         - Adrienne L Watson (0000-0002-9752-3689) -> Profile:3335979 (both People and Investigators)
+      4. Union of both routes gives 5 authors with a Synapse user id, out of
+         22 total authors on the publication
+
+    notes: |
+      This question tests whether an agent can actually traverse the ORCID
+      linkage end to end.
+      - A naive agent may check only nf:Investigator (the more familiar,
+        curated entity) and miss Mark N Kirstein and Eva Dombi, who are only
+        reachable via the generic People/owl:sameAs route.
+      - A naive agent may check only the People table and miss Nancy Ratner,
+        who is only reachable via nf:Investigator's owl:sameAs to her ORCID.
+      - The remaining 17 authors (including all 3 without any authorOrcid link
+        at all, per PUB-001) have no discoverable Synapse user id in the graph.
 
   CR-001:
     question: "Which cell lines have shown sensitivity to HDAC inhibitors?"
