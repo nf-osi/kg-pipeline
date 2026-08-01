@@ -106,6 +106,17 @@ profiles:
         note: Publication details (title, DOI, PMID, abstract, journal, authors, date);
           linked from development table via publicationId
         source_version: 9
+        collection_name: ToolsCentralPublications
+        collection_label: NF Research Tools Central publications
+        collection_comment: >-
+          Publications catalogued by NF Research Tools Central (Synapse project
+          syn26338068) -- papers associated with research tools and resources,
+          reachable from a resource via nf:Development. This is a PARTIAL view
+          of NF publications on the portal: study-associated publications are
+          maintained separately in the main portal listing (syn16857542,
+          project syn26451327) and form their own collection. Do not assume
+          this collection is every NF publication, and group or filter by
+          prov:wasDerivedFrom when counting publications.
       donor_tool:
         synapse_id: syn51735419
         concrete_type: MaterializedView
@@ -158,6 +169,26 @@ profiles:
         note: Portal datasets with rich metadata (data type, species, assay, disease
           focus, access type, etc.); links to studies
         source_version: 15
+      study_publications:
+        synapse_id: syn16857542
+        concrete_type: TableEntity
+        note: Main portal publication listing (doi, pmid, title, journal, year, author,
+          studyId); study-associated papers, keyed by DOI with a pmid-<id> fallback
+        source_version: 5
+        collection_name: MainPortalPublications
+        collection_label: NF main portal publications
+        collection_comment: >-
+          Publications listed by the main NF Data Portal (Synapse project
+          syn26451327) -- papers associated with portal STUDIES, carrying
+          studyId, diseaseFocus and manifestation. This is a PARTIAL view of NF
+          publications: tool- and resource-associated papers are maintained
+          separately in NF Research Tools Central (syn26486839) as
+          nf:ToolsCentralPublications. The two listings overlap, and because
+          they are keyed differently (this one by DOI, Tools Central by an
+          internal publicationId) the SAME paper can appear as two distinct
+          biolink:Publication nodes. Deduplicate on pmid, doi or title before
+          counting publications; do not treat a raw count of
+          biolink:Publication as a count of distinct papers.
       people:
         synapse_id: syn23564971
         concrete_type: TableEntity
@@ -243,6 +274,8 @@ profiles:
         synapse_id: syn26486839
         concrete_type: TableEntity
         source_version: 9
+        collection_name: ToolsCentralPublications
+        collection_label: NF Research Tools Central publications
       donor_tool:
         synapse_id: syn51735419
         concrete_type: MaterializedView
@@ -280,6 +313,12 @@ profiles:
         synapse_id: syn50913342
         concrete_type: TableEntity
         source_version: 15
+      study_publications:
+        synapse_id: syn16857542
+        concrete_type: TableEntity
+        source_version: 5
+        collection_name: MainPortalPublications
+        collection_label: NF main portal publications
       people:
         synapse_id: syn23564971
         concrete_type: TableEntity

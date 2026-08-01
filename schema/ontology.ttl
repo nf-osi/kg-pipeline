@@ -382,7 +382,23 @@ nf:Investigator a owl:Class ;
 # nf:Person not defined locally; biolink:Person used directly for generic
 # Synapse profiles with a known ORCID, linked via owl:sameAs to the ORCID IRI
 
+nf:SynapseUser a owl:Class ;
+    rdfs:subClassOf biolink:Person ;
+    rdfs:label "Synapse User" ;
+    rdfs:comment "A person who has both an ORCID and a Synapse profile on record, i.e. a researcher identifiable on Synapse. Asserted on the ORCID IRI (the canonical person identifier), NOT on the Synapse Profile IRI, so that counting instances of this class counts people rather than double-counting each person once per identifier. To find whether a publication's authors are Synapse users, join the publication's nf:authorOrcid value directly against this type: `?pub nf:doi ?doi . ?doi nf:authorOrcid ?orcid . ?orcid a nf:SynapseUser .` The corresponding Synapse profile is then one owl:sameAs hop away. Note this class covers only people with BOTH identifiers -- a researcher with an ORCID but no known Synapse profile is not typed here. Also note a person may hold more than one Synapse account, so a single ORCID can owl:sameAs several Synapse Profile IRIs; this is expected, not a data error. Consequently the ORCID -> Profile hop is one-to-many: count distinct ORCIDs (or instances of this class) when counting people, and do not assume one profile per person." .
+
 # nf:Publication replaced by biolink:Publication
+#
+# IMPORTANT -- biolink:Publication instances CAN BE DUPLICATED. Publications are
+# ingested from more than one area of the portal, each keyed differently:
+#   nf:ToolsCentralPublications  keyed by an internal publicationId (syn26486839)
+#   nf:MainPortalPublications    keyed by DOI, or "pmid-<pmid>" when the source
+#                                row has no usable DOI (syn16857542)
+# The listings overlap, so the same paper can appear as two distinct nodes with
+# different IRIs. A raw COUNT of biolink:Publication is therefore a count of
+# RECORDS, not of distinct papers. Deduplicate on nf:pmid, nf:doi or
+# nf:publicationTitle before counting or listing, and use prov:wasDerivedFrom to
+# see which collection a given node came from.
 
 nf:Data a owl:Class ;
     rdfs:label "Data" ;
@@ -452,6 +468,23 @@ nf:ObservationExtraction a prov:Activity ;
 nf:KGBuild a void:Dataset ;
     rdfs:label "NF-OSI Knowledge Graph" ;
     rdfs:comment "The individual representing this build of the knowledge graph. Annotated at build time with dcterms:hasVersion and prov:generatedAtTime for the graph build version and datetime, and prov:wasDerivedFrom the source Synapse tables/views/materialized views used to construct it." .
+
+################################################################################
+# Source provenance
+#
+# Standard PROV-O / VoID terms, annotated locally so they are discoverable
+# through the ontology (a schema listing that selects owl:Class and owl:*Property
+# will not otherwise surface a term borrowed from an external vocabulary).
+################################################################################
+
+prov:wasDerivedFrom a owl:ObjectProperty ;
+    rdfs:label "wasDerivedFrom" ;
+    rdfs:comment "Links an ingested entity to the named source collection it came from, e.g. `?pub prov:wasDerivedFrom nf:ToolsCentralPublications`. Several collections can supply the same entity type, and each is typically a PARTIAL view -- so when counting or listing entities of a type, check which collections exist (`?c a void:Dataset`) and read their rdfs:comment for coverage caveats rather than assuming one source holds everything. Also used at graph level, where nf:KGBuild is derived from each source Synapse table, and on a collection to point at the Synapse table behind it." ;
+    rdfs:range void:Dataset .
+
+void:Dataset a owl:Class ;
+    rdfs:label "Dataset (source collection)" ;
+    rdfs:comment "A named collection of entities ingested from one source, giving that subset a stable identity independent of the Synapse table behind it. Instances carry rdfs:label, an rdfs:comment describing what the collection covers AND excludes, dcterms:isPartOf nf:KGBuild, and prov:wasDerivedFrom the source table. Generated from the `collection:` blocks in data_sources.yaml." .
 
 ################################################################################
 # Properties - File related
@@ -1700,12 +1733,35 @@ nf:inFullTextIndex a owl:DatatypeProperty ;
 
 nf:hasPublication a owl:ObjectProperty ;
     rdfs:label "hasPublication" ;
-    rdfs:comment "Links a development record to a publication." ;
+    rdfs:comment "Links a resource-development context to the publication describing it: asserted from an nf:Development record and, as a shortcut, from the nf:Tool itself. This is a resource-development association, NOT authorship -- the linked investigator need not be an author of the paper. For authorship use the publication's DOI IRI and nf:authorOrcid." ;
     rdfs:range biolink:Publication .
+
+nf:year a owl:DatatypeProperty ;
+    rdfs:label "year" ;
+    rdfs:comment "Publication year." ;
+    rdfs:domain biolink:Publication ;
+    rdfs:range xsd:string .
+
+nf:publicationType a owl:DatatypeProperty ;
+    rdfs:label "publicationType" ;
+    rdfs:comment "Type of publication as recorded by the main portal listing (e.g. preprint, review)." ;
+    rdfs:domain biolink:Publication ;
+    rdfs:range xsd:string .
+
+nf:onProject a owl:ObjectProperty ;
+    rdfs:label "onProject" ;
+    rdfs:comment "Links a person (biolink:Person, identified by their Synapse Profile IRI) to a Synapse project they are a member of. Two people sharing a project are project collaborators, which is a different relation from co-authorship (see nf:authorOrcid). CAVEAT: the source column is capped at 100 entries per person, and 32 people sit exactly at that cap, so their project lists -- and any collaborator counts derived from them -- are truncated lower bounds. Do not rank people by project or collaborator count until the cap is lifted upstream." ;
+    rdfs:domain biolink:Person .
+
+nf:aboutStudy a owl:ObjectProperty ;
+    rdfs:label "aboutStudy" ;
+    rdfs:comment "Links a publication to a portal study whose data it reports. Asserted for main-portal (study-associated) publications; a publication can be about more than one study." ;
+    rdfs:domain biolink:Publication ;
+    rdfs:range biolink:Study .
 
 nf:authorOrcid a owl:ObjectProperty ;
     rdfs:label "authorOrcid" ;
-    rdfs:comment "Links a DOI-identified publication to an author's ORCID identifier, enabling linkage between publication authors and person/investigator entities via shared ORCID IRIs. Note: ORCID may not be available for all authors, so authorOrcid values can be a partial subset of a publication's authorship. nf:authors (literal author names) is the complete author list; do not assume every author in nf:authors has a corresponding authorOrcid, and do not use the count of authorOrcid values as the author count." .
+    rdfs:comment "Links a DOI IRI (the object of a publication's nf:doi, not the Publication node itself) to an author's ORCID identifier: query as `?pub nf:doi ?doi . ?doi nf:authorOrcid ?orcid`. To check whether that author has a Synapse identity, join on the ORCID value via owl:sameAs -- e.g. `?synapseNode owl:sameAs ?orcid` -- which matches both biolink:Person and nf:Investigator records. Do NOT try to match by author name: biolink:Person records have no name literal, so name matching will silently miss people who are only in the People ingest, not nf:Investigator. Note: ORCID may not be available for all authors, so authorOrcid values can be a partial subset of a publication's authorship. nf:authors (literal author names) is the complete author list; do not assume every author in nf:authors has a corresponding authorOrcid, and do not use the count of authorOrcid values as the author count." .
 
 ################################################################################
 # Properties - Observation related

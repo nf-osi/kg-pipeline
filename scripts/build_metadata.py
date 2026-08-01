@@ -54,11 +54,26 @@ RDF_TYPE = NamedNode(TTL_PREFIXES["rdf"] + "type")
 RDFS_LABEL = NamedNode(TTL_PREFIXES["rdfs"] + "label")
 RDFS_COMMENT = NamedNode(TTL_PREFIXES["rdfs"] + "comment")
 DCTERMS_HAS_VERSION = NamedNode(TTL_PREFIXES["dcterms"] + "hasVersion")
+DCTERMS_IS_PART_OF = NamedNode(TTL_PREFIXES["dcterms"] + "isPartOf")
 PROV_GENERATED_AT_TIME = NamedNode(TTL_PREFIXES["prov"] + "generatedAtTime")
 PROV_WAS_DERIVED_FROM = NamedNode(TTL_PREFIXES["prov"] + "wasDerivedFrom")
 VOID_DATASET = NamedNode(TTL_PREFIXES["void"] + "Dataset")
 XSD_DATETIME = NamedNode(TTL_PREFIXES["xsd"] + "dateTime")
 KG_BUILD = NamedNode(TTL_PREFIXES["nf"] + "KGBuild")
+
+
+def collection_node(table: dict) -> NamedNode | None:
+    """Return the nf: IRI for a table's named source collection, if it declares one.
+
+    A collection is the stable, concept-level identity for the subset of the
+    graph ingested from one source (e.g. nf:ToolsCentralPublications). Ingested
+    entities point at it with prov:wasDerivedFrom, so consumers can tell which
+    partial view an entity came from once several sources are merged into one
+    graph. Declared by ``collection_name`` (plus optional ``collection_label``
+    and ``collection_comment``) on a table in data_sources.yaml.
+    """
+    name = table.get("collection_name")
+    return NamedNode(TTL_PREFIXES["nf"] + name) if name else None
 
 
 def build_metadata_quads(profile: dict, build_time: datetime) -> list[Quad]:
@@ -87,6 +102,20 @@ def build_metadata_quads(profile: dict, build_time: datetime) -> list[Quad]:
             quads.append(Quad(source_node, DCTERMS_HAS_VERSION, Literal(str(source_version))))
         elif table.get("source_version_note"):
             quads.append(Quad(source_node, RDFS_COMMENT, Literal(table["source_version_note"])))
+
+        # Named source collection, when the table declares one. Entities
+        # ingested from this table carry prov:wasDerivedFrom -> this node (see
+        # the mapping in mappings/rml/), which is what distinguishes partial
+        # views of the same entity type once they are merged into one graph.
+        node = collection_node(table)
+        if node is not None:
+            quads.append(Quad(node, RDF_TYPE, VOID_DATASET))
+            quads.append(Quad(node, DCTERMS_IS_PART_OF, KG_BUILD))
+            quads.append(Quad(node, PROV_WAS_DERIVED_FROM, source_node))
+            if table.get("collection_label"):
+                quads.append(Quad(node, RDFS_LABEL, Literal(table["collection_label"])))
+            if table.get("collection_comment"):
+                quads.append(Quad(node, RDFS_COMMENT, Literal(table["collection_comment"])))
     return quads
 
 

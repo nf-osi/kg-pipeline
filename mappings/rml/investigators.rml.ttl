@@ -31,3 +31,46 @@ map:InvestigatorCore a rr:TriplesMap ;
     rr:predicateObjectMap [ rr:predicate nf:institution ; rr:objectMap [ rml:reference "institution" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [ rr:predicate owl:sameAs ; rr:objectMap [ rr:template "https://orcid.org/{orcid}" ; rr:termType rr:IRI ] ] ;
     rr:predicateObjectMap [ rr:predicate owl:sameAs ; rr:objectMap [ rr:template "https://www.synapse.org/Profile:{investigatorSynapseId}" ; rr:termType rr:IRI ] ] .
+
+################################################################################
+# Direct ORCID <-> Synapse Profile link
+#
+# owl:sameAs is symmetric/transitive, so <ORCID> owl:sameAs <Profile> already
+# follows from InvestigatorCore's two sameAs edges through the shared
+# investigator node -- this just materializes that consequence as an explicit
+# triple so a plain SPARQL query (no OWL reasoner) can find it in one hop,
+# matching the direct ORCID<->Profile edge the People ingest already produces
+# (see people.rml.ttl). Both subject and object references are on the same
+# CSV row, so the standard RML null-propagation (subject unresolvable, or
+# object reference empty -> no triple) means these triples are only emitted
+# for rows where both orcid and investigatorSynapseId are populated.
+################################################################################
+
+map:InvestigatorOrcidToProfile a rr:TriplesMap ;
+    rdfs:label "Investigator ORCID to Synapse Profile" ;
+    rml:logicalSource map:InvestigatorsSource ;
+    rr:subjectMap [ rr:template "https://orcid.org/{orcid}" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [ rr:predicate owl:sameAs ; rr:objectMap [ rr:template "https://www.synapse.org/Profile:{investigatorSynapseId}" ; rr:termType rr:IRI ] ] .
+
+map:InvestigatorProfileToOrcid a rr:TriplesMap ;
+    rdfs:label "Investigator Synapse Profile to ORCID" ;
+    rml:logicalSource map:InvestigatorsSource ;
+    rr:subjectMap [ rr:template "https://www.synapse.org/Profile:{investigatorSynapseId}" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [ rr:predicate owl:sameAs ; rr:objectMap [ rr:template "https://orcid.org/{orcid}" ; rr:termType rr:IRI ] ] .
+
+################################################################################
+# SynapseUser typing
+#
+# Types the ORCID IRI (not the Profile IRI) as nf:SynapseUser -- see the
+# nf:SynapseUser comment in schema/ontology.ttl for why the ORCID is the
+# canonical subject. synapseUserOrcid is a derived column (see
+# apply_derived_columns in scripts/prepare_portal_tables.py) holding the ORCID
+# only when the investigator also has a Synapse profile, so RML's normal
+# null-propagation skips investigators with an ORCID but no known profile.
+################################################################################
+
+map:InvestigatorSynapseUser a rr:TriplesMap ;
+    rdfs:label "Investigator Synapse User" ;
+    rml:logicalSource map:InvestigatorsSource ;
+    rr:subjectMap [ rr:template "https://orcid.org/{synapseUserOrcid}" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [ rr:predicate rdf:type ; rr:objectMap [ rr:constant nf:SynapseUser ; rr:termType rr:IRI ] ] .

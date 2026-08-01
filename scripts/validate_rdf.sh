@@ -69,3 +69,10 @@ echo "No malformed placeholder IRIs found"
 # an RML mapping / SSSOM lookup without a matching ontology update).
 echo ""
 python3 scripts/validate_schema_drift.py --rdf-dir "${RDF_DIR}"
+
+# Check that every named source collection referenced by prov:wasDerivedFrom is
+# declared in data_sources.yaml and was actually built. The per-entity link is a
+# hardcoded constant in the RML mapping while the collection node is generated
+# from the YAML, so the two can drift apart.
+echo ""
+python3 scripts/validate_collections.py --rdf-dir "${RDF_DIR}"

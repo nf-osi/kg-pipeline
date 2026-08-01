@@ -3,7 +3,11 @@
 @prefix ql:   <http://semweb.mmlab.be/ns/ql#> .
 @prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix fnml: <http://semweb.mmlab.be/ns/fnml#> .
+@prefix fno:  <https://w3id.org/function/ontology#> .
+@prefix grel: <http://users.ugent.be/~bjdmeest/function/grel.ttl#> .
 @prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix nf:      <http://nf-osi.github.com/terms#> .
 @prefix biolink: <https://w3id.org/biolink/vocab/> .
 @prefix map:  <http://nf-osi.github.com/mappings/people#> .
 
@@ -31,3 +35,92 @@ map:PersonCore a rr:TriplesMap ;
     rr:subjectMap [ rr:template "https://www.synapse.org/Profile:{ownerID}" ; rr:termType rr:IRI ] ;
     rr:predicateObjectMap [ rr:predicate rdf:type ; rr:objectMap [ rr:constant biolink:Person ; rr:termType rr:IRI ] ] ;
     rr:predicateObjectMap [ rr:predicate owl:sameAs ; rr:objectMap [ rr:template "https://orcid.org/{orcid}" ; rr:termType rr:IRI ] ] .
+
+################################################################################
+# ORCID-subject facts
+#
+# Types the ORCID IRI (not the Profile IRI) as nf:SynapseUser so that counting
+# the class counts people, not identifiers -- see the nf:SynapseUser comment in
+# schema/ontology.ttl. Every row in this source has both an ownerID and an
+# orcid (rows without an ORCID are dropped upstream in prepare_portal_tables.py),
+# so each row qualifies; the subject template still null-propagates if orcid is
+# somehow empty, emitting nothing for that row.
+#
+# Also emits the ORCID -> Profile direction of owl:sameAs. PersonCore already
+# asserts Profile -> ORCID, and owl:sameAs is symmetric, but QLever does no OWL
+# reasoning -- so without this a query starting from an ORCID (e.g. from a
+# publication's nf:authorOrcid) could not reach the Synapse profile in one hop.
+# investigators.rml.ttl materializes both directions for the same reason.
+################################################################################
+
+map:PersonSynapseUser a rr:TriplesMap ;
+    rdfs:label "Person Synapse User" ;
+    rml:logicalSource map:PeopleSource ;
+    rr:subjectMap [ rr:template "https://orcid.org/{orcid}" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [ rr:predicate rdf:type ; rr:objectMap [ rr:constant nf:SynapseUser ; rr:termType rr:IRI ] ] ;
+    rr:predicateObjectMap [ rr:predicate owl:sameAs ; rr:objectMap [ rr:template "https://www.synapse.org/Profile:{ownerID}" ; rr:termType rr:IRI ] ] .
+
+################################################################################
+# Project membership
+#
+# onProject is a pipe-delimited list of Synapse project IDs. Two people sharing
+# a project are project collaborators -- a different relation from co-authorship.
+#
+# Unlike the facts above, this is emitted for people with NO ORCID too: most
+# Synapse profiles have no ORCID on record but are still project members, and
+# excluding them would badly undercount collaboration.
+#
+# CAVEAT: the source column is capped at 100 entries (see nf:onProject in
+# schema/ontology.ttl and docs/publication-issues.md) so lists for the most
+# active people are truncated.
+################################################################################
+
+map:PersonProjects a rr:TriplesMap ;
+    rdfs:label "Person Projects" ;
+    rml:logicalSource map:PeopleSource ;
+    rr:subjectMap [ rr:template "https://www.synapse.org/Profile:{ownerID}" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:onProject ;
+        rr:objectMap [
+            a fnml:FunctionTermMap ;
+            rr:termType rr:IRI ;
+            fnml:functionValue [
+                a fno:Execution ;
+                rml:logicalSource map:PeopleSource ;
+                rr:predicateObjectMap [
+                    rr:predicate fno:executes ;
+                    rr:objectMap [ rr:constant grel:string_split ; rr:termType rr:IRI ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:valueParameter ;
+                    rr:objectMap [
+                        a fnml:FunctionTermMap ;
+                        fnml:functionValue [
+                            a fno:Execution ;
+                            rml:logicalSource map:PeopleSource ;
+                            rr:predicateObjectMap [
+                                rr:predicate fno:executes ;
+                                rr:objectMap [ rr:constant grel:string_replace ; rr:termType rr:IRI ]
+                            ] ;
+                            rr:predicateObjectMap [
+                                rr:predicate grel:valueParameter ;
+                                rr:objectMap [ rml:reference "onProject" ; rr:termType rr:Literal ]
+                            ] ;
+                            rr:predicateObjectMap [
+                                rr:predicate grel:p_string_find ;
+                                rr:objectMap [ rr:constant "syn" ; rr:termType rr:Literal ]
+                            ] ;
+                            rr:predicateObjectMap [
+                                rr:predicate grel:p_string_replace ;
+                                rr:objectMap [ rr:constant "https://www.synapse.org/Synapse:syn" ; rr:termType rr:Literal ]
+                            ]
+                        ]
+                    ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:p_string_sep ;
+                    rr:objectMap [ rr:constant "\\|" ; rr:termType rr:Literal ]
+                ]
+            ]
+        ]
+    ] .

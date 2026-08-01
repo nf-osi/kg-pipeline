@@ -138,3 +138,22 @@ Two tables have foreign key columns populated with `resourceId` values from
 Both issues originate in the upstream Synapse tables and need to be corrected
 there. The pipeline currently passes them through as-is.
 
+### Silent schema breaks between pipeline stages
+
+A column is declared in several places (SELECT clause, `TABLES[...]["columns"]`,
+RML mapping, ontology) and a disagreement between them drops triples without
+failing anything. `nf:createdBy`/`nf:modifiedBy` were mapped but absent from the
+CSV for as long as the mapping existed. See
+[docs/schema-propagation.md](docs/schema-propagation.md) for the trace, a survey
+of the 23 declared-but-unused properties, and options for propagation and checks.
+
+### Duplicated publications and conflicting author lists
+
+Publications are ingested from two portal listings that key their records
+differently, so the same paper can appear as two `biolink:Publication` nodes.
+Two papers additionally have contaminated author lists in the main portal
+listing (authors from an unrelated paper appended). See
+[docs/publication-issues.md](docs/publication-issues.md) for the
+measured extent, the correct way to count publications, and the specific
+records needing curator attention.
+
