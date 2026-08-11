@@ -9,7 +9,7 @@ Supports two eval tasks:
 2. Runs ``inspect eval`` for each model in parallel.
 
 Required models (need ANTHROPIC_API_KEY):
-    anthropic/claude-sonnet-4-5, anthropic/claude-haiku-4-5
+    anthropic/claude-sonnet-5, anthropic/claude-haiku-4-5
 
 With --full, additionally runs (need GOOGLE_API_KEY and OPENAI_API_KEY):
     google/gemini-2.5-pro, openai/gpt-5.4
@@ -41,7 +41,7 @@ EVAL_DIR = REPO_ROOT / "evaluation"
 ASTABENCH_EVALS = REPO_ROOT / "astabench" / "astabench" / "evals"
 
 ANTHROPIC_MODELS = [
-    "anthropic/claude-sonnet-4-5",
+    "anthropic/claude-sonnet-5",
     "anthropic/claude-haiku-4-5",
 ]
 

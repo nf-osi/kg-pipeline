@@ -9,8 +9,10 @@ Tests mappings for development-related entities:
 """
 
 import pytest
-from rdflib import URIRef, Literal
+from rdflib import URIRef, Literal, Namespace
 from rdflib.namespace import RDF
+
+FOAF = Namespace("http://xmlns.com/foaf/0.1/")
 
 
 class TestFunder:
@@ -96,10 +98,10 @@ class TestInvestigator:
         SELECT ?investigator ?name
         WHERE {
             ?investigator a nf:Investigator ;
-                         nf:name ?name .
+                         foaf:name ?name .
         }
         """
-        results = list(investigator_graph.query(query, initNs={"nf": NF}))
+        results = list(investigator_graph.query(query, initNs={"nf": NF, "foaf": FOAF}))
         assert len(results) > 0, "No investigators with names found"
 
         names = [str(row.name) for row in results]
@@ -123,24 +125,105 @@ class TestInvestigator:
         institutions = [str(row.institution) for row in results]
         assert "Johns Hopkins University" in institutions, "Expected JHU from test data"
 
-    def test_investigators_have_orcid(self, investigator_graph, namespaces):
-        """Investigators should have ORCID IRI property"""
+    def test_investigators_have_same_as_orcid_and_profile(self, investigator_graph, namespaces):
+        """Investigators should have owl:sameAs links to both their ORCID and Synapse profile IRIs"""
         NF = namespaces["nf"]
+        OWL = namespaces["owl"]
 
         query = """
-        SELECT ?investigator ?orcid
+        SELECT ?investigator ?sameAs
         WHERE {
             ?investigator a nf:Investigator ;
-                         nf:orcid ?orcid .
+                         owl:sameAs ?sameAs .
         }
         """
-        results = list(investigator_graph.query(query, initNs={"nf": NF}))
-        assert len(results) > 0, "No investigators with ORCID found"
+        results = list(investigator_graph.query(query, initNs={"nf": NF, "owl": OWL}))
+        assert len(results) > 0, "No investigators with owl:sameAs found"
 
-        # ORCIDs should be IRIs
+        # owl:sameAs objects should be IRIs
         for row in results:
-            assert isinstance(row.orcid, URIRef), \
-                f"ORCID {row.orcid} should be IRI, not literal"
+            assert isinstance(row.sameAs, URIRef), \
+                f"owl:sameAs target {row.sameAs} should be IRI, not literal"
+
+        # An investigator should have at most one orcid.org and one Synapse
+        # Profile sameAs each (an investigator can have just an orcid with no
+        # Synapse profile on record, e.g. test-data inv-004, but never more
+        # than one of each)
+        by_investigator = {}
+        for row in results:
+            by_investigator.setdefault(row.investigator, []).append(str(row.sameAs))
+
+        for investigator, targets in by_investigator.items():
+            orcid_targets = [t for t in targets if t.startswith("https://orcid.org/")]
+            profile_targets = [t for t in targets if t.startswith("https://www.synapse.org/Profile:")]
+            assert len(orcid_targets) == 1, \
+                f"Expected exactly 1 orcid.org sameAs for {investigator}, got {orcid_targets}"
+            assert len(profile_targets) <= 1, \
+                f"Expected at most 1 Synapse Profile sameAs for {investigator}, got {profile_targets}"
+
+        # inv-001..003 have both; inv-004 (test data) has only an orcid
+        investigators_with_profile = sum(
+            1 for targets in by_investigator.values()
+            if any(t.startswith("https://www.synapse.org/Profile:") for t in targets)
+        )
+        assert investigators_with_profile == 3, \
+            f"Expected 3 investigators with a Synapse profile sameAs, got {investigators_with_profile}"
+
+    def test_orcid_profile_direct_link_materialized(self, investigator_graph, namespaces):
+        """ORCID and Synapse Profile IRIs should be directly linked via owl:sameAs
+        (both directions) when an investigator record has both -- this makes the
+        link discoverable via plain SPARQL without going through the investigator
+        node, matching the direct link the People ingest produces."""
+        OWL = namespaces["owl"]
+
+        query = """
+        SELECT ?orcid ?profile
+        WHERE {
+            ?orcid owl:sameAs ?profile .
+            FILTER(STRSTARTS(STR(?orcid), "https://orcid.org/"))
+            FILTER(STRSTARTS(STR(?profile), "https://www.synapse.org/Profile:"))
+        }
+        """
+        forward = list(investigator_graph.query(query, initNs={"owl": OWL}))
+        assert len(forward) == 3, f"Expected 3 direct orcid->profile links, got {len(forward)}"
+
+        reverse_query = """
+        SELECT ?profile ?orcid
+        WHERE {
+            ?profile owl:sameAs ?orcid .
+            FILTER(STRSTARTS(STR(?profile), "https://www.synapse.org/Profile:"))
+            FILTER(STRSTARTS(STR(?orcid), "https://orcid.org/"))
+        }
+        """
+        reverse = list(investigator_graph.query(reverse_query, initNs={"owl": OWL}))
+        assert len(reverse) == 3, f"Expected 3 direct profile->orcid links, got {len(reverse)}"
+
+        # test-data inv-004 has an orcid but no Synapse profile, so its orcid
+        # (0000-0004-5678-9012) must not appear in the direct link at all
+        forward_orcids = {str(row.orcid) for row in forward}
+        assert "https://orcid.org/0000-0004-5678-9012" not in forward_orcids, \
+            "orcid-only investigator (no Synapse profile) should not produce a direct link"
+
+    def test_synapse_profile_linked_only_when_profile_present(self, investigator_graph, namespaces):
+        """Investigators with both an ORCID and a Synapse profile get an
+        nf:hasSynapseProfile edge from their ORCID; an investigator with only an
+        ORCID does not."""
+        NF = namespaces["nf"]
+        pairs = list(investigator_graph.subject_objects(NF.hasSynapseProfile))
+        subjects = {str(s) for s, _ in pairs}
+
+        assert len(pairs) == 3, f"Expected 3 account linkages, got {sorted(pairs)}"
+        assert all(s.startswith("https://orcid.org/") for s in subjects), \
+            f"Subjects should be ORCID IRIs, got {sorted(subjects)}"
+        assert all(str(o).startswith("https://www.synapse.org/Profile:") for _, o in pairs), \
+            f"Objects should be Profile IRIs, got {sorted(pairs)}"
+        assert "https://orcid.org/0000-0004-5678-9012" not in subjects, \
+            "investigator with an ORCID but no Synapse profile must not claim one"
+
+    def test_synapse_user_class_is_gone(self, investigator_graph, namespaces):
+        """Replaced by nf:hasSynapseProfile -- see schema/ontology.ttl."""
+        NF = namespaces["nf"]
+        assert list(investigator_graph.subjects(RDF.type, NF.SynapseUser)) == []
 
 
 class TestPublication:
@@ -162,6 +245,20 @@ class TestPublication:
         publications = list(publication_graph.subjects(RDF.type, BIOLINK.Publication))
         assert len(publications) > 0, "No publications found in graph"
         assert len(publications) >= 2, f"Expected at least 2 publications, got {len(publications)}"
+
+    def test_publications_carry_source_collection(self, publication_graph, namespaces):
+        """Every publication should record the named source collection it came
+        from, so it stays distinguishable once other portal publication
+        listings are ingested into the same graph."""
+        BIOLINK = namespaces["biolink"]
+        NF = namespaces["nf"]
+        PROV = Namespace("http://www.w3.org/ns/prov#")
+
+        publications = list(publication_graph.subjects(RDF.type, BIOLINK.Publication))
+        for pub in publications:
+            sources = list(publication_graph.objects(pub, PROV.wasDerivedFrom))
+            assert sources == [NF.ToolsCentralPublications], \
+                f"{pub} should be derived from exactly nf:ToolsCentralPublications, got {sources}"
 
     def test_publications_have_titles(self, publication_graph, namespaces):
         """Publications should have publicationTitle property"""

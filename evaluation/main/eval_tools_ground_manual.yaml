@@ -10,6 +10,12 @@ metadata:
     - CL-003
     - CR-001
     - CR-004
+    - PUB-001
+    - PUB-002
+    - PUB-003
+    - PUB-004
+    - PUB-005
+    - PUB-006
 
 ground_truth:
   AM-004:
@@ -112,6 +118,367 @@ ground_truth:
         usage constraints and investigator-contact acquisition model, reads
         the ontology guidance, and correctly hedges with "Not explicitly
         documented but likely"
+
+  PUB-001:
+    question: "How many authors are on 'Validating Techniques for Measurement of Cutaneous Neurofibromas: Recommendations for Clinical Trials' (PMID: 34230197, DOI: 10.1212/WNL.0000000000012428)?"
+    results:
+      - 15
+
+    methodology: |
+      1. Find the publication by PMID 34230197 (Neurology 2021). The question
+         also quotes the DOI as published, 10.1212/WNL.0000000000012428, but the
+         graph normalises DOIs to lowercase (DOIs are case-insensitive; see
+         docs/publication-issues.md), so nf:doi holds
+         https://doi.org/10.1212/wnl.0000000000012428 -- match case-insensitively
+         or use the PMID.
+      2. Count authors from nf:authors — the pipe-delimited literal author name
+         list on the publication itself — NOT from nf:authorOrcid triples
+      3. nf:authors lists 15 names; only 8 have a corresponding nf:authorOrcid
+         link, so an agent counting ORCIDs undercounts by 7
+
+    notes: |
+      This question tests whether an agent respects the ontology guidance on
+      nf:authorOrcid: ORCID is not available for all authors, so authorOrcid
+      is a partial subset of authorship, while nf:authors is the complete list.
+      - A naive agent may count distinct nf:authorOrcid values (or people/
+        investigator entities reachable via ORCID) and answer 8, undercounting.
+      - A well-calibrated agent uses nf:authors as the authoritative, complete
+        author list and answers 15.
+
+      This paper is deliberately chosen to exist as exactly ONE
+      biolink:Publication node (it appears only in nf:MainPortalPublications),
+      so the count is unambiguous. Publications ingested from more than one
+      portal listing can otherwise be duplicated, and the two records do not
+      always agree.
+
+      HISTORY: this question originally used the minipig paper
+      (10.1038/s42003-018-0163-y, answer 22). It was moved after the main portal
+      listing (syn16857542) was ingested, because that paper then existed as two
+      nodes whose author lists DISAGREED: Tools Central had the correct 22, while
+      the main portal record had 25 -- the same 22 plus three names (Jody F Longo,
+      Joshua C Anderson, Steven L Carroll) spliced onto the end, which belong to
+      an unrelated paper (PMID 37328102). An agent landing on the corrupted node
+      answered 25 with no principled way to detect the error, making the item a
+      coin flip. The upstream contamination is worth reporting to curators; only
+      2 of the 23 duplicated papers have disagreeing author counts, but that
+      happened to be one of them.
+
+  PUB-002:
+    question: "Which authors for 'Genetically engineered minipigs model the major clinical features of human neurofibromatosis type 1' (DOI: 10.1038/s42003-018-0163-y) are Synapse users? Answer with the Synapse profile id of each such author (the numeric id, e.g. '1234567')."
+    results:
+      - "3341049"  # Nancy Ratner
+      - "3340245"  # Eva Dombi
+      - "3335866"  # Mark Kirstein
+      - "3357732"  # David Gutmann
+      - "3335979"  # Adrienne Watson
+      - "3335875"  # David Largaespada
+      - "3364519"  # Kyle Williams
+      - "3417597"  # Jeremie Vitte
+
+    methodology: |
+      1. Find the publication by DOI and get its nf:authorOrcid links (19 ORCID
+         IRIs; see PUB-001)
+      2. Ask each ORCID IRI for nf:hasSynapseProfile — the whole answer is one
+         query, and the profile comes back in the same triple pattern, with no
+         second hop and no IRI-prefix filter:
+           ?pub nf:doi ?doi .
+           ?doi nf:authorOrcid ?orcid .
+           ?orcid nf:hasSynapseProfile ?profile .
+         nf:hasSynapseProfile is emitted from the ORCID IRI whenever a person has
+         both an ORCID and a Synapse profile, from either source ingest, so it
+         covers every match.
+         Equivalent longer route (what the graph looked like before the account
+         linkage was materialized) is to union both identity sources, since
+         neither alone covers every match:
+         - biolink:Person owl:sameAs <ORCID IRI> — a person from the people
+           registry who HAS a Synapse account; subject IRI is
+           https://www.synapse.org/Profile:{id}. Note the registry also holds
+           people with no account, whose biolink:Person node IS the ORCID IRI
+           and has no owl:sameAs — they are correctly absent from this answer.
+         - nf:Investigator owl:sameAs <ORCID IRI> — a curated investigator
+           record, which also has a second owl:sameAs to its Synapse profile IRI
+      3. Matches found (names ARE now derivable from the graph — see notes):
+         - 3335866 (Mark Kirstein,      0000-0002-3486-083X) — People only
+         - 3335875 (David Largaespada,  0000-0002-3183-0491) — People only
+         - 3340245 (Eva Dombi,          0000-0002-5323-6995) — People only
+         - 3341049 (Nancy Ratner,       0000-0001-5030-9354) — Investigators only
+         - 3357732 (David Gutmann,      0000-0002-3127-5045) — both People and Investigators
+         - 3335979 (Adrienne Watson,    0000-0002-9752-3689) — both People and Investigators
+         - 3364519 (Kyle Williams,      0000-0003-4333-9111) — People only
+         - 3417597 (Jeremie Vitte,      0000-0002-2567-7988) — People only
+      4. Union of both routes gives 8 authors with a Synapse user id, out of
+         22 total authors on the publication
+
+    notes: |
+      This question tests whether an agent finds and uses the simplest available
+      route (nf:hasSynapseProfile on the ORCID IRI) rather than a partial or
+      roundabout one.
+
+      IMPORTANT for future readers: this question was originally authored when
+      the graph had no direct ORCID -> account linkage, and it reliably caught
+      agents that traversed the ORCID linkage only partially. That linkage was
+      then materialized (see schema/ontology.ttl) precisely to make this kind of
+      question answerable in one hop, so the question is now easier BY
+      CONSTRUCTION -- a good score here no longer demonstrates multi-hop
+      traversal ability the way it once did. Historical failure modes it used
+      to catch, all of which still yield a wrong answer if an agent ignores
+      nf:hasSynapseProfile:
+      - Checking only nf:Investigator (the more familiar, curated entity) and
+        missing Mark Kirstein and Eva Dombi, who have no Investigator record and
+        are reachable only via the generic People/owl:sameAs route.
+      - Checking only the People ingest and missing Nancy Ratner. She IS in the
+        people registry, but as an account-less row -- so the people ingest
+        alone gives her ORCID and name and no profile id. Only
+        nf:Investigator's owl:sameAs connects her ORCID to Profile:3341049.
+      - Skipping ORCID entirely and matching author name strings against
+        nf:Investigator names. Person nodes DO carry foaf:name now, but the
+        registry's display-name spelling need not match the publication's
+        nf:authors spelling, so string matching is still the wrong route.
+      - The remaining 14 authors (including all 3 without any authorOrcid link
+        at all, per PUB-001) have no discoverable Synapse user id in the graph.
+
+      WHY THE ANSWER IS PROFILE IDS, NOT NAMES: this question originally asked
+      for author names and was unanswerable as posed, because a biolink:Person
+      node carried only its type and an owl:sameAs to its ORCID. That is no
+      longer true -- the people registry supplies foaf:name / rdfs:label, and a
+      name is reachable from an ORCID for both kinds of person node:
+        { ?orcid foaf:name ?name }                              # no account
+        UNION { ?orcid owl:sameAs ?p . ?p foaf:name ?name }     # has account
+      All 8 answers here resolve to a name by that query. The question is
+      nonetheless LEFT as profile ids: ids are exact and unambiguous to grade,
+      whereas name spellings vary between the registry and nf:authors. A names
+      variant is now feasible if one is wanted.
+
+  PUB-003:
+    question: "I have Synapse profile 3334263. How many of my publications are on the portal?"
+    results:
+      - 14
+
+    methodology: |
+      Personalized discovery: start from a Synapse profile id and gather every
+      publication the graph can evidence a connection to, then DEDUPLICATE.
+      Two routes exist. Route (b) is now fully SUBSUMED by route (a), but an
+      agent cannot know that in advance and should still union both:
+
+        # (a) authorship via ORCID -- 19 nodes
+        <https://www.synapse.org/Profile:3334263> owl:sameAs ?orcid .
+        ?doi nf:authorOrcid ?orcid .
+        ?pub nf:doi ?doi .
+
+        # (b) resource-development context -- 4 nodes, all also in (a)
+        ?inv a nf:Investigator ; owl:sameAs ?orcid .
+        ?dev nf:hasInvestigator ?inv ; nf:hasPublication ?pub .
+
+      The union yields 19 biolink:Publication NODES, but those collapse to 14
+      distinct PAPERS: publications are ingested from two portal listings
+      (nf:ToolsCentralPublications and nf:MainPortalPublications) and 5 of these
+      papers are present as one node from each. Deduplicate on pmid, falling
+      back to doi then title, before counting -- a raw node count of 19 is the
+      expected wrong answer here.
+      Both directions of owl:sameAs (Profile -> ORCID and ORCID -> Profile) are
+      materialized, so either route works from either identifier.
+
+      The profile belongs to Margaret Wallace (ORCID 0000-0002-5202-8895), who
+      has both a biolink:Person record and an nf:Investigator record.
+
+      The 14 distinct papers ([ab] = found by both routes, [a] = authorship only):
+        [a]  A detailed landscape of genomic alterations in MPNST cell lines ...
+        [a]  A High-Throughput Screening Platform Identifies Novel Combination Treatments for MPNST
+        [a]  A porcine model of neurofibromatosis type 1 that mimics the human disease
+        [ab] An orthotopic xenograft model of intraneural NF1 MPNST ...
+        [ab] Analysis of steroid hormone effects on xenografted human NF1 tumor schwann cells
+        [a]  Assessment of nociception and related quality-of-life measures in a porcine model of NF1
+        [a]  Development of 3D culture models of plexiform neurofibroma ...
+        [ab] Immortalization of human normal and NF1 neurofibroma Schwann cells
+        [a]  Pharmacological and genomic profiling of NF1 plexiform neurofibroma-derived schwann cells
+        [ab] Plexiform-like neurofibromas develop in the mouse by intraneural xenograft ...
+        [a]  Sex-dependent differences in pain and sleep in a porcine model of NF1
+        [a]  snRNA-seq of human cutaneous neurofibromas before and after selumetinib treatment ...
+        [a]  Survival and NF1 Analysis in a Cohort of Orthopedics Patients with MPNST
+        [a]  Targeted exon skipping of NF1 exon 17 as a therapeutic for neurofibromatosis type I
+
+    notes: |
+      Represents the personalized-discovery use case from issue #74 (a portal
+      user asking about their own contributions), and exercises the
+      Profile -> ORCID -> publication traversal end to end.
+
+      THE ANSWER IS WHAT THE GRAPH CAN EVIDENCE. A prior manual review put
+      Margaret Wallace's true portal authorship at ~16 papers; that estimate was
+      NOT re-derived when this item was recomputed, so treat it as approximate.
+      (A naive `CONTAINS(?authors, "Wallace")` scan hits 26 distinct papers, but
+      that matches every Wallace, not only Margaret.) What is verified:
+        - route (a) authorship-via-ORCID finds  19 nodes -> 14 papers
+        - route (b) development context finds    4 nodes, all also in (a)
+        - union                                 19 nodes -> 14 papers
+
+      IF ORCID COVERAGE IS EXPANDED UPSTREAM, THIS ANSWER MUST BE RECOMPUTED.
+
+  PUB-004:
+    question: "Some publications are listed by both NF Research Tools Central and the main NF Data Portal. Which publications appear in both listings? Answer with the PubMed ID (PMID) of each one."
+    results:
+      - "26375012"  # Preclinical Evidence for the Use of Sunitinib Malate...
+      - "27617404"  # Immortalization of human normal and NF1 neurofibroma Schwann cells
+      - "28469964"  # Comprehensive pharmacological profiling of neurofibromatosis...
+      - "29055717"  # Development of 3D culture models of plexiform neurofibroma
+      - "29893754"  # Pharmacological and genomic profiling of NF1 plexiform neurofibroma
+      - "30302402"  # Genetically engineered minipigs model...
+      - "30348677"  # Spatiotemporal Loss of NF1 in Schwann Cell Lineage
+      - "30936125"  # Targeted inhibition of the dual specificity phosphatases DUSP1/DUSP5
+      - "31127187"  # Feasibility of using NF1-GRD and AAV for gene replacement
+      - "31246731"  # Assessment of nociception... porcine model of NF1
+      - "31278855"  # TYK2 promotes malignant peripheral nerve sheath tumor progression
+      - "31545171"  # Optical dopamine monitoring with dLight1
+      - "32074109"  # Validating indicators of CNS disorders in a swine model
+      - "32459399"  # Early administration of imatinib mesylate
+      - "32561749"  # A clinically and genomically annotated nerve sheath tumor biospecimen
+      - "33108355"  # Humanized neurofibroma model from iPSCs
+      - "33203698"  # Activation of Receptor Tyrosine Kinases Mediates Acquired Resistance
+      - "34066061"  # Neurofibromin Deficiency and Extracellular Matrix Cooperate
+      - "34945792"  # Restoration of Normal NF1 Function with Antisense Morpholinos
+      - "35172160"  # Modeling iPSC-derived human neurofibroma-like tumors in mice
+      - "35433111"  # Targeted exon skipping of NF1 exon 17
+      - "35741605"  # Integrated Drug Mining Reveals Actionable Strategies
+
+    methodology: |
+      Publications come from two portal listings, and each node records which one
+      via prov:wasDerivedFrom. A paper in both listings exists as two nodes, so
+      the task is to group nodes by a shared identifier and keep the groups
+      spanning both collections:
+        ?pub a biolink:Publication ;
+             prov:wasDerivedFrom ?collection ;
+             nf:pmid ?pmid .
+        GROUP BY ?pmid HAVING (COUNT(DISTINCT ?collection) > 1)
+      -> 22 PMIDs.
+
+      The two collections are nf:ToolsCentralPublications (691 nodes, syn26486839)
+      and nf:MainPortalPublications (246 nodes, syn16857542); 937 nodes total.
+
+    notes: |
+      Tests whether an agent understands that biolink:Publication is populated
+      from multiple partial sources, can discover the prov:wasDerivedFrom
+      provenance link, and can group across it. See
+      docs/publication-issues.md.
+
+      The choice of matching key changes the answer, which is the main thing
+      this question discriminates:
+      - 22 by nf:pmid (CORRECT -- best coverage, 906 distinct PMIDs)
+      - 19 by nf:doi (undercounts: only 807 distinct DOIs, because the main
+        portal doi column holds an article number or publisher PII for ~13% of
+        rows, so those nodes have no nf:doi to match on)
+      - 19 by nf:publicationTitle (undercounts similarly; also brittle to
+        punctuation and trailing periods)
+      An agent matching on DOI or title scores 19/22 recall -- a reasonable but
+      inferior answer, which is the intended partial credit.
+
+      Do NOT count "any paper with more than one node" -- that gives 23. One
+      extra pair (PMID 37406085) is a same-collection duplicate: the main portal
+      lists it twice with DOIs differing only in case
+      (10.1158/1078-0432.CCR-22-2854 vs ...ccr-22-2854), producing two nodes
+      within nf:MainPortalPublications. That is an upstream data-entry issue,
+      not a cross-listing overlap.
+
+  PUB-005:
+    question: "I have Synapse profile 3334263. Among the co-authors on my papers who have an ORCID on record, how many are NOT Synapse users?"
+    results:
+      - 72
+
+    methodology: |
+      Invert the account lookup: gather co-authors by ORCID, then keep the ones
+      with no nf:hasSynapseProfile.
+        <https://www.synapse.org/Profile:3334263> owl:sameAs ?me .
+        ?doi nf:authorOrcid ?me .            # 14 DOIs I authored
+        ?doi nf:authorOrcid ?collab .        # everyone on those papers
+        FILTER(?collab != ?me)
+        FILTER NOT EXISTS { ?collab nf:hasSynapseProfile ?any }
+        -> COUNT(DISTINCT ?collab) = 72
+
+      Breakdown for this profile (Margaret Wallace, ORCID 0000-0002-5202-8895):
+        14   DOIs carrying her nf:authorOrcid
+        99   distinct co-author ORCIDs on those papers (excluding her own)
+         27  of those have an nf:hasSynapseProfile (a Synapse account)
+         72  are not  <- the answer
+
+      nf:hasSynapseProfile is emitted exactly when a person has BOTH an ORCID and
+      a Synapse profile, so "no nf:hasSynapseProfile" is precisely "has an ORCID
+      but no Synapse profile on record".
+
+    notes: |
+      Tests whether an agent can traverse co-authorship and then apply a
+      NEGATIVE condition (FILTER NOT EXISTS / MINUS) over nf:hasSynapseProfile,
+      rather than only positive lookups as in PUB-002.
+
+      WHY THE QUESTION SAYS "who have an ORCID on record": without that scope it
+      would be ill-posed, because "not on Synapse" would conflate two different
+      things:
+        - evidence of absence -- co-author HAS an ORCID, and that ORCID is not a
+          nf:hasSynapseProfile. Derivable: 72.
+        - absence of evidence -- co-author has no ORCID at all, so they cannot be
+          identified as a person in the graph and their Synapse status is
+          unknowable. NOT derivable.
+      The scale of the second group is still large: those 14 papers carry 186
+      distinct nf:authors name literals but only 100 ORCIDs. A question phrased
+      "how many of my collaborators are not on Synapse" would therefore have no
+      defensible single answer, the same failure mode that made an earlier draft
+      of PUB-002 unanswerable.
+
+      Expected wrong answers:
+      -  99 = all co-author ORCIDs, forgetting to exclude the Synapse users
+      -  27 = the complement (co-authors who ARE Synapse users)
+      -  73 = failing to exclude the querying author's own ORCID
+      - 186 = counting nf:authors name literals instead of ORCIDs, which both
+              ignores the ORCID scope and double-counts people whose name is
+              spelled differently across papers
+
+      Scoring caveat: "72" is not a substring of any of the plausible wrong
+      answers above.
+
+  PUB-006:
+    question: "Across the publications in this knowledge graph, which researcher has the most distinct co-authors? Answer with their ORCID."
+    results:
+      - "0000-0002-1049-0993"
+
+    methodology: |
+      Co-authorship is expressed by two ORCIDs sharing a DOI via nf:authorOrcid.
+      For each ORCID, union the other ORCIDs on every DOI it appears on:
+        ?doi nf:authorOrcid ?a , ?b .
+        FILTER(?a != ?b)
+        GROUP BY ?a ORDER BY DESC(COUNT(DISTINCT ?b))
+      -> https://orcid.org/0000-0002-1049-0993 with 162 distinct co-authors,
+         across 31 DOIs.
+
+      The margin is clear and the maximum is unique, so the answer is stable:
+        162  0000-0002-1049-0993   <- answer (Jaishri Blakeley, profile 3324237)
+        138  0000-0001-5030-9354   (Nancy Ratner, profile 3341049)
+        137  0000-0002-7116-0605   (Christine Pratilas, profile 3374664)
+        108  0000-0002-9198-7175   (Brigitte C. Widemann)
+        107  0000-0003-1719-0771   (Angela Hirbe, profile 3366920)
+      1200 ORCIDs have at least one co-author.
+
+    notes: |
+      Tests aggregation over a self-join: the agent must pair ORCIDs sharing a
+      DOI, exclude self-pairing, count DISTINCT partners (not co-authorship
+      edges, which would inflate anyone appearing on several papers together
+      with the same people), and take the maximum.
+
+      THE ANSWER IS AN ORCID because that is what the question asks for, and
+      because the ORCID is the identifier the co-authorship join runs on. Unlike
+      earlier versions of this item, the winner IS now otherwise identifiable:
+      0000-0002-1049-0993 has nf:hasSynapseProfile -> Profile:3324237, which
+      carries foaf:name "Jaishri Blakeley". Grading on the ORCID keeps the item
+      exact; a name variant is now answerable if wanted.
+
+      SCOPE: co-authorship is only visible where nf:authorOrcid exists, which
+      covers 284 DOIs out of ~937 publication nodes. 
+      This is therefore "most co-authors among
+      papers with ORCID data on record", not a true bibliometric ranking. The
+      ranking is still well defined and reproducible over what the graph holds,
+      which is what the question asks.
+
+      Expected wrong answers:
+      - 0000-0001-5030-9354 (138) -- second place, e.g. if the winner's papers
+        are partly missed
+      - counting nf:authorOrcid edges or papers rather than DISTINCT co-authors
+      - failing to exclude self, which adds 1 to every count uniformly
 
   CR-001:
     question: "Which cell lines have shown sensitivity to HDAC inhibitors?"

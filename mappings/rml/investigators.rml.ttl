@@ -4,7 +4,9 @@
 @prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
 @prefix nf:   <http://nf-osi.github.com/terms#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
 @prefix map:  <http://nf-osi.github.com/mappings/investigators#> .
 
 ################################################################################
@@ -25,8 +27,47 @@ map:InvestigatorCore a rr:TriplesMap ;
     rr:subjectMap [ rr:template "http://nf-osi.github.com/terms#investigator/{investigatorId}" ; rr:termType rr:IRI ] ;
     rr:predicateObjectMap [ rr:predicate rdf:type ; rr:objectMap [ rr:constant nf:Investigator ; rr:termType rr:IRI ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:investigatorId ; rr:objectMap [ rml:reference "investigatorId" ; rr:datatype xsd:string ] ] ;
-    rr:predicateObjectMap [ rr:predicate nf:name ; rr:objectMap [ rml:reference "investigatorName" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate foaf:name ; rr:objectMap [ rml:reference "investigatorName" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [ rr:predicate rdfs:label ; rr:objectMap [ rml:reference "investigatorName" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:institution ; rr:objectMap [ rml:reference "institution" ; rr:datatype xsd:string ] ] ;
-    rr:predicateObjectMap [ rr:predicate nf:orcid ; rr:objectMap [ rr:template "https://orcid.org/{orcid}" ; rr:termType rr:IRI ] ] ;
-    rr:predicateObjectMap [ rr:predicate nf:investigatorSynapseId ; rr:objectMap [ rr:template "https://www.synapse.org/Profile:{investigatorSynapseId}" ; rr:termType rr:IRI ] ] .
+    rr:predicateObjectMap [ rr:predicate owl:sameAs ; rr:objectMap [ rr:template "https://orcid.org/{orcid}" ; rr:termType rr:IRI ] ] ;
+    rr:predicateObjectMap [ rr:predicate owl:sameAs ; rr:objectMap [ rr:template "https://www.synapse.org/Profile:{investigatorSynapseId}" ; rr:termType rr:IRI ] ] .
+
+################################################################################
+# Direct ORCID <-> Synapse Profile link
+#
+# owl:sameAs is symmetric/transitive, so <ORCID> owl:sameAs <Profile> already
+# follows from InvestigatorCore's two sameAs edges through the shared
+# investigator node -- this just materializes that consequence as an explicit
+# triple so a plain SPARQL query (no OWL reasoner) can find it in one hop,
+# matching the direct ORCID<->Profile edge the People ingest already produces
+# (see people.rml.ttl). Both subject and object references are on the same
+# CSV row, so the standard RML null-propagation (subject unresolvable, or
+# object reference empty -> no triple) means these triples are only emitted
+# for rows where both orcid and investigatorSynapseId are populated.
+################################################################################
+
+map:InvestigatorOrcidToProfile a rr:TriplesMap ;
+    rdfs:label "Investigator ORCID to Synapse Profile" ;
+    rml:logicalSource map:InvestigatorsSource ;
+    rr:subjectMap [ rr:template "https://orcid.org/{orcid}" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [ rr:predicate nf:hasSynapseProfile ; rr:objectMap [ rr:template "https://www.synapse.org/Profile:{investigatorSynapseId}" ; rr:termType rr:IRI ] ] ;
+    rr:predicateObjectMap [ rr:predicate owl:sameAs ; rr:objectMap [ rr:template "https://www.synapse.org/Profile:{investigatorSynapseId}" ; rr:termType rr:IRI ] ] .
+
+map:InvestigatorProfileToOrcid a rr:TriplesMap ;
+    rdfs:label "Investigator Synapse Profile to ORCID" ;
+    rml:logicalSource map:InvestigatorsSource ;
+    rr:subjectMap [ rr:template "https://www.synapse.org/Profile:{investigatorSynapseId}" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [ rr:predicate owl:sameAs ; rr:objectMap [ rr:template "https://orcid.org/{orcid}" ; rr:termType rr:IRI ] ] .
+
+################################################################################
+# Synapse account linkage
+#
+# Folded into InvestigatorOrcidToProfile above: nf:hasSynapseProfile has the
+# same emit condition as the ORCID -> Profile owl:sameAs (both identifiers
+# present on the row), and both templates null-propagate, so no separate map
+# and no derived companion column are needed. This replaces a former
+# InvestigatorSynapseUser map that asserted `rdf:type nf:SynapseUser` over a
+# derived synapseUserOrcid column -- the column existed only because a constant
+# object cannot null-propagate. See nf:hasSynapseProfile in schema/ontology.ttl.
+################################################################################

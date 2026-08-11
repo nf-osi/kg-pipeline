@@ -2,8 +2,10 @@
 @prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
 @prefix nf:   <http://nf-osi.github.com/terms#> .
 @prefix biolink: <https://w3id.org/biolink/vocab/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
 @prefix shapes: <http://nf-osi.github.com/shapes#> .
 
 ################################################################################
@@ -867,14 +869,14 @@ shapes:PublicationShape a sh:NodeShape ;
 shapes:InvestigatorShape a sh:NodeShape ;
     sh:targetClass nf:Investigator ;
     rdfs:label "Investigator shape" ;
-    rdfs:comment "Expected properties for Investigator instances." ;
+    rdfs:comment "Expected properties for Investigator instances. owl:sameAs links to both the ORCID IRI and the Synapse Profile IRI, and (when both are on record) the ORCID and Profile IRIs are also directly linked to each other via owl:sameAs -- so a Synapse identity lookup by ORCID value works the same way here as it does for biolink:Person, without going through this Investigator node or its foaf:name at all. Like biolink:Person (of which this is a subclass) the name is foaf:name, not nf:name." ;
     sh:property [
         sh:path nf:investigatorId ;
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
     ] ;
     sh:property [
-        sh:path nf:name ;
+        sh:path foaf:name ;
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
     ] ;
@@ -889,14 +891,45 @@ shapes:InvestigatorShape a sh:NodeShape ;
         sh:maxCount 1 ;
     ] ;
     sh:property [
-        sh:path nf:orcid ;
+        sh:path owl:sameAs ;
         sh:nodeKind sh:IRI ;
+        sh:maxCount 2 ;
+    ] .
+
+################################################################################
+# Person
+################################################################################
+
+shapes:PersonShape a sh:NodeShape ;
+    sh:targetClass biolink:Person ;
+    rdfs:label "Person shape" ;
+    rdfs:comment "A person in the portal people registry. The node is keyed by the Synapse Profile IRI when the person has an account and by the ORCID IRI when they do not -- never both, so instances of this class count people rather than identifiers. Most carry foaf:name / rdfs:label, but names are display strings and need not match a publication's nf:authors spelling: identify a person by ORCID, not by name matching. Person names use foaf:name, NOT nf:name -- the latter is for non-person entities." ;
+    sh:property [
+        sh:path foaf:name ;
+        sh:datatype xsd:string ;
         sh:maxCount 1 ;
     ] ;
+    # NO sh:maxCount on owl:sameAs: an account-holder's Profile IRI links to
+    # their ORCID, and a person holding more than one Synapse account means an
+    # ORCID legitimately links to several Profile IRIs. Expected upstream data,
+    # not a defect -- do not "tidy" this to sh:maxCount 1.
     sh:property [
-        sh:path nf:investigatorSynapseId ;
+        sh:path owl:sameAs ;
         sh:nodeKind sh:IRI ;
-        sh:maxCount 1 ;
+    ] .
+
+################################################################################
+# Synapse account linkage
+################################################################################
+
+shapes:HasSynapseProfileShape a sh:NodeShape ;
+    sh:targetSubjectsOf nf:hasSynapseProfile ;
+    rdfs:label "Has Synapse profile shape" ;
+    rdfs:comment "Constrains the ORCID -> Synapse Profile linkage that answers 'is this researcher on Synapse'. Targeted by subject rather than by class on purpose: the subject is an ORCID IRI, which for an account-holder is deliberately NOT typed biolink:Person (their Person node is the Profile IRI), so there is no class to target. See nf:hasSynapseProfile in the ontology." ;
+    sh:property [
+        sh:path nf:hasSynapseProfile ;
+        sh:nodeKind sh:IRI ;
+        sh:minCount 1 ;
     ] .
 
 ################################################################################

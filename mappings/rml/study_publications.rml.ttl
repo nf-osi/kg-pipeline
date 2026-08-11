@@ -1,0 +1,175 @@
+@prefix rr:   <http://www.w3.org/ns/r2rml#> .
+@prefix rml:  <http://semweb.mmlab.be/ns/rml#> .
+@prefix fnml: <http://semweb.mmlab.be/ns/fnml#> .
+@prefix fno:  <https://w3id.org/function/ontology#> .
+@prefix ql:   <http://semweb.mmlab.be/ns/ql#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix grel: <http://users.ugent.be/~bjdmeest/function/grel.ttl#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix nf:      <http://nf-osi.github.com/terms#> .
+@prefix biolink: <https://w3id.org/biolink/vocab/> .
+@prefix map:  <http://nf-osi.github.com/mappings/study_publications#> .
+
+################################################################################
+# Logical source
+################################################################################
+
+map:StudyPublicationsSource a rml:LogicalSource ;
+    rml:source "data/csv/study_publications.csv" ;
+    rml:referenceFormulation ql:CSV .
+
+################################################################################
+# Study publication core properties
+#
+# The main portal listing has no stable primary key, so the subject is keyed by
+# `publicationKey`: the DOI where the source really has one, otherwise
+# "pmid-<pmid>" (see apply_derived_columns in scripts/prepare_portal_tables.py
+# for why -- ~13% of rows carry an article number or publisher PII in the doi
+# column). Rows with neither identifier mint no subject and are skipped.
+#
+# NOTE these nodes are a DIFFERENT IRI space from the Tools Central publications
+# in publications.rml.ttl, which are keyed by an internal publicationId. The two
+# listings overlap, so the same paper can exist as two biolink:Publication nodes;
+# deduplicate on pmid/doi/title before counting. See the nf:MainPortalPublications
+# collection comment in data_sources.yaml.
+#
+# rr:template percent-escapes the "/" inside a DOI, so subjects look like
+# ...#publication/10.1001%2Fjamadermatol.2024.2912. That is left as-is
+# deliberately: the escaping is injective (no two DOIs collide) and the IRI is
+# opaque to consumers, who should match on nf:doi / nf:pmid / nf:publicationTitle
+# rather than parsing the local name. nf:doi below is unescaped and is the value
+# to join on.
+################################################################################
+
+map:StudyPublicationCore a rr:TriplesMap ;
+    rdfs:label "Study Publication Core" ;
+    rml:logicalSource map:StudyPublicationsSource ;
+    rr:subjectMap [ rr:template "http://nf-osi.github.com/terms#publication/{publicationKey}" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [ rr:predicate rdf:type ; rr:objectMap [ rr:constant biolink:Publication ; rr:termType rr:IRI ] ] ;
+    rr:predicateObjectMap [ rr:predicate prov:wasDerivedFrom ; rr:objectMap [ rr:constant nf:MainPortalPublications ; rr:termType rr:IRI ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:publicationTitle ; rr:objectMap [ rml:reference "title" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate rdfs:label ; rr:objectMap [ rml:reference "title" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:journal ; rr:objectMap [ rml:reference "journal" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:year ; rr:objectMap [ rml:reference "year" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:diseaseFocus ; rr:objectMap [ rml:reference "diseaseFocus" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:publicationType ; rr:objectMap [ rml:reference "publicationType" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:pmid ; rr:objectMap [ rr:template "https://pubmed.ncbi.nlm.nih.gov/{pmid}" ; rr:termType rr:IRI ] ] ;
+    # cleanDoi is blank when the source's doi column held an article number or
+    # PII, so nf:doi is only emitted when it is a real DOI. Uses the same
+    # grel:string_replace approach as publications.rml.ttl so the "/" in the DOI
+    # is not percent-escaped by rr:template.
+    rr:predicateObjectMap [
+        rr:predicate nf:doi ;
+        rr:objectMap [
+            a fnml:FunctionTermMap ;
+            rr:termType rr:IRI ;
+            fnml:functionValue [
+                a fno:Execution ;
+                rml:logicalSource map:StudyPublicationsSource ;
+                rr:predicateObjectMap [
+                    rr:predicate fno:executes ;
+                    rr:objectMap [ rr:constant grel:string_replace ; rr:termType rr:IRI ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:valueParameter ;
+                    rr:objectMap [ rr:constant "https://doi.org/PLACEHOLDER" ; rr:termType rr:Literal ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:p_string_find ;
+                    rr:objectMap [ rr:constant "PLACEHOLDER" ; rr:termType rr:Literal ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:p_string_replace ;
+                    rr:objectMap [ rml:reference "cleanDoi" ; rr:termType rr:Literal ]
+                ]
+            ]
+        ]
+    ] .
+
+################################################################################
+# Authors (pipe-delimited literal names, as in publications.rml.ttl)
+################################################################################
+
+map:StudyPublicationAuthors a rr:TriplesMap ;
+    rdfs:label "Study Publication Authors" ;
+    rml:logicalSource map:StudyPublicationsSource ;
+    rr:subjectMap [ rr:template "http://nf-osi.github.com/terms#publication/{publicationKey}" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:authors ;
+        rr:objectMap [
+            a fnml:FunctionTermMap ;
+            rr:datatype xsd:string ;
+            fnml:functionValue [
+                a fno:Execution ;
+                rml:logicalSource map:StudyPublicationsSource ;
+                rr:predicateObjectMap [
+                    rr:predicate fno:executes ;
+                    rr:objectMap [ rr:constant grel:string_split ; rr:termType rr:IRI ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:valueParameter ;
+                    rr:objectMap [ rml:reference "author" ; rr:termType rr:Literal ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:p_string_sep ;
+                    rr:objectMap [ rr:constant "\\|" ; rr:termType rr:Literal ]
+                ]
+            ]
+        ]
+    ] .
+
+################################################################################
+# Publication -> Study links (pipe-delimited Synapse IDs)
+################################################################################
+
+map:StudyPublicationStudies a rr:TriplesMap ;
+    rdfs:label "Study Publication Studies" ;
+    rml:logicalSource map:StudyPublicationsSource ;
+    rr:subjectMap [ rr:template "http://nf-osi.github.com/terms#publication/{publicationKey}" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:aboutStudy ;
+        rr:objectMap [
+            a fnml:FunctionTermMap ;
+            rr:termType rr:IRI ;
+            fnml:functionValue [
+                a fno:Execution ;
+                rml:logicalSource map:StudyPublicationsSource ;
+                rr:predicateObjectMap [
+                    rr:predicate fno:executes ;
+                    rr:objectMap [ rr:constant grel:string_split ; rr:termType rr:IRI ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:valueParameter ;
+                    rr:objectMap [
+                        a fnml:FunctionTermMap ;
+                        fnml:functionValue [
+                            a fno:Execution ;
+                            rml:logicalSource map:StudyPublicationsSource ;
+                            rr:predicateObjectMap [
+                                rr:predicate fno:executes ;
+                                rr:objectMap [ rr:constant grel:string_replace ; rr:termType rr:IRI ]
+                            ] ;
+                            rr:predicateObjectMap [
+                                rr:predicate grel:valueParameter ;
+                                rr:objectMap [ rml:reference "studyId" ; rr:termType rr:Literal ]
+                            ] ;
+                            rr:predicateObjectMap [
+                                rr:predicate grel:p_string_find ;
+                                rr:objectMap [ rr:constant "syn" ; rr:termType rr:Literal ]
+                            ] ;
+                            rr:predicateObjectMap [
+                                rr:predicate grel:p_string_replace ;
+                                rr:objectMap [ rr:constant "https://www.synapse.org/Synapse:syn" ; rr:termType rr:Literal ]
+                            ]
+                        ]
+                    ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:p_string_sep ;
+                    rr:objectMap [ rr:constant "\\|" ; rr:termType rr:Literal ]
+                ]
+            ]
+        ]
+    ] .

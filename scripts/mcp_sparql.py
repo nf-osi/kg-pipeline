@@ -36,15 +36,23 @@ def sparql_query(query: str) -> str:
 
 @mcp.tool()
 def get_schema() -> str:
-    """Return all classes and properties defined in the NF ontology.
+    """Return all classes and properties in the NF ontology.
 
     Use this to discover the graph structure before writing queries.
+
+    Two documentation columns are returned and both are worth reading:
+      comment   -- the definition, on terms this ontology defines (nf:*)
+      scopeNote -- NF-OSI usage guidance on a term imported from another
+                   vocabulary (biolink:, foaf:, prov:, void:), covering how it
+                   is keyed and counted here. Terms normally have one or the
+                   other, so a blank column is expected rather than missing data.
     """
     q = """\
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 
-SELECT ?term ?kind ?label ?comment ?domain ?range WHERE {
+SELECT ?term ?kind ?label ?comment ?scopeNote ?domain ?range WHERE {
   {
     ?term a owl:Class .
     BIND("Class" AS ?kind)
@@ -56,7 +64,14 @@ SELECT ?term ?kind ?label ?comment ?domain ?range WHERE {
     BIND("DatatypeProperty" AS ?kind)
   }
   OPTIONAL { ?term rdfs:label ?label }
+  # Two documentation slots, kept as separate columns because they mean
+  # different things. rdfs:comment is the DEFINITION, present on terms this
+  # ontology mints. scopeNote is NF-OSI USAGE GUIDANCE on a term imported from
+  # another vocabulary (biolink:, foaf:, prov:, void:) -- we never write to a
+  # borrowed term's rdfs:comment, since that slot belongs to whoever defined it.
+  # A term normally has one or the other, so an empty column is expected.
   OPTIONAL { ?term rdfs:comment ?comment }
+  OPTIONAL { ?term skos:scopeNote ?scopeNote }
   OPTIONAL { ?term rdfs:domain ?domain }
   OPTIONAL { ?term rdfs:range ?range }
 } ORDER BY ?kind ?term"""
