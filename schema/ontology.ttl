@@ -8,6 +8,7 @@
 @prefix obo:      <http://purl.obolibrary.org/obo/> .
 @prefix prov:     <http://www.w3.org/ns/prov#> .
 @prefix void:     <http://rdfs.org/ns/void#> .
+@prefix foaf:     <http://xmlns.com/foaf/0.1/> .
 
 
 nf:KGOntology a owl:Ontology ;
@@ -485,6 +486,29 @@ nf:KGBuild a void:Dataset ;
     rdfs:comment "The individual representing this build of the knowledge graph. Annotated at build time with dcterms:hasVersion and prov:generatedAtTime for the graph build version and datetime, and prov:wasDerivedFrom the source Synapse tables/views/materialized views used to construct it." .
 
 ################################################################################
+# Person names
+#
+# foaf:name is the name property for every person node -- both biolink:Person
+# (the people registry) and nf:Investigator (curated records), which is a
+# subclass of it. Annotated locally for the same reason as the PROV-O / VoID
+# terms below: so a schema listing that selects owl:*Property still surfaces it.
+#
+# Non-person entities (files, studies, resources, biobanks, funders, datasets,
+# initiatives) keep nf:name. Person names moved to the standard vocabulary
+# because they are the one kind of name external consumers are most likely to
+# expect at a well-known predicate.
+################################################################################
+
+foaf:name a owl:DatatypeProperty ;
+    rdfs:label "name" ;
+    rdfs:comment "A person's display name. Emitted for both biolink:Person and nf:Investigator, so ONE predicate reaches the name of any person in the graph -- `{ ?orcid foaf:name ?n } UNION { ?orcid owl:sameAs ?p . ?p foaf:name ?n }` covers people with and without a Synapse account alike. The same string is also available as rdfs:label. CAVEAT: this is a display name from the source record, and it need NOT match the spelling of the same person in a publication's nf:authors literals -- identify people by ORCID, never by matching name strings. Replaces nf:name on person nodes; nf:name is still used for non-person entities." ;
+    rdfs:range xsd:string .
+# NO rdfs:domain, deliberately. Every subject in THIS graph is a person, but
+# foaf:name is a standard term whose domain is unrestricted upstream; narrowing
+# it here would license inferring biolink:Person for any foaf:name subject
+# anywhere. Same reasoning as nf:hasSynapseProfile -- see the note there.
+
+################################################################################
 # Source provenance
 #
 # Standard PROV-O / VoID terms, annotated locally so they are discoverable
@@ -507,7 +531,7 @@ void:Dataset a owl:Class ;
 
 nf:name a owl:DatatypeProperty ;
     rdfs:label "name" ;
-    rdfs:comment "Name of a resource. For RDF-friendly systems, the same data is available in rdfs:label." ;
+    rdfs:comment "Name of a non-person entity: files, studies, resources, biobanks, funders, datasets and initiatives. For RDF-friendly systems, the same data is available in rdfs:label. NOT used for people -- biolink:Person and nf:Investigator carry foaf:name instead, so do not look for a person's name here." ;
     rdfs:range xsd:string .
 
 nf:parentStudy a owl:ObjectProperty ;

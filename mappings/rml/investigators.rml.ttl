@@ -6,6 +6,7 @@
 @prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
 @prefix owl:  <http://www.w3.org/2002/07/owl#> .
 @prefix nf:   <http://nf-osi.github.com/terms#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
 @prefix map:  <http://nf-osi.github.com/mappings/investigators#> .
 
 ################################################################################
@@ -26,7 +27,7 @@ map:InvestigatorCore a rr:TriplesMap ;
     rr:subjectMap [ rr:template "http://nf-osi.github.com/terms#investigator/{investigatorId}" ; rr:termType rr:IRI ] ;
     rr:predicateObjectMap [ rr:predicate rdf:type ; rr:objectMap [ rr:constant nf:Investigator ; rr:termType rr:IRI ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:investigatorId ; rr:objectMap [ rml:reference "investigatorId" ; rr:datatype xsd:string ] ] ;
-    rr:predicateObjectMap [ rr:predicate nf:name ; rr:objectMap [ rml:reference "investigatorName" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate foaf:name ; rr:objectMap [ rml:reference "investigatorName" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [ rr:predicate rdfs:label ; rr:objectMap [ rml:reference "investigatorName" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:institution ; rr:objectMap [ rml:reference "institution" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [ rr:predicate owl:sameAs ; rr:objectMap [ rr:template "https://orcid.org/{orcid}" ; rr:termType rr:IRI ] ] ;

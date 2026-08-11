@@ -12,6 +12,8 @@ import pytest
 from rdflib import URIRef, Literal, Namespace
 from rdflib.namespace import RDF
 
+FOAF = Namespace("http://xmlns.com/foaf/0.1/")
+
 
 class TestFunder:
     """Test funder entity properties"""
@@ -96,10 +98,10 @@ class TestInvestigator:
         SELECT ?investigator ?name
         WHERE {
             ?investigator a nf:Investigator ;
-                         nf:name ?name .
+                         foaf:name ?name .
         }
         """
-        results = list(investigator_graph.query(query, initNs={"nf": NF}))
+        results = list(investigator_graph.query(query, initNs={"nf": NF, "foaf": FOAF}))
         assert len(results) > 0, "No investigators with names found"
 
         names = [str(row.name) for row in results]

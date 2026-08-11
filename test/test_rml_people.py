@@ -7,8 +7,10 @@ Tests the people.rml.ttl mapping against test/people.csv
 import re
 
 import pytest
-from rdflib import URIRef
+from rdflib import Namespace, URIRef
 from rdflib.namespace import RDF, RDFS
+
+FOAF = Namespace("http://xmlns.com/foaf/0.1/")
 
 
 @pytest.fixture
@@ -91,14 +93,14 @@ class TestPeopleCore:
 
 
 class TestPeopleNames:
-    """nf:name / rdfs:label make a person's display name reachable, which is
+    """foaf:name / rdfs:label make a person's display name reachable, which is
     what lets an agent answer 'who wrote this' from a publication's
     nf:authorOrcid rather than only returning bare identifiers."""
 
     def test_account_holder_has_name(self, people_graph, namespaces):
         NF = namespaces["nf"]
         subj = URIRef("https://www.synapse.org/Profile:3324237")
-        assert [str(o) for o in people_graph.objects(subj, NF.name)] == ["David Gutmann"]
+        assert [str(o) for o in people_graph.objects(subj, FOAF.name)] == ["David Gutmann"]
         assert [str(o) for o in people_graph.objects(subj, RDFS.label)] == ["David Gutmann"]
 
     def test_orcid_only_person_has_name(self, people_graph, namespaces):
@@ -106,7 +108,7 @@ class TestPeopleNames:
         so the name hangs off the ORCID IRI."""
         NF = namespaces["nf"]
         subj = URIRef("https://orcid.org/0000-0001-5030-9354")
-        assert [str(o) for o in people_graph.objects(subj, NF.name)] == ["Nancy Ratner"]
+        assert [str(o) for o in people_graph.objects(subj, FOAF.name)] == ["Nancy Ratner"]
         assert [str(o) for o in people_graph.objects(subj, RDFS.label)] == ["Nancy Ratner"]
 
     def test_name_reachable_from_orcid_for_both_kinds(self, people_graph, namespaces):
@@ -120,13 +122,13 @@ class TestPeopleNames:
                 <https://orcid.org/0000-0002-3127-5045>
                 <https://orcid.org/0000-0001-5030-9354>
             }
-            { ?orcid nf:name ?name }
+            { ?orcid foaf:name ?name }
             UNION
-            { ?orcid owl:sameAs ?profile . ?profile nf:name ?name }
+            { ?orcid owl:sameAs ?profile . ?profile foaf:name ?name }
         }
         """
         results = list(people_graph.query(
-            query, initNs={"nf": namespaces["nf"], "owl": namespaces["owl"]}
+            query, initNs={"foaf": FOAF, "owl": namespaces["owl"]}
         ))
         assert {str(r.name) for r in results} == {"David Gutmann", "Nancy Ratner"}, results
 
@@ -134,7 +136,7 @@ class TestPeopleNames:
         """Not every row has a name; those must simply emit no name triple."""
         NF = namespaces["nf"]
         subj = URIRef("https://orcid.org/0000-0002-9752-3689")
-        assert list(people_graph.objects(subj, NF.name)) == []
+        assert list(people_graph.objects(subj, FOAF.name)) == []
         assert (subj, RDF.type, namespaces["biolink"].Person) in people_graph, \
             "A nameless ORCID-only person is still a person node"
 

@@ -217,12 +217,16 @@ Two consequences worth knowing when querying:
    inference that duplicates account-holders. The relation is one-to-many — 3 people hold two
    Synapse accounts — so count DISTINCT subjects when counting people.
 
-Person nodes now also carry `nf:name` / `rdfs:label`, so an author name is reachable from an ORCID:
+Person nodes now also carry `foaf:name` / `rdfs:label`, so an author name is reachable from an ORCID:
 
 ```sparql
-{ ?orcid nf:name ?name }                            # no Synapse account
-UNION { ?orcid owl:sameAs ?p . ?p nf:name ?name }   # has one
+{ ?orcid foaf:name ?name }                            # no Synapse account
+UNION { ?orcid owl:sameAs ?p . ?p foaf:name ?name }   # has one
 ```
+
+Person names use **`foaf:name`**, not `nf:name` — that applies to `nf:Investigator` too, so one predicate
+reaches any person in the graph. `nf:name` remains the name property for non-person entities (files,
+studies, resources, biobanks, funders, datasets, initiatives).
 
 Note the registry's display-name spelling need not match the `nf:authors` spelling on a
 publication, so these names are for display and disambiguation, not for joining.

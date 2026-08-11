@@ -47,6 +47,9 @@ DEFAULT_PREFIXES = {
     "efo": "http://www.ebi.ac.uk/efo/",
     "obo": "http://purl.obolibrary.org/obo/",
     "prov": "http://www.w3.org/ns/prov#",
+    # Person names live on foaf:name (biolink:Person and nf:Investigator alike),
+    # so almost any people question needs this declared.
+    "foaf": "http://xmlns.com/foaf/0.1/",
 }
 
 FORMAT_ACTIONS = {

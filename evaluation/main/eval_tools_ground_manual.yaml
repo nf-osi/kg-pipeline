@@ -231,7 +231,7 @@ ground_truth:
         alone gives her ORCID and name and no profile id. Only
         nf:Investigator's owl:sameAs connects her ORCID to Profile:3341049.
       - Skipping ORCID entirely and matching author name strings against
-        nf:Investigator names. Person nodes DO carry nf:name now, but the
+        nf:Investigator names. Person nodes DO carry foaf:name now, but the
         registry's display-name spelling need not match the publication's
         nf:authors spelling, so string matching is still the wrong route.
       - The remaining 14 authors (including all 3 without any authorOrcid link
@@ -240,10 +240,10 @@ ground_truth:
       WHY THE ANSWER IS PROFILE IDS, NOT NAMES: this question originally asked
       for author names and was unanswerable as posed, because a biolink:Person
       node carried only its type and an owl:sameAs to its ORCID. That is no
-      longer true -- the people registry supplies nf:name / rdfs:label, and a
+      longer true -- the people registry supplies foaf:name / rdfs:label, and a
       name is reachable from an ORCID for both kinds of person node:
-        { ?orcid nf:name ?name }                                # no account
-        UNION { ?orcid owl:sameAs ?p . ?p nf:name ?name }       # has account
+        { ?orcid foaf:name ?name }                              # no account
+        UNION { ?orcid owl:sameAs ?p . ?p foaf:name ?name }     # has account
       All 8 answers here resolve to a name by that query. The question is
       nonetheless LEFT as profile ids: ids are exact and unambiguous to grade,
       whereas name spellings vary between the registry and nf:authors. A names
@@ -464,7 +464,7 @@ ground_truth:
       because the ORCID is the identifier the co-authorship join runs on. Unlike
       earlier versions of this item, the winner IS now otherwise identifiable:
       0000-0002-1049-0993 has nf:hasSynapseProfile -> Profile:3324237, which
-      carries nf:name "Jaishri Blakeley". Grading on the ORCID keeps the item
+      carries foaf:name "Jaishri Blakeley". Grading on the ORCID keeps the item
       exact; a name variant is now answerable if wanted.
 
       SCOPE: co-authorship is only visible where nf:authorOrcid exists, which

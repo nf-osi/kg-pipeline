@@ -10,6 +10,7 @@
 @prefix owl:  <http://www.w3.org/2002/07/owl#> .
 @prefix nf:      <http://nf-osi.github.com/terms#> .
 @prefix biolink: <https://w3id.org/biolink/vocab/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
 @prefix map:  <http://nf-osi.github.com/mappings/people#> .
 
 ################################################################################
@@ -46,7 +47,7 @@ map:PersonCore a rr:TriplesMap ;
     rml:logicalSource map:PeopleSource ;
     rr:subjectMap [ rr:template "https://www.synapse.org/Profile:{ownerID}" ; rr:termType rr:IRI ] ;
     rr:predicateObjectMap [ rr:predicate rdf:type ; rr:objectMap [ rr:constant biolink:Person ; rr:termType rr:IRI ] ] ;
-    rr:predicateObjectMap [ rr:predicate nf:name ; rr:objectMap [ rml:reference "name" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate foaf:name ; rr:objectMap [ rml:reference "name" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [ rr:predicate rdfs:label ; rr:objectMap [ rml:reference "name" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [ rr:predicate owl:sameAs ; rr:objectMap [ rr:template "https://orcid.org/{orcid}" ; rr:termType rr:IRI ] ] .
 
@@ -71,7 +72,7 @@ map:PersonOrcidOnly a rr:TriplesMap ;
     rml:logicalSource map:PeopleSource ;
     rr:subjectMap [ rr:template "https://orcid.org/{nonSynapseOrcid}" ; rr:termType rr:IRI ] ;
     rr:predicateObjectMap [ rr:predicate rdf:type ; rr:objectMap [ rr:constant biolink:Person ; rr:termType rr:IRI ] ] ;
-    rr:predicateObjectMap [ rr:predicate nf:name ; rr:objectMap [ rml:reference "name" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate foaf:name ; rr:objectMap [ rml:reference "name" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [ rr:predicate rdfs:label ; rr:objectMap [ rml:reference "name" ; rr:datatype xsd:string ] ] .
 
 ################################################################################
