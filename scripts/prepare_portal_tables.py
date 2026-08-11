@@ -502,7 +502,7 @@ TABLES: Dict[str, Dict[str, Any]] = {
             {"target": "modelSystemName", "source": "modelSystemName", "type": "text+", "transform": "string_list"},
             # Synapse user who created / last modified the file. These resolve to
             # the same Profile IRIs used by biolink:Person, so they connect file
-            # contributions to the person graph (ORCID, nf:SynapseUser,
+            # contributions to the person graph (ORCID, nf:hasSynapseProfile,
             # nf:onProject). files.rml.ttl has always mapped nf:createdBy and
             # nf:modifiedBy, but without these entries the columns were fetched
             # and then dropped before reaching the CSV, so the mapping emitted
@@ -717,7 +717,6 @@ TABLES: Dict[str, Dict[str, Any]] = {
             {"target": "investigatorId", "source": "investigatorId", "type": "iri"},
             {"target": "investigatorSynapseId", "source": "investigatorSynapseId", "type": "iri", "transform": "synapse_id"},
             {"target": "orcid", "source": "orcid", "type": "iri"},
-            {"target": "synapseUserOrcid", "source": "synapseUserOrcid", "type": "iri"},
             {"target": "institution", "source": "institution", "type": "text"},
             {"target": "investigatorName", "source": "investigatorName", "type": "text"},
         ],
@@ -951,9 +950,8 @@ TABLES: Dict[str, Dict[str, Any]] = {
             {"target": "orcid", "source": "orcid", "type": "iri", "transform": "orcid"},
             {"target": "name", "source": "name", "type": "text"},
             {"target": "onProject", "source": "onProject", "type": "iri+", "transform": "synapse_id_list"},
-            # Derived (see apply_derived_columns): the ORCID, partitioned by
-            # whether the person also has a Synapse account.
-            {"target": "synapseUserOrcid", "source": "synapseUserOrcid", "type": "iri", "transform": "orcid"},
+            # Derived (see apply_derived_columns): the ORCID, but only for
+            # people with NO Synapse account -- it keys their person node.
             {"target": "nonSynapseOrcid", "source": "nonSynapseOrcid", "type": "iri", "transform": "orcid"},
         ],
     },
@@ -1297,9 +1295,9 @@ def apply_derived_columns(
         # Keep anyone with an ORCID or a project membership. Rows with neither
         # carry no usable fact, so they are dropped; people WITHOUT an ORCID are
         # deliberately kept, because most Synapse profiles have no ORCID on
-        # record yet are still legitimate project collaborators (128 such rows
-        # at source_version 9). Only the ORCID-bearing subset gets owl:sameAs and
-        # nf:SynapseUser -- both null-propagate in people.rml.ttl.
+        # record yet are still legitimate project collaborators (123 such rows
+        # at source_version 10). Only the ORCID-bearing subset gets owl:sameAs
+        # and nf:hasSynapseProfile -- both null-propagate in people.rml.ttl.
         def _keep(row):
             has_orcid = not is_missing(row.get("orcid")) and str(row.get("orcid")).strip() != ""
             proj = row.get("onProject")
@@ -1309,35 +1307,38 @@ def apply_derived_columns(
             return df
         df = df[df.apply(_keep, axis=1)]
 
-        if "synapseUserOrcid" in df.columns:
+        if "nonSynapseOrcid" in df.columns:
             return df
 
-        # This source is no longer Synapse-profile-centric: only 458 of its
-        # 1519 rows are Synapse accounts, the other 1061 are publication-derived
-        # researchers carrying an ORCID and a name but no ownerID. The two kinds
-        # of row need different subjects in people.rml.ttl, so split the ORCID
-        # into two mutually exclusive derived columns and let RML's normal
-        # null-propagation pick the right TriplesMap per row:
+        # This source is not Synapse-profile-centric: only 458 of its 1518 rows
+        # are Synapse accounts, the other 1060 are publication-derived
+        # researchers carrying an ORCID and a name but no ownerID. Those two
+        # kinds of row need different subjects in people.rml.ttl.
         #
-        #   synapseUserOrcid -- ORCID of someone who ALSO has a Synapse profile.
-        #       Subject of the nf:SynapseUser typing and of the ORCID -> Profile
-        #       owl:sameAs. Deriving it here (rather than with a nested GREL
-        #       conditional) mirrors what investigators.rml.ttl does, and is
-        #       load-bearing: typing the bare `orcid` column would falsely mark
-        #       all 1061 account-less researchers as Synapse users.
-        #   nonSynapseOrcid -- ORCID of someone with NO Synapse profile. Subject
-        #       of their biolink:Person node, since they have no Profile IRI to
-        #       key on. Mutually exclusive with synapseUserOrcid, so each person
-        #       is exactly one biolink:Person node and class counts stay honest.
+        # Only the account-less case needs a derived column. nonSynapseOrcid
+        # holds the ORCID of someone with NO Synapse profile, and is the subject
+        # of their biolink:Person node (they have no Profile IRI to key on).
+        # Account-holders are keyed by Profile IRI instead, so exactly one
+        # person node exists per person and class counts stay honest.
+        #
+        # There is deliberately no matching synapseUserOrcid column: every
+        # account-holder fact is emitted by a TriplesMap whose object is a
+        # {ownerID} template, which null-propagates on its own.
         #
         # The partition is computed ACROSS rows, not per row: the registry can
         # hold the same researcher twice, once as a Synapse account and once as
-        # a publication-derived entry (Xiyuan Zhang, 0009-0005-7564-346X, at
-        # source_version 9). Judging each row alone would give that person both
-        # a Profile-keyed and an ORCID-keyed biolink:Person node -- counting
-        # them twice -- and would type an ORCID as nf:SynapseUser and as a
-        # separate account-less person at the same time. So an ORCID claimed by
-        # ANY account row is never eligible for nonSynapseOrcid.
+        # a publication-derived entry (Xiyuan Zhang, 0009-0005-7564-346X).
+        # Judging each row alone would give that person both a Profile-keyed and
+        # an ORCID-keyed biolink:Person node, counting them twice. So an ORCID
+        # claimed by ANY account row is never eligible for nonSynapseOrcid.
+        #
+        # KNOWN LIMIT: this can only match rows that share an ORCID. A person
+        # duplicated with DISJOINT identifiers -- an account row with no ORCID
+        # plus a publication-derived row with one -- is invisible here, because
+        # nothing in this table links them. Margaret Wallace was such a case and
+        # was merged upstream at source_version 10; `duplicateOf` is the
+        # registry's own mechanism for the general problem and is not yet
+        # ingested.
         df = df.copy()
 
         def _has_owner(row) -> bool:
@@ -1350,10 +1351,6 @@ def apply_derived_columns(
             if format_orcid(v).strip()
         }
 
-        df["synapseUserOrcid"] = [
-            row.get("orcid", "") if has_owner else ""
-            for has_owner, (_, row) in zip(owner_rows, df.iterrows())
-        ]
         df["nonSynapseOrcid"] = [
             ""
             if has_owner or format_orcid(row.get("orcid", "")).strip() in claimed_orcids
@@ -1418,26 +1415,6 @@ def apply_derived_columns(
 
         df["cleanDoi"] = df["doi"].apply(_clean_doi) if "doi" in df.columns else ""
         df["publicationKey"] = df.apply(_key, axis=1)
-        return df
-
-    if table_name == "investigators":
-        if "synapseUserOrcid" not in df.columns:
-            # The ORCID, but only for investigators who also have a Synapse
-            # profile on record. investigators.rml.ttl types this column's IRI
-            # as nf:SynapseUser; deriving it here (rather than with a nested
-            # GREL conditional in the mapping) keeps the RML trivial and lets
-            # RML's normal null-propagation skip rows with no Synapse profile.
-            df = df.copy()
-            has_profile = df.get("investigatorSynapseId")
-            if has_profile is None:
-                df["synapseUserOrcid"] = ""
-            else:
-                df["synapseUserOrcid"] = df.apply(
-                    lambda r: r.get("orcid", "")
-                    if str(r.get("investigatorSynapseId") or "").strip()
-                    else "",
-                    axis=1,
-                )
         return df
 
     if table_name == "initiatives":

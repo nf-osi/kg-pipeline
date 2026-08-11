@@ -195,11 +195,11 @@ profiles:
         concrete_type: TableEntity
         note: >-
           Portal people registry (ownerID, orcid, name, onProject). No longer
-          Synapse-profile-only: 458 of 1519 rows are Synapse accounts, the rest
+          Synapse-profile-only: 458 of 1518 rows are Synapse accounts, the rest
           are publication-derived researchers with an ORCID and a name but no
           ownerID. Supplies person nodes, their ORCID linkage, display names
           and project memberships.
-        source_version: 9
+        source_version: 10
       publication_author_orcids:
         synapse_id: syn23564971
         concrete_type: TableEntity
@@ -210,7 +210,7 @@ profiles:
           (doi, orcid) row per pair in apply_derived_columns. Formerly its own
           table (syn76406574), which was deleted upstream once the people table
           absorbed the publication list.
-        source_version: 9
+        source_version: 10
   evaluation:
     version: KG v0.2-eval
     date: '2026-05-26'
@@ -332,8 +332,8 @@ profiles:
       people:
         synapse_id: syn23564971
         concrete_type: TableEntity
-        source_version: 9
+        source_version: 10
       publication_author_orcids:
         synapse_id: syn23564971
         concrete_type: TableEntity
-        source_version: 9
+        source_version: 10

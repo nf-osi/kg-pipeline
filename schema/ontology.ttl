@@ -392,13 +392,15 @@ nf:Investigator a owl:Class ;
 #                                         the ORCID is the only identifier.
 # The two are mutually exclusive per person, so `?p a biolink:Person` counts
 # people, not identifiers. Do not assume a Person subject is a Profile IRI --
-# most are not; only 458 of 1519 people in the registry have a Synapse account.
+# most are not; only 458 of 1518 people in the registry have a Synapse account.
 # Both kinds carry nf:name / rdfs:label when a name is on record.
-
-nf:SynapseUser a owl:Class ;
-    rdfs:subClassOf biolink:Person ;
-    rdfs:label "Synapse User" ;
-    rdfs:comment "A person who has both an ORCID and a Synapse profile on record, i.e. a researcher identifiable on Synapse. Asserted on the ORCID IRI (the canonical person identifier), NOT on the Synapse Profile IRI, so that counting instances of this class counts people rather than double-counting each person once per identifier. To find whether a publication's authors are Synapse users, join the publication's nf:authorOrcid value directly against this type: `?pub nf:doi ?doi . ?doi nf:authorOrcid ?orcid . ?orcid a nf:SynapseUser .` The corresponding Synapse profile is then one owl:sameAs hop away. Note this class covers only people with BOTH identifiers -- a researcher with an ORCID but no known Synapse profile is not typed here. Also note a person may hold more than one Synapse account, so a single ORCID can owl:sameAs several Synapse Profile IRIs; this is expected, not a data error. Consequently the ORCID -> Profile hop is one-to-many: count distinct ORCIDs (or instances of this class) when counting people, and do not assume one profile per person." .
+#
+# "Is this person on Synapse?" is answered by nf:hasSynapseProfile, NOT by a
+# class. There was formerly an nf:SynapseUser class asserted on the ORCID IRI;
+# it was removed because it was an index rather than a type -- it declared
+# rdfs:subClassOf biolink:Person while sitting on a second IRI for a person
+# already typed at their Profile IRI, so materializing that axiom duplicated
+# every account-holder. See nf:hasSynapseProfile.
 
 # nf:Publication replaced by biolink:Publication
 #
@@ -1761,6 +1763,16 @@ nf:publicationType a owl:DatatypeProperty ;
     rdfs:domain biolink:Publication ;
     rdfs:range xsd:string .
 
+nf:hasSynapseProfile a owl:ObjectProperty ;
+    rdfs:label "hasSynapseProfile" ;
+    rdfs:comment "Links a person to the Synapse Profile IRI that identifies them, i.e. asserts that this researcher has a Synapse account. This is the test for 'is this author on Synapse', and it returns the profile in the same triple pattern rather than requiring a follow-up hop: `?pub nf:doi ?doi . ?doi nf:authorOrcid ?orcid . ?orcid nf:hasSynapseProfile ?profile .` The subject is the ORCID IRI, which is the identifier a publication's nf:authorOrcid gives you and the only identifier every person in the registry has. Prefer this over filtering owl:sameAs objects by IRI prefix -- owl:sameAs also links ORCIDs to nf:Investigator records, so a bare sameAs traversal does not mean 'has an account'. A person with an ORCID but no known Synapse account simply has no nf:hasSynapseProfile triple. NOTE the relation is one-to-many: a person may hold more than one Synapse account (3 do), so count DISTINCT subjects, not objects, when counting people with accounts. Replaces the former nf:SynapseUser class." .
+# NO rdfs:domain, deliberately. The subject is an ORCID IRI, which for an
+# account-holder is NOT the person's biolink:Person node (that is their Profile
+# IRI). Declaring `rdfs:domain biolink:Person` would let a reasoner infer the
+# type onto the ORCID IRI and duplicate every account-holder -- precisely the
+# defect that removing nf:SynapseUser fixed. Like owl:sameAs, this property
+# relates two identifiers and is deliberately domain-free.
+
 nf:onProject a owl:ObjectProperty ;
     rdfs:label "onProject" ;
     rdfs:comment "Links a person (biolink:Person, identified by their Synapse Profile IRI) to a Synapse project they are a member of. Two people sharing a project are project collaborators, which is a different relation from co-authorship (see nf:authorOrcid). CAVEAT: the source column is capped at 100 entries per person, and 32 people sit exactly at that cap, so their project lists -- and any collaborator counts derived from them -- are truncated lower bounds. Do not rank people by project or collaborator count until the cap is lifted upstream." ;
@@ -1774,7 +1786,7 @@ nf:aboutStudy a owl:ObjectProperty ;
 
 nf:authorOrcid a owl:ObjectProperty ;
     rdfs:label "authorOrcid" ;
-    rdfs:comment "Links a DOI IRI (the object of a publication's nf:doi, not the Publication node itself) to an author's ORCID identifier: query as `?pub nf:doi ?doi . ?doi nf:authorOrcid ?orcid`. To check whether that author has a Synapse identity, test the ORCID IRI for the nf:SynapseUser type, or join on it via owl:sameAs -- e.g. `?synapseNode owl:sameAs ?orcid` -- which matches both biolink:Person and nf:Investigator records. To get the author's NAME, ask the ORCID IRI for nf:name directly (authors with no Synapse account are biolink:Person nodes keyed by their ORCID) and fall back to one owl:sameAs hop for those who do have an account: `{ ?orcid nf:name ?name } UNION { ?orcid owl:sameAs ?p . ?p nf:name ?name }`. Do NOT match authors by name string against nf:authors -- the registry's display-name spelling need not match the publication's. Note: ORCID may not be available for all authors, so authorOrcid values can be a partial subset of a publication's authorship. nf:authors (literal author names) is the complete author list; do not assume every author in nf:authors has a corresponding authorOrcid, and do not use the count of authorOrcid values as the author count." .
+    rdfs:comment "Links a DOI IRI (the object of a publication's nf:doi, not the Publication node itself) to an author's ORCID identifier: query as `?pub nf:doi ?doi . ?doi nf:authorOrcid ?orcid`. To check whether that author has a Synapse account, ask the ORCID IRI for nf:hasSynapseProfile, which yields the profile directly. To get the author's NAME, ask the ORCID IRI for nf:name directly (authors with no Synapse account are biolink:Person nodes keyed by their ORCID) and fall back to one owl:sameAs hop for those who do have an account: `{ ?orcid nf:name ?name } UNION { ?orcid owl:sameAs ?p . ?p nf:name ?name }`. Do NOT match authors by name string against nf:authors -- the registry's display-name spelling need not match the publication's. Note: ORCID may not be available for all authors, so authorOrcid values can be a partial subset of a publication's authorship. nf:authors (literal author names) is the complete author list; do not assume every author in nf:authors has a corresponding authorOrcid, and do not use the count of authorOrcid values as the author count." .
 
 ################################################################################
 # Properties - Observation related

@@ -50,6 +50,7 @@ map:InvestigatorOrcidToProfile a rr:TriplesMap ;
     rdfs:label "Investigator ORCID to Synapse Profile" ;
     rml:logicalSource map:InvestigatorsSource ;
     rr:subjectMap [ rr:template "https://orcid.org/{orcid}" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [ rr:predicate nf:hasSynapseProfile ; rr:objectMap [ rr:template "https://www.synapse.org/Profile:{investigatorSynapseId}" ; rr:termType rr:IRI ] ] ;
     rr:predicateObjectMap [ rr:predicate owl:sameAs ; rr:objectMap [ rr:template "https://www.synapse.org/Profile:{investigatorSynapseId}" ; rr:termType rr:IRI ] ] .
 
 map:InvestigatorProfileToOrcid a rr:TriplesMap ;
@@ -59,18 +60,13 @@ map:InvestigatorProfileToOrcid a rr:TriplesMap ;
     rr:predicateObjectMap [ rr:predicate owl:sameAs ; rr:objectMap [ rr:template "https://orcid.org/{orcid}" ; rr:termType rr:IRI ] ] .
 
 ################################################################################
-# SynapseUser typing
+# Synapse account linkage
 #
-# Types the ORCID IRI (not the Profile IRI) as nf:SynapseUser -- see the
-# nf:SynapseUser comment in schema/ontology.ttl for why the ORCID is the
-# canonical subject. synapseUserOrcid is a derived column (see
-# apply_derived_columns in scripts/prepare_portal_tables.py) holding the ORCID
-# only when the investigator also has a Synapse profile, so RML's normal
-# null-propagation skips investigators with an ORCID but no known profile.
+# Folded into InvestigatorOrcidToProfile above: nf:hasSynapseProfile has the
+# same emit condition as the ORCID -> Profile owl:sameAs (both identifiers
+# present on the row), and both templates null-propagate, so no separate map
+# and no derived companion column are needed. This replaces a former
+# InvestigatorSynapseUser map that asserted `rdf:type nf:SynapseUser` over a
+# derived synapseUserOrcid column -- the column existed only because a constant
+# object cannot null-propagate. See nf:hasSynapseProfile in schema/ontology.ttl.
 ################################################################################
-
-map:InvestigatorSynapseUser a rr:TriplesMap ;
-    rdfs:label "Investigator Synapse User" ;
-    rml:logicalSource map:InvestigatorsSource ;
-    rr:subjectMap [ rr:template "https://orcid.org/{synapseUserOrcid}" ; rr:termType rr:IRI ] ;
-    rr:predicateObjectMap [ rr:predicate rdf:type ; rr:objectMap [ rr:constant nf:SynapseUser ; rr:termType rr:IRI ] ] .

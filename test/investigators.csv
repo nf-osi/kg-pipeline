@@ -1,5 +1,5 @@
-investigatorId,investigatorSynapseId,orcid,synapseUserOrcid,institution,investigatorName
-inv-001,syn123456,0000-0001-2345-6789,0000-0001-2345-6789,Johns Hopkins University,John Smith
-inv-002,syn234567,0000-0002-3456-7890,0000-0002-3456-7890,Stanford University,Jane Doe
-inv-003,syn345678,0000-0003-4567-8901,0000-0003-4567-8901,Harvard Medical School,Bob Johnson
-inv-004,,0000-0004-5678-9012,,MIT,Alice Nguyen
+investigatorId,investigatorSynapseId,orcid,institution,investigatorName
+inv-001,syn123456,0000-0001-2345-6789,Johns Hopkins University,John Smith
+inv-002,syn234567,0000-0002-3456-7890,Stanford University,Jane Doe
+inv-003,syn345678,0000-0003-4567-8901,Harvard Medical School,Bob Johnson
+inv-004,,0000-0004-5678-9012,MIT,Alice Nguyen

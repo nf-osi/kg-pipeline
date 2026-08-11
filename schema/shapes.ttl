@@ -902,29 +902,33 @@ shapes:InvestigatorShape a sh:NodeShape ;
 shapes:PersonShape a sh:NodeShape ;
     sh:targetClass biolink:Person ;
     rdfs:label "Person shape" ;
-    rdfs:comment "Expected properties for generic Person instances (Synapse profiles with a known ORCID). A Person has no name literal at all -- identify one only by its owl:sameAs ORCID IRI (e.g. join a publication's nf:authorOrcid value against this owl:sameAs), never by matching an author's name string." ;
+    rdfs:comment "A person in the portal people registry. The node is keyed by the Synapse Profile IRI when the person has an account and by the ORCID IRI when they do not -- never both, so instances of this class count people rather than identifiers. Most carry nf:name / rdfs:label, but names are display strings and need not match a publication's nf:authors spelling: identify a person by ORCID, not by name matching." ;
+    sh:property [
+        sh:path nf:name ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    # NO sh:maxCount on owl:sameAs: an account-holder's Profile IRI links to
+    # their ORCID, and a person holding more than one Synapse account means an
+    # ORCID legitimately links to several Profile IRIs. Expected upstream data,
+    # not a defect -- do not "tidy" this to sh:maxCount 1.
     sh:property [
         sh:path owl:sameAs ;
         sh:nodeKind sh:IRI ;
-        sh:maxCount 1 ;
     ] .
 
 ################################################################################
-# Synapse User
+# Synapse account linkage
 ################################################################################
 
-shapes:SynapseUserShape a sh:NodeShape ;
-    sh:targetClass nf:SynapseUser ;
-    rdfs:label "Synapse User shape" ;
-    rdfs:comment "A person with both an ORCID and a Synapse profile. Instances of this class ARE ORCID IRIs (https://orcid.org/{id}), so a publication's nf:authorOrcid value can be tested for this type directly: `?pub nf:doi ?doi . ?doi nf:authorOrcid ?orcid . ?orcid a nf:SynapseUser .` The person's Synapse profile is one owl:sameAs hop from there. Instances carry no name literal; do not attempt name matching." ;
-    # NO sh:maxCount here, deliberately: one person can hold more than one
-    # Synapse account, so an ORCID legitimately owl:sameAs's several Profile
-    # IRIs. This is expected upstream data, not a defect -- do not "tidy" this
-    # to sh:maxCount 1, and do not treat the extra profiles as duplicates to be
-    # merged or dropped.
+shapes:HasSynapseProfileShape a sh:NodeShape ;
+    sh:targetSubjectsOf nf:hasSynapseProfile ;
+    rdfs:label "Has Synapse profile shape" ;
+    rdfs:comment "Constrains the ORCID -> Synapse Profile linkage that answers 'is this researcher on Synapse'. Targeted by subject rather than by class on purpose: the subject is an ORCID IRI, which for an account-holder is deliberately NOT typed biolink:Person (their Person node is the Profile IRI), so there is no class to target. See nf:hasSynapseProfile in the ontology." ;
     sh:property [
-        sh:path owl:sameAs ;
+        sh:path nf:hasSynapseProfile ;
         sh:nodeKind sh:IRI ;
+        sh:minCount 1 ;
     ] .
 
 ################################################################################

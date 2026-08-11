@@ -29,7 +29,7 @@ map:PeopleSource a rml:LogicalSource ;
 # graph rather than minting a separate identity. owl:sameAs asserts the
 # Profile IRI and the ORCID IRI denote the same real-world person.
 #
-# Only 458 of the source's 1519 rows are Synapse accounts; the rest have no
+# Only 458 of the source's 1518 rows are Synapse accounts; the rest have no
 # ownerID and are handled by PersonOrcidOnly below, for which this map's
 # subject template null-propagates.
 #
@@ -37,7 +37,7 @@ map:PeopleSource a rml:LogicalSource ;
 # investigators.rml.ttl emits for nf:Investigator. The name is the person's
 # own recorded display name, so it is NOT guaranteed to match the author-name
 # spelling in a publication's nf:authors literals -- it is for display and
-# disambiguation, not for joining. Not every row has one (28 of 1519 rows have
+# disambiguation, not for joining. Not every row has one (27 of 1518 rows have
 # no name on record); those rows null-propagate and emit no name triple.
 ################################################################################
 
@@ -53,20 +53,17 @@ map:PersonCore a rr:TriplesMap ;
 ################################################################################
 # Person core facts -- people WITHOUT a Synapse account
 #
-# 1061 of the source's 1519 rows are publication-derived researchers: an ORCID
+# 1060 of the source's 1518 rows are publication-derived researchers: an ORCID
 # and a name, but no Synapse account. They have no Profile IRI to key on, so
-# their person node is the ORCID IRI -- which the ontology already treats as
-# the canonical person identifier (see the nf:SynapseUser comment in
-# schema/ontology.ttl).
+# their person node is the ORCID IRI -- the only identifier they have.
 #
 # The subject is nonSynapseOrcid, a derived column (see apply_derived_columns
 # in scripts/prepare_portal_tables.py) that holds the ORCID only when the
-# person has NO ownerID. It is mutually exclusive with synapseUserOrcid below,
-# which is what keeps class counts honest: every row contributes exactly one
-# biolink:Person node, keyed by Profile IRI when there is an account and by
-# ORCID IRI otherwise, so `?p a biolink:Person` counts people, not identifiers.
-# These people are deliberately NOT typed nf:SynapseUser -- that class means
-# "has both an ORCID and a Synapse profile", which they do not.
+# person has NO ownerID. That is what keeps counts honest: every row
+# contributes exactly one biolink:Person node, keyed by Profile IRI when there
+# is an account and by ORCID IRI otherwise, so `?p a biolink:Person` counts
+# people, not identifiers. These people get no nf:hasSynapseProfile, since they
+# have no account -- see PersonSynapseProfile below.
 ################################################################################
 
 map:PersonOrcidOnly a rr:TriplesMap ;
@@ -78,17 +75,19 @@ map:PersonOrcidOnly a rr:TriplesMap ;
     rr:predicateObjectMap [ rr:predicate rdfs:label ; rr:objectMap [ rml:reference "name" ; rr:datatype xsd:string ] ] .
 
 ################################################################################
-# ORCID-subject facts
+# ORCID-subject facts -- the Synapse account linkage
 #
-# Types the ORCID IRI (not the Profile IRI) as nf:SynapseUser so that counting
-# the class counts people, not identifiers -- see the nf:SynapseUser comment in
-# schema/ontology.ttl.
+# nf:hasSynapseProfile asserts "this researcher has a Synapse account" and hands
+# back the profile in the same triple, which is what makes the authorship query
+# one hop: ?doi nf:authorOrcid ?orcid . ?orcid nf:hasSynapseProfile ?profile.
 #
-# The subject is synapseUserOrcid, a derived column holding the ORCID only for
-# people who ALSO have a Synapse profile, so rows with an ORCID but no account
-# (the majority -- see PersonOrcidOnly) null-propagate here instead of being
-# falsely typed as Synapse users. investigators.rml.ttl derives the same column
-# for the same reason.
+# Both the subject and the object are plain templates over columns on the same
+# row, so RML's ordinary null-propagation does the filtering for free: a row
+# with no ownerID (the majority -- see PersonOrcidOnly) emits nothing here.
+# That is why this map reads the raw `orcid` column and needs no derived
+# companion column. Its predecessor asserted `rdf:type nf:SynapseUser`, and a
+# constant object cannot null-propagate, which is the only reason a derived
+# synapseUserOrcid column ever existed.
 #
 # Also emits the ORCID -> Profile direction of owl:sameAs. PersonCore already
 # asserts Profile -> ORCID, and owl:sameAs is symmetric, but QLever does no OWL
@@ -97,11 +96,11 @@ map:PersonOrcidOnly a rr:TriplesMap ;
 # investigators.rml.ttl materializes both directions for the same reason.
 ################################################################################
 
-map:PersonSynapseUser a rr:TriplesMap ;
-    rdfs:label "Person Synapse User" ;
+map:PersonSynapseProfile a rr:TriplesMap ;
+    rdfs:label "Person Synapse Profile" ;
     rml:logicalSource map:PeopleSource ;
-    rr:subjectMap [ rr:template "https://orcid.org/{synapseUserOrcid}" ; rr:termType rr:IRI ] ;
-    rr:predicateObjectMap [ rr:predicate rdf:type ; rr:objectMap [ rr:constant nf:SynapseUser ; rr:termType rr:IRI ] ] ;
+    rr:subjectMap [ rr:template "https://orcid.org/{orcid}" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [ rr:predicate nf:hasSynapseProfile ; rr:objectMap [ rr:template "https://www.synapse.org/Profile:{ownerID}" ; rr:termType rr:IRI ] ] ;
     rr:predicateObjectMap [ rr:predicate owl:sameAs ; rr:objectMap [ rr:template "https://www.synapse.org/Profile:{ownerID}" ; rr:termType rr:IRI ] ] .
 
 ################################################################################

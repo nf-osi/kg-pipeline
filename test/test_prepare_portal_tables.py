@@ -20,91 +20,59 @@ from prepare_portal_tables import (
 )
 
 
-class TestInvestigatorSynapseUserOrcid:
-    """The synapseUserOrcid derived column drives nf:SynapseUser typing."""
-
-    def _derive(self, rows):
-        df = pd.DataFrame(rows)
-        return apply_derived_columns("investigators", df, {})
-
-    def test_populated_only_when_both_ids_present(self):
-        out = self._derive([
-            {"orcid": "0000-0001-1111-1111", "investigatorSynapseId": "3334263"},
-            {"orcid": "0000-0002-2222-2222", "investigatorSynapseId": ""},
-        ])
-        assert out.loc[0, "synapseUserOrcid"] == "0000-0001-1111-1111"
-        assert out.loc[1, "synapseUserOrcid"] == ""
-
-    def test_blank_orcid_yields_blank(self):
-        """No ORCID means nothing to type, even with a Synapse profile."""
-        out = self._derive([{"orcid": "", "investigatorSynapseId": "3334263"}])
-        assert out.loc[0, "synapseUserOrcid"] == ""
-
-    def test_whitespace_only_profile_treated_as_absent(self):
-        out = self._derive([{"orcid": "0000-0001-1111-1111", "investigatorSynapseId": "   "}])
-        assert out.loc[0, "synapseUserOrcid"] == ""
-
-    def test_missing_profile_column_does_not_raise(self):
-        """Defensive: a source missing the column entirely should still process."""
-        out = self._derive([{"orcid": "0000-0001-1111-1111"}])
-        assert out.loc[0, "synapseUserOrcid"] == ""
-
-    def test_existing_column_is_not_recomputed(self):
-        """Re-processing from cache must not clobber an already-derived column."""
-        df = pd.DataFrame([{
-            "orcid": "0000-0001-1111-1111",
-            "investigatorSynapseId": "3334263",
-            "synapseUserOrcid": "preserved",
-        }])
-        out = apply_derived_columns("investigators", df, {})
-        assert out.loc[0, "synapseUserOrcid"] == "preserved"
-
-
 class TestPeopleOrcidPartition:
     """The people source mixes Synapse accounts with publication-derived people
-    who have an ORCID but no ownerID. synapseUserOrcid / nonSynapseOrcid split
-    the ORCID between them so each row yields exactly one person node, and so
-    that account-less people are never typed nf:SynapseUser."""
+    who have an ORCID but no ownerID. nonSynapseOrcid keys the person node for
+    the latter; account-holders are keyed by Profile IRI instead, so each row
+    yields exactly one biolink:Person."""
 
     def _derive(self, rows):
         return apply_derived_columns("people", pd.DataFrame(rows), {})
 
-    def test_account_holder_gets_synapse_user_orcid_only(self):
+    def test_account_holder_gets_no_orcid_keyed_node(self):
         out = self._derive([
             {"ownerID": "3324237", "orcid": "0000-0001-1111-1111", "onProject": ""},
         ]).reset_index(drop=True)
-        assert out.loc[0, "synapseUserOrcid"] == "0000-0001-1111-1111"
         assert out.loc[0, "nonSynapseOrcid"] == ""
 
-    def test_account_less_person_gets_non_synapse_orcid_only(self):
+    def test_account_less_person_is_keyed_by_orcid(self):
         out = self._derive([
             {"ownerID": "", "orcid": "0000-0002-2222-2222", "onProject": ""},
         ]).reset_index(drop=True)
-        assert out.loc[0, "synapseUserOrcid"] == ""
         assert out.loc[0, "nonSynapseOrcid"] == "0000-0002-2222-2222"
 
-    def test_columns_are_mutually_exclusive(self):
+    def test_no_synapse_user_orcid_column_is_produced(self):
+        """It existed only to give `rdf:type nf:SynapseUser` something to
+        null-propagate on. nf:hasSynapseProfile has a templated object, so the
+        raw columns suffice -- see people.rml.ttl."""
         out = self._derive([
             {"ownerID": "3324237", "orcid": "0000-0001-1111-1111", "onProject": ""},
-            {"ownerID": None, "orcid": "0000-0002-2222-2222", "onProject": ""},
-            {"ownerID": "3399999", "orcid": "", "onProject": "syn1"},
         ])
-        both = out[(out["synapseUserOrcid"] != "") & (out["nonSynapseOrcid"] != "")]
-        assert both.empty, f"A row must not populate both columns: {both}"
+        assert "synapseUserOrcid" not in out.columns
 
     def test_orcid_claimed_by_an_account_row_never_mints_a_second_person(self):
         """The registry holds some researchers twice -- once as a Synapse
         account, once publication-derived. Judging rows independently would give
         that person both a Profile-keyed and an ORCID-keyed biolink:Person node,
-        double-counting them and typing one ORCID as a Synapse user and an
-        account-less person at once."""
+        double-counting them."""
         out = self._derive([
             {"ownerID": "3572182", "orcid": "0009-0005-7564-346X", "onProject": "syn1"},
             {"ownerID": "", "orcid": "0009-0005-7564-346X", "onProject": ""},
         ]).reset_index(drop=True)
-        assert out.loc[0, "synapseUserOrcid"] == "0009-0005-7564-346X"
+        assert out.loc[0, "nonSynapseOrcid"] == ""
         assert out.loc[1, "nonSynapseOrcid"] == "", \
             "duplicate publication-derived row must not become a second person"
+
+    def test_disjoint_identifier_duplicate_is_not_caught(self):
+        """KNOWN LIMIT, documented in apply_derived_columns: an account row with
+        no ORCID plus a publication-derived row with one cannot be linked from
+        this table alone, so both survive. This was Margaret Wallace, fixed
+        upstream at source_version 10 rather than in code."""
+        out = self._derive([
+            {"ownerID": "3334263", "orcid": "", "onProject": "syn1"},
+            {"ownerID": "", "orcid": "0000-0002-5202-8895", "onProject": ""},
+        ]).reset_index(drop=True)
+        assert out.loc[1, "nonSynapseOrcid"] == "0000-0002-5202-8895"
 
     def test_claim_matching_ignores_orcid_prefix_formatting(self):
         """The source writes ORCIDs as 'orcid:<id>'; the two rows for one person
@@ -129,7 +97,6 @@ class TestPeopleOrcidPartition:
             {"ownerID": float("nan"), "orcid": "0000-0002-2222-2222", "onProject": ""},
         ]).reset_index(drop=True)
         assert out.loc[0, "nonSynapseOrcid"] == "0000-0002-2222-2222"
-        assert out.loc[0, "synapseUserOrcid"] == ""
 
     def test_row_without_orcid_or_project_is_dropped(self):
         out = self._derive([
@@ -138,17 +105,16 @@ class TestPeopleOrcidPartition:
         ])
         assert list(out["ownerID"]) == ["3399999"]
 
-    def test_existing_columns_are_not_recomputed(self):
-        """Re-processing from cache must not clobber already-derived columns."""
+    def test_existing_column_is_not_recomputed(self):
+        """Re-processing from cache must not clobber an already-derived column."""
         df = pd.DataFrame([{
-            "ownerID": "3324237",
+            "ownerID": "",
             "orcid": "0000-0001-1111-1111",
             "onProject": "",
-            "synapseUserOrcid": "preserved",
-            "nonSynapseOrcid": "",
+            "nonSynapseOrcid": "preserved",
         }])
         out = apply_derived_columns("people", df, {}).reset_index(drop=True)
-        assert out.loc[0, "synapseUserOrcid"] == "preserved"
+        assert out.loc[0, "nonSynapseOrcid"] == "preserved"
 
 
 class TestPublicationAuthorOrcidExplode:

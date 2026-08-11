@@ -140,17 +140,17 @@ class TestPeopleNames:
 
 
 class TestPeopleOrcidOnly:
-    """People with an ORCID but no Synapse account -- 1061 of 1519 source rows."""
+    """People with an ORCID but no Synapse account -- 1060 of 1518 source rows."""
 
-    def test_orcid_only_person_not_typed_synapse_user(self, people_graph, namespaces):
-        """nf:SynapseUser means 'has BOTH an ORCID and a Synapse profile'.
-        Typing the bare orcid column would falsely mark every publication-derived
-        researcher as a Synapse user, which is the failure this guards."""
+    def test_orcid_only_person_has_no_synapse_profile(self, people_graph, namespaces):
+        """nf:hasSynapseProfile means 'this researcher has a Synapse account'.
+        Emitting it from the bare orcid column would falsely claim an account for
+        every publication-derived researcher, which is the failure this guards."""
         NF = namespaces["nf"]
-        users = {str(u) for u in people_graph.subjects(RDF.type, NF.SynapseUser)}
-        assert "https://orcid.org/0000-0001-5030-9354" not in users, \
-            f"ORCID-only person must not be typed nf:SynapseUser: {users}"
-        assert "https://orcid.org/0000-0002-9752-3689" not in users, users
+        linked = {str(s) for s in people_graph.subjects(NF.hasSynapseProfile, None)}
+        assert "https://orcid.org/0000-0001-5030-9354" not in linked, \
+            f"ORCID-only person must not claim a Synapse profile: {linked}"
+        assert "https://orcid.org/0000-0002-9752-3689" not in linked, linked
 
     def test_orcid_only_person_has_no_profile_link(self, people_graph, namespaces):
         """No ownerID means no Profile IRI to point at, so no owl:sameAs."""
@@ -170,38 +170,52 @@ class TestPeopleOrcidOnly:
                 f"Float-formatted ownerID leaked into IRI: {iri}"
 
 
-class TestPeopleSynapseUser:
-    """Test nf:SynapseUser typing (asserted on the ORCID IRI, not the profile)"""
+class TestPeopleSynapseProfile:
+    """nf:hasSynapseProfile: the ORCID -> Synapse account assertion."""
 
-    def test_orcid_typed_as_synapse_user(self, people_graph, namespaces):
-        """Every person's ORCID IRI should be typed nf:SynapseUser"""
+    def test_account_holders_link_orcid_to_profile(self, people_graph, namespaces):
         NF = namespaces["nf"]
-        users = list(people_graph.subjects(RDF.type, NF.SynapseUser))
-        assert len(users) == 2, f"Expected 2 SynapseUser instances, got {len(users)}"
-        for u in users:
-            assert str(u).startswith("https://orcid.org/"), \
-                f"SynapseUser should be an ORCID IRI, got {u}"
+        pairs = list(people_graph.subject_objects(NF.hasSynapseProfile))
+        assert len(pairs) == 2, f"Expected 2 account linkages, got {pairs}"
+        for s, o in pairs:
+            assert str(s).startswith("https://orcid.org/"), \
+                f"Subject should be the ORCID IRI, got {s}"
+            assert str(o).startswith("https://www.synapse.org/Profile:"), \
+                f"Object should be the Profile IRI, got {o}"
 
-    def test_profile_iri_not_typed_synapse_user(self, people_graph, namespaces):
-        """The Synapse Profile IRI must NOT carry the SynapseUser type -- typing
-        both identifiers would double-count people in class counts."""
+    def test_profile_iri_is_not_the_subject(self, people_graph, namespaces):
+        """The subject must be the ORCID, since that is the identifier a
+        publication's nf:authorOrcid hands you."""
         NF = namespaces["nf"]
-        users = [str(u) for u in people_graph.subjects(RDF.type, NF.SynapseUser)]
-        assert not any("synapse.org/Profile:" in u for u in users), \
-            f"Profile IRIs should not be typed nf:SynapseUser: {users}"
+        subjects = [str(s) for s in people_graph.subjects(NF.hasSynapseProfile, None)]
+        assert not any("synapse.org/Profile:" in s for s in subjects), subjects
 
-    def test_synapse_user_reachable_from_orcid_value(self, people_graph, namespaces):
-        """An ORCID value should be testable for the SynapseUser type directly,
-        which is the join an agent makes from a publication's nf:authorOrcid."""
+    def test_answers_the_authorship_question_in_one_hop(self, people_graph, namespaces):
+        """From an ORCID alone, get the profile in a single triple pattern --
+        the query shape an agent uses from nf:authorOrcid."""
         NF = namespaces["nf"]
-
         query = """
-        ASK {
-            <https://orcid.org/0000-0002-3127-5045> a nf:SynapseUser .
+        SELECT ?profile WHERE {
+            <https://orcid.org/0000-0002-3127-5045> nf:hasSynapseProfile ?profile .
         }
         """
-        assert people_graph.query(query, initNs={"nf": NF}).askAnswer, \
-            "Expected the ORCID IRI to be directly typed nf:SynapseUser"
+        rows = list(people_graph.query(query, initNs={"nf": NF}))
+        assert [str(r.profile) for r in rows] == ["https://www.synapse.org/Profile:3324237"]
+
+    def test_no_orcid_means_no_linkage(self, people_graph, namespaces):
+        """A profile with no ORCID on record cannot be linked in either
+        direction, so nothing is emitted for it."""
+        NF = namespaces["nf"]
+        objects = {str(o) for o in people_graph.objects(None, NF.hasSynapseProfile)}
+        assert "https://www.synapse.org/Profile:3399999" not in objects, objects
+
+    def test_synapse_user_class_is_gone(self, people_graph, namespaces):
+        """nf:SynapseUser was removed: it declared rdfs:subClassOf biolink:Person
+        while sitting on a second IRI for an already-typed person, so
+        materializing that axiom duplicated every account-holder."""
+        NF = namespaces["nf"]
+        assert list(people_graph.subjects(RDF.type, NF.SynapseUser)) == [], \
+            "nf:SynapseUser should no longer be emitted"
 
 
 class TestPeopleProjects:
@@ -223,7 +237,7 @@ class TestPeopleProjects:
         OWL = namespaces["owl"]
         subj = URIRef("https://www.synapse.org/Profile:3399999")
         assert len(list(people_graph.objects(subj, NF.onProject))) == 2
-        # ...and gets no owl:sameAs or SynapseUser typing, since it has no ORCID
+        # ...and gets no owl:sameAs or account linkage, since it has no ORCID
         assert list(people_graph.objects(subj, OWL.sameAs)) == []
 
     def test_person_without_projects_emits_none(self, people_graph, namespaces):

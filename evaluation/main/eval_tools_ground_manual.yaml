@@ -178,21 +178,18 @@ ground_truth:
     methodology: |
       1. Find the publication by DOI and get its nf:authorOrcid links (19 ORCID
          IRIs; see PUB-001)
-      2. Test each ORCID IRI for the nf:SynapseUser type, then hop to the
-         profile — the whole answer is one query:
+      2. Ask each ORCID IRI for nf:hasSynapseProfile — the whole answer is one
+         query, and the profile comes back in the same triple pattern, with no
+         second hop and no IRI-prefix filter:
            ?pub nf:doi ?doi .
            ?doi nf:authorOrcid ?orcid .
-           ?orcid a nf:SynapseUser ;
-                  owl:sameAs ?profile .
-           FILTER(STRSTARTS(STR(?profile), "https://www.synapse.org/Profile:"))
-         nf:SynapseUser is asserted on the ORCID IRI whenever a person has both
-         an ORCID and a Synapse profile, from either source ingest, so it covers
-         every match. Both ingests materialize owl:sameAs in both directions, so
-         the ORCID -> Profile hop works regardless of which ingest supplied the
-         person.
-         Equivalent longer route (what the graph looked like before nf:SynapseUser
-         was materialized) is to union both identity sources, since neither alone
-         covers every match:
+           ?orcid nf:hasSynapseProfile ?profile .
+         nf:hasSynapseProfile is emitted from the ORCID IRI whenever a person has
+         both an ORCID and a Synapse profile, from either source ingest, so it
+         covers every match.
+         Equivalent longer route (what the graph looked like before the account
+         linkage was materialized) is to union both identity sources, since
+         neither alone covers every match:
          - biolink:Person owl:sameAs <ORCID IRI> — a person from the people
            registry who HAS a Synapse account; subject IRI is
            https://www.synapse.org/Profile:{id}. Note the registry also holds
@@ -214,18 +211,18 @@ ground_truth:
 
     notes: |
       This question tests whether an agent finds and uses the simplest available
-      route (the nf:SynapseUser type on the ORCID IRI) rather than a partial or
+      route (nf:hasSynapseProfile on the ORCID IRI) rather than a partial or
       roundabout one.
 
       IMPORTANT for future readers: this question was originally authored when
-      the graph had no nf:SynapseUser class, and it reliably caught agents that
-      traversed the ORCID linkage only partially. nf:SynapseUser was then
-      materialized (see schema/ontology.ttl) precisely to make this kind of
+      the graph had no direct ORCID -> account linkage, and it reliably caught
+      agents that traversed the ORCID linkage only partially. That linkage was
+      then materialized (see schema/ontology.ttl) precisely to make this kind of
       question answerable in one hop, so the question is now easier BY
       CONSTRUCTION -- a good score here no longer demonstrates multi-hop
       traversal ability the way it once did. Historical failure modes it used
       to catch, all of which still yield a wrong answer if an agent ignores
-      nf:SynapseUser:
+      nf:hasSynapseProfile:
       - Checking only nf:Investigator (the more familiar, curated entity) and
         missing Mark Kirstein and Eva Dombi, who have no Investigator record and
         are reachable only via the generic People/owl:sameAs route.
@@ -386,35 +383,35 @@ ground_truth:
       - 72
 
     methodology: |
-      Invert the nf:SynapseUser lookup: gather co-authors by ORCID, then keep the
-      ones that are not typed nf:SynapseUser.
+      Invert the account lookup: gather co-authors by ORCID, then keep the ones
+      with no nf:hasSynapseProfile.
         <https://www.synapse.org/Profile:3334263> owl:sameAs ?me .
         ?doi nf:authorOrcid ?me .            # 14 DOIs I authored
         ?doi nf:authorOrcid ?collab .        # everyone on those papers
         FILTER(?collab != ?me)
-        FILTER NOT EXISTS { ?collab a nf:SynapseUser }
+        FILTER NOT EXISTS { ?collab nf:hasSynapseProfile ?any }
         -> COUNT(DISTINCT ?collab) = 72
 
       Breakdown for this profile (Margaret Wallace, ORCID 0000-0002-5202-8895):
         14   DOIs carrying her nf:authorOrcid
         99   distinct co-author ORCIDs on those papers (excluding her own)
-         27  of those are nf:SynapseUser (have a Synapse profile)
+         27  of those have an nf:hasSynapseProfile (a Synapse account)
          72  are not  <- the answer
 
-      nf:SynapseUser is asserted exactly when a person has BOTH an ORCID and a
-      Synapse profile, so "not a nf:SynapseUser" is precisely "has an ORCID but
-      no Synapse profile on record".
+      nf:hasSynapseProfile is emitted exactly when a person has BOTH an ORCID and
+      a Synapse profile, so "no nf:hasSynapseProfile" is precisely "has an ORCID
+      but no Synapse profile on record".
 
     notes: |
       Tests whether an agent can traverse co-authorship and then apply a
-      NEGATIVE condition (FILTER NOT EXISTS / MINUS) over the nf:SynapseUser
-      type, rather than only positive lookups as in PUB-002.
+      NEGATIVE condition (FILTER NOT EXISTS / MINUS) over nf:hasSynapseProfile,
+      rather than only positive lookups as in PUB-002.
 
       WHY THE QUESTION SAYS "who have an ORCID on record": without that scope it
       would be ill-posed, because "not on Synapse" would conflate two different
       things:
         - evidence of absence -- co-author HAS an ORCID, and that ORCID is not a
-          nf:SynapseUser. Derivable: 72.
+          nf:hasSynapseProfile. Derivable: 72.
         - absence of evidence -- co-author has no ORCID at all, so they cannot be
           identified as a person in the graph and their Synapse status is
           unknowable. NOT derivable.
@@ -466,13 +463,13 @@ ground_truth:
       THE ANSWER IS AN ORCID because that is what the question asks for, and
       because the ORCID is the identifier the co-authorship join runs on. Unlike
       earlier versions of this item, the winner IS now otherwise identifiable:
-      0000-0002-1049-0993 is typed nf:SynapseUser and owl:sameAs
-      Profile:3324237, which carries nf:name "Jaishri Blakeley". Grading on the
-      ORCID keeps the item exact; a name variant is now answerable if wanted.
+      0000-0002-1049-0993 has nf:hasSynapseProfile -> Profile:3324237, which
+      carries nf:name "Jaishri Blakeley". Grading on the ORCID keeps the item
+      exact; a name variant is now answerable if wanted.
 
       SCOPE: co-authorship is only visible where nf:authorOrcid exists, which
-      covers 284 DOIs out of ~937 publication nodes (see
-      docs/publication-issues.md). This is therefore "most co-authors among
+      covers 284 DOIs out of ~937 publication nodes. 
+      This is therefore "most co-authors among
       papers with ORCID data on record", not a true bibliometric ranking. The
       ranking is still well defined and reproducible over what the graph holds,
       which is what the question asks.

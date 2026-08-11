@@ -202,19 +202,26 @@ class TestInvestigator:
         assert "https://orcid.org/0000-0004-5678-9012" not in forward_orcids, \
             "orcid-only investigator (no Synapse profile) should not produce a direct link"
 
-    def test_synapse_user_typed_only_when_profile_present(self, investigator_graph, namespaces):
-        """Investigators with both an ORCID and a Synapse profile get their ORCID
-        typed nf:SynapseUser; an investigator with only an ORCID does not."""
+    def test_synapse_profile_linked_only_when_profile_present(self, investigator_graph, namespaces):
+        """Investigators with both an ORCID and a Synapse profile get an
+        nf:hasSynapseProfile edge from their ORCID; an investigator with only an
+        ORCID does not."""
         NF = namespaces["nf"]
-        users = {str(u) for u in investigator_graph.subjects(RDF.type, NF.SynapseUser)}
+        pairs = list(investigator_graph.subject_objects(NF.hasSynapseProfile))
+        subjects = {str(s) for s, _ in pairs}
 
-        assert len(users) == 3, f"Expected 3 SynapseUser instances, got {sorted(users)}"
-        assert all(u.startswith("https://orcid.org/") for u in users), \
-            f"SynapseUser instances should be ORCID IRIs, got {sorted(users)}"
-        assert "https://orcid.org/0000-0004-5678-9012" not in users, \
-            "investigator with an ORCID but no Synapse profile must not be typed nf:SynapseUser"
-        assert not any("synapse.org/Profile:" in u for u in users), \
-            "Profile IRIs must not be typed nf:SynapseUser (would double-count people)"
+        assert len(pairs) == 3, f"Expected 3 account linkages, got {sorted(pairs)}"
+        assert all(s.startswith("https://orcid.org/") for s in subjects), \
+            f"Subjects should be ORCID IRIs, got {sorted(subjects)}"
+        assert all(str(o).startswith("https://www.synapse.org/Profile:") for _, o in pairs), \
+            f"Objects should be Profile IRIs, got {sorted(pairs)}"
+        assert "https://orcid.org/0000-0004-5678-9012" not in subjects, \
+            "investigator with an ORCID but no Synapse profile must not claim one"
+
+    def test_synapse_user_class_is_gone(self, investigator_graph, namespaces):
+        """Replaced by nf:hasSynapseProfile -- see schema/ontology.ttl."""
+        NF = namespaces["nf"]
+        assert list(investigator_graph.subjects(RDF.type, NF.SynapseUser)) == []
 
 
 class TestPublication:
