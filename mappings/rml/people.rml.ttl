@@ -30,16 +30,16 @@ map:PeopleSource a rml:LogicalSource ;
 # graph rather than minting a separate identity. owl:sameAs asserts the
 # Profile IRI and the ORCID IRI denote the same real-world person.
 #
-# Only 458 of the source's 1518 rows are Synapse accounts; the rest have no
+# Only a minority of source rows are Synapse accounts; the rest have no
 # ownerID and are handled by PersonOrcidOnly below, for which this map's
 # subject template null-propagates.
 #
-# nf:name / rdfs:label carry the person's display name, matching the pair
+# foaf:name / rdfs:label carry the person's display name, matching the pair
 # investigators.rml.ttl emits for nf:Investigator. The name is the person's
 # own recorded display name, so it is NOT guaranteed to match the author-name
 # spelling in a publication's nf:authors literals -- it is for display and
-# disambiguation, not for joining. Not every row has one (27 of 1518 rows have
-# no name on record); those rows null-propagate and emit no name triple.
+# disambiguation, not for joining. Not every row has a name on record; those
+# rows null-propagate and emit no name triple.
 ################################################################################
 
 map:PersonCore a rr:TriplesMap ;
@@ -54,9 +54,9 @@ map:PersonCore a rr:TriplesMap ;
 ################################################################################
 # Person core facts -- people WITHOUT a Synapse account
 #
-# 1060 of the source's 1518 rows are publication-derived researchers: an ORCID
-# and a name, but no Synapse account. They have no Profile IRI to key on, so
-# their person node is the ORCID IRI -- the only identifier they have.
+# Most of the source's rows are publication-derived researchers: an ORCID and
+# a name, but no Synapse account. They have no Profile IRI to key on, so their
+# person node is the ORCID IRI -- the only identifier they have.
 #
 # The subject is nonSynapseOrcid, a derived column (see apply_derived_columns
 # in scripts/prepare_portal_tables.py) that holds the ORCID only when the

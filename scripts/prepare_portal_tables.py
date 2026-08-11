@@ -1295,9 +1295,9 @@ def apply_derived_columns(
         # Keep anyone with an ORCID or a project membership. Rows with neither
         # carry no usable fact, so they are dropped; people WITHOUT an ORCID are
         # deliberately kept, because most Synapse profiles have no ORCID on
-        # record yet are still legitimate project collaborators (123 such rows
-        # at source_version 10). Only the ORCID-bearing subset gets owl:sameAs
-        # and nf:hasSynapseProfile -- both null-propagate in people.rml.ttl.
+        # record yet are still legitimate project collaborators. Only the
+        # ORCID-bearing subset gets owl:sameAs and nf:hasSynapseProfile --
+        # both null-propagate in people.rml.ttl.
         def _keep(row):
             has_orcid = not is_missing(row.get("orcid")) and str(row.get("orcid")).strip() != ""
             proj = row.get("onProject")
@@ -1310,8 +1310,8 @@ def apply_derived_columns(
         if "nonSynapseOrcid" in df.columns:
             return df
 
-        # This source is not Synapse-profile-centric: only 458 of its 1518 rows
-        # are Synapse accounts, the other 1060 are publication-derived
+        # This source is not Synapse-profile-centric: only a minority of rows
+        # are Synapse accounts, and the majority are publication-derived
         # researchers carrying an ORCID and a name but no ownerID. Those two
         # kinds of row need different subjects in people.rml.ttl.
         #
