@@ -1,7 +1,7 @@
 # Harmonization and Data Transform Notes
 
-This document describes the data transformations applied between the raw Synapse
-export and the final RDF, and documents known upstream data quality issues.
+This documents data transformations applied between the raw Synapse
+export and the final RDF and known upstream data quality issues.
 
 ## Pipeline stages
 
@@ -138,3 +138,10 @@ Two tables have foreign key columns populated with `resourceId` values from
 Both issues originate in the upstream Synapse tables and need to be corrected
 there. The pipeline currently passes them through as-is.
 
+### Duplicated publications and conflicting author lists
+
+Publications are ingested from two portal listings that key their records
+differently, so the same paper can appear as two `biolink:Publication` nodes.
+See [docs/publication-issues.md](docs/publication-issues.md) for details 
+of known issues, the correct way to count publications, and the specific 
+records needing curator attention.

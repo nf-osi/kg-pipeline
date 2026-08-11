@@ -8,6 +8,8 @@
 @prefix obo:      <http://purl.obolibrary.org/obo/> .
 @prefix prov:     <http://www.w3.org/ns/prov#> .
 @prefix void:     <http://rdfs.org/ns/void#> .
+@prefix foaf:     <http://xmlns.com/foaf/0.1/> .
+@prefix skos:     <http://www.w3.org/2004/02/skos/core#> .
 
 
 nf:KGOntology a owl:Ontology ;
@@ -379,7 +381,26 @@ nf:Investigator a owl:Class ;
     rdfs:label "Investigator" ;
     rdfs:comment "A researcher involved in resource development." .
 
-# nf:Publication replaced by biolink:Publication
+# Borrowed classes, annotated locally so their NF-OSI usage rules travel with
+# the graph rather than living only in this file's source. nf:Person and
+# nf:Publication are deliberately not defined; the Biolink terms are used
+# directly.
+#
+# CONVENTION -- terms we do NOT define carry their local guidance on
+# skos:scopeNote, never rdfs:comment. rdfs:comment is the defining vocabulary's
+# slot; writing ours there would leave two unattributed definitions on the same
+# term once the upstream ontology is merged in. skos:scopeNote means exactly
+# "how use of this term is limited in this vocabulary's practice", and carries
+# no domain, so it annotates any resource. Terms in the nf: namespace keep
+# rdfs:comment -- there we are the definer.
+
+biolink:Person a owl:Class ;
+    rdfs:label "Person" ;
+    skos:scopeNote "A person in the NF-OSI portal people registry. IRI KEYING -- a biolink:Person node is keyed by ONE of two schemes depending on which identifiers the person has: https://www.synapse.org/Profile:{id} when they have a Synapse account, or https://orcid.org/{orcid} when they do not and are known only from authorship. The two are mutually exclusive per person, so counting instances of this class counts people rather than identifiers. Do NOT assume a Person subject is a Profile IRI -- most people in the registry have no Synapse account, so most are ORCID-keyed. Where the person has both identifiers, owl:sameAs links them in both directions. Names are on foaf:name (mirrored to rdfs:label) for both kinds of node, when a name is on record. To ask whether a person has a Synapse account, use nf:hasSynapseProfile; there is deliberately no class for this. nf:Investigator is a subclass, used for curated resource-development records." .
+
+biolink:Publication a owl:Class ;
+    rdfs:label "Publication" ;
+    skos:scopeNote "A publication on the NF-OSI portal. INSTANCES CAN BE DUPLICATED: publications are ingested from more than one portal listing, and each listing keys its records differently -- nf:ToolsCentralPublications by an internal publicationId, nf:MainPortalPublications by DOI with a \"pmid-<pmid>\" fallback for rows with no usable DOI. The listings overlap, so the same paper can appear as two distinct nodes with different IRIs, and their fields do not always agree. A raw COUNT of this class is therefore a count of RECORDS, not of distinct papers. Deduplicate on nf:pmid, falling back to nf:doi then nf:publicationTitle, before counting or listing. Each node carries prov:wasDerivedFrom naming the collection it came from; read that collection\'s rdfs:comment for its coverage and caveats." .
 
 nf:Data a owl:Class ;
     rdfs:label "Data" ;
@@ -451,12 +472,38 @@ nf:KGBuild a void:Dataset ;
     rdfs:comment "The individual representing this build of the knowledge graph. Annotated at build time with dcterms:hasVersion and prov:generatedAtTime for the graph build version and datetime, and prov:wasDerivedFrom the source Synapse tables/views/materialized views used to construct it." .
 
 ################################################################################
+# Person names
+################################################################################
+
+foaf:name a owl:DatatypeProperty ;
+    rdfs:label "name" ;
+    skos:scopeNote "A person's display name. Emitted for both biolink:Person and nf:Investigator, so ONE predicate reaches the name of any person in the graph -- `{ ?orcid foaf:name ?n } UNION { ?orcid owl:sameAs ?p . ?p foaf:name ?n }` covers people with and without a Synapse account alike. The same string is also available as rdfs:label. Non-person entities (files, studies, resources, biobanks, funders, datasets, initiatives) use nf:name instead; person names use this standard term because a name is the thing external consumers are most likely to look for at a well-known predicate. CAVEAT: this is a display name from the source record, and it need NOT match the spelling of the same person in a publication's nf:authors literals -- identify people by ORCID, never by matching name strings. NOTE this property intentionally has no rdfs:domain: every subject of it in this graph is a person, but foaf:name is a standard term with an unrestricted domain upstream, and narrowing it here would license inferring biolink:Person for any foaf:name subject anywhere -- see nf:hasSynapseProfile for the same reasoning." ;
+    rdfs:range xsd:string .
+
+################################################################################
+# Source provenance
+#
+# Standard PROV-O / VoID terms, annotated locally so they are discoverable
+# through the ontology (a schema listing that selects owl:Class and owl:*Property
+# will not otherwise surface a term borrowed from an external vocabulary).
+################################################################################
+
+prov:wasDerivedFrom a owl:ObjectProperty ;
+    rdfs:label "wasDerivedFrom" ;
+    skos:scopeNote "Links an ingested entity to the named source collection it came from, e.g. `?pub prov:wasDerivedFrom nf:ToolsCentralPublications`. Several collections can supply the same entity type, and each is typically a PARTIAL view -- so when counting or listing entities of a type, check which collections exist (`?c a void:Dataset`) and read their rdfs:comment for coverage caveats rather than assuming one source holds everything. Also used at graph level, where nf:KGBuild is derived from each source Synapse table, and on a collection to point at the Synapse table behind it." ;
+    rdfs:range void:Dataset .
+
+void:Dataset a owl:Class ;
+    rdfs:label "Dataset (source collection)" ;
+    skos:scopeNote "A named collection of entities ingested from one source, giving that subset a stable identity independent of the Synapse table behind it. Instances carry rdfs:label, an rdfs:comment describing what the collection covers AND excludes, dcterms:isPartOf nf:KGBuild, and prov:wasDerivedFrom the source table. Generated from the `collection:` blocks in data_sources.yaml." .
+
+################################################################################
 # Properties - File related
 ################################################################################
 
 nf:name a owl:DatatypeProperty ;
     rdfs:label "name" ;
-    rdfs:comment "Name of a resource. For RDF-friendly systems, the same data is available in rdfs:label." ;
+    rdfs:comment "Name of a non-person entity: files, studies, resources, biobanks, funders, datasets and initiatives. For RDF-friendly systems, the same data is available in rdfs:label. NOT used for people -- biolink:Person and nf:Investigator carry foaf:name instead, so do not look for a person's name here." ;
     rdfs:range xsd:string .
 
 nf:parentStudy a owl:ObjectProperty ;
@@ -1612,21 +1659,12 @@ nf:hasFunder a owl:ObjectProperty ;
     rdfs:range nf:Funder .
 
 # Investigator
-nf:investigatorSynapseId a owl:DatatypeProperty ;
-    rdfs:label "investigatorSynapseId" ;
-    rdfs:comment "Synapse user ID of the investigator." ;
-    rdfs:domain nf:Investigator ;
-    rdfs:range xsd:string .
+#
+# ORCID and Synapse profiles linked via owl:sameAs
 
 nf:institution a owl:DatatypeProperty ;
     rdfs:label "institution" ;
     rdfs:comment "Affiliated institution." ;
-    rdfs:domain nf:Investigator ;
-    rdfs:range xsd:string .
-
-nf:orcid a owl:DatatypeProperty ;
-    rdfs:label "orcid" ;
-    rdfs:comment "ORCID identifier for an investigator." ;
     rdfs:domain nf:Investigator ;
     rdfs:range xsd:string .
 
@@ -1706,8 +1744,39 @@ nf:inFullTextIndex a owl:DatatypeProperty ;
 
 nf:hasPublication a owl:ObjectProperty ;
     rdfs:label "hasPublication" ;
-    rdfs:comment "Links a development record to a publication." ;
+    rdfs:comment "Links a resource-development context to the publication describing it: asserted from an nf:Development record and, as a shortcut, from the nf:Tool itself. This is a resource-development association, NOT authorship -- the linked investigator need not be an author of the paper. For authorship use the publication's DOI IRI and nf:authorOrcid." ;
     rdfs:range biolink:Publication .
+
+nf:year a owl:DatatypeProperty ;
+    rdfs:label "year" ;
+    rdfs:comment "Publication year." ;
+    rdfs:domain biolink:Publication ;
+    rdfs:range xsd:string .
+
+nf:publicationType a owl:DatatypeProperty ;
+    rdfs:label "publicationType" ;
+    rdfs:comment "Type of publication as recorded by the main portal listing (e.g. preprint, review)." ;
+    rdfs:domain biolink:Publication ;
+    rdfs:range xsd:string .
+
+nf:hasSynapseProfile a owl:ObjectProperty ;
+    rdfs:label "hasSynapseProfile" ;
+    rdfs:comment "Links a person to the Synapse Profile IRI that identifies them, i.e. asserts that this researcher has a Synapse account. This is the test for 'is this author on Synapse', and it returns the profile in the same triple pattern rather than requiring a follow-up hop: `?pub nf:doi ?doi . ?doi nf:authorOrcid ?orcid . ?orcid nf:hasSynapseProfile ?profile .` The subject is the ORCID IRI, which is the identifier a publication's nf:authorOrcid gives you and the only identifier every person in the registry has. Prefer this over filtering owl:sameAs objects by IRI prefix -- owl:sameAs also links ORCIDs to nf:Investigator records, so a bare sameAs traversal does not mean 'has an account'. A person with an ORCID but no known Synapse account simply has no nf:hasSynapseProfile triple. NOTE the relation is one-to-many: a person may hold more than one Synapse account, so count DISTINCT subjects, not objects, when counting people with accounts. NOTE this property intentionally has no rdfs:domain: its subject is an ORCID IRI, which for an account-holder is NOT that person's biolink:Person node (their Profile IRI is), so declaring a domain would let a reasoner type the ORCID IRI as a second person and duplicate every account-holder. Like owl:sameAs it relates two identifiers rather than describing one entity. This property replaces a former nf:SynapseUser class, which was removed for that same duplication defect: the class declared rdfs:subClassOf biolink:Person while sitting on a second IRI for an already-typed person, and it carried no data of its own." .
+
+nf:onProject a owl:ObjectProperty ;
+    rdfs:label "onProject" ;
+    rdfs:comment "Links a person (biolink:Person, identified by their Synapse Profile IRI) to a Synapse project they are a member of. Two people sharing a project are project collaborators, which is a different relation from co-authorship (see nf:authorOrcid). CAVEAT: the source column is a bounded list, and the most active people sit exactly at that cap, so their project lists -- and any collaborator counts derived from them -- are truncated LOWER BOUNDS, not true totals. Do not rank people by project count or project-collaborator count until the cap is lifted upstream; per-person questions about someone below the cap are fine." ;
+    rdfs:domain biolink:Person .
+
+nf:aboutStudy a owl:ObjectProperty ;
+    rdfs:label "aboutStudy" ;
+    rdfs:comment "Links a publication to a portal study whose data it reports. Asserted for main-portal (study-associated) publications; a publication can be about more than one study." ;
+    rdfs:domain biolink:Publication ;
+    rdfs:range biolink:Study .
+
+nf:authorOrcid a owl:ObjectProperty ;
+    rdfs:label "authorOrcid" ;
+    rdfs:comment "Links a DOI IRI (the object of a publication's nf:doi, not the Publication node itself) to an author's ORCID identifier: query as `?pub nf:doi ?doi . ?doi nf:authorOrcid ?orcid`. To check whether that author has a Synapse account, ask the ORCID IRI for nf:hasSynapseProfile, which yields the profile directly. To get the author's NAME, ask the ORCID IRI for nf:name directly (authors with no Synapse account are biolink:Person nodes keyed by their ORCID) and fall back to one owl:sameAs hop for those who do have an account: `{ ?orcid nf:name ?name } UNION { ?orcid owl:sameAs ?p . ?p nf:name ?name }`. Do NOT match authors by name string against nf:authors -- the registry's display-name spelling need not match the publication's. Note: ORCID may not be available for all authors, so authorOrcid values can be a partial subset of a publication's authorship. nf:authors (literal author names) is the complete author list; do not assume every author in nf:authors has a corresponding authorOrcid, and do not use the count of authorOrcid values as the author count." .
 
 ################################################################################
 # Properties - Observation related
@@ -1753,6 +1822,12 @@ nf:observationLink a owl:ObjectProperty ;
     rdfs:label "observationLink" ;
     rdfs:comment "Link to supporting material." ;
     rdfs:domain nf:Observation .
+
+nf:investigatorSynapseId a owl:DatatypeProperty ;
+    rdfs:label "investigatorSynapseId" ;
+    rdfs:comment "Synapse user ID of the observation's submitter." ;
+    rdfs:domain nf:Observation ;
+    rdfs:range xsd:string .
 
 nf:reliabilityRating a owl:DatatypeProperty ;
     rdfs:label "reliabilityRating" ;

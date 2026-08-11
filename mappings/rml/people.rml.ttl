@@ -1,0 +1,170 @@
+@prefix rr:   <http://www.w3.org/ns/r2rml#> .
+@prefix rml:  <http://semweb.mmlab.be/ns/rml#> .
+@prefix ql:   <http://semweb.mmlab.be/ns/ql#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix fnml: <http://semweb.mmlab.be/ns/fnml#> .
+@prefix fno:  <https://w3id.org/function/ontology#> .
+@prefix grel: <http://users.ugent.be/~bjdmeest/function/grel.ttl#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix nf:      <http://nf-osi.github.com/terms#> .
+@prefix biolink: <https://w3id.org/biolink/vocab/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix map:  <http://nf-osi.github.com/mappings/people#> .
+
+################################################################################
+# Logical source
+################################################################################
+
+map:PeopleSource a rml:LogicalSource ;
+    rml:source "data/csv/people.csv" ;
+    rml:referenceFormulation ql:CSV .
+
+################################################################################
+# Person core facts -- people WITH a Synapse account
+#
+# Subject is the Synapse Profile IRI itself (same template used for
+# nf:investigatorSynapseId, nf:createdBy, nf:modifiedBy elsewhere), so this
+# ingest attaches an ORCID to the same node already referenced across the
+# graph rather than minting a separate identity. owl:sameAs asserts the
+# Profile IRI and the ORCID IRI denote the same real-world person.
+#
+# Only a minority of source rows are Synapse accounts; the rest have no
+# ownerID and are handled by PersonOrcidOnly below, for which this map's
+# subject template null-propagates.
+#
+# foaf:name / rdfs:label carry the person's display name, matching the pair
+# investigators.rml.ttl emits for nf:Investigator. The name is the person's
+# own recorded display name, so it is NOT guaranteed to match the author-name
+# spelling in a publication's nf:authors literals -- it is for display and
+# disambiguation, not for joining. Not every row has a name on record; those
+# rows null-propagate and emit no name triple.
+################################################################################
+
+map:PersonCore a rr:TriplesMap ;
+    rdfs:label "Person Core" ;
+    rml:logicalSource map:PeopleSource ;
+    rr:subjectMap [ rr:template "https://www.synapse.org/Profile:{ownerID}" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [ rr:predicate rdf:type ; rr:objectMap [ rr:constant biolink:Person ; rr:termType rr:IRI ] ] ;
+    rr:predicateObjectMap [ rr:predicate foaf:name ; rr:objectMap [ rml:reference "name" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate rdfs:label ; rr:objectMap [ rml:reference "name" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate owl:sameAs ; rr:objectMap [ rr:template "https://orcid.org/{orcid}" ; rr:termType rr:IRI ] ] .
+
+################################################################################
+# Person core facts -- people WITHOUT a Synapse account
+#
+# Most of the source's rows are publication-derived researchers: an ORCID and
+# a name, but no Synapse account. They have no Profile IRI to key on, so their
+# person node is the ORCID IRI -- the only identifier they have.
+#
+# The subject is nonSynapseOrcid, a derived column (see apply_derived_columns
+# in scripts/prepare_portal_tables.py) that holds the ORCID only when the
+# person has NO ownerID. That is what keeps counts honest: every row
+# contributes exactly one biolink:Person node, keyed by Profile IRI when there
+# is an account and by ORCID IRI otherwise, so `?p a biolink:Person` counts
+# people, not identifiers. These people get no nf:hasSynapseProfile, since they
+# have no account -- see PersonSynapseProfile below.
+################################################################################
+
+map:PersonOrcidOnly a rr:TriplesMap ;
+    rdfs:label "Person ORCID Only" ;
+    rml:logicalSource map:PeopleSource ;
+    rr:subjectMap [ rr:template "https://orcid.org/{nonSynapseOrcid}" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [ rr:predicate rdf:type ; rr:objectMap [ rr:constant biolink:Person ; rr:termType rr:IRI ] ] ;
+    rr:predicateObjectMap [ rr:predicate foaf:name ; rr:objectMap [ rml:reference "name" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate rdfs:label ; rr:objectMap [ rml:reference "name" ; rr:datatype xsd:string ] ] .
+
+################################################################################
+# ORCID-subject facts -- the Synapse account linkage
+#
+# nf:hasSynapseProfile asserts "this researcher has a Synapse account" and hands
+# back the profile in the same triple, which is what makes the authorship query
+# one hop: ?doi nf:authorOrcid ?orcid . ?orcid nf:hasSynapseProfile ?profile.
+#
+# Both the subject and the object are plain templates over columns on the same
+# row, so RML's ordinary null-propagation does the filtering for free: a row
+# with no ownerID (the majority -- see PersonOrcidOnly) emits nothing here.
+# That is why this map reads the raw `orcid` column and needs no derived
+# companion column. Its predecessor asserted `rdf:type nf:SynapseUser`, and a
+# constant object cannot null-propagate, which is the only reason a derived
+# synapseUserOrcid column ever existed.
+#
+# Also emits the ORCID -> Profile direction of owl:sameAs. PersonCore already
+# asserts Profile -> ORCID, and owl:sameAs is symmetric, but QLever does no OWL
+# reasoning -- so without this a query starting from an ORCID (e.g. from a
+# publication's nf:authorOrcid) could not reach the Synapse profile in one hop.
+# investigators.rml.ttl materializes both directions for the same reason.
+################################################################################
+
+map:PersonSynapseProfile a rr:TriplesMap ;
+    rdfs:label "Person Synapse Profile" ;
+    rml:logicalSource map:PeopleSource ;
+    rr:subjectMap [ rr:template "https://orcid.org/{orcid}" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [ rr:predicate nf:hasSynapseProfile ; rr:objectMap [ rr:template "https://www.synapse.org/Profile:{ownerID}" ; rr:termType rr:IRI ] ] ;
+    rr:predicateObjectMap [ rr:predicate owl:sameAs ; rr:objectMap [ rr:template "https://www.synapse.org/Profile:{ownerID}" ; rr:termType rr:IRI ] ] .
+
+################################################################################
+# Project membership
+#
+# onProject is a pipe-delimited list of Synapse project IDs. Two people sharing
+# a project are project collaborators -- a different relation from co-authorship.
+#
+# Unlike the facts above, this is emitted for people with NO ORCID too: most
+# Synapse profiles have no ORCID on record but are still project members, and
+# excluding them would badly undercount collaboration.
+#
+# CAVEAT: the source column is capped at 100 entries (see nf:onProject in
+# schema/ontology.ttl and docs/publication-issues.md) so lists for the most
+# active people are truncated.
+################################################################################
+
+map:PersonProjects a rr:TriplesMap ;
+    rdfs:label "Person Projects" ;
+    rml:logicalSource map:PeopleSource ;
+    rr:subjectMap [ rr:template "https://www.synapse.org/Profile:{ownerID}" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:onProject ;
+        rr:objectMap [
+            a fnml:FunctionTermMap ;
+            rr:termType rr:IRI ;
+            fnml:functionValue [
+                a fno:Execution ;
+                rml:logicalSource map:PeopleSource ;
+                rr:predicateObjectMap [
+                    rr:predicate fno:executes ;
+                    rr:objectMap [ rr:constant grel:string_split ; rr:termType rr:IRI ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:valueParameter ;
+                    rr:objectMap [
+                        a fnml:FunctionTermMap ;
+                        fnml:functionValue [
+                            a fno:Execution ;
+                            rml:logicalSource map:PeopleSource ;
+                            rr:predicateObjectMap [
+                                rr:predicate fno:executes ;
+                                rr:objectMap [ rr:constant grel:string_replace ; rr:termType rr:IRI ]
+                            ] ;
+                            rr:predicateObjectMap [
+                                rr:predicate grel:valueParameter ;
+                                rr:objectMap [ rml:reference "onProject" ; rr:termType rr:Literal ]
+                            ] ;
+                            rr:predicateObjectMap [
+                                rr:predicate grel:p_string_find ;
+                                rr:objectMap [ rr:constant "syn" ; rr:termType rr:Literal ]
+                            ] ;
+                            rr:predicateObjectMap [
+                                rr:predicate grel:p_string_replace ;
+                                rr:objectMap [ rr:constant "https://www.synapse.org/Synapse:syn" ; rr:termType rr:Literal ]
+                            ]
+                        ]
+                    ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:p_string_sep ;
+                    rr:objectMap [ rr:constant "\\|" ; rr:termType rr:Literal ]
+                ]
+            ]
+        ]
+    ] .

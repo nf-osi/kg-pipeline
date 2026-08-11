@@ -1,0 +1,5 @@
+publicationKey,cleanDoi,pmid,title,journal,year,author,studyId,diseaseFocus,manifestation,fundingAgency,publicationType
+10.1000/valid-doi,10.1000/valid-doi,11111111,A paper with a real DOI,Journal of NF,2022,Jane Doe|John Smith,syn111111|syn222222,Neurofibromatosis type 1,Plexiform Neurofibroma,CTF,
+pmid-22222222,,22222222,A paper whose doi column held an article number,Journal of NF,2023,Alice Nguyen,syn111111,Neurofibromatosis type 2,Schwannoma,NTAP,preprint
+10.1000/no-study,10.1000/no-study,33333333,A paper with no linked study,Other Journal,2021,Bob Johnson,,Neurofibromatosis type 1,,,
+,,,A row with neither DOI nor PMID that must be skipped,Ghost Journal,2020,Nobody,,,,,

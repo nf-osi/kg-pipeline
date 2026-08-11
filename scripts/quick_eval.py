@@ -26,7 +26,7 @@ from dotenv import load_dotenv
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
-DEFAULT_MODEL = "anthropic/claude-sonnet-4-5"
+DEFAULT_MODEL = "anthropic/claude-sonnet-5"
 
 
 def prepare_data(pubs: bool) -> int:

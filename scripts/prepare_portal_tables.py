@@ -11,9 +11,11 @@ from __future__ import annotations
 
 import argparse
 import csv
+import re
 import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional
+from urllib.parse import quote
 
 import numpy as np
 import pandas as pd
@@ -330,6 +332,37 @@ versionLabel as versionLabel,
 externalRepositoryUri as externalRepositoryUri
 """
 
+STUDY_PUBLICATIONS_SELECT = """
+doi as doi,
+pmid as pmid,
+title as title,
+journal as journal,
+"year",
+author as author,
+studyId as studyId,
+diseaseFocus as diseaseFocus,
+manifestation as manifestation,
+fundingAgency as fundingAgency,
+publicationType as publicationType
+"""
+
+PEOPLE_SELECT = """
+ownerID as ownerID,
+orcid as orcid,
+name as name,
+onProject as onProject
+"""
+
+# Same table as PEOPLE_SELECT, different projection: the `publications` DOI
+# list is exploded against the person's ORCID into (doi, orcid) pairs -- see
+# apply_derived_columns. The source column is named `publications` here and
+# renamed to `doi` only after the explode, so the alias stays honest about
+# what Synapse returns (a list, not a single DOI).
+PUBLICATION_AUTHOR_ORCIDS_SELECT = """
+orcid as orcid,
+publications as publications
+"""
+
 OBSERVATIONS_SELECT = """
 observationId as observationId,
 resourceId as resourceId,
@@ -393,6 +426,8 @@ TABLE_ALIASES = {
     "computational": "computational_tools",
     "initiative": "initiatives",
     "dataset": "datasets",
+    "person": "people",
+    "pub_author_orcid": "publication_author_orcids",
 }
 
 TABLES: Dict[str, Dict[str, Any]] = {
@@ -465,6 +500,15 @@ TABLES: Dict[str, Dict[str, Any]] = {
                 "transform": "string_list",
             },
             {"target": "modelSystemName", "source": "modelSystemName", "type": "text+", "transform": "string_list"},
+            # Synapse user who created / last modified the file. These resolve to
+            # the same Profile IRIs used by biolink:Person, so they connect file
+            # contributions to the person graph (ORCID, nf:hasSynapseProfile,
+            # nf:onProject). files.rml.ttl has always mapped nf:createdBy and
+            # nf:modifiedBy, but without these entries the columns were fetched
+            # and then dropped before reaching the CSV, so the mapping emitted
+            # nothing.
+            {"target": "createdBy", "source": "createdBy", "type": "iri", "transform": "synapse_id"},
+            {"target": "modifiedBy", "source": "modifiedBy", "type": "iri", "transform": "synapse_id"},
         ],
     },
     "mutations": {
@@ -873,6 +917,59 @@ TABLES: Dict[str, Dict[str, Any]] = {
             {"target": "externalRepositoryUri", "source": "externalRepositoryUri", "type": "iri"},
         ],
     },
+    "study_publications": {
+        "synapse_id": "syn16857542",
+        "csv_path": Path("data/csv/study_publications.csv"),
+        "raw_filename": "study_publications_raw.csv",
+        "select_clause": STUDY_PUBLICATIONS_SELECT,
+        "columns": [
+            # publicationKey / cleanDoi are derived (see apply_derived_columns):
+            # this source has no stable primary key, and its `doi` column holds a
+            # real DOI for only ~87% of rows.
+            {"target": "publicationKey", "source": "publicationKey", "type": "iri"},
+            {"target": "cleanDoi", "source": "cleanDoi", "type": "iri"},
+            {"target": "pmid", "source": "pmid", "type": "iri", "transform": "pmid"},
+            {"target": "title", "source": "title", "type": "text"},
+            {"target": "journal", "source": "journal", "type": "text"},
+            {"target": "year", "source": "year", "type": "text", "transform": "number"},
+            {"target": "author", "source": "author", "type": "text+", "transform": "string_list"},
+            {"target": "studyId", "source": "studyId", "type": "iri+", "transform": "synapse_id_list"},
+            {"target": "diseaseFocus", "source": "diseaseFocus", "type": "text"},
+            {"target": "manifestation", "source": "manifestation", "type": "text+", "transform": "string_list"},
+            {"target": "fundingAgency", "source": "fundingAgency", "type": "text+", "transform": "string_list"},
+            {"target": "publicationType", "source": "publicationType", "type": "text"},
+        ],
+    },
+    "people": {
+        "synapse_id": "syn23564971",
+        "csv_path": Path("data/csv/people.csv"),
+        "raw_filename": "people_raw.csv",
+        "select_clause": PEOPLE_SELECT,
+        "columns": [
+            {"target": "ownerID", "source": "ownerID", "type": "iri", "transform": "synapse_id"},
+            {"target": "orcid", "source": "orcid", "type": "iri", "transform": "orcid"},
+            {"target": "name", "source": "name", "type": "text"},
+            {"target": "onProject", "source": "onProject", "type": "iri+", "transform": "synapse_id_list"},
+            # Derived (see apply_derived_columns): the ORCID, but only for
+            # people with NO Synapse account -- it keys their person node.
+            {"target": "nonSynapseOrcid", "source": "nonSynapseOrcid", "type": "iri", "transform": "orcid"},
+        ],
+    },
+    # Reads the same Synapse table as "people". The publication-author ORCID
+    # links used to live in their own table (syn76406574), which was deleted
+    # upstream once the people table gained a `publications` DOI list per
+    # person. The (doi, orcid) CSV shape -- and therefore the RML mapping and
+    # the triples it emits -- is unchanged; only the provenance differs.
+    "publication_author_orcids": {
+        "synapse_id": "syn23564971",
+        "csv_path": Path("data/csv/publication_author_orcids.csv"),
+        "raw_filename": "publication_author_orcids_raw.csv",
+        "select_clause": PUBLICATION_AUTHOR_ORCIDS_SELECT,
+        "columns": [
+            {"target": "doi", "source": "doi", "type": "iri", "transform": "doi"},
+            {"target": "orcid", "source": "orcid", "type": "iri", "transform": "orcid"},
+        ],
+    },
 }
 
 
@@ -958,6 +1055,11 @@ def format_synapse_id(value: Any) -> str:
     # Strip spurious "syn:" prefix from materialized views (e.g. "syn:syn2343195" -> "syn2343195")
     if raw.startswith("syn:"):
         raw = raw[len("syn:"):]
+    # A bare-numeric USERID/ENTITYID column comes back from pandas as float64 as
+    # soon as any row is null, so the id stringifies as "3324237.0" and would be
+    # baked into an IRI that resolves to nothing. Re-integerize it.
+    if raw.endswith(".0") and raw[:-2].isdigit():
+        raw = raw[:-2]
     return raw
 
 
@@ -975,12 +1077,50 @@ def format_pmid(value: Any) -> str:
     return s
 
 
+# Characters left unescaped by format_doi(): unreserved (letters/digits handled
+# by quote() automatically) plus '/' (path separator) and RFC 3986 sub-delims
+# that legitimately appear in DOIs (e.g. "10.1016/0006-291X(85)91841-8").
+# '%' is included so already-percent-encoded DOIs in source data pass through
+# unchanged instead of being double-encoded.
+# Everything else -- notably '[' ']' '<' '>' which appear in older
+# BioOne/Wiley-style DOIs like "10.1667/0033-7587(2000)153[0062:FORIMI]2.0.CO;2"
+# -- gets percent-encoded, since those are not valid unescaped in an IRI/Turtle
+# IRIREF and were previously masked by RMLMapper's (overly broad) rr:template
+# escaping.
+_DOI_SAFE_CHARS = "/:;()!$&'*+,=@%"
+
+
 def format_doi(value: Any) -> str:
-    """Strip URL prefix so the bare DOI path can be used in IRI templates."""
+    """Strip URL prefix, lowercase, and percent-encode IRI-unsafe characters so
+    the DOI can be used directly (without further escaping) in IRI templates.
+
+    DOIs are case-insensitive by specification, so the same DOI can be written
+    with different capitalisation in different source tables. Because DOI IRIs
+    are the join key between publications, study_publications and
+    publication_author_orcids -- and the documented key for deduplicating the
+    same paper across portal listings -- they are normalised to lowercase here.
+    Without this, two spellings of one DOI mint two nodes and fail to join (see
+    docs/publication-issues.md).
+    """
     s = format_string(value)
     for prefix in ("https://www.doi.org/", "https://doi.org/", "http://doi.org/"):
         if s.startswith(prefix):
-            return s[len(prefix):]
+            s = s[len(prefix):]
+            break
+    s = quote(s.lower(), safe=_DOI_SAFE_CHARS)
+    # Re-uppercase percent-escape hex. Lowercasing above also lowercases escapes
+    # that were already in the source ("%3C" -> "%3c"), whereas quote() emits
+    # uppercase hex for characters it escapes itself -- so without this the same
+    # DOI supplied raw vs pre-encoded would still produce two different strings,
+    # which is the divergence the lowercasing exists to prevent.
+    return re.sub(r"%([0-9a-fA-F]{2})", lambda m: "%" + m.group(1).upper(), s)
+
+
+def format_orcid(value: Any) -> str:
+    """Strip ``orcid:`` prefix so the bare ORCID iD can be used in IRI templates."""
+    s = format_string(value)
+    if s.startswith("orcid:"):
+        return s[len("orcid:"):]
     return s
 
 
@@ -1008,6 +1148,7 @@ TRANSFORMS = {
     "number": format_number,
     "pmid": format_pmid,
     "doi": format_doi,
+    "orcid": format_orcid,
 }
 
 
@@ -1149,6 +1290,132 @@ def apply_derived_columns(
             keep="first",
         )
         return df.merge(donor_race, on="donorId", how="left")
+
+    if table_name == "people":
+        # Keep anyone with an ORCID or a project membership. Rows with neither
+        # carry no usable fact, so they are dropped; people WITHOUT an ORCID are
+        # deliberately kept, because most Synapse profiles have no ORCID on
+        # record yet are still legitimate project collaborators. Only the
+        # ORCID-bearing subset gets owl:sameAs and nf:hasSynapseProfile --
+        # both null-propagate in people.rml.ttl.
+        def _keep(row):
+            has_orcid = not is_missing(row.get("orcid")) and str(row.get("orcid")).strip() != ""
+            proj = row.get("onProject")
+            has_proj = not is_missing(proj) and len(ensure_list(proj)) > 0
+            return has_orcid or has_proj
+        if "orcid" not in df.columns and "onProject" not in df.columns:
+            return df
+        df = df[df.apply(_keep, axis=1)]
+
+        if "nonSynapseOrcid" in df.columns:
+            return df
+
+        # This source is not Synapse-profile-centric: only a minority of rows
+        # are Synapse accounts, and the majority are publication-derived
+        # researchers carrying an ORCID and a name but no ownerID. Those two
+        # kinds of row need different subjects in people.rml.ttl.
+        #
+        # Only the account-less case needs a derived column. nonSynapseOrcid
+        # holds the ORCID of someone with NO Synapse profile, and is the subject
+        # of their biolink:Person node (they have no Profile IRI to key on).
+        # Account-holders are keyed by Profile IRI instead, so exactly one
+        # person node exists per person and class counts stay honest.
+        #
+        # There is deliberately no matching synapseUserOrcid column: every
+        # account-holder fact is emitted by a TriplesMap whose object is a
+        # {ownerID} template, which null-propagates on its own.
+        #
+        # The partition is computed ACROSS rows, not per row: the registry can
+        # hold the same researcher twice, once as a Synapse account and once as
+        # a publication-derived entry (Xiyuan Zhang, 0009-0005-7564-346X).
+        # Judging each row alone would give that person both a Profile-keyed and
+        # an ORCID-keyed biolink:Person node, counting them twice. So an ORCID
+        # claimed by ANY account row is never eligible for nonSynapseOrcid.
+        #
+        # KNOWN LIMIT: this can only match rows that share an ORCID. A person
+        # duplicated with DISJOINT identifiers -- an account row with no ORCID
+        # plus a publication-derived row with one -- is invisible here, because
+        # nothing in this table links them. Margaret Wallace was such a case and
+        # was merged upstream at source_version 10; `duplicateOf` is the
+        # registry's own mechanism for the general problem and is not yet
+        # ingested.
+        df = df.copy()
+
+        def _has_owner(row) -> bool:
+            return format_string(row.get("ownerID")).strip() != ""
+
+        owner_rows = df.apply(_has_owner, axis=1)
+        claimed_orcids = {
+            format_orcid(v).strip()
+            for v in df.loc[owner_rows, "orcid"]
+            if format_orcid(v).strip()
+        }
+
+        df["nonSynapseOrcid"] = [
+            ""
+            if has_owner or format_orcid(row.get("orcid", "")).strip() in claimed_orcids
+            else row.get("orcid", "")
+            for has_owner, (_, row) in zip(owner_rows, df.iterrows())
+        ]
+        return df
+
+    if table_name == "publication_author_orcids":
+        # Explode the people table's per-person `publications` DOI list into
+        # one (doi, orcid) row per pair, which is the shape
+        # publication_author_orcids.rml.ttl expects. Done here rather than in
+        # RML because the DOI is the triple's SUBJECT, and an RML subject map
+        # must yield exactly one term -- the grel:string_split trick used for
+        # nf:onProject only works for multi-valued objects.
+        if "doi" in df.columns:
+            return df
+        if "publications" not in df.columns:
+            return df
+        df = df.copy()
+        df["publications"] = df["publications"].apply(ensure_list)
+        df = df.explode("publications").rename(columns={"publications": "doi"})
+        # Rows for people with no ORCID, or with no publications, carry no
+        # (doi, orcid) fact. RML would null-propagate them anyway, but dropping
+        # here keeps the CSV an honest link table and makes the row count
+        # meaningful.
+        has_pair = df.apply(
+            lambda r: format_string(r.get("doi")).strip() != ""
+            and format_string(r.get("orcid")).strip() != "",
+            axis=1,
+        )
+        df = df[has_pair]
+        # A DOI can repeat across a person's list, and the same pair can arrive
+        # from duplicate profile rows; the caller's drop_duplicates() ran before
+        # the explode, so dedupe again here.
+        return df.drop_duplicates(subset=["doi", "orcid"])
+
+    if table_name == "study_publications":
+        if "publicationKey" in df.columns:
+            return df
+        # This source has no stable primary key, so publications are keyed by
+        # DOI. Its `doi` column is unreliable though: ~13% of rows hold an
+        # article number ("720", "e98601", "tgac021") or an Elsevier PII
+        # ("S1044-579X(18)30003-8") rather than a DOI. Minting IRIs from those
+        # would produce meaningless, collision-prone keys, so:
+        #   cleanDoi       -- the DOI only when it really is one, else blank,
+        #                     so nf:doi never points at a bogus doi.org IRI
+        #   publicationKey -- cleanDoi, else "pmid-<pmid>", else blank (RML
+        #                     then emits nothing for the row)
+        df = df.copy()
+
+        def _clean_doi(v):
+            d = format_doi(v)
+            return d if d.startswith("10.") else ""
+
+        def _key(row):
+            doi = _clean_doi(row.get("doi"))
+            if doi:
+                return doi
+            pmid = format_pmid(format_string(row.get("pmid"))).strip()
+            return f"pmid-{pmid}" if pmid.isdigit() else ""
+
+        df["cleanDoi"] = df["doi"].apply(_clean_doi) if "doi" in df.columns else ""
+        df["publicationKey"] = df.apply(_key, axis=1)
+        return df
 
     if table_name == "initiatives":
         if "initiativeKey" not in df.columns and "initiative" in df.columns:

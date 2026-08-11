@@ -104,3 +104,82 @@ def test_write_metadata_ttl_writes_parseable_turtle(tmp_path):
     ttl = output_path.read_text()
     assert "syn26486835" in ttl
     assert "hasVersion" in ttl
+
+
+# ---------------------------------------------------------------------------
+# Named source collections (generated from the `collection:` block in
+# data_sources.yaml; entities point at them with prov:wasDerivedFrom)
+# ---------------------------------------------------------------------------
+
+BUILD_TIME = datetime(2026, 7, 8, 12, 0, 0, tzinfo=timezone.utc)
+
+COLLECTION_PROFILE = {
+    "version": "KG v0.3",
+    "tables": {
+        "publications": {
+            "synapse_id": "syn26486839",
+            "concrete_type": "TableEntity",
+            "source_version": 9,
+            "collection_name": "ToolsCentralPublications",
+            "collection_label": "NF Research Tools Central publications",
+            "collection_comment": "Partial view: tool-associated publications only.",
+        },
+        "mutations": {"synapse_id": "syn26486835", "concrete_type": "TableEntity", "source_version": 4},
+    },
+}
+
+NF = "http://nf-osi.github.com/terms#"
+VOID_DATASET_IRI = "http://rdfs.org/ns/void#Dataset"
+
+
+def _quads_for(quads, subject_iri):
+    return {(q.predicate.value, q.object.value) for q in quads if q.subject.value == subject_iri}
+
+
+def test_collection_node_built_from_yaml():
+    """A table declaring `collection:` yields a void:Dataset node carrying its
+    label, comment, link to the build, and link to the source Synapse table."""
+    quads = build_metadata_quads(COLLECTION_PROFILE, BUILD_TIME)
+    facts = _quads_for(quads, NF + "ToolsCentralPublications")
+
+    assert (RDF_TYPE.value, VOID_DATASET_IRI) in facts
+    assert (PROV_WAS_DERIVED_FROM.value, "https://www.synapse.org/Synapse:syn26486839") in facts
+    assert ("http://purl.org/dc/terms/isPartOf", KG_BUILD.value) in facts
+    assert ("http://www.w3.org/2000/01/rdf-schema#label",
+            "NF Research Tools Central publications") in facts
+    comments = [o for p, o in facts if p.endswith("rdfs-schema#comment") or p.endswith("#comment")]
+    assert any("Partial view" in c for c in comments)
+
+
+def test_table_without_collection_emits_no_collection_node():
+    """Only tables that opt in get a collection; the rest are unaffected."""
+    quads = build_metadata_quads(COLLECTION_PROFILE, BUILD_TIME)
+    collection_subjects = {
+        q.subject.value for q in quads
+        if q.predicate == RDF_TYPE and q.object.value == VOID_DATASET_IRI
+    }
+    # nf:KGBuild is itself a void:Dataset; the publications collection is the
+    # only table-level one, and mutations (no `collection:` block) adds none.
+    assert collection_subjects == {KG_BUILD.value, NF + "ToolsCentralPublications"}
+
+
+def test_collection_name_only_is_sufficient():
+    """label/comment are optional -- a bare name still produces a usable node."""
+    profile = {
+        "version": "v",
+        "tables": {"t": {"synapse_id": "syn1", "collection_name": "BareCollection"}},
+    }
+    facts = _quads_for(build_metadata_quads(profile, BUILD_TIME), NF + "BareCollection")
+    assert (RDF_TYPE.value, VOID_DATASET_IRI) in facts
+    assert (PROV_WAS_DERIVED_FROM.value, "https://www.synapse.org/Synapse:syn1") in facts
+
+
+def test_source_version_stays_on_the_table_not_the_collection():
+    """The version describes the Synapse table, so it is asserted there; the
+    collection reaches it in one hop via prov:wasDerivedFrom."""
+    quads = build_metadata_quads(COLLECTION_PROFILE, BUILD_TIME)
+    table_facts = _quads_for(quads, "https://www.synapse.org/Synapse:syn26486839")
+    collection_facts = _quads_for(quads, NF + "ToolsCentralPublications")
+
+    assert ("http://purl.org/dc/terms/hasVersion", "9") in table_facts
+    assert not any(p.endswith("hasVersion") for p, _ in collection_facts)
