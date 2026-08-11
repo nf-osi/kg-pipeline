@@ -47,6 +47,8 @@ DEFAULT_PREFIXES = {
     "efo": "http://www.ebi.ac.uk/efo/",
     "obo": "http://purl.obolibrary.org/obo/",
     "prov": "http://www.w3.org/ns/prov#",
+    # Imported terms carry NF-OSI usage guidance on skos:scopeNote.
+    "skos": "http://www.w3.org/2004/02/skos/core#",
     # Person names live on foaf:name (biolink:Person and nf:Investigator alike),
     # so almost any people question needs this declared.
     "foaf": "http://xmlns.com/foaf/0.1/",
@@ -64,9 +66,9 @@ CLASS_NAME_RE = re.compile(r"([A-Za-z_][A-Za-z0-9_]*:)?[A-Za-z_][A-Za-z0-9_]*")
 # merged in on top of DEFAULT_PREFIXES (unless --no-default-prefixes is set).
 CANNED_QUERIES = {
     "schema": {
-        "help": "Classes and properties defined in the ontology, with labels/comments/domain/range",
+        "help": "Classes and properties in the ontology, with label, rdfs:comment (definition), skos:scopeNote (NF-OSI usage guidance on imported terms), domain and range",
         "query": """\
-SELECT ?term ?kind ?label ?comment ?domain ?range WHERE {
+SELECT ?term ?kind ?label ?comment ?scopeNote ?domain ?range WHERE {
   {
     ?term a owl:Class .
     BIND("Class" AS ?kind)
@@ -78,7 +80,14 @@ SELECT ?term ?kind ?label ?comment ?domain ?range WHERE {
     BIND("DatatypeProperty" AS ?kind)
   }
   OPTIONAL { ?term rdfs:label ?label }
+  # Two documentation slots, kept as separate columns because they mean
+  # different things. rdfs:comment is the DEFINITION, present on terms this
+  # ontology mints. scopeNote is NF-OSI USAGE GUIDANCE on a term imported from
+  # another vocabulary (biolink:, foaf:, prov:, void:) -- we never write to a
+  # borrowed term's rdfs:comment, since that slot belongs to whoever defined it.
+  # A term normally has one or the other, so an empty column is expected.
   OPTIONAL { ?term rdfs:comment ?comment }
+  OPTIONAL { ?term skos:scopeNote ?scopeNote }
   OPTIONAL { ?term rdfs:domain ?domain }
   OPTIONAL { ?term rdfs:range ?range }
 } ORDER BY ?kind ?term""",
