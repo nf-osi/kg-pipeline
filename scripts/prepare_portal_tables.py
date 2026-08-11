@@ -348,13 +348,19 @@ publicationType as publicationType
 
 PEOPLE_SELECT = """
 ownerID as ownerID,
-hasORCID as orcid,
+orcid as orcid,
+name as name,
 onProject as onProject
 """
 
+# Same table as PEOPLE_SELECT, different projection: the `publications` DOI
+# list is exploded against the person's ORCID into (doi, orcid) pairs -- see
+# apply_derived_columns. The source column is named `publications` here and
+# renamed to `doi` only after the explode, so the alias stays honest about
+# what Synapse returns (a list, not a single DOI).
 PUBLICATION_AUTHOR_ORCIDS_SELECT = """
-doi as doi,
-orcid as orcid
+orcid as orcid,
+publications as publications
 """
 
 OBSERVATIONS_SELECT = """
@@ -943,11 +949,21 @@ TABLES: Dict[str, Dict[str, Any]] = {
         "columns": [
             {"target": "ownerID", "source": "ownerID", "type": "iri", "transform": "synapse_id"},
             {"target": "orcid", "source": "orcid", "type": "iri", "transform": "orcid"},
+            {"target": "name", "source": "name", "type": "text"},
             {"target": "onProject", "source": "onProject", "type": "iri+", "transform": "synapse_id_list"},
+            # Derived (see apply_derived_columns): the ORCID, partitioned by
+            # whether the person also has a Synapse account.
+            {"target": "synapseUserOrcid", "source": "synapseUserOrcid", "type": "iri", "transform": "orcid"},
+            {"target": "nonSynapseOrcid", "source": "nonSynapseOrcid", "type": "iri", "transform": "orcid"},
         ],
     },
+    # Reads the same Synapse table as "people". The publication-author ORCID
+    # links used to live in their own table (syn76406574), which was deleted
+    # upstream once the people table gained a `publications` DOI list per
+    # person. The (doi, orcid) CSV shape -- and therefore the RML mapping and
+    # the triples it emits -- is unchanged; only the provenance differs.
     "publication_author_orcids": {
-        "synapse_id": "syn76406574",
+        "synapse_id": "syn23564971",
         "csv_path": Path("data/csv/publication_author_orcids.csv"),
         "raw_filename": "publication_author_orcids_raw.csv",
         "select_clause": PUBLICATION_AUTHOR_ORCIDS_SELECT,
@@ -1041,6 +1057,11 @@ def format_synapse_id(value: Any) -> str:
     # Strip spurious "syn:" prefix from materialized views (e.g. "syn:syn2343195" -> "syn2343195")
     if raw.startswith("syn:"):
         raw = raw[len("syn:"):]
+    # A bare-numeric USERID/ENTITYID column comes back from pandas as float64 as
+    # soon as any row is null, so the id stringifies as "3324237.0" and would be
+    # baked into an IRI that resolves to nothing. Re-integerize it.
+    if raw.endswith(".0") and raw[:-2].isdigit():
+        raw = raw[:-2]
     return raw
 
 
@@ -1276,8 +1297,8 @@ def apply_derived_columns(
         # Keep anyone with an ORCID or a project membership. Rows with neither
         # carry no usable fact, so they are dropped; people WITHOUT an ORCID are
         # deliberately kept, because most Synapse profiles have no ORCID on
-        # record yet are still legitimate project collaborators (254 such rows
-        # at time of writing). Only the ORCID-bearing subset gets owl:sameAs and
+        # record yet are still legitimate project collaborators (128 such rows
+        # at source_version 9). Only the ORCID-bearing subset gets owl:sameAs and
         # nf:SynapseUser -- both null-propagate in people.rml.ttl.
         def _keep(row):
             has_orcid = not is_missing(row.get("orcid")) and str(row.get("orcid")).strip() != ""
@@ -1286,7 +1307,89 @@ def apply_derived_columns(
             return has_orcid or has_proj
         if "orcid" not in df.columns and "onProject" not in df.columns:
             return df
-        return df[df.apply(_keep, axis=1)]
+        df = df[df.apply(_keep, axis=1)]
+
+        if "synapseUserOrcid" in df.columns:
+            return df
+
+        # This source is no longer Synapse-profile-centric: only 458 of its
+        # 1519 rows are Synapse accounts, the other 1061 are publication-derived
+        # researchers carrying an ORCID and a name but no ownerID. The two kinds
+        # of row need different subjects in people.rml.ttl, so split the ORCID
+        # into two mutually exclusive derived columns and let RML's normal
+        # null-propagation pick the right TriplesMap per row:
+        #
+        #   synapseUserOrcid -- ORCID of someone who ALSO has a Synapse profile.
+        #       Subject of the nf:SynapseUser typing and of the ORCID -> Profile
+        #       owl:sameAs. Deriving it here (rather than with a nested GREL
+        #       conditional) mirrors what investigators.rml.ttl does, and is
+        #       load-bearing: typing the bare `orcid` column would falsely mark
+        #       all 1061 account-less researchers as Synapse users.
+        #   nonSynapseOrcid -- ORCID of someone with NO Synapse profile. Subject
+        #       of their biolink:Person node, since they have no Profile IRI to
+        #       key on. Mutually exclusive with synapseUserOrcid, so each person
+        #       is exactly one biolink:Person node and class counts stay honest.
+        #
+        # The partition is computed ACROSS rows, not per row: the registry can
+        # hold the same researcher twice, once as a Synapse account and once as
+        # a publication-derived entry (Xiyuan Zhang, 0009-0005-7564-346X, at
+        # source_version 9). Judging each row alone would give that person both
+        # a Profile-keyed and an ORCID-keyed biolink:Person node -- counting
+        # them twice -- and would type an ORCID as nf:SynapseUser and as a
+        # separate account-less person at the same time. So an ORCID claimed by
+        # ANY account row is never eligible for nonSynapseOrcid.
+        df = df.copy()
+
+        def _has_owner(row) -> bool:
+            return format_string(row.get("ownerID")).strip() != ""
+
+        owner_rows = df.apply(_has_owner, axis=1)
+        claimed_orcids = {
+            format_orcid(v).strip()
+            for v in df.loc[owner_rows, "orcid"]
+            if format_orcid(v).strip()
+        }
+
+        df["synapseUserOrcid"] = [
+            row.get("orcid", "") if has_owner else ""
+            for has_owner, (_, row) in zip(owner_rows, df.iterrows())
+        ]
+        df["nonSynapseOrcid"] = [
+            ""
+            if has_owner or format_orcid(row.get("orcid", "")).strip() in claimed_orcids
+            else row.get("orcid", "")
+            for has_owner, (_, row) in zip(owner_rows, df.iterrows())
+        ]
+        return df
+
+    if table_name == "publication_author_orcids":
+        # Explode the people table's per-person `publications` DOI list into
+        # one (doi, orcid) row per pair, which is the shape
+        # publication_author_orcids.rml.ttl expects. Done here rather than in
+        # RML because the DOI is the triple's SUBJECT, and an RML subject map
+        # must yield exactly one term -- the grel:string_split trick used for
+        # nf:onProject only works for multi-valued objects.
+        if "doi" in df.columns:
+            return df
+        if "publications" not in df.columns:
+            return df
+        df = df.copy()
+        df["publications"] = df["publications"].apply(ensure_list)
+        df = df.explode("publications").rename(columns={"publications": "doi"})
+        # Rows for people with no ORCID, or with no publications, carry no
+        # (doi, orcid) fact. RML would null-propagate them anyway, but dropping
+        # here keeps the CSV an honest link table and makes the row count
+        # meaningful.
+        has_pair = df.apply(
+            lambda r: format_string(r.get("doi")).strip() != ""
+            and format_string(r.get("orcid")).strip() != "",
+            axis=1,
+        )
+        df = df[has_pair]
+        # A DOI can repeat across a person's list, and the same pair can arrive
+        # from duplicate profile rows; the caller's drop_duplicates() ran before
+        # the explode, so dedupe again here.
+        return df.drop_duplicates(subset=["doi", "orcid"])
 
     if table_name == "study_publications":
         if "publicationKey" in df.columns:

@@ -23,8 +23,17 @@ map:PublicationAuthorOrcidsSource a rml:LogicalSource ;
 # value), so this ingest attaches author ORCID facts to the same node the
 # Publication entity already points to via nf:doi, without requiring a join
 # on the internal publicationId. Coverage of DOIs here is broader than the
-# curated publications table, since it is sourced from a separate
-# publication-mining pipeline.
+# curated publications table, since the source records a person's full
+# publication list rather than only portal-listed papers.
+#
+# PROVENANCE: the (doi, orcid) pairs come from the people table (syn23564971),
+# which holds a per-person `publications` DOI list alongside their ORCID.
+# prepare_portal_tables.py explodes that list into one row per pair before this
+# mapping runs -- the explode lives in Python because the DOI is the SUBJECT
+# here, and an RML subject map must yield exactly one term (the
+# grel:string_split trick people.rml.ttl uses for nf:onProject only works on
+# multi-valued objects). Until 2026-08 these pairs came from a standalone
+# publication-mining table, syn76406574, since deleted upstream.
 ################################################################################
 
 map:PublicationAuthorOrcid a rr:TriplesMap ;

@@ -379,8 +379,21 @@ nf:Investigator a owl:Class ;
     rdfs:label "Investigator" ;
     rdfs:comment "A researcher involved in resource development." .
 
-# nf:Person not defined locally; biolink:Person used directly for generic
-# Synapse profiles with a known ORCID, linked via owl:sameAs to the ORCID IRI
+# nf:Person not defined locally; biolink:Person used directly for people in the
+# portal people registry.
+#
+# IMPORTANT -- a biolink:Person node is keyed by ONE of two IRI schemes,
+# depending on which identifiers the person has:
+#   https://www.synapse.org/Profile:{id}  person has a Synapse account. Linked
+#                                         to their ORCID (if known) by
+#                                         owl:sameAs in both directions.
+#   https://orcid.org/{orcid}             person has NO Synapse account; they
+#                                         are known only from authorship, so
+#                                         the ORCID is the only identifier.
+# The two are mutually exclusive per person, so `?p a biolink:Person` counts
+# people, not identifiers. Do not assume a Person subject is a Profile IRI --
+# most are not; only 458 of 1519 people in the registry have a Synapse account.
+# Both kinds carry nf:name / rdfs:label when a name is on record.
 
 nf:SynapseUser a owl:Class ;
     rdfs:subClassOf biolink:Person ;
@@ -1761,7 +1774,7 @@ nf:aboutStudy a owl:ObjectProperty ;
 
 nf:authorOrcid a owl:ObjectProperty ;
     rdfs:label "authorOrcid" ;
-    rdfs:comment "Links a DOI IRI (the object of a publication's nf:doi, not the Publication node itself) to an author's ORCID identifier: query as `?pub nf:doi ?doi . ?doi nf:authorOrcid ?orcid`. To check whether that author has a Synapse identity, join on the ORCID value via owl:sameAs -- e.g. `?synapseNode owl:sameAs ?orcid` -- which matches both biolink:Person and nf:Investigator records. Do NOT try to match by author name: biolink:Person records have no name literal, so name matching will silently miss people who are only in the People ingest, not nf:Investigator. Note: ORCID may not be available for all authors, so authorOrcid values can be a partial subset of a publication's authorship. nf:authors (literal author names) is the complete author list; do not assume every author in nf:authors has a corresponding authorOrcid, and do not use the count of authorOrcid values as the author count." .
+    rdfs:comment "Links a DOI IRI (the object of a publication's nf:doi, not the Publication node itself) to an author's ORCID identifier: query as `?pub nf:doi ?doi . ?doi nf:authorOrcid ?orcid`. To check whether that author has a Synapse identity, test the ORCID IRI for the nf:SynapseUser type, or join on it via owl:sameAs -- e.g. `?synapseNode owl:sameAs ?orcid` -- which matches both biolink:Person and nf:Investigator records. To get the author's NAME, ask the ORCID IRI for nf:name directly (authors with no Synapse account are biolink:Person nodes keyed by their ORCID) and fall back to one owl:sameAs hop for those who do have an account: `{ ?orcid nf:name ?name } UNION { ?orcid owl:sameAs ?p . ?p nf:name ?name }`. Do NOT match authors by name string against nf:authors -- the registry's display-name spelling need not match the publication's. Note: ORCID may not be available for all authors, so authorOrcid values can be a partial subset of a publication's authorship. nf:authors (literal author names) is the complete author list; do not assume every author in nf:authors has a corresponding authorOrcid, and do not use the count of authorOrcid values as the author count." .
 
 ################################################################################
 # Properties - Observation related

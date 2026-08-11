@@ -12,7 +12,12 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 
-from prepare_portal_tables import apply_derived_columns, format_doi, format_orcid
+from prepare_portal_tables import (
+    apply_derived_columns,
+    format_doi,
+    format_orcid,
+    format_synapse_id,
+)
 
 
 class TestInvestigatorSynapseUserOrcid:
@@ -53,6 +58,182 @@ class TestInvestigatorSynapseUserOrcid:
         }])
         out = apply_derived_columns("investigators", df, {})
         assert out.loc[0, "synapseUserOrcid"] == "preserved"
+
+
+class TestPeopleOrcidPartition:
+    """The people source mixes Synapse accounts with publication-derived people
+    who have an ORCID but no ownerID. synapseUserOrcid / nonSynapseOrcid split
+    the ORCID between them so each row yields exactly one person node, and so
+    that account-less people are never typed nf:SynapseUser."""
+
+    def _derive(self, rows):
+        return apply_derived_columns("people", pd.DataFrame(rows), {})
+
+    def test_account_holder_gets_synapse_user_orcid_only(self):
+        out = self._derive([
+            {"ownerID": "3324237", "orcid": "0000-0001-1111-1111", "onProject": ""},
+        ]).reset_index(drop=True)
+        assert out.loc[0, "synapseUserOrcid"] == "0000-0001-1111-1111"
+        assert out.loc[0, "nonSynapseOrcid"] == ""
+
+    def test_account_less_person_gets_non_synapse_orcid_only(self):
+        out = self._derive([
+            {"ownerID": "", "orcid": "0000-0002-2222-2222", "onProject": ""},
+        ]).reset_index(drop=True)
+        assert out.loc[0, "synapseUserOrcid"] == ""
+        assert out.loc[0, "nonSynapseOrcid"] == "0000-0002-2222-2222"
+
+    def test_columns_are_mutually_exclusive(self):
+        out = self._derive([
+            {"ownerID": "3324237", "orcid": "0000-0001-1111-1111", "onProject": ""},
+            {"ownerID": None, "orcid": "0000-0002-2222-2222", "onProject": ""},
+            {"ownerID": "3399999", "orcid": "", "onProject": "syn1"},
+        ])
+        both = out[(out["synapseUserOrcid"] != "") & (out["nonSynapseOrcid"] != "")]
+        assert both.empty, f"A row must not populate both columns: {both}"
+
+    def test_orcid_claimed_by_an_account_row_never_mints_a_second_person(self):
+        """The registry holds some researchers twice -- once as a Synapse
+        account, once publication-derived. Judging rows independently would give
+        that person both a Profile-keyed and an ORCID-keyed biolink:Person node,
+        double-counting them and typing one ORCID as a Synapse user and an
+        account-less person at once."""
+        out = self._derive([
+            {"ownerID": "3572182", "orcid": "0009-0005-7564-346X", "onProject": "syn1"},
+            {"ownerID": "", "orcid": "0009-0005-7564-346X", "onProject": ""},
+        ]).reset_index(drop=True)
+        assert out.loc[0, "synapseUserOrcid"] == "0009-0005-7564-346X"
+        assert out.loc[1, "nonSynapseOrcid"] == "", \
+            "duplicate publication-derived row must not become a second person"
+
+    def test_claim_matching_ignores_orcid_prefix_formatting(self):
+        """The source writes ORCIDs as 'orcid:<id>'; the two rows for one person
+        must still be recognised as the same ORCID."""
+        out = self._derive([
+            {"ownerID": "3572182", "orcid": "orcid:0009-0005-7564-346X", "onProject": ""},
+            {"ownerID": "", "orcid": "0009-0005-7564-346X", "onProject": ""},
+        ]).reset_index(drop=True)
+        assert out.loc[1, "nonSynapseOrcid"] == ""
+
+    def test_unclaimed_orcid_still_mints_a_person(self):
+        """The de-duplication must not swallow genuinely account-less people."""
+        out = self._derive([
+            {"ownerID": "3572182", "orcid": "0000-0001-1111-1111", "onProject": ""},
+            {"ownerID": "", "orcid": "0000-0002-2222-2222", "onProject": ""},
+        ]).reset_index(drop=True)
+        assert out.loc[1, "nonSynapseOrcid"] == "0000-0002-2222-2222"
+
+    def test_missing_owner_id_is_null_not_nan_string(self):
+        """A NaN ownerID must not stringify into the Profile IRI template."""
+        out = self._derive([
+            {"ownerID": float("nan"), "orcid": "0000-0002-2222-2222", "onProject": ""},
+        ]).reset_index(drop=True)
+        assert out.loc[0, "nonSynapseOrcid"] == "0000-0002-2222-2222"
+        assert out.loc[0, "synapseUserOrcid"] == ""
+
+    def test_row_without_orcid_or_project_is_dropped(self):
+        out = self._derive([
+            {"ownerID": "3324237", "orcid": "", "onProject": ""},
+            {"ownerID": "3399999", "orcid": "", "onProject": "syn1"},
+        ])
+        assert list(out["ownerID"]) == ["3399999"]
+
+    def test_existing_columns_are_not_recomputed(self):
+        """Re-processing from cache must not clobber already-derived columns."""
+        df = pd.DataFrame([{
+            "ownerID": "3324237",
+            "orcid": "0000-0001-1111-1111",
+            "onProject": "",
+            "synapseUserOrcid": "preserved",
+            "nonSynapseOrcid": "",
+        }])
+        out = apply_derived_columns("people", df, {}).reset_index(drop=True)
+        assert out.loc[0, "synapseUserOrcid"] == "preserved"
+
+
+class TestPublicationAuthorOrcidExplode:
+    """(doi, orcid) pairs are exploded out of the people table's per-person
+    `publications` DOI list, because an RML subject map cannot be multi-valued."""
+
+    def _derive(self, rows):
+        out = apply_derived_columns("publication_author_orcids", pd.DataFrame(rows), {})
+        return out.reset_index(drop=True)
+
+    def test_list_is_exploded_to_one_row_per_pair(self):
+        out = self._derive([
+            {"orcid": "0000-0001-1111-1111", "publications": ["10.1/a", "10.1/b"]},
+        ])
+        assert list(out["doi"]) == ["10.1/a", "10.1/b"]
+        assert set(out["orcid"]) == {"0000-0001-1111-1111"}
+
+    def test_tuple_from_synapse_list_column_is_handled(self):
+        """normalize_fetched_df turns list cells into tuples before this runs."""
+        out = self._derive([
+            {"orcid": "0000-0001-1111-1111", "publications": ("10.1/a", "10.1/b")},
+        ])
+        assert list(out["doi"]) == ["10.1/a", "10.1/b"]
+
+    def test_repr_string_from_cached_csv_is_handled(self):
+        """--from-cache re-reads the raw CSV, where the list is a repr string."""
+        out = self._derive([
+            {"orcid": "0000-0001-1111-1111", "publications": "['10.1/a', '10.1/b']"},
+        ])
+        assert list(out["doi"]) == ["10.1/a", "10.1/b"]
+
+    def test_person_without_orcid_contributes_no_pair(self):
+        out = self._derive([
+            {"orcid": "", "publications": ["10.1/a"]},
+            {"orcid": "0000-0001-1111-1111", "publications": ["10.1/b"]},
+        ])
+        assert list(out["doi"]) == ["10.1/b"]
+
+    def test_person_without_publications_contributes_no_pair(self):
+        out = self._derive([
+            {"orcid": "0000-0001-1111-1111", "publications": []},
+            {"orcid": "0000-0002-2222-2222", "publications": ["10.1/b"]},
+        ])
+        assert list(out["doi"]) == ["10.1/b"]
+
+    def test_duplicate_pairs_are_collapsed(self):
+        """The same DOI can repeat within a list and across duplicate profiles."""
+        out = self._derive([
+            {"orcid": "0000-0001-1111-1111", "publications": ["10.1/a", "10.1/a"]},
+            {"orcid": "0000-0001-1111-1111", "publications": ["10.1/a"]},
+        ])
+        assert len(out) == 1
+
+    def test_same_doi_keeps_distinct_authors(self):
+        """Co-authorship: one paper legitimately maps to many ORCIDs."""
+        out = self._derive([
+            {"orcid": "0000-0001-1111-1111", "publications": ["10.1/a"]},
+            {"orcid": "0000-0002-2222-2222", "publications": ["10.1/a"]},
+        ])
+        assert len(out) == 2
+        assert set(out["orcid"]) == {"0000-0001-1111-1111", "0000-0002-2222-2222"}
+
+    def test_already_exploded_frame_is_left_alone(self):
+        """--from-cache path: the raw CSV may already hold (doi, orcid) rows."""
+        df = pd.DataFrame([{"doi": "10.1/a", "orcid": "0000-0001-1111-1111"}])
+        out = apply_derived_columns("publication_author_orcids", df, {})
+        assert list(out["doi"]) == ["10.1/a"]
+
+
+class TestFormatSynapseId:
+    def test_strips_materialized_view_prefix(self):
+        assert format_synapse_id("syn:syn2343195") == "syn2343195"
+
+    def test_reintegerizes_float_user_id(self):
+        """A USERID column with any null becomes float64 in pandas, so the id
+        arrives as '3324237.0' and would be baked into a dead Profile IRI."""
+        assert format_synapse_id(3324237.0) == "3324237"
+        assert format_synapse_id("3324237.0") == "3324237"
+
+    def test_leaves_non_integral_looking_values_alone(self):
+        assert format_synapse_id("syn123") == "syn123"
+        assert format_synapse_id("3324237") == "3324237"
+
+    def test_empty(self):
+        assert format_synapse_id(None) == ""
 
 
 class TestFormatOrcid:
