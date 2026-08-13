@@ -1,0 +1,2011 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>NF Portal Assistant</title>
+<style>
+.deck-embed,
+.deck-embed *,
+.deck-embed *::before,
+.deck-embed *::after{box-sizing:border-box;margin:0;padding:0}
+
+.deck-embed{
+  --bg:#f8fafc;
+  --panel-3:#edf3f9;
+  --line:rgba(44,94,148,.16);
+  --text:#182433;
+  --muted:#4f647b;
+  --dim:#77889d;
+  --sky:#2f73d6;
+  --teal:#138f7a;
+  --gold:#9a6a00;
+  --rose:#be5874;
+  --shadow:0 24px 80px rgba(25,50,80,.10);
+
+  /* Design canvas the slides are authored against. JS rewrites these to
+     compensate for the host page's root font-size, then scales the stage
+     to fit this element. Ratio stays 16:9 either way. */
+  --stage-w:1440;
+  --stage-h:810;
+  --stage-scale:1;
+  --stage-x:0px;
+  --stage-y:0px;
+
+  position:relative !important;
+  display:block !important;
+  width:100% !important;
+  max-width:100% !important;
+  max-height:100% !important;
+  min-height:0 !important;
+  aspect-ratio:var(--stage-w) / var(--stage-h) !important;
+  margin-inline:auto;
+  padding:0 !important;
+  overflow:hidden !important;
+  float:none !important;
+  isolation:isolate;
+  contain:layout paint;
+  font-family:"Avenir Next","Trebuchet MS","Segoe UI",sans-serif;
+  color:var(--text);
+  background:
+    radial-gradient(circle at top left, rgba(47,115,214,.12), transparent 28%),
+    radial-gradient(circle at 82% 18%, rgba(19,143,122,.10), transparent 26%),
+    linear-gradient(180deg, #fbfdff 0%, #f4f8fc 54%, #edf3f9 100%);
+}
+
+.deck-embed .deck-stage{
+  position:absolute !important;
+  top:0 !important;
+  left:0 !important;
+  right:auto !important;
+  bottom:auto !important;
+  width:calc(var(--stage-w) * 1px) !important;
+  height:calc(var(--stage-h) * 1px) !important;
+  max-width:none !important;
+  max-height:none !important;
+  margin:0 !important;
+  padding:0 !important;
+  transform-origin:0 0 !important;
+  transform:translate(var(--stage-x), var(--stage-y)) scale(var(--stage-scale)) !important;
+  visibility:hidden;
+}
+
+/* Revealed by JS once measured. The animation is a no-JS fallback so the deck
+   still appears (unscaled) if the host strips or never runs our script. */
+.deck-embed.is-measured .deck-stage{visibility:visible}
+
+@keyframes deck-reveal{to{visibility:visible}}
+.deck-embed:not(.is-measured) .deck-stage{animation:deck-reveal 0s linear 1.5s forwards}
+
+.deck-embed .deck{position:relative !important;width:100% !important;height:100% !important;margin:0 !important;padding:0 !important;overflow:visible !important}
+
+.deck-embed .slide{
+  position:absolute !important;
+  inset:0 !important;
+  width:auto !important;
+  height:auto !important;
+  max-width:none !important;
+  max-height:none !important;
+  margin:0 !important;
+  float:none !important;
+  display:flex;
+  flex-direction:column;
+  gap:1.5rem;
+  opacity:0;
+  pointer-events:none;
+  transform:translateX(42px);
+  transition:opacity .45s ease,transform .45s ease;
+}
+
+.deck-embed .slide.active{
+  opacity:1;
+  pointer-events:auto;
+  transform:translateX(0);
+}
+
+.deck-embed .slide.exit{
+  opacity:0;
+  transform:translateX(-42px);
+}
+
+.frame{
+  position:relative;
+  flex:1;
+  padding:3.25rem 4rem 4.25rem;
+  background:linear-gradient(180deg, rgba(255,255,255,.94), rgba(248,251,255,.96));
+  overflow:hidden;
+}
+
+.frame::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:
+    linear-gradient(90deg, rgba(34,76,120,.03) 1px, transparent 1px),
+    linear-gradient(rgba(34,76,120,.03) 1px, transparent 1px);
+  background-size:32px 32px;
+  mask-image:linear-gradient(180deg, rgba(255,255,255,.8), transparent 90%);
+  pointer-events:none;
+}
+
+.frame::after{
+  content:"";
+  position:absolute;
+  inset:1rem;
+  border:1px solid rgba(44,94,148,.08);
+  border-radius:22px;
+  pointer-events:none;
+}
+
+.eyebrow{
+  display:inline-flex;
+  align-items:center;
+  gap:.55rem;
+  width:max-content;
+  font-size:.72rem;
+  font-weight:700;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  color:var(--sky);
+  padding:.42rem .78rem;
+  border:1px solid rgba(47,115,214,.16);
+  border-radius:999px;
+  background:rgba(255,255,255,.78);
+}
+
+.eyebrow .dot{
+  width:.42rem;
+  height:.42rem;
+  border-radius:999px;
+  background:var(--teal);
+  box-shadow:0 0 10px rgba(19,143,122,.20);
+}
+
+.hero{
+  display:flex;
+  justify-content:space-between;
+  gap:2rem;
+  align-items:flex-start;
+  margin-bottom:.35rem;
+  position:relative;
+}
+
+.hero-copy{max-width:48rem}
+
+.deck-embed h2{
+  font-family:"Iowan Old Style","Palatino Linotype","Book Antiqua",serif;
+  font-size:2.7rem;
+  line-height:1.04;
+  letter-spacing:-.04em;
+  margin-top:.85rem;
+  margin-bottom:.55rem;
+}
+
+.lead{
+  font-size:1.08rem;
+  line-height:1.7;
+  color:var(--muted);
+  max-width:54rem;
+}
+
+.emph-both{
+  background:linear-gradient(90deg, var(--teal), var(--sky));
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+  font-style:italic;
+}
+
+.deck-embed code{
+  font-family:"SFMono-Regular","Consolas","Liberation Mono",monospace;
+  font-size:.92em;
+  color:#244b7c;
+}
+
+/* ---- Slide 1: agent + sources diagram ---- */
+
+.diagram-wrap{
+  flex:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.diagram-wrap svg{
+  width:100%;
+  max-width:64rem;
+  height:auto;
+  display:block;
+}
+
+/* ---- Slide 2: why grounding matters ---- */
+
+.reason-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:1.4rem;
+  margin-top:2rem;
+  flex:1;
+  align-items:start;
+}
+
+.reason-card{
+  position:relative;
+  padding:1.6rem 1.7rem 1.5rem;
+  border-radius:20px;
+  border:1px solid rgba(44,94,148,.10);
+  background:linear-gradient(180deg, rgba(255,255,255,.98), rgba(243,248,253,.96));
+  overflow:hidden;
+}
+
+.reason-card::before{
+  content:"";
+  position:absolute;
+  inset:0 auto auto 0;
+  width:100%;
+  height:4px;
+  background:var(--accent);
+}
+
+.reason-tag{
+  display:inline-block;
+  font-size:.7rem;
+  font-weight:700;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--accent);
+  margin-bottom:.6rem;
+}
+
+.reason-card h3{
+  font-size:1.4rem;
+  line-height:1.28;
+  margin-bottom:.7rem;
+}
+
+.reason-card p{
+  font-size:1rem;
+  line-height:1.62;
+  color:var(--muted);
+  margin-bottom:1.2rem;
+}
+
+.reason-example{
+  display:flex;
+  align-items:center;
+  gap:.6rem;
+  flex-wrap:wrap;
+  padding:.85rem 1rem;
+  border-radius:12px;
+  background:rgba(44,94,148,.05);
+  border:1px solid rgba(44,94,148,.08);
+  font-family:"SFMono-Regular","Consolas","Liberation Mono",monospace;
+  font-size:.88rem;
+  color:#22466f;
+}
+
+.reason-example .arrow{
+  color:var(--accent);
+  font-weight:700;
+}
+
+/* ---- Slide 3: demo prompts ---- */
+
+.demo-grid{
+  position:relative;
+  display:grid;
+  grid-template-columns:1.6fr .7fr;
+  gap:1.2rem;
+  margin-top:1rem;
+  align-items:start;
+}
+
+.prompt-stack{
+  display:grid;
+  gap:.85rem;
+}
+
+.prompt-card{
+  padding:1rem 1.05rem;
+  border-radius:18px;
+  border:1px solid rgba(44,94,148,.10);
+  background:linear-gradient(180deg, rgba(255,255,255,.98), rgba(243,248,253,.96));
+}
+
+.prompt-top{
+  display:flex;
+  justify-content:space-between;
+  gap:1rem;
+  align-items:center;
+  margin-bottom:.55rem;
+}
+
+/* "Prompt N" is a colored text title, not a pill/badge */
+.prompt-title{
+  font-size:.78rem;
+  font-weight:800;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+
+.prompt-title.persona-drug{color:var(--sky)}
+.prompt-title.persona-bench{color:var(--teal)}
+.prompt-title.persona-gene{color:var(--gold)}
+.prompt-title.persona-contrib{color:var(--sky)}
+.prompt-title.persona-reuse{color:var(--teal)}
+.prompt-title.persona-off{color:var(--rose)}
+
+.copy-btn{
+  appearance:none;
+  border:1px solid rgba(44,94,148,.12);
+  background:rgba(255,255,255,.86);
+  color:var(--sky);
+  border-radius:999px;
+  padding:.34rem .6rem;
+  font-size:.66rem;
+  font-weight:700;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  cursor:pointer;
+  transition:background .15s ease,color .15s ease,border-color .15s ease;
+}
+
+.copy-btn:hover{
+  background:rgba(237,243,249,.96);
+  border-color:rgba(44,94,148,.18);
+}
+
+.prompt-card code{
+  display:block;
+  white-space:normal;
+  font-size:1rem;
+  line-height:1.5;
+  color:#22466f;
+}
+
+.note-side{
+  display:grid;
+  gap:.85rem;
+}
+
+.note-panel-side{
+  padding:1rem 1.05rem;
+  border-radius:20px;
+  border:1px solid rgba(44,94,148,.10);
+  background:linear-gradient(180deg, rgba(238,244,251,.98), rgba(229,238,248,.98));
+}
+
+.note-panel-side h3{
+  font-size:1.1rem;
+  margin-bottom:.45rem;
+}
+
+.note-panel-side p{
+  font-size:.92rem;
+  line-height:1.55;
+  color:var(--muted);
+}
+
+.note-list{
+  list-style:none;
+  display:grid;
+  gap:.7rem;
+  margin-top:.75rem;
+}
+
+.note-list li{
+  padding:.78rem .82rem;
+  border-radius:14px;
+  border:1px solid rgba(44,94,148,.08);
+  background:rgba(255,255,255,.72);
+  color:#2e4765;
+  font-size:.9rem;
+  line-height:1.48;
+}
+
+.note-list strong{
+  color:var(--text);
+}
+
+.note-list li.hl{
+  background:rgba(190,88,116,.10);
+  border-color:rgba(190,88,116,.30);
+  color:#5a3242;
+}
+
+.note-list li.hl strong{
+  color:var(--rose);
+}
+
+.prompt-card-body{
+  display:grid;
+  grid-template-columns:1fr 1.35fr;
+  gap:.9rem;
+  align-items:start;
+}
+
+.persona-col{
+  padding-right:.9rem;
+  border-right:1px solid rgba(44,94,148,.08);
+}
+
+.persona-label{
+  font-size:.62rem;
+  font-weight:700;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--dim);
+  margin-bottom:.5rem;
+}
+
+/* Persona badges: colored pill per persona so each is distinguishable at a glance */
+.persona-badge{
+  display:inline-flex;
+  align-items:center;
+  padding:.3rem .6rem;
+  border-radius:999px;
+  font-size:.82rem;
+  font-weight:700;
+  line-height:1.3;
+  margin-bottom:.5rem;
+}
+
+.persona-badge.persona-drug{
+  color:var(--sky);
+  background:rgba(47,115,214,.12);
+  border:1px solid rgba(47,115,214,.22);
+}
+
+.persona-badge.persona-bench{
+  color:var(--teal);
+  background:rgba(19,143,122,.12);
+  border:1px solid rgba(19,143,122,.22);
+}
+
+.persona-badge.persona-gene{
+  color:var(--gold);
+  background:rgba(154,106,0,.12);
+  border:1px solid rgba(154,106,0,.24);
+}
+
+.persona-badge.persona-contrib{
+  color:var(--sky);
+  background:rgba(47,115,214,.12);
+  border:1px solid rgba(47,115,214,.22);
+}
+
+.persona-badge.persona-reuse{
+  color:var(--teal);
+  background:rgba(19,143,122,.12);
+  border:1px solid rgba(19,143,122,.22);
+}
+
+.persona-badge.persona-off{
+  color:var(--rose);
+  background:rgba(190,88,116,.12);
+  border:1px solid rgba(190,88,116,.24);
+}
+
+.persona-why{
+  font-size:.82rem;
+  line-height:1.52;
+  color:var(--muted);
+}
+
+.prompt-col{
+  display:flex;
+  flex-direction:column;
+  gap:.5rem;
+}
+
+/* ---- IKEA story lead-in ---- */
+
+/* problem slide: bold oversized pull-quote + danger callout */
+.pq-wrap{
+  position:relative;
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-end;
+  gap:2rem;
+  max-width:56rem;
+  margin-top:2.4rem;
+  padding-bottom:3.2rem;
+}
+
+.pullquote{
+  position:relative;
+  font-family:"Iowan Old Style","Palatino Linotype","Book Antiqua",serif;
+  font-size:3.85rem;
+  line-height:1.12;
+  letter-spacing:-.032em;
+  color:var(--text);
+}
+
+.pullquote::before{
+  content:"\201C";
+  position:absolute;
+  left:-2.6rem;
+  top:-2.1rem;
+  font-size:8.5rem;
+  line-height:1;
+  color:var(--sky);
+  opacity:.14;
+  pointer-events:none;
+}
+
+.pullquote em{
+  font-style:normal;
+  color:var(--sky);
+  box-shadow:inset 0 -.16em 0 rgba(47,115,214,.24);
+}
+
+.pq-attrib{
+  font-size:.86rem;
+  font-weight:800;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  color:var(--dim);
+}
+
+.danger-note{
+  position:relative;
+  display:grid;
+  gap:.45rem;
+  max-width:42rem;
+  padding:1.15rem 1.35rem 1.2rem;
+  border-radius:16px;
+  background:linear-gradient(180deg, rgba(190,88,116,.11), rgba(190,88,116,.045));
+  border:1px solid rgba(190,88,116,.22);
+}
+
+.danger-label{
+  font-size:.68rem;
+  font-weight:800;
+  letter-spacing:.15em;
+  text-transform:uppercase;
+  color:var(--rose);
+}
+
+.danger-note p{
+  font-size:1.04rem;
+  line-height:1.55;
+  color:var(--muted);
+}
+
+.danger-note strong{color:var(--text)}
+
+/* solution slide: pyramid figure + reading */
+.solution-grid{
+  display:grid;
+  grid-template-columns:1.2fr .85fr;
+  gap:2rem;
+  margin-top:1.6rem;
+  align-items:end;
+}
+
+.tingby-figure{
+  max-width:660px;
+  justify-self:start;
+  border-radius:16px;
+  overflow:hidden;
+  border:1px solid var(--line);
+  box-shadow:var(--shadow);
+}
+
+.tingby-figure img{display:block;width:100%;height:auto}
+
+.expert-read{display:grid;gap:1rem;align-content:end;padding-bottom:.6rem}
+
+.ex-label{
+  font-size:.68rem;
+  font-weight:800;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--teal);
+}
+
+.reason-rows{display:grid;gap:.6rem}
+
+.reason-row{
+  display:grid;
+  grid-template-columns:9.5rem auto 1fr;
+  gap:.7rem;
+  align-items:center;
+}
+
+.reason-attr{
+  font-size:.92rem;
+  font-weight:600;
+  color:var(--text);
+  padding:.42rem .7rem;
+  border-radius:10px;
+  background:rgba(44,94,148,.06);
+  border:1px solid rgba(44,94,148,.10);
+}
+
+.reason-arrow{color:var(--sky);font-weight:700}
+
+.reason-inf{font-size:.98rem;line-height:1.35;color:var(--muted)}
+
+.ex-result{
+  justify-self:start;
+  margin-top:.15rem;
+  font-size:.98rem;
+  font-weight:700;
+  color:var(--teal);
+  padding:.5rem .9rem;
+  border-radius:999px;
+  background:rgba(19,143,122,.10);
+  border:1px solid rgba(19,143,122,.22);
+}
+
+.payoff{
+  margin-top:1.3rem;
+  display:grid;
+  gap:.45rem;
+  max-width:62rem;
+}
+
+.payoff blockquote{
+  font-family:"Iowan Old Style","Palatino Linotype","Book Antiqua",serif;
+  font-size:1.15rem;
+  line-height:1.45;
+  color:var(--text);
+  border-left:3px solid var(--teal);
+  padding-left:1rem;
+}
+
+.payoff p{font-size:.98rem;line-height:1.55;color:var(--muted)}
+.payoff p strong{color:var(--text)}
+
+.story-read{
+  display:grid;
+  gap:1rem;
+  align-content:center;
+}
+
+.story-read blockquote{
+  font-family:"Iowan Old Style","Palatino Linotype","Book Antiqua",serif;
+  font-size:1.18rem;
+  line-height:1.5;
+  color:var(--text);
+  border-left:3px solid var(--teal);
+  padding-left:1rem;
+}
+
+.story-read p{
+  font-size:1rem;
+  line-height:1.62;
+  color:var(--muted);
+}
+
+.story-read p strong{color:var(--text)}
+
+/* bridge slide: analogy mapping as paired transform cards */
+.xform-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:1.1rem;
+  margin-top:1.6rem;
+  flex:1;
+  align-content:center;
+}
+
+.xf-card{
+  position:relative;
+  padding:1.25rem 1.4rem 1.35rem;
+  border-radius:18px;
+  border:1px solid rgba(44,94,148,.10);
+  background:linear-gradient(180deg, rgba(255,255,255,.98), rgba(243,248,253,.96));
+  display:grid;
+  gap:.55rem;
+}
+
+.xf-side{
+  display:flex;
+  align-items:baseline;
+  gap:.6rem;
+}
+
+.xf-tag{
+  flex:none;
+  width:4.4rem;
+  font-size:.6rem;
+  font-weight:800;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  padding:.2rem 0;
+  text-align:center;
+  border-radius:999px;
+}
+
+.xf-tag.ikea{color:#0058a3;background:#ffda1a;border:1px solid #ffda1a}
+.xf-tag.nf{color:#fff;background:var(--teal);border:1px solid var(--teal)}
+
+.xf-from{font-size:1rem;line-height:1.38;color:var(--muted)}
+.xf-to{font-size:1.05rem;line-height:1.38;color:var(--text);font-weight:600}
+.xf-to strong{color:var(--teal)}
+
+.xf-join{
+  text-align:center;
+  color:var(--sky);
+  font-size:.95rem;
+  line-height:.6;
+  opacity:.75;
+}
+
+/* shared citation footnote */
+.cite{
+  position:absolute;
+  left:4rem;
+  right:4rem;
+  bottom:1.55rem;
+  font-size:.72rem;
+  line-height:1.4;
+  color:var(--dim);
+  border-top:1px solid rgba(44,94,148,.10);
+  padding-top:.6rem;
+}
+
+.cite a{color:var(--sky);text-decoration:none}
+
+/* ---- Funder guidance / expert evidence ---- */
+
+.evidence-overlap{
+  position:relative;
+  flex:1;
+  margin-top:1.4rem;
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+}
+
+.evidence-figure{
+  margin:0;
+  width:68%;
+}
+
+.evidence-figure img{
+  display:block;
+  width:100%;
+  height:auto;
+  border-radius:12px;
+  border:1px solid rgba(44,94,148,.10);
+  box-shadow:var(--shadow);
+}
+
+.evidence-note{
+  position:absolute;
+  left:0;
+  top:50%;
+  transform:translateY(-50%);
+  width:46%;
+  z-index:2;
+  padding:1.3rem 1.4rem;
+  border-radius:18px;
+  border:1px solid rgba(44,94,148,.12);
+  background:linear-gradient(180deg, rgba(255,255,255,.99), rgba(244,249,254,.98));
+  box-shadow:0 26px 64px rgba(25,50,80,.22);
+}
+
+.evidence-note h3{
+  font-size:1.2rem;
+  margin-bottom:.7rem;
+}
+
+/* ---- Symbolic reasoning: imported + internal ontologies ---- */
+
+.dual-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:1.4rem;
+  margin-top:1.3rem;
+  flex:1;
+  align-items:start;
+}
+
+.onto-card{
+  display:grid;
+  gap:.85rem;
+  align-content:start;
+  padding:1.3rem 1.4rem 1.4rem;
+  border-radius:18px;
+  border:1px solid rgba(44,94,148,.10);
+  background:linear-gradient(180deg, rgba(255,255,255,.98), rgba(243,248,253,.96));
+}
+
+.onto-tag{
+  justify-self:start;
+  font-size:.66rem;
+  font-weight:800;
+  letter-spacing:.13em;
+  text-transform:uppercase;
+  padding:.32rem .72rem;
+  border-radius:999px;
+}
+
+.onto-tag.ext{color:var(--teal);background:rgba(19,143,122,.12);border:1px solid rgba(19,143,122,.22)}
+.onto-tag.int{color:var(--gold);background:rgba(154,106,0,.12);border:1px solid rgba(154,106,0,.24)}
+
+.onto-label{
+  font-size:.64rem;
+  font-weight:800;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--dim);
+  margin-bottom:.4rem;
+}
+
+.onto-req{
+  display:inline-block;
+  font-family:"SFMono-Regular","Consolas","Liberation Mono",monospace;
+  font-size:1rem;
+  color:#22466f;
+  padding:.42rem .72rem;
+  border-radius:10px;
+  background:rgba(44,94,148,.06);
+  border:1px solid rgba(44,94,148,.12);
+}
+
+.onto-q{
+  margin-top:.6rem;
+  font-size:1rem;
+  line-height:1.5;
+  color:var(--muted);
+}
+
+.onto-q strong{color:var(--text)}
+
+.onto-figure{
+  border-radius:12px;
+  overflow:hidden;
+  border:1px solid rgba(44,94,148,.10);
+  box-shadow:var(--shadow);
+}
+
+.onto-figure img{
+  display:block;
+  width:100%;
+  height:auto;
+  max-height:250px;
+  object-fit:cover;
+  object-position:top;
+}
+
+.onto-cap{font-size:.92rem;line-height:1.5;color:var(--muted)}
+.onto-cap strong{color:var(--teal)}
+
+.onto-payoff{
+  margin-top:.15rem;
+  font-size:.96rem;
+  line-height:1.5;
+  color:#7a5600;
+  background:rgba(154,106,0,.09);
+  border:1px solid rgba(154,106,0,.20);
+  border-radius:12px;
+  padding:.72rem .85rem;
+}
+
+.onto-payoff strong{color:var(--gold)}
+
+/* ---- Development timeline ---- */
+
+.compact-diagram{flex:0 1 auto}
+.compact-diagram svg{max-width:47rem}
+
+.timeline{
+  position:relative;
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  column-gap:.5rem;
+  margin-top:.6rem;
+}
+
+.timeline::before{
+  content:"";
+  position:absolute;
+  top:7px;
+  left:7.14%;
+  right:21.43%;
+  height:2px;
+  background:linear-gradient(90deg, var(--teal), var(--sky));
+  opacity:.55;
+}
+
+.timeline::after{
+  content:"";
+  position:absolute;
+  top:6px;
+  left:78.57%;
+  right:7.14%;
+  border-top:2px dashed rgba(47,115,214,.4);
+}
+
+.tl-item{
+  position:relative;
+  text-align:center;
+  padding:0 .25rem;
+}
+
+.tl-dot{
+  display:block;
+  width:14px;
+  height:14px;
+  border-radius:50%;
+  background:#fff;
+  border:2.5px solid var(--sky);
+  margin:0 auto .5rem;
+  position:relative;
+  z-index:1;
+}
+
+.tl-date{
+  font-size:.74rem;
+  font-weight:800;
+  letter-spacing:.05em;
+  text-transform:uppercase;
+  color:var(--dim);
+  margin-bottom:.3rem;
+}
+
+.tl-desc strong{
+  display:block;
+  font-size:.82rem;
+  line-height:1.25;
+  color:var(--text);
+}
+
+.tl-sub{
+  display:block;
+  font-size:.74rem;
+  line-height:1.3;
+  color:var(--muted);
+  margin-top:.15rem;
+}
+
+.tl-item.is-key .tl-dot{background:var(--gold);border-color:var(--gold);box-shadow:0 0 0 4px rgba(154,106,0,.16)}
+.tl-item.is-key .tl-date{color:var(--gold)}
+.tl-item.is-now .tl-dot{background:var(--teal);border-color:var(--teal);box-shadow:0 0 0 4px rgba(19,143,122,.16)}
+.tl-item.is-now .tl-date{color:var(--teal)}
+
+.tl-item.is-planned .tl-dot{background:#fff;border-style:dashed;border-color:var(--dim)}
+.tl-item.is-planned .tl-date{color:var(--dim)}
+.tl-item.is-planned .tl-desc strong{color:var(--muted)}
+
+.tl-span{
+  grid-column:1 / 7;
+  margin-top:.9rem;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:.45rem;
+  padding:.42rem .9rem;
+  border-radius:999px;
+  background:rgba(19,143,122,.09);
+  border:1px dashed rgba(19,143,122,.4);
+}
+
+.tl-span-arrow{color:var(--teal);font-weight:700;font-size:.9rem;opacity:.75}
+
+.tl-span-label{
+  font-size:.74rem;
+  font-weight:700;
+  letter-spacing:.04em;
+  color:var(--teal);
+}
+
+/* ---- Overview / agenda ---- */
+
+.agenda-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:1.2rem;
+  margin-top:1.8rem;
+  flex:1;
+  align-content:center;
+}
+
+.agenda-card{
+  display:grid;
+  grid-template-columns:auto 1fr;
+  gap:1.1rem;
+  align-items:center;
+  padding:1.35rem 1.5rem;
+  border-radius:18px;
+  border:1px solid rgba(44,94,148,.10);
+  background:linear-gradient(180deg, rgba(255,255,255,.98), rgba(243,248,253,.96));
+}
+
+.agenda-num{
+  font-family:"Iowan Old Style","Palatino Linotype","Book Antiqua",serif;
+  font-size:2.6rem;
+  font-weight:700;
+  line-height:1;
+  color:var(--accent);
+  width:2.2rem;
+  text-align:center;
+}
+
+.agenda-card h3{
+  font-size:1.28rem;
+  line-height:1.2;
+  margin-bottom:.35rem;
+}
+
+.agenda-card p{
+  font-size:.98rem;
+  line-height:1.5;
+  color:var(--muted);
+}
+
+/* ---- OpenSearch vs Assistant comparison ---- */
+
+.comparison-grid{
+  display:grid;
+  grid-template-columns:1fr 1.15fr;
+  gap:1.35rem;
+  margin-top:1rem;
+  flex:1;
+  align-items:start;
+}
+
+.panel{
+  position:relative;
+  padding:1.45rem 1.5rem 1.35rem;
+  border-radius:24px;
+  border:1px solid var(--line);
+  background:linear-gradient(180deg, rgba(255,255,255,.98), rgba(243,248,253,.98));
+  overflow:hidden;
+}
+
+.panel::before{
+  content:"";
+  position:absolute;
+  inset:0 auto auto 0;
+  width:100%;
+  height:3px;
+  background:linear-gradient(90deg, transparent, rgba(47,115,214,.18), transparent);
+}
+
+.panel.search{box-shadow:inset 0 0 0 1px rgba(47,115,214,.06)}
+.panel.agent{box-shadow:inset 0 0 0 1px rgba(19,143,122,.08)}
+
+.panel-tag{
+  display:inline-flex;
+  align-items:center;
+  gap:.45rem;
+  font-size:.68rem;
+  font-weight:700;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  padding:.38rem .7rem;
+  border-radius:999px;
+  margin-bottom:.9rem;
+}
+
+.search .panel-tag{color:var(--sky);background:rgba(47,115,214,.12);border:1px solid rgba(47,115,214,.2)}
+.agent .panel-tag{color:var(--teal);background:rgba(19,143,122,.12);border:1px solid rgba(19,143,122,.22)}
+
+.panel-head{
+  display:flex;
+  align-items:center;
+  gap:.6rem;
+  flex-wrap:wrap;
+  margin-bottom:.9rem;
+}
+
+.panel-head .panel-tag{margin-bottom:0}
+
+.deliverable-badge{
+  font-size:.62rem;
+  font-weight:800;
+  letter-spacing:.09em;
+  text-transform:uppercase;
+  color:var(--dim);
+  padding:.3rem .6rem;
+  border-radius:999px;
+  border:1px solid rgba(44,94,148,.16);
+  background:rgba(255,255,255,.7);
+}
+
+.panel h3{
+  font-size:1.4rem;
+  line-height:1.18;
+  margin-bottom:.55rem;
+}
+
+.panel-copy{
+  color:var(--muted);
+  font-size:1rem;
+  line-height:1.6;
+  margin-bottom:1rem;
+}
+
+.feature-list{
+  list-style:none;
+  display:grid;
+  gap:.55rem;
+  margin-bottom:1rem;
+}
+
+.feature-list li{
+  position:relative;
+  padding-left:1.35rem;
+  color:#2c4058;
+  font-size:.98rem;
+  line-height:1.4;
+}
+
+.feature-list li::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:.5rem;
+  width:.45rem;
+  height:.45rem;
+  border-radius:999px;
+  background:currentColor;
+}
+
+.search .feature-list li{color:#31527e}
+.agent .feature-list li{color:#1c5f58}
+
+.mini-note{
+  padding:.9rem 1rem;
+  border-radius:16px;
+  border:1px solid rgba(44,94,148,.10);
+  background:rgba(243,248,253,.88);
+}
+
+.mini-label{
+  font-size:.68rem;
+  font-weight:700;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--dim);
+  margin-bottom:.38rem;
+}
+
+.mini-note p{
+  font-size:.94rem;
+  line-height:1.5;
+  color:var(--muted);
+}
+
+/* ---- footer chrome ---- */
+
+.deck-embed .deck-progress{
+  position:absolute;
+  bottom:0;
+  left:0;
+  height:3px;
+  background:linear-gradient(90deg, var(--teal), var(--sky));
+  transition:width .35s ease;
+  z-index:50;
+}
+
+.deck-embed .deck-slide-num{
+  position:absolute;
+  right:1.25rem;
+  bottom:1rem;
+  font-size:.82rem;
+  color:var(--dim);
+  z-index:50;
+  font-variant-numeric:tabular-nums;
+}
+
+</style>
+</head>
+<body>
+<div class="deck-embed" id="deck-embed">
+<div class="deck-stage" id="deck-stage">
+<div class="deck" id="deck">
+
+  <section class="slide active" data-slide="0">
+    <div class="frame">
+      <div class="hero">
+        <div class="hero-copy">
+          <div class="eyebrow"><span class="dot"></span>Overview</div>
+          <h2>The Portal Assistant: More Depth, More Demos</h2>
+          <p class="lead">Providing more insight into our engineering approach for advanced search and discovery with AI, as well as new use case demos.</p>
+        </div>
+      </div>
+
+      <div class="agenda-grid">
+        <div class="agenda-card" style="--accent:var(--sky)">
+          <div class="agenda-num">1</div>
+          <div>
+            <h3>The IKEA lesson</h3>
+            <p>Why good recommendations explain the <em>why</em>, not just the <em>what</em>.</p>
+          </div>
+        </div>
+        <div class="agenda-card" style="--accent:var(--teal)">
+          <div class="agenda-num">2</div>
+          <div>
+            <h3>The Portal Assistant</h3>
+            <p>The contextual update on architecture and development timeline.</p>
+          </div>
+        </div>
+        <div class="agenda-card" style="--accent:var(--gold)">
+          <div class="agenda-num">3</div>
+          <div>
+            <h3>How it reasons</h3>
+            <p>Deeper connection into ontology and LLM reasoning for grounded and explainable product.</p>
+          </div>
+        </div>
+        <div class="agenda-card" style="--accent:var(--rose)">
+          <div class="agenda-num">4</div>
+          <div>
+            <h3>Live demo</h3>
+            <p>Real questions across researcher and data-contributor personas.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-slide="1">
+    <div class="frame">
+      <div class="hero">
+        <div class="hero-copy">
+          <div class="eyebrow"><span class="dot"></span>Case Study &middot; IKEA</div>
+          <h2>Why a furniture company built a knowledge graph</h2>
+          <p class="lead">IKEA wanted to recreate online what its interior designers do in-store: pair products that truly belong together. The obvious approach, learning from what the crowd buys, had a blind spot.</p>
+        </div>
+      </div>
+
+      <div class="pq-wrap">
+        <blockquote class="pullquote">The wisdom of the crowd can't provide the <em>why</em> to the recommendations it gives.</blockquote>
+        <p class="pq-attrib">Katariina Kari &middot; Inter IKEA Systems &middot; KGC 2023</p>
+      </div>
+
+      <div class="cite">Source: Katariina Kari &amp; Adam Keresztes (Inter IKEA Systems), presented at KGC 2023, via metaphacts, <a href="https://blog.metaphacts.com/building-explainable-trustworthy-recommendation-systems-ikea-at-kgc2023" target="_blank" rel="noopener"><em>&ldquo;Building Explainable, Trustworthy Recommendation Systems.&rdquo;</em>&#8239;&#8599;</a></div>
+    </div>
+  </section>
+
+  <section class="slide" data-slide="2">
+    <div class="frame">
+      <div class="hero">
+        <div class="hero-copy">
+          <div class="eyebrow"><span class="dot"></span>IKEA's Answer</div>
+          <h2 style="white-space:nowrap">Capture the reasoning only an expert has</h2>
+        </div>
+      </div>
+
+      <div class="solution-grid">
+        <figure class="tingby-figure">
+          <img src="ikea/ikea-catalog.png" alt="Product photo of the IKEA TINGBY, a small white square side table with two flat shelves, set against a bright IKEA-yellow background and labeled 'TINGBY, Side table.' Three hand-drawn black marker arrows call out its features: 'rounded corners' pointing to the softened top edges, 'additional shelf' pointing to the lower shelf, and 'on castors' pointing to the small wheels on its feet. Marked copyright Inter IKEA Systems B.V. 2023."/>
+        </figure>
+        <div class="expert-read">
+          <div class="ex-label">What only an expert knows</div>
+          <div class="reason-rows">
+            <div class="reason-row">
+              <span class="reason-attr">Rounded corners</span>
+              <span class="reason-arrow">&rarr;</span>
+              <span class="reason-inf">safe for homes with babies and young children</span>
+            </div>
+            <div class="reason-row">
+              <span class="reason-attr">On castors</span>
+              <span class="reason-arrow">&rarr;</span>
+              <span class="reason-inf">rolls out of the way to free up a tight space</span>
+            </div>
+            <div class="reason-row">
+              <span class="reason-attr">Additional shelf</span>
+              <span class="reason-arrow">&rarr;</span>
+              <span class="reason-inf">holds more in less floor area, ideal for small homes</span>
+            </div>
+          </div>
+          <span class="ex-result">&rArr;&nbsp; family-friendly &middot; small-space</span>
+        </div>
+      </div>
+
+      <div class="payoff">
+        <blockquote>Structuring data this way enables IKEA's recommender to make recommendations that are thoughtful, customer-focused and true-to-life.</blockquote>
+        <p><strong>The graph carries the reasoning, not just the label.</strong> Encode it once and every product inherits it, while preventing mistakes like tagging a table with <em>sharp</em> corners &ldquo;suitable for families.&rdquo;</p>
+        <p><strong>Reused again for vision:</strong> IKEA feeds the same encoded reasoning into image-based machine learning, linking how a product looks to what its features mean.</p>
+      </div>
+
+      <div class="cite">Diagram &copy; Inter IKEA Systems B.V. 2023. Source: Kari &amp; Keresztes, KGC 2023, via metaphacts, <a href="https://blog.metaphacts.com/building-explainable-trustworthy-recommendation-systems-ikea-at-kgc2023" target="_blank" rel="noopener"><em>&ldquo;Building Explainable, Trustworthy Recommendation Systems.&rdquo;</em>&#8239;&#8599;</a></div>
+    </div>
+  </section>
+
+  <section class="slide" data-slide="3">
+    <div class="frame">
+      <div class="hero">
+        <div class="hero-copy">
+          <div class="eyebrow"><span class="dot"></span>The Same Pattern</div>
+          <h2>From sofas to Schwann cells</h2>
+          <p class="lead">Swap furniture for biology and IKEA's blueprint is exactly ours. Domain experts' knowledge, captured as ontology structure, lets the Portal Assistant answer with reasoning and evidence, not keyword luck.</p>
+        </div>
+      </div>
+
+      <div class="xform-grid">
+        <div class="xf-card">
+          <div class="xf-side"><span class="xf-tag ikea">IKEA</span><span class="xf-from">Interior designers' pairing rules</span></div>
+          <div class="xf-join">&#9662;</div>
+          <div class="xf-side"><span class="xf-tag nf">NF&nbsp;Portal</span><span class="xf-to">Curated <strong>knowledge graph &amp; ontologies</strong></span></div>
+        </div>
+        <div class="xf-card">
+          <div class="xf-side"><span class="xf-tag ikea">IKEA</span><span class="xf-from">Product attributes, material, shape</span></div>
+          <div class="xf-join">&#9662;</div>
+          <div class="xf-side"><span class="xf-tag nf">NF&nbsp;Portal</span><span class="xf-to">Biological entities &amp; <strong>normalized terms</strong></span></div>
+        </div>
+        <div class="xf-card">
+          <div class="xf-side"><span class="xf-tag ikea">IKEA</span><span class="xf-from">&ldquo;Goes well with&rdquo; business rule</span></div>
+          <div class="xf-join">&#9662;</div>
+          <div class="xf-side"><span class="xf-tag nf">NF&nbsp;Portal</span><span class="xf-to">Encoded <strong>relationships the agent reasons over</strong></span></div>
+        </div>
+        <div class="xf-card">
+          <div class="xf-side"><span class="xf-tag ikea">IKEA</span><span class="xf-from">Explaining the <em>why</em> behind a pick</span></div>
+          <div class="xf-join">&#9662;</div>
+          <div class="xf-side"><span class="xf-tag nf">NF&nbsp;Portal</span><span class="xf-to">Grounded, <strong>cited answers with next steps</strong></span></div>
+        </div>
+      </div>
+
+      <div class="cite">IKEA framing: Kari &amp; Keresztes, KGC 2023, via metaphacts, <a href="https://blog.metaphacts.com/building-explainable-trustworthy-recommendation-systems-ikea-at-kgc2023" target="_blank" rel="noopener"><em>&ldquo;Building Explainable, Trustworthy Recommendation Systems.&rdquo;</em>&#8239;&#8599;</a></div>
+    </div>
+  </section>
+
+  <section class="slide" data-slide="4">
+    <div class="frame">
+      <div class="hero">
+        <div class="hero-copy">
+          <div class="eyebrow"><span class="dot"></span>System Overview</div>
+          <h2>One assistant, grounded across three sources</h2>
+          <p class="lead">The Portal Assistant sits in front of a knowledge graph, the published literature, and platform help documentation, and it routes each question to the source that can actually answer it.</p>
+        </div>
+      </div>
+
+      <div class="diagram-wrap compact-diagram">
+        <svg viewBox="0 0 1200 460" role="img" aria-labelledby="agentDiagramTitle agentDiagramDesc" xmlns="http://www.w3.org/2000/svg">
+          <title id="agentDiagramTitle">Portal Assistant connected to three grounding sources</title>
+          <desc id="agentDiagramDesc">A hub-and-spoke diagram. On the left, an atom-like icon labeled "Portal Assistant, orchestrates every question." Three curved connector lines fan out from it to three sources stacked on the right: at the top, a linked-nodes icon labeled "Knowledge Graph, curated entities and relationships"; in the middle, a stacked-pages icon labeled "Publications, full-text literature evidence"; and at the bottom, a document-with-question-mark icon labeled "Help Docs, platform guidance and definitions." The layout shows the assistant routing each question to whichever of the three sources can answer it.</desc>
+
+          <path d="M250,205 C550,120 700,80 846,80" fill="none" stroke="#138f7a" stroke-width="2.5" opacity="0.55"/>
+          <path d="M260,230 C550,230 700,230 846,230" fill="none" stroke="#9a6a00" stroke-width="2.5" opacity="0.55"/>
+          <path d="M250,255 C550,340 700,380 846,380" fill="none" stroke="#be5874" stroke-width="2.5" opacity="0.55"/>
+
+          <g>
+            <circle cx="190" cy="230" r="70" fill="rgba(47,115,214,0.08)" stroke="#2f73d6" stroke-width="1.5"/>
+            <g transform="rotate(0 190 230)">
+              <ellipse cx="190" cy="230" rx="50" ry="20" fill="none" stroke="#2f73d6" stroke-width="1.3" opacity="0.5"/>
+              <circle cx="240" cy="230" r="4.5" fill="#2f73d6"/>
+            </g>
+            <g transform="rotate(60 190 230)">
+              <ellipse cx="190" cy="230" rx="50" ry="20" fill="none" stroke="#2f73d6" stroke-width="1.3" opacity="0.5"/>
+              <circle cx="240" cy="230" r="4.5" fill="#2f73d6"/>
+            </g>
+            <g transform="rotate(120 190 230)">
+              <ellipse cx="190" cy="230" rx="50" ry="20" fill="none" stroke="#2f73d6" stroke-width="1.3" opacity="0.5"/>
+              <circle cx="240" cy="230" r="4.5" fill="#2f73d6"/>
+            </g>
+            <circle cx="190" cy="230" r="9" fill="#2f73d6"/>
+          </g>
+          <text x="190" y="334" text-anchor="middle" font-size="22" font-weight="700" fill="#182433">Portal Assistant</text>
+          <text x="190" y="358" text-anchor="middle" font-size="14" fill="#4f647b">Orchestrates every question</text>
+
+          <g>
+            <circle cx="900" cy="80" r="54" fill="rgba(19,143,122,0.08)" stroke="#138f7a" stroke-width="1.5"/>
+            <line x1="888" y1="68" x2="918" y2="74" stroke="#138f7a" stroke-width="1.5"/>
+            <line x1="888" y1="68" x2="896" y2="96" stroke="#138f7a" stroke-width="1.5"/>
+            <line x1="918" y1="74" x2="896" y2="96" stroke="#138f7a" stroke-width="1.5"/>
+            <circle cx="888" cy="68" r="5" fill="#ffffff" stroke="#138f7a" stroke-width="1.5"/>
+            <circle cx="918" cy="74" r="5" fill="#ffffff" stroke="#138f7a" stroke-width="1.5"/>
+            <circle cx="896" cy="96" r="5" fill="#ffffff" stroke="#138f7a" stroke-width="1.5"/>
+          </g>
+          <text x="964" y="76" font-size="22" font-weight="700" fill="#182433">Knowledge Graph</text>
+          <text x="964" y="100" font-size="14" fill="#4f647b">Curated entities &amp; relationships</text>
+
+          <g>
+            <circle cx="900" cy="230" r="54" fill="rgba(154,106,0,0.08)" stroke="#9a6a00" stroke-width="1.5"/>
+            <rect x="886" y="204" width="34" height="26" rx="3" fill="#ffffff" stroke="#9a6a00" stroke-width="1.5"/>
+            <rect x="880" y="210" width="34" height="26" rx="3" fill="#ffffff" stroke="#9a6a00" stroke-width="1.5"/>
+            <line x1="887" y1="219" x2="907" y2="219" stroke="#9a6a00" stroke-width="1.2"/>
+            <line x1="887" y1="225" x2="903" y2="225" stroke="#9a6a00" stroke-width="1.2"/>
+          </g>
+          <text x="964" y="226" font-size="22" font-weight="700" fill="#182433">Publications</text>
+          <text x="964" y="250" font-size="14" fill="#4f647b">Full-text literature evidence</text>
+
+          <g>
+            <circle cx="900" cy="380" r="54" fill="rgba(190,88,116,0.08)" stroke="#be5874" stroke-width="1.5"/>
+            <rect x="882" y="356" width="36" height="46" rx="4" fill="#ffffff" stroke="#be5874" stroke-width="1.5"/>
+            <text x="900" y="387" text-anchor="middle" font-size="22" font-weight="700" fill="#be5874">?</text>
+          </g>
+          <text x="964" y="376" font-size="22" font-weight="700" fill="#182433">Help Docs</text>
+          <text x="964" y="400" font-size="14" fill="#4f647b">Platform guidance &amp; definitions</text>
+        </svg>
+      </div>
+
+      <div class="timeline">
+        <div class="tl-item">
+          <span class="tl-dot"></span>
+          <div class="tl-date">Feb 2026</div>
+          <div class="tl-desc"><strong>Agent + Knowledge Graph</strong><span class="tl-sub">KG testing &amp; benchmarking</span></div>
+        </div>
+        <div class="tl-item">
+          <span class="tl-dot"></span>
+          <div class="tl-date">Mar 2026</div>
+          <div class="tl-desc"><strong>Publications indexed</strong><span class="tl-sub">Pub-RAG benchmarking</span><span class="tl-sub">Agent UI with suggested actions</span></div>
+        </div>
+        <div class="tl-item">
+          <span class="tl-dot"></span>
+          <div class="tl-date">Apr 2026</div>
+          <div class="tl-desc"><strong>Docs benchmarked</strong><span class="tl-sub">KG representation improvements</span></div>
+        </div>
+        <div class="tl-item is-key">
+          <span class="tl-dot"></span>
+          <div class="tl-date">May 2026</div>
+          <div class="tl-desc"><strong>Alpha, in experimental mode</strong><span class="tl-sub">Coordinate with tech/product team for post-alpha MVP</span></div>
+        </div>
+        <div class="tl-item">
+          <span class="tl-dot"></span>
+          <div class="tl-date">Jun 2026</div>
+          <div class="tl-desc"><strong>CTF Global Conference poster</strong><span class="tl-sub">Added source-routing benchmark</span></div>
+        </div>
+        <div class="tl-item is-now">
+          <span class="tl-dot"></span>
+          <div class="tl-date">Jul 2026</div>
+          <div class="tl-desc"><strong>Security &amp; safety benchmark</strong><span class="tl-sub">Exiting experimental mode this month</span></div>
+        </div>
+        <div class="tl-item is-planned">
+          <span class="tl-dot"></span>
+          <div class="tl-date">Planned</div>
+          <div class="tl-desc"><strong>UX research study</strong><span class="tl-sub">Direct input from users</span></div>
+        </div>
+        <div class="tl-span">
+          <span class="tl-span-arrow">&harr;</span>
+          <span class="tl-span-label">Ongoing KG improvements: richer representation + new data pulled in</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-slide="5">
+    <div class="frame">
+      <div class="hero">
+        <div class="hero-copy">
+          <div class="eyebrow"><span class="dot"></span>Funder Guidance</div>
+          <h2>We need to recommend the way domain experts want</h2>
+          <p class="lead">Just like IKEA's interior designers, our domain experts have a specific sense of what makes a tool the right one. This is a real example of what they are looking for when they search for tools.</p>
+        </div>
+      </div>
+
+      <div class="evidence-overlap">
+        <div class="evidence-note">
+          <h3>What this tells us</h3>
+          <ul class="note-list">
+            <li><strong>Reusable tool-criteria logic:</strong> capture what makes a tool fit once, then reuse that judgment for every recommendation.</li>
+            <li><strong>Search isn't enough:</strong> the current OpenSearch retrieval and faceting interface can't answer these questions.</li>
+            <li class="hl"><strong>Beyond search, into research:</strong> answering them takes synthesis and reasoning, not just retrieval.</li>
+          </ul>
+        </div>
+        <figure class="evidence-figure">
+          <img src="funder-guidance.png" alt="Screenshot of written notes shared by an external research funder. The notes lay out several real, complex example questions that domain experts want answered when they are searching for tools, the kind of questions that cannot be satisfied by simple keyword filtering or grouping, and instead need synthesis, interpretation, and supporting evidence."/>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-slide="6">
+    <div class="frame">
+      <div class="hero">
+        <div class="hero-copy">
+          <div class="eyebrow"><span class="dot"></span>How It Reasons</div>
+          <h2><span class="emph-both">Both</span> the ontology and the LLM contribute reasoning to help the user</h2>
+        </div>
+      </div>
+
+      <div class="diagram-wrap">
+        <svg viewBox="0 0 1200 650" role="img" aria-labelledby="reasonTitle reasonDesc" xmlns="http://www.w3.org/2000/svg">
+          <title id="reasonTitle">The ontology and the LLM both feed the Portal Assistant, which helps the user</title>
+          <desc id="reasonDesc">A three-tier diagram. At the top, two panels: on the left, "Deterministic and symbolic, the ontology," contributing invariant facts and relationships, auditable reasoning that traces the why, and knowledge encoded once and reused at scale; on the right, "Probabilistic and generative, the LLM," contributing interpretation of intent and context, synthesis across sources, and soft judgment and drafting. Arrows from both panels feed into a central node in the middle, the Portal Assistant, which notes that the ontology helps it reason the way we want. A final arrow flows down from the Portal Assistant to the outcome at the bottom: grounded, explained help for the user.</desc>
+
+          <defs>
+            <marker id="ah-teal" markerWidth="10" markerHeight="10" refX="7" refY="5" orient="auto">
+              <path d="M0,0 L8,5 L0,10 z" fill="#138f7a"/>
+            </marker>
+            <marker id="ah-sky" markerWidth="10" markerHeight="10" refX="7" refY="5" orient="auto">
+              <path d="M0,0 L8,5 L0,10 z" fill="#2f73d6"/>
+            </marker>
+            <marker id="ah-ink" markerWidth="10" markerHeight="10" refX="7" refY="5" orient="auto">
+              <path d="M0,0 L8,5 L0,10 z" fill="#4f647b"/>
+            </marker>
+          </defs>
+
+          <!-- LEFT PANEL: deterministic / symbolic -->
+          <rect x="100" y="46" width="440" height="252" rx="22" fill="rgba(19,143,122,0.06)" stroke="#138f7a" stroke-width="1.5"/>
+          <text x="132" y="90" font-size="15" font-weight="700" letter-spacing="2" fill="#138f7a">DETERMINISTIC &#183; SYMBOLIC</text>
+          <text x="132" y="132" font-size="30" font-weight="700" fill="#182433">The ontology</text>
+          <g>
+            <line x1="486" y1="76" x2="510" y2="70" stroke="#138f7a" stroke-width="1.6"/>
+            <line x1="486" y1="76" x2="496" y2="98" stroke="#138f7a" stroke-width="1.6"/>
+            <line x1="510" y1="70" x2="496" y2="98" stroke="#138f7a" stroke-width="1.6"/>
+            <circle cx="486" cy="76" r="5" fill="#ffffff" stroke="#138f7a" stroke-width="1.6"/>
+            <circle cx="510" cy="70" r="5" fill="#ffffff" stroke="#138f7a" stroke-width="1.6"/>
+            <circle cx="496" cy="98" r="5" fill="#ffffff" stroke="#138f7a" stroke-width="1.6"/>
+          </g>
+          <circle cx="140" cy="176" r="4" fill="#138f7a"/>
+          <text x="156" y="182" font-size="19" fill="#35506e">Invariant facts &amp; relationships</text>
+          <circle cx="140" cy="216" r="4" fill="#138f7a"/>
+          <text x="156" y="222" font-size="19" fill="#35506e">Auditable, it traces the &ldquo;why&rdquo;</text>
+          <circle cx="140" cy="256" r="4" fill="#138f7a"/>
+          <text x="156" y="262" font-size="19" fill="#35506e">Encode once, apply at scale</text>
+
+          <!-- RIGHT PANEL: probabilistic / generative -->
+          <rect x="660" y="46" width="440" height="252" rx="22" fill="rgba(47,115,214,0.06)" stroke="#2f73d6" stroke-width="1.5"/>
+          <text x="692" y="90" font-size="15" font-weight="700" letter-spacing="2" fill="#2f73d6">PROBABILISTIC &#183; GENERATIVE</text>
+          <text x="692" y="132" font-size="30" font-weight="700" fill="#182433">The LLM</text>
+          <path d="M1052,62 l6,17 l17,6 l-17,6 l-6,17 l-6,-17 l-17,-6 l17,-6 z" fill="#2f73d6" opacity="0.9"/>
+          <circle cx="700" cy="176" r="4" fill="#2f73d6"/>
+          <text x="716" y="182" font-size="19" fill="#35506e">Interprets intent &amp; context</text>
+          <circle cx="700" cy="216" r="4" fill="#2f73d6"/>
+          <text x="716" y="222" font-size="19" fill="#35506e">Synthesizes across sources</text>
+          <circle cx="700" cy="256" r="4" fill="#2f73d6"/>
+          <text x="716" y="262" font-size="19" fill="#35506e">Soft judgment &amp; drafting</text>
+
+          <!-- both sources feed the agent -->
+          <path d="M320,300 C330,356 392,398 434,404" fill="none" stroke="#138f7a" stroke-width="2.5" marker-end="url(#ah-teal)"/>
+          <path d="M880,300 C870,356 808,398 766,404" fill="none" stroke="#2f73d6" stroke-width="2.5" marker-end="url(#ah-sky)"/>
+
+          <!-- agent hub -->
+          <rect x="360" y="404" width="480" height="100" rx="26" fill="#ffffff" stroke="rgba(44,94,148,0.32)" stroke-width="1.6"/>
+          <g>
+            <ellipse cx="404" cy="438" rx="15" ry="6" fill="none" stroke="#4f647b" stroke-width="1.2" opacity="0.7" transform="rotate(0 404 438)"/>
+            <ellipse cx="404" cy="438" rx="15" ry="6" fill="none" stroke="#4f647b" stroke-width="1.2" opacity="0.7" transform="rotate(60 404 438)"/>
+            <ellipse cx="404" cy="438" rx="15" ry="6" fill="none" stroke="#4f647b" stroke-width="1.2" opacity="0.7" transform="rotate(120 404 438)"/>
+            <circle cx="404" cy="438" r="4.5" fill="#2c5e94"/>
+          </g>
+          <text x="434" y="445" font-size="22" font-weight="700" fill="#182433">Portal Assistant</text>
+          <text x="392" y="476" font-size="15" fill="#4f647b">The <tspan fill="#138f7a" font-weight="700">ontology</tspan> helps it reason the way we want</text>
+
+          <!-- agent to user -->
+          <path d="M600,506 L600,568" fill="none" stroke="#4f647b" stroke-width="2.5" marker-end="url(#ah-ink)"/>
+
+          <!-- outcome node -->
+          <rect x="350" y="572" width="500" height="72" rx="36" fill="#ffffff" stroke="rgba(44,94,148,0.25)" stroke-width="1.5"/>
+          <g transform="translate(396,608)" fill="none" stroke="#182433" stroke-width="2">
+            <circle cx="0" cy="-9" r="8"/>
+            <path d="M-14,15 a14,14 0 0,1 28,0"/>
+          </g>
+          <text x="430" y="615" font-size="20" font-weight="700" fill="#182433">Grounded, explained help for the user</text>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-slide="7">
+    <div class="frame">
+      <div class="hero">
+        <div class="hero-copy">
+          <div class="eyebrow"><span class="dot"></span>Deterministic &#183; Symbolic</div>
+          <h2>Symbolic reasoning: imported ontologies and our own</h2>
+          <p class="lead">When a requirement can be pinned to explicit criteria, we encode it once, importing an established ontology or building our own, so the category resolves consistently with auditable reasoning.</p>
+        </div>
+      </div>
+
+      <div class="dual-grid">
+        <div class="onto-card">
+          <span class="onto-tag ext">Imported ontology &#183; BAO</span>
+          <div>
+            <div class="onto-label">Requirement</div>
+            <code class="onto-req">metabolic pathway profiling</code>
+            <p class="onto-q">Which assays actually <strong>count</strong> as this?</p>
+          </div>
+          <figure class="onto-figure">
+            <img src="bioassay.png" alt="Screenshot of a biomedical journal article titled 'Advancing the bioassay ontology through integrated PK/PD and safety pharmacology representation,' published in the Journal of Biomedical Semantics in 2026. The abstract states that the latest release of the BioAssay Ontology (BAO), version 2.8.16, introduces major updates that expand its ability to describe and categorize assays related to pharmacokinetics, pharmacodynamics, and safety pharmacology. Shown as evidence that BAO is an actively maintained external ontology that defines assay types."/>
+          </figure>
+          <p class="onto-cap">The <strong>BioAssay Ontology (BAO)</strong> already defines and categorizes assay types, so the assistant can resolve exactly which assays qualify.</p>
+        </div>
+
+        <div class="onto-card">
+          <span class="onto-tag int">Our internal ontology</span>
+          <div>
+            <div class="onto-label">Requirement</div>
+            <code class="onto-req">pediatric-relevant model</code>
+            <p class="onto-q">What does that actually mean, <strong>per model type</strong>?</p>
+          </div>
+          <div class="reason-rows">
+            <div class="reason-row">
+              <span class="reason-attr">Cell lines</span>
+              <span class="reason-arrow">&rarr;</span>
+              <span class="reason-inf">check the age of the donor it was derived from</span>
+            </div>
+            <div class="reason-row">
+              <span class="reason-attr">Animal models</span>
+              <span class="reason-arrow">&rarr;</span>
+              <span class="reason-inf">check that disease manifestations occur in the developmental stage</span>
+            </div>
+          </div>
+          <p class="onto-payoff"><strong>Encode the rule once</strong> and the category populates automatically, with each entry carrying the reason why it qualifies.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-slide="8">
+    <div class="frame">
+      <div class="hero">
+        <div class="hero-copy">
+          <div class="eyebrow"><span class="dot"></span>Live Demo</div>
+          <h2>Questions for the Portal Assistant</h2>
+          <p class="lead">These prompts emphasize the portal assistant's strengths and special features. They ask for synthesis, deeper evidence, and guided next steps across multiple information sources.</p>
+        </div>
+      </div>
+
+      <div class="demo-grid">
+        <div class="prompt-stack">
+          <div class="prompt-card">
+            <div class="prompt-top">
+              <span class="prompt-title persona-drug">Prompt 1</span>
+              <button class="copy-btn" type="button">Copy</button>
+            </div>
+            <div class="prompt-card-body">
+              <div class="persona-col">
+                <div class="persona-label">Persona</div>
+                <div class="persona-badge persona-drug">Drug Discovery Researcher</div>
+                <div class="persona-why">Searching for validated resources to begin a screening campaign</div>
+              </div>
+              <div class="prompt-col">
+                <code>Which mpnst cell lines are suitable for drug screen?</code>
+              </div>
+            </div>
+          </div>
+
+          <div class="prompt-card">
+            <div class="prompt-top">
+              <span class="prompt-title persona-bench">Prompt 2</span>
+              <button class="copy-btn" type="button">Copy</button>
+            </div>
+            <div class="prompt-card-body">
+              <div class="persona-col">
+                <div class="persona-label">Persona</div>
+                <div class="persona-badge persona-bench">Bench Scientist</div>
+                <div class="persona-why">Finding matched pairs to isolate a single genetic variable</div>
+              </div>
+              <div class="prompt-col">
+                <code>I need isogenic cell line pairs that differ only in NF1 status</code>
+              </div>
+            </div>
+          </div>
+
+          <div class="prompt-card">
+            <div class="prompt-top">
+              <span class="prompt-title persona-gene">Prompt 3</span>
+              <button class="copy-btn" type="button">Copy</button>
+            </div>
+            <div class="prompt-card-body">
+              <div class="persona-col">
+                <div class="persona-label">Persona</div>
+                <div class="persona-badge persona-gene">Gene Therapy Developer</div>
+                <div class="persona-why">Connecting their approach to relevant biological models</div>
+              </div>
+              <div class="prompt-col">
+                <code>I work on exon skipping therapy, what models are relevant for me?</code>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="note-side">
+          <div class="note-panel-side">
+            <h3>Why this is not simply search</h3>
+            <p>Each prompt depends on assistant behaviors that go beyond fast ranked retrieval over indexed metadata.</p>
+            <ul class="note-list">
+              <li class="hl"><strong>Personalization and domain understanding:</strong> needs implict interpretation of question and results, comparative judgment.</li>
+              <li><strong>Cross-source synthesis:</strong> the answer needs information to be connected across entities and to other sources like literature.</li>
+              <li><strong>Reasoning:</strong> the assistant has to "do research" to find the right answer, which requires analytical steps.</li>
+              <li><strong>Guided action:</strong> useful output includes explanation and suggested next steps.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-slide="9">
+    <div class="frame">
+      <div class="hero">
+        <div class="hero-copy">
+          <div class="eyebrow"><span class="dot"></span>Live Demo</div>
+          <h2>Documentation, submissions, and staying in scope</h2>
+          <p class="lead">The same assistant also handles help-desk questions grounded in the portal's documentation, from licensing to access requests, while recognizing what falls outside its remit.</p>
+        </div>
+      </div>
+
+      <div class="demo-grid">
+        <div class="prompt-stack">
+          <div class="prompt-card">
+            <div class="prompt-top">
+              <span class="prompt-title persona-contrib">Prompt 1</span>
+              <button class="copy-btn" type="button">Copy</button>
+            </div>
+            <div class="prompt-card-body">
+              <div class="persona-col">
+                <div class="persona-label">Persona</div>
+                <div class="persona-badge persona-contrib">Data Contributor</div>
+                <div class="persona-why">Preparing to share data and needs the right license</div>
+              </div>
+              <div class="prompt-col">
+                <code>What license is recommended for non-human research data?</code>
+              </div>
+            </div>
+          </div>
+
+          <div class="prompt-card">
+            <div class="prompt-top">
+              <span class="prompt-title persona-reuse">Prompt 2</span>
+              <button class="copy-btn" type="button">Copy</button>
+            </div>
+            <div class="prompt-card-body">
+              <div class="persona-col">
+                <div class="persona-label">Persona</div>
+                <div class="persona-badge persona-reuse">Data Reuser</div>
+                <div class="persona-why">Wants to access data and needs the process</div>
+              </div>
+              <div class="prompt-col">
+                <code>How do I submit a data access request?</code>
+              </div>
+            </div>
+          </div>
+
+          <div class="prompt-card">
+            <div class="prompt-top">
+              <span class="prompt-title persona-reuse">Prompt 3</span>
+              <button class="copy-btn" type="button">Copy</button>
+            </div>
+            <div class="prompt-card-body">
+              <div class="persona-col">
+                <div class="persona-label">Persona</div>
+                <div class="persona-badge persona-reuse">Data Reuser</div>
+                <div class="persona-why">Needs help drafting a compelling request</div>
+              </div>
+              <div class="prompt-col">
+                <code>Can you help me write a good data access request?</code>
+              </div>
+            </div>
+          </div>
+
+          <div class="prompt-card">
+            <div class="prompt-top">
+              <span class="prompt-title persona-off">Prompt 4</span>
+              <button class="copy-btn" type="button">Copy</button>
+            </div>
+            <div class="prompt-card-body">
+              <div class="persona-col">
+                <div class="persona-label">Persona</div>
+                <div class="persona-badge persona-off">Off-topic</div>
+                <div class="persona-why">Testing the assistant's scope with an unrelated ask</div>
+              </div>
+              <div class="prompt-col">
+                <code>Can you also craft an interesting cookie recipe to try?</code>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="note-side">
+          <div class="note-panel-side">
+            <h3>A different kind of question</h3>
+            <p>These lean on the portal's help documentation, and the last one checks the assistant knows its scope.</p>
+            <ul class="note-list">
+              <li><strong>Docs grounding:</strong> license guidance and submission steps are answered in context, straight from the help docs.</li>
+              <li><strong>Drafting help:</strong> the assistant can help compose a strong access request, not just link to the form.</li>
+              <li class="hl"><strong>Stays on topic:</strong> an off-topic ask, like a cookie recipe, should be politely declined and redirected.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-slide="10">
+    <div class="frame">
+      <div class="hero">
+        <div class="hero-copy">
+          <div class="eyebrow"><span class="dot"></span>Portal Search &amp; Discovery Strategy</div>
+          <h2>OpenSearch and an AI Portal Copilot solve different classes of questions</h2>
+          <p class="lead">Two complementary efforts: better search for everyday discovery, and an assistant for the questions search cannot answer.</p>
+        </div>
+      </div>
+
+      <div class="comparison-grid">
+        <article class="panel search">
+          <div class="panel-head">
+            <div class="panel-tag">OpenSearch</div>
+            <span class="deliverable-badge">Deliverable 1.1.1</span>
+          </div>
+          <h3>Fast discovery over what is already indexed</h3>
+          <p class="panel-copy">The first pass: fast keyword and faceted search over existing portal data, at low cost.</p>
+          <ul class="feature-list">
+            <li>Fast lookups, filtering, and sorting</li>
+            <li>Autosuggest from current portal vocabulary</li>
+            <li>Semantic flexibility via synonyms and ranking</li>
+            <li>Low cost for everyday search traffic</li>
+          </ul>
+          <div class="mini-note">
+            <div class="mini-label">Best Fit</div>
+            <p>Known-item search, metadata lookups, and faceted browsing.</p>
+          </div>
+        </article>
+
+        <article class="panel agent">
+          <div class="panel-head">
+            <div class="panel-tag">AI Portal Assistant</div>
+            <span class="deliverable-badge">Deliverable 1.1.2</span>
+          </div>
+          <h3>For answers that must be assembled, compared, or acted on</h3>
+          <p class="panel-copy">An agent over the knowledge graph and publications, answering what search cannot.</p>
+          <ul class="feature-list">
+            <li>Cross-source synthesis, including the knowledge graph</li>
+            <li>Uses publications not indexed in OpenSearch</li>
+            <li>Multi-step reasoning, aggregation, and comparison</li>
+            <li>Suggests next steps and can act on your behalf</li>
+          </ul>
+          <div class="mini-note">
+            <div class="mini-label">Best Fit</div>
+            <p>Synthesis, comparisons, explanation-heavy and guided workflows.</p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<div class="deck-progress"></div>
+<div class="deck-slide-num"></div>
+
+</div><!-- /.deck-stage -->
+</div><!-- /.deck-embed -->
+
+<script>
+(function () {
+  var embed = document.getElementById("deck-embed");
+  var slides = embed.querySelectorAll(".slide");
+  var total = slides.length;
+  var cur = 0;
+
+  var m = /slide=(\d+)/.exec(location.hash);
+  if (m) {
+    var idx = parseInt(m[1], 10);
+    if (idx >= 0 && idx < total && idx !== cur) {
+      slides[cur].classList.remove("active");
+      cur = idx;
+      slides[cur].classList.add("active");
+    }
+  }
+
+  function updateStatus() {
+    embed.querySelector(".deck-slide-num").textContent = (cur + 1) + " / " + total;
+    embed.querySelector(".deck-progress").style.width = ((cur / (total - 1)) * 100) + "%";
+  }
+
+  function go(n) {
+    if (n < 0 || n >= total || n === cur) return;
+    var prev = cur;
+    slides[prev].classList.remove("active");
+    slides[prev].classList.add("exit");
+    cur = n;
+    slides[cur].classList.add("active");
+    setTimeout(function () {
+      slides[prev].classList.remove("exit");
+    }, 460);
+    updateStatus();
+  }
+
+  function deckHasFocus(e) {
+    var t = e.target;
+    if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return false;
+    var r = embed.getBoundingClientRect();
+    if (r.width === 0 || r.height === 0) return false;
+    return r.bottom > 0 && r.right > 0 &&
+           r.top < (window.innerHeight || 0) && r.left < (window.innerWidth || 0);
+  }
+
+  document.addEventListener("keydown", function (e) {
+    if (!deckHasFocus(e)) return;
+    if (e.key === "ArrowRight" || e.key === " ") {
+      e.preventDefault();
+      go(cur + 1);
+    }
+    if (e.key === "ArrowLeft") {
+      e.preventDefault();
+      go(cur - 1);
+    }
+    if (e.key === "Home") {
+      e.preventDefault();
+      go(0);
+    }
+    if (e.key === "End") {
+      e.preventDefault();
+      go(total - 1);
+    }
+  });
+
+  embed.querySelectorAll(".copy-btn").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var card = btn.closest(".prompt-card");
+      var code = card ? card.querySelector("code") : null;
+      if (!code) return;
+      var original = btn.textContent;
+      navigator.clipboard.writeText(code.textContent.trim()).then(function () {
+        btn.textContent = "Copied";
+        setTimeout(function () { btn.textContent = original; }, 1200);
+      });
+    });
+  });
+
+  updateStatus();
+
+  /* ---- fit the fixed stage to whatever container this lands in ---- */
+
+  var BASE_W = 1440;
+  var BASE_H = 810;
+
+  var fitting = false;
+
+  function fit() {
+    if (fitting) return;
+    fitting = true;
+    try { measure(); } finally { fitting = false; }
+  }
+
+  function measure() {
+    // Width comes from the container; height is ours to dictate. Setting it
+    // explicitly means the deck cannot grow the container even if the host's
+    // CSS overrides aspect-ratio.
+    var width = embed.getBoundingClientRect().width;
+    if (!width) return;
+
+    var parent = embed.parentElement;
+    var parentH = parent ? parent.clientHeight : 0;
+    var wanted = width * (BASE_H / BASE_W);
+    if (parentH && parentH < wanted && parent !== document.body) wanted = parentH;
+    embed.style.height = wanted + "px";
+
+    var rect = embed.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+
+    // rem units inside the stage resolve against the HOST page's root
+    // font-size. Rescale the design canvas by the same factor so the deck
+    // renders identically no matter what the host sets.
+    var rootPx = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+    var k = 16 / rootPx;
+    var stageW = BASE_W * k;
+    var stageH = BASE_H * k;
+
+    var scale = Math.min(rect.width / stageW, rect.height / stageH);
+
+    embed.style.setProperty("--stage-w", stageW);
+    embed.style.setProperty("--stage-h", stageH);
+    embed.style.setProperty("--stage-scale", scale);
+    embed.style.setProperty("--stage-x", ((rect.width - stageW * scale) / 2) + "px");
+    embed.style.setProperty("--stage-y", ((rect.height - stageH * scale) / 2) + "px");
+    embed.classList.add("is-measured");
+  }
+
+  // Only touch the host document when this file clearly IS the page.
+  var strays = Array.prototype.filter.call(document.body.children, function (el) {
+    return el !== embed && !/^(SCRIPT|STYLE|LINK|TEMPLATE|NOSCRIPT)$/.test(el.tagName);
+  });
+  if (strays.length === 0) {
+    document.body.style.margin = "0";
+    document.body.style.minHeight = "100vh";
+    document.body.style.display = "flex";
+    document.body.style.alignItems = "center";
+    embed.style.maxHeight = "100vh";
+  }
+
+  if (typeof ResizeObserver === "function") {
+    new ResizeObserver(fit).observe(embed);
+  }
+  window.addEventListener("resize", fit);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+  fit();
+})();
+</script>
+</body>
+</html>
