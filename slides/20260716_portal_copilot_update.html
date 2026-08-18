@@ -5,6 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>NF Portal Assistant</title>
 <style>
+/* This file is always loaded as an isolated document (iframe srcDoc), never
+   innerHTML'd into a host page, so it's safe to touch html/body directly
+   here. Keeping them overflow:hidden means this document's own viewport
+   can never grow a scrollbar as content settles — hosts that resize the
+   iframe by polling this document's scrollHeight (e.g. Synapse Wiki's
+   HtmlPreview widget) would otherwise see that scrollbar's width nudge
+   layout/scrollHeight on every poll and feed a runaway growth loop. */
+html,body{overflow:hidden}
+
 .deck-embed,
 .deck-embed *,
 .deck-embed *::before,
@@ -1954,18 +1963,14 @@
   }
 
   function measure() {
-    // Width comes from the container; height is ours to dictate. Setting it
-    // explicitly means the deck cannot grow the container even if the host's
-    // CSS overrides aspect-ratio.
-    var width = embed.getBoundingClientRect().width;
-    if (!width) return;
-
-    var parent = embed.parentElement;
-    var parentH = parent ? parent.clientHeight : 0;
-    var wanted = width * (BASE_H / BASE_W);
-    if (parentH && parentH < wanted && parent !== document.body) wanted = parentH;
-    embed.style.height = wanted + "px";
-
+    // Read-only: the embed's own box is sized entirely by its CSS
+    // (width:100% + aspect-ratio), never written here. `embed` is the
+    // element the ResizeObserver below watches — if this function wrote
+    // back to its height, that write would itself trigger another resize
+    // callback, and when the host's container sizes itself to its content
+    // (its height following the embed's), the two chase each other and the
+    // deck visibly resizes/drifts once embedded. Only descendants get
+    // written to, never the observed element itself.
     var rect = embed.getBoundingClientRect();
     if (!rect.width || !rect.height) return;
 
@@ -1987,11 +1992,16 @@
     embed.classList.add("is-measured");
   }
 
-  // Only touch the host document when this file clearly IS the page.
-  var strays = Array.prototype.filter.call(document.body.children, function (el) {
-    return el !== embed && !/^(SCRIPT|STYLE|LINK|TEMPLATE|NOSCRIPT)$/.test(el.tagName);
-  });
-  if (strays.length === 0) {
+  // Only apply full-page centering when a human opened this file directly
+  // as the top-level page — never when embedded in an iframe. Setting
+  // body's min-height (or this element's max-height) to 100vh while this
+  // document is itself inside an iframe whose height a host resizes to fit
+  // this same body's scrollHeight (e.g. Synapse Wiki's HtmlPreview widget)
+  // creates a closed loop: iframe grows -> 100vh grows -> min-height grows
+  // -> scrollHeight grows -> host grows the iframe again, forever. Counting
+  // sibling elements can't tell "alone in an iframe" apart from "the whole
+  // page" — window.top === window.self can, and never throws cross-origin.
+  if (window.top === window.self) {
     document.body.style.margin = "0";
     document.body.style.minHeight = "100vh";
     document.body.style.display = "flex";
