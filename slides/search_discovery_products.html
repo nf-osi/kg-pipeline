@@ -27,9 +27,19 @@
   --shadow:0 24px 80px rgba(25,50,80,.10);
 }
 
-html,body{
-  height:100%;
+/* ── EMBED ROOT: everything is scoped to this element instead of
+   html/body or the viewport, so dropping this markup into another
+   page's innerHTML (no iframe) can't leak styles onto the host page
+   or let the deck drift with the host page's own scroll/resize.
+   width:100% + aspect-ratio gives it an intrinsic size either way,
+   standalone (fills the window) or embedded (fills its container) —
+   no viewport-height dependency needed. ── */
+.deck{
+  position:relative;
+  width:100%;
+  aspect-ratio:16/9;
   overflow:hidden;
+  margin-inline:auto;
   font-family:"Avenir Next","Trebuchet MS","Segoe UI",sans-serif;
   background:
     radial-gradient(circle at top left, rgba(47,115,214,.12), transparent 28%),
@@ -39,10 +49,10 @@ html,body{
   color:var(--text);
 }
 
-body::before,
-body::after{
+.deck::before,
+.deck::after{
   content:"";
-  position:fixed;
+  position:absolute;
   inset:auto;
   border-radius:999px;
   pointer-events:none;
@@ -50,7 +60,7 @@ body::after{
   opacity:.75;
 }
 
-body::before{
+.deck::before{
   width:22rem;
   height:22rem;
   right:-6rem;
@@ -58,15 +68,13 @@ body::before{
   background:radial-gradient(circle, rgba(47,115,214,.14), transparent 70%);
 }
 
-body::after{
+.deck::after{
   width:24rem;
   height:24rem;
   left:-7rem;
   bottom:-8rem;
   background:radial-gradient(circle, rgba(19,143,122,.10), transparent 70%);
 }
-
-.deck{position:relative;width:100%;height:100%}
 .slide{
   position:absolute;
   inset:0;
@@ -1020,7 +1028,7 @@ code{
 }
 
 #progress{
-  position:fixed;
+  position:absolute;
   bottom:0;
   left:0;
   height:3px;
@@ -1030,7 +1038,7 @@ code{
 }
 
 #slide-num{
-  position:fixed;
+  position:absolute;
   right:1.25rem;
   bottom:1rem;
   font-size:.82rem;
@@ -1040,7 +1048,7 @@ code{
 }
 
 @media (max-width: 1100px){
-  html,body{overflow:auto}
+  .deck{overflow:auto}
   .slide{position:relative;min-height:100vh;opacity:1;pointer-events:auto;transform:none}
   .slide + .slide{margin-top:1rem}
   .hero,
@@ -1088,8 +1096,8 @@ code{
     print-color-adjust:exact;
   }
 
-  body::before,
-  body::after,
+  .deck::before,
+  .deck::after,
   #progress,
   #slide-num{
     display:none !important;
@@ -1659,10 +1667,10 @@ code{
     </div>
   </section>
 
-</div>
-
 <div id="progress"></div>
 <div id="slide-num"></div>
+
+</div>
 
 <script>
 (function () {
