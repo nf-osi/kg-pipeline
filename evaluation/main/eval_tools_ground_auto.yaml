@@ -1,11 +1,17 @@
 metadata:
-  generated_at: '2026-05-26T22:36:55.737788'
+  generated_at: '2026-08-18T22:56:49.787822'
   skipped_questions:
   - AM-004
   - CL-003
   - CR-001
   - CR-004
-  total_questions: 40
+  - PUB-001
+  - PUB-002
+  - PUB-003
+  - PUB-004
+  - PUB-005
+  - PUB-006
+  total_questions: 46
   generated_questions: 36
 ground_truth:
   AB-001:

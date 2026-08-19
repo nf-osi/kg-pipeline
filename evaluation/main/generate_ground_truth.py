@@ -9,6 +9,16 @@ DATA_DIR = '../data/csv'
 DATASET_ATTRIBUTES_FILE = 'dataset_attributes.yaml'
 OUTPUT_FILE = 'eval_tools_ground_auto.yaml'
 
+# Predicate for "is this sample human".
+#
+# Matches "Homo sapiens" or a standalone "Human", including inside multi-valued
+# cells such as "Rattus norvegicus,Homo sapiens" and "Homo sapiens|Mus musculus".
+#
+# The word boundaries are the point. A plain substring alternation also matches
+# "Mus musculus (humanized)", so humanized mouse samples were counted as human.
+# \b prevents that: there is no word boundary between "human" and "ized".
+HUMAN_SPECIES_PATTERN = r'\b(?:Homo sapiens|Human)\b'
+
 def load_data():
     data = {}
     # New filenames without portal_ prefix
@@ -341,7 +351,7 @@ def run_queries(data):
         df = cells_donors
         ped_human = df[
             df['age'].apply(is_pediatric) &
-            df['species'].str.contains('Homo sapiens|Human', case=False, na=False)
+            df['species'].str.contains(HUMAN_SPECIES_PATTERN, case=False, na=False)
         ]
         results['CL-005'] = ensure_resource_id(ped_human['cellLineId'].tolist())
 
@@ -350,7 +360,7 @@ def run_queries(data):
         df = cells_donors
         matches = df[
             (df['organ'].str.contains('Lung', case=False, na=False)) &
-            (df['species'].str.contains('Homo sapiens|Human', case=False, na=False))
+            (df['species'].str.contains(HUMAN_SPECIES_PATTERN, case=False, na=False))
         ]
         results['CL-006'] = ensure_resource_id(matches['cellLineId'].tolist())
 
@@ -491,7 +501,7 @@ def run_queries(data):
     # CR-002: Human cell line with most diverse data types
     if not data['files'].empty:
         files = data['files']
-        human_files = files[files['species'].str.contains('Homo sapiens|Human', case=False, na=False)]
+        human_files = files[files['species'].str.contains(HUMAN_SPECIES_PATTERN, case=False, na=False)]
         stats = human_files.groupby('modelSystemName')['dataType'].nunique()
         if not stats.empty:
             max_diverse = stats.max()
@@ -525,7 +535,7 @@ def run_queries(data):
     if not data['files'].empty:
         wgs_human_female = data['files'][
             (data['files']['assay'].str.contains('whole genome sequencing', case=False, na=False)) &
-            (data['files']['species'].str.contains('Homo sapiens|Human', case=False, na=False)) &
+            (data['files']['species'].str.contains(HUMAN_SPECIES_PATTERN, case=False, na=False)) &
             (data['files']['sex'].str.contains('Female', case=False, na=False))
         ]
         ids = sorted(set(wgs_human_female['studyId'].dropna()))

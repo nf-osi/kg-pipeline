@@ -187,6 +187,19 @@ def generate_readme(data, stats):
         if version:
             lines.append(f"**Dataset Version**: {version}\n")
 
+        # `data_archive` was retired in favour of naming a profile in
+        # data_sources.yaml, which carries the archive ids. Emit whichever the
+        # dataset declares so the README always records its data provenance.
+        profile = metadata.get('data_sources_profile')
+        sources_version = metadata.get('data_sources_version')
+        if profile or sources_version:
+            parts = []
+            if sources_version:
+                parts.append(f"**{sources_version}**")
+            if profile:
+                parts.append(f"`{profile}` profile in `data_sources.yaml`")
+            lines.append("Built against " + ", ".join(parts) + "\n")
+
         data_archive = metadata.get('data_archive')
         if data_archive:
             lines.append(f"Data archived at **{data_archive}**\n")
