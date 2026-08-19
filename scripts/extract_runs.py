@@ -155,13 +155,134 @@ def _duration_seconds(start: str | None, end: str | None) -> float | None:
         return None
 
 
+def _load_flat_eval_runs(
+    log_root: Path,
+    question_meta: QuestionMeta,
+) -> list[RunSummary]:
+    """Load nf_rag results from flat .eval archive files.
+
+    Current inspect_ai versions write a single .eval archive per run instead
+    of the directory-per-run layout (summary_stats.json/scores.json/header.json)
+    that the loop below expects, so runs produced by plain `inspect eval`
+    (e.g. via scripts/astabench.py or scripts/quick_eval.py) land here.
+    """
+    from inspect_ai.log import read_eval_log
+
+    runs: list[RunSummary] = []
+    for eval_file in sorted(log_root.glob("*.eval")):
+        try:
+            log = read_eval_log(str(eval_file))
+        except Exception as exc:
+            print(f"Skipping {eval_file}: failed to read ({exc})", file=sys.stderr)
+            continue
+
+        if log.eval.task != "astabench/nf_rag":
+            continue  # nf_rag_pubs and other tasks belong in load_pubs_runs, not here
+
+        model = log.eval.model
+        task_version = (
+            str(log.eval.task_version) if log.eval.task_version is not None else None
+        )
+        git_commit = log.eval.revision.commit if log.eval.revision else None
+
+        started_at = getattr(log.stats, "started_at", None) if log.stats else None
+        completed_at = getattr(log.stats, "completed_at", None) if log.stats else None
+
+        overall_score = None
+        score_stderr = None
+        if log.results and log.results.scores:
+            metrics = log.results.scores[0].metrics
+            if "f1" in metrics:
+                overall_score = metrics["f1"].value
+            elif "accuracy" in metrics:
+                overall_score = metrics["accuracy"].value
+            if "stderr" in metrics:
+                score_stderr = metrics["stderr"].value
+
+        input_tokens = output_tokens = cache_write_tokens = None
+        cache_read_tokens = total_tokens = None
+        cost = None
+        if log.stats and log.stats.model_usage:
+            usage = log.stats.model_usage.get(model)
+            if usage:
+                input_tokens = usage.input_tokens or 0
+                output_tokens = usage.output_tokens or 0
+                cache_write_tokens = usage.input_tokens_cache_write or 0
+                cache_read_tokens = usage.input_tokens_cache_read or 0
+                total_tokens = usage.total_tokens or 0
+                cost = _compute_cost(model, usage)
+
+        min_sample_time = max_sample_time = avg_sample_time = None
+        summaries_data: list[dict] = []
+        if log.samples:
+            times = [s.total_time for s in log.samples if s.total_time is not None]
+            if times:
+                min_sample_time = min(times)
+                max_sample_time = max(times)
+                avg_sample_time = sum(times) / len(times)
+            for s in log.samples:
+                summaries_data.append(
+                    {
+                        "id": s.id,
+                        "scores": {
+                            name: {"value": sc.value}
+                            for name, sc in (s.scores or {}).items()
+                        },
+                        "metadata": s.metadata or {},
+                    }
+                )
+
+        (
+            difficulty_scores,
+            category_scores,
+            frustration_scores,
+            frustration_samples,
+            level_samples,
+            complexity_samples,
+        ) = _compute_sample_breakdowns(summaries_data, question_meta)
+
+        runs.append(
+            RunSummary(
+                name=eval_file.stem,
+                model=model,
+                solver=log.eval.solver,
+                overall_score=overall_score,
+                overall_cost=cost,
+                summary_path=eval_file,
+                started_at=started_at,
+                completed_at=completed_at,
+                total_samples=len(log.samples) if log.samples else 0,
+                git_commit=git_commit,
+                task_name=log.eval.task,
+                task_version=task_version,
+                score_stderr=score_stderr,
+                min_sample_time=min_sample_time,
+                max_sample_time=max_sample_time,
+                avg_sample_time=avg_sample_time,
+                input_tokens=input_tokens,
+                output_tokens=output_tokens,
+                cache_write_tokens=cache_write_tokens,
+                cache_read_tokens=cache_read_tokens,
+                total_tokens=total_tokens,
+                difficulty_scores=difficulty_scores,
+                category_scores=category_scores,
+                frustration_scores=frustration_scores,
+                frustration_samples=frustration_samples,
+                level_samples=level_samples,
+                complexity_samples=complexity_samples,
+                task_stats={},
+            )
+        )
+    return runs
+
+
 def load_runs(
     log_root: Path,
     question_meta: QuestionMeta,
 ) -> list[RunSummary]:
     from inspect_ai.log import read_eval_log
 
-    runs: list[RunSummary] = []
+    runs: list[RunSummary] = list(_load_flat_eval_runs(log_root, question_meta))
     for run_dir in sorted(log_root.iterdir()):
         if not run_dir.is_dir():
             continue

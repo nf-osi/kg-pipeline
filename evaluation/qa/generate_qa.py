@@ -66,9 +66,9 @@ OUTPUT_DIR = Path(__file__).resolve().parent
 
 SEED = 42
 N_PAPERS = 15
-ANTHROPIC_MODEL = "claude-opus-4-6"
+ANTHROPIC_MODEL = "claude-opus-5"
 GOOGLE_MODEL = "gemini-3.1-pro-preview"
-OPENAI_MODEL = "gpt-5.4"
+OPENAI_MODEL = "gpt-5.6-luna"
 MAX_TOKENS = 8192
 MAX_RETRIES = 3
 RETRY_DELAY = 30  # seconds
