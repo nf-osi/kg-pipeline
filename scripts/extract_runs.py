@@ -424,6 +424,33 @@ def load_runs(
     return runs
 
 
+# The 6 PUB questions were added to the ground truth in #75 without bumping the
+# dataset version, so runs that executed the 46-question set still report
+# task_version v1.2 from their eval log. That set is what the changelog calls
+# v1.3, and correcting the label here means it survives re-extraction rather
+# than needing a hand-edit of runs.json each time.
+#
+# The marker is category/PUB, which the harness derives from per-sample metadata
+# in the log. It is therefore independent of dataset_attributes.yaml, and works
+# whether or not the PUB attributes are present. A sample count would not do:
+# most of these are targeted development runs covering one or two questions.
+#
+# Runs that predate PUB keep their label -- the May 2026 ST-only development run
+# is genuinely v1.2.
+_MISLABELLED_VERSION = "v1.2"
+_CORRECTED_VERSION = "v1.3"
+_CORRECTED_VERSION_MARKER = "category/PUB"
+
+
+def corrected_task_version(run: RunSummary) -> str | None:
+    """The dataset version a run actually executed, not the one it reported."""
+    if run.task_version != _MISLABELLED_VERSION:
+        return run.task_version
+    if _CORRECTED_VERSION_MARKER in (run.category_scores or {}):
+        return _CORRECTED_VERSION
+    return run.task_version
+
+
 def run_to_dict(run: RunSummary) -> dict:
     """Serialize RunSummary to JSON dict."""
     return {
@@ -433,7 +460,7 @@ def run_to_dict(run: RunSummary) -> dict:
         "score": run.overall_score,
         "cost": run.overall_cost,
         "task_name": run.task_name,
-        "task_version": run.task_version,
+        "task_version": corrected_task_version(run),
         "total_samples": run.total_samples,
         "started_at": run.started_at,
         "completed_at": run.completed_at,

@@ -24,6 +24,11 @@ that counted humanized mouse samples as human.
   - CR-004 was not cosmetic drift: the attribute file offered lettered options `(A) Yes (B) No …`, while the prompt in use asks for the exact phrase. An agent answering "A" would fail the phrase-containment scorer, so promoting that wording into the ground truth would have broken the item
   - AM-004's attribute wording ("Which mouse model has…?") reads better than the prompt in use ("Find mouse model with…"). Improving the prompt itself is a deliberate change that would invalidate recorded runs, so it is deliberately not done here
 
+- **Runs that executed the v1.3 set reported v1.2.** Because the PUB questions predate the version bump, their eval logs carry `task_version: v1.2`. `extract_runs.py` now corrects this when writing `runs.json`
+  - Keyed on `category/PUB`, which the harness derives from per-sample metadata in the log. That makes the rule independent of `dataset_attributes.yaml`, so it holds whether or not the PUB attributes are present, and a sample count would not work since most of these are targeted development runs covering one or two questions
+  - 19 runs relabelled v1.2 → v1.3; the 2026-05-27 ST-only development run correctly keeps v1.2. No other field on any run changes
+  - Done in the extractor rather than by editing `runs.json`, so it survives re-extraction
+
 ### Changed
 - `complexity` now uses **3-hop** for the first time. PUB-003 and PUB-005 traverse Synapse profile → ORCID → DOI before filtering, one hop further than anything earlier
 - New personas in `user_story`: **Portal Contributor** (PUB-003, PUB-005) and **Data Curator** (PUB-004)
@@ -61,10 +66,11 @@ that counted humanized mouse samples as human.
 - **Manual ground truth:** AM-004, CL-003, CR-001, CR-004 (unchanged)
 
 > **Note on runs reporting v1.2.** The 6 PUB questions were added to the ground
-> truth in #75 without a version bump, so runs recorded from 2026-07-25 onward
-> report `task_version: v1.2` while already executing 46 questions. v1.3 is the
-> first version to declare that set. Treat v1.2 runs with 46 samples as v1.3
-> content.
+> truth in #75 without a version bump, so eval logs from 2026-07-25 onward record
+> `task_version: v1.2` while already executing the 46-question set. v1.3 is the
+> first version to declare that set, and `extract_runs.py` now corrects the label
+> when writing `runs.json`, so those 19 runs report v1.3. The one genuine v1.2
+> run — an ST-only development run from 2026-05-27 — keeps its label.
 
 ## [v1.1] - 2026-04-17
 
