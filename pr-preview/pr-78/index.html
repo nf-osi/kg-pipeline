@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>NF Knowledge Graph Evaluation</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      max-width: 900px;
+      margin: 3rem auto;
+      padding: 0 2rem;
+      line-height: 1.6;
+    }
+    h1 { color: #1976d2; margin-bottom: 0.5rem; }
+    .subtitle { color: #666; margin-top: 0; }
+    .dashboards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+    .card {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 2rem;
+      background: #f9f9f9;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .card h2 { margin-top: 0; color: #1976d2; }
+    .card p { color: #555; margin: 1rem 0; }
+    .card a {
+      display: inline-block;
+      padding: 0.75rem 1.5rem;
+      background: #1976d2;
+      color: white;
+      text-decoration: none;
+      border-radius: 4px;
+      font-weight: 600;
+      margin-top: 1rem;
+    }
+    .card a:hover {
+      background: #1565c0;
+    }
+    footer { margin-top: 3rem; padding-top: 2rem; border-top: 1px solid #ddd; color: #666; font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+  <h1>NF Knowledge Graph Evaluation</h1>
+  <p class="subtitle">Model performance benchmarks for neurofibromatosis research tools</p>
+
+  <div class="dashboards">
+    <div class="card">
+      <h2>Research Tools Discovery</h2>
+      <p>Structured SPARQL queries against the Synapse portal knowledge graph. Evaluates recall for discovering datasets, publications, tools, and cross-resource linkages.</p>
+      <p><strong>Task:</strong> <code>nf_rag</code><br>
+      <strong>Metrics:</strong> Recall by difficulty, complexity, and resource category</p>
+      <a href="main.html">View Dashboard →</a>
+    </div>
+
+    <div class="card">
+      <h2>Publication QA</h2>
+      <p>Question answering over full-text biomedical literature using SPARQL+Text retrieval. Evaluates accuracy and citation attribution across diverse question types.</p>
+      <p><strong>Task:</strong> <code>nf_rag_pubs</code><br>
+      <strong>Metrics:</strong> Accuracy, Citation F1</p>
+      <a href="pubs.html">View Dashboard →</a>
+    </div>
+  </div>
+
+  <footer>
+    Generated 2026-08-19 22:28 UTC &mdash;
+    <a href="https://github.com/nf-osi/kg-pipeline">kg-pipeline</a> |
+    <a href="https://github.com/nf-osi/asta-bench">asta-bench</a>
+  </footer>
+</body>
+</html>

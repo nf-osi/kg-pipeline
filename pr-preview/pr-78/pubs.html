@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>NF Publication RAG Evaluation</title>
+  <style>
+    body { font-family: sans-serif; margin: 2rem; }
+    table { border-collapse: collapse; width: 100%; margin-bottom: 2rem; }
+    th, td { border: 1px solid #ccc; padding: 0.5rem; text-align: left; }
+    th { font-weight: 600; cursor: pointer; }
+    /* Column group colors for better readability */
+    th.info { background: #e3f2fd; }     /* Run info: soft blue */
+    th.metrics { background: #c8e6c9; }  /* Accuracy, F1: emphasized green */
+    th.cost { background: #fff3e0; }     /* Cost: soft amber */
+    th.time { background: #f3e5f5; }     /* Timing: soft purple */
+    th.meta { background: #f5f5f5; }     /* Metadata: light gray */
+    .charts { display: flex; flex-wrap: wrap; gap: 2rem; justify-content: center; }
+    .charts figure { margin: 0; text-align: center; }
+    .charts figcaption { font-weight: bold; margin-bottom: 0.5rem; }
+    canvas { border: 1px solid #eee; }
+    em { color: #e65100; }
+    #token-toggle { margin-bottom: 1rem; padding: 0.5rem 1rem; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <h1>NF Publication RAG Evaluation</h1>
+  <p>Generated 2026-08-19 22:28 UTC &mdash; 130 questions across 14 papers</p>
+
+  <h2>Summary</h2>
+  <p><strong>Accuracy</strong> measures whether the agent selected the correct answer from the multiple-choice options.
+  <strong>Citation F1</strong> measures how well the agent cited the correct supporting passages (PMID + passage index tuples) &mdash;
+  precision is the fraction of cited passages that are relevant, and recall is the fraction of expected passages that were cited.</p>
+  <p><strong>Note:</strong> Charts below show results for the <em>user_query</em> question style only.
+  Performance is similar for both <em>precise</em> and <em>user_query</em> styles, but <em>user_query</em> better reflects realistic user interactions with natural phrasing and ambiguity.</p>
+  <button id="token-toggle">Show Token Details</button>
+  <table id="runs-table">
+    <thead>
+      <tr>
+        <th class="info">Model</th>
+        <th class="info">Question Style</th>
+        <th class="info">Samples</th>
+        <th class="metrics">Accuracy</th>
+        <th class="metrics">Citation F1</th>
+        <th class="cost">Total Cost (USD)</th>
+        <th class='token-col cost'>Input Tokens</th>
+        <th class='token-col cost'>Output Tokens</th>
+        <th class='token-col cost'>Cache Write</th>
+        <th class='token-col cost'>Cache Read</th>
+        <th class='token-col cost'>Total Tokens</th>
+        <th class="time">Total Time</th>
+        <th class="time">Avg / Sample</th>
+        <th class="time">Shortest</th>
+        <th class="time">Longest</th>
+        <th class="meta">Date</th>
+        <th class="meta">Task Dataset Version</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>anthropic/claude-sonnet-4-5</td><td>precise</td><td>130</td><td><strong>0.9923 &plusmn; 0.0077</strong></td><td><strong>0.7717 &plusmn; 0.0208</strong></td><td>$18.63</td><td class='token-col'>4,423</td><td class='token-col'>141,022</td><td class='token-col'>3,279,840</td><td class='token-col'>13,990,883</td><td class='token-col'>17,416,168</td><td>7m 23s</td><td>0m 30s</td><td>0m 08s</td><td>1m 23s</td><td>2026-03-17</td><td>v0</td></tr>
+<tr><td>anthropic/claude-haiku-4-5</td><td>precise</td><td>130</td><td>0.9615 &plusmn; 0.0169</td><td>0.6888 &plusmn; 0.0288</td><td>$4.69</td><td class='token-col'>428,108</td><td class='token-col'>125,762</td><td class='token-col'>2,378,880</td><td class='token-col'>6,615,404</td><td class='token-col'>9,548,154</td><td>3m 06s</td><td>0m 12s</td><td>0m 03s</td><td>1m 15s</td><td>2026-03-17</td><td>v0</td></tr>
+<tr><td>anthropic/claude-haiku-4-5</td><td>user_query</td><td>130</td><td>0.9692 &plusmn; 0.0152</td><td>0.6383 &plusmn; 0.0320</td><td>$4.93</td><td class='token-col'>373,712</td><td class='token-col'>133,684</td><td class='token-col'>2,546,536</td><td class='token-col'>7,064,397</td><td class='token-col'>10,118,329</td><td>2m 54s</td><td>0m 12s</td><td>0m 03s</td><td>1m 31s</td><td>2026-03-17</td><td>v0</td></tr>
+<tr><td>anthropic/claude-sonnet-4-5</td><td>user_query</td><td>130</td><td>0.9846 &plusmn; 0.0108</td><td>0.7403 &plusmn; 0.0232</td><td>$19.33</td><td class='token-col'>4,505</td><td class='token-col'>142,830</td><td class='token-col'>3,384,474</td><td class='token-col'>14,939,587</td><td class='token-col'>18,471,396</td><td>7m 35s</td><td>0m 32s</td><td>0m 08s</td><td>1m 43s</td><td>2026-03-17</td><td>v0</td></tr>
+<tr><td>openai/gpt-5.4</td><td>precise</td><td>130</td><td>0.9846 &plusmn; 0.0108</td><td>0.7303 &plusmn; 0.0255</td><td>$4.34</td><td class='token-col'>1,360,860</td><td class='token-col'>56,360</td><td class='token-col'>0</td><td class='token-col'>354,688</td><td class='token-col'>1,417,220</td><td>2m 00s</td><td>0m 07s</td><td>0m 02s</td><td>0m 37s</td><td>2026-03-17</td><td>v0</td></tr>
+<tr><td>openai/gpt-5.4</td><td>user_query</td><td>130</td><td><strong>0.9923 &plusmn; 0.0077</strong></td><td>0.7087 &plusmn; 0.0262</td><td>$5.00</td><td class='token-col'>1,600,970</td><td class='token-col'>61,405</td><td class='token-col'>0</td><td class='token-col'>325,760</td><td class='token-col'>1,662,375</td><td>1m 49s</td><td>0m 08s</td><td>0m 03s</td><td>0m 30s</td><td>2026-03-17</td><td>v0</td></tr>
+    </tbody>
+  </table>
+
+  <div class="charts">
+    <figure>
+      <figcaption>Cost vs Accuracy</figcaption>
+      <canvas id="cost-acc-chart" width="720" height="420"></canvas>
+    </figure>
+    <figure>
+      <figcaption>Time vs Accuracy</figcaption>
+      <canvas id="time-acc-chart" width="720" height="420"></canvas>
+    </figure>
+    <figure>
+      <figcaption>Cost vs Citation F1</figcaption>
+      <canvas id="cost-f1-chart" width="720" height="420"></canvas>
+    </figure>
+    <figure>
+      <figcaption>Time vs Citation F1</figcaption>
+      <canvas id="time-f1-chart" width="720" height="420"></canvas>
+    </figure>
+    <figure>
+      <figcaption>Accuracy by Difficulty</figcaption>
+      <canvas id="diff-acc-slope" width="900" height="420"></canvas>
+    </figure>
+    <figure>
+      <figcaption>Citation F1 by Difficulty</figcaption>
+      <canvas id="diff-f1-slope" width="900" height="420"></canvas>
+    </figure>
+    <figure>
+      <figcaption>Accuracy by Question Type</figcaption>
+      <canvas id="qtype-acc-chart" width="900" height="420"></canvas>
+    </figure>
+    <figure>
+      <figcaption>Citation F1 by Question Type</figcaption>
+      <canvas id="qtype-f1-chart" width="900" height="420"></canvas>
+    </figure>
+  </div>
+
+  <p>Raw data: <a href="pubs_runs.json">pubs_runs.json</a></p>
+
+<script>
+function drawScatter(canvasId, data, xLabel, yLabel, xFmt) {
+  if (!data.length) return;
+  var canvas = document.getElementById(canvasId);
+  var ctx = canvas.getContext("2d");
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  var W = canvas.width, H = canvas.height;
+  var pad = {top: 30, right: 30, bottom: 50, left: 60};
+  var pW = W - pad.left - pad.right;
+  var pH = H - pad.top - pad.bottom;
+
+  var maxX = Math.max.apply(null, data.map(function(d) { return d.x; })) * 1.15;
+  var minY = Math.max(0, Math.min.apply(null, data.map(function(d) { return d.y; })) - 0.05);
+  var maxY = Math.min(1, Math.max.apply(null, data.map(function(d) { return d.y; })) + 0.05);
+  var rangeY = maxY - minY;
+
+  ctx.strokeStyle = "#999";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(pad.left, pad.top);
+  ctx.lineTo(pad.left, H - pad.bottom);
+  ctx.lineTo(W - pad.right, H - pad.bottom);
+  ctx.stroke();
+
+  ctx.fillStyle = "#666";
+  ctx.font = "12px sans-serif";
+  ctx.textAlign = "center";
+  for (var i = 0; i <= 5; i++) {
+    var xVal = (maxX / 5) * i;
+    var x = pad.left + (xVal / maxX) * pW;
+    ctx.fillText(xFmt(xVal), x, H - pad.bottom + 18);
+    ctx.strokeStyle = "#eee";
+    ctx.beginPath(); ctx.moveTo(x, pad.top); ctx.lineTo(x, H - pad.bottom); ctx.stroke();
+  }
+  ctx.textAlign = "right";
+  for (var j = 0; j <= 5; j++) {
+    var yVal = minY + (rangeY / 5) * j;
+    var y = H - pad.bottom - ((yVal - minY) / rangeY) * pH;
+    ctx.fillText(yVal.toFixed(2), pad.left - 8, y + 4);
+    ctx.strokeStyle = "#eee";
+    ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(W - pad.right, y); ctx.stroke();
+  }
+
+  ctx.fillStyle = "#333";
+  ctx.font = "14px sans-serif";
+  ctx.textAlign = "center";
+  ctx.fillText(xLabel, W / 2, H - 5);
+  ctx.save();
+  ctx.translate(15, H / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.fillText(yLabel, 0, 0);
+  ctx.restore();
+
+  var colors = ["#4e79a7","#f28e2b","#e15759","#76b7b2","#59a14f","#edc948","#b07aa1","#ff9da7"];
+  var modelColors = {};
+  var ci = 0;
+  data.forEach(function(d) {
+    if (!modelColors[d.label]) modelColors[d.label] = colors[ci++ % colors.length];
+  });
+
+  data.forEach(function(d) {
+    var x = pad.left + (d.x / maxX) * pW;
+    var y = H - pad.bottom - ((d.y - minY) / rangeY) * pH;
+    ctx.fillStyle = modelColors[d.label];
+    ctx.beginPath();
+    ctx.arc(x, y, 6, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.strokeStyle = "#fff";
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    ctx.fillStyle = "#333";
+    ctx.font = "11px sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText(d.label, x, y - 10);
+  });
+}
+
+function drawSlope(canvasId, data, categories, yLabel) {
+  if (!data.length) return;
+  var canvas = document.getElementById(canvasId);
+  var ctx = canvas.getContext("2d");
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  var W = canvas.width, H = canvas.height;
+  var pad = {top: 30, right: 30, bottom: 50, left: 60};
+  var pW = W - pad.left - pad.right;
+  var pH = H - pad.top - pad.bottom;
+  var nCat = categories.length;
+
+  // Dynamic y-axis range
+  var minY = Math.max(0, Math.min.apply(null, data.map(function(d) { return d.y; })) - 0.05);
+  var maxY = Math.min(1, Math.max.apply(null, data.map(function(d) { return d.y; })) + 0.05);
+  var rangeY = maxY - minY;
+
+  // axes
+  ctx.strokeStyle = "#999";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(pad.left, pad.top);
+  ctx.lineTo(pad.left, H - pad.bottom);
+  ctx.lineTo(W - pad.right, H - pad.bottom);
+  ctx.stroke();
+
+  // y grid
+  ctx.fillStyle = "#666";
+  ctx.font = "12px sans-serif";
+  ctx.textAlign = "right";
+  for (var j = 0; j <= 5; j++) {
+    var yVal = minY + (rangeY / 5) * j;
+    var y = H - pad.bottom - ((yVal - minY) / rangeY) * pH;
+    ctx.fillText(yVal.toFixed(2), pad.left - 8, y + 4);
+    ctx.strokeStyle = "#eee";
+    ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(W - pad.right, y); ctx.stroke();
+  }
+
+  // y-axis label
+  ctx.fillStyle = "#333";
+  ctx.font = "14px sans-serif";
+  ctx.save();
+  ctx.translate(15, H / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.textAlign = "center";
+  ctx.fillText(yLabel, 0, 0);
+  ctx.restore();
+
+  // x positions for each category
+  var xPositions = [];
+  ctx.fillStyle = "#333";
+  ctx.font = "12px sans-serif";
+  ctx.textAlign = "center";
+  categories.forEach(function(cat, ci) {
+    var x = pad.left + (ci / (nCat - 1)) * pW;
+    xPositions.push(x);
+    ctx.fillText(cat, x, H - pad.bottom + 20);
+  });
+
+  // model colors
+  var colors = ["#4e79a7","#f28e2b","#e15759","#76b7b2","#59a14f","#edc948","#b07aa1","#ff9da7"];
+  var modelColors = {};
+  var ci = 0;
+  data.forEach(function(d) {
+    if (!modelColors[d.label]) modelColors[d.label] = colors[ci++ % colors.length];
+  });
+
+  // average by model per category
+  var modelList = Object.keys(modelColors);
+  var modelAvgs = {};
+  modelList.forEach(function(m) {
+    var avgs = [];
+    for (var c = 0; c < nCat; c++) {
+      var vals = [];
+      data.forEach(function(d) {
+        if (d.label === m && d.x === c) vals.push(d.y);
+      });
+      avgs.push(vals.length ? vals.reduce(function(a, b) { return a + b; }, 0) / vals.length : null);
+    }
+    modelAvgs[m] = avgs;
+  });
+
+  // draw lines and dots
+  modelList.forEach(function(m) {
+    var avgs = modelAvgs[m];
+    var color = modelColors[m];
+    // line segments
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    var started = false;
+    avgs.forEach(function(val, ci) {
+      if (val == null) return;
+      var x = xPositions[ci];
+      var y = H - pad.bottom - ((val - minY) / rangeY) * pH;
+      if (!started) { ctx.moveTo(x, y); started = true; }
+      else ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+    // dots with value labels
+    avgs.forEach(function(val, ci) {
+      if (val == null) return;
+      var x = xPositions[ci];
+      var y = H - pad.bottom - ((val - minY) / rangeY) * pH;
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.arc(x, y, 5, 0, 2 * Math.PI);
+      ctx.fill();
+      ctx.strokeStyle = "#fff";
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+      ctx.fillStyle = "#333";
+      ctx.font = "10px sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText(val.toFixed(2), x, y - 10);
+    });
+  });
+
+  // legend
+  var lx = W - pad.right - 10;
+  var ly = pad.top + 5;
+  modelList.forEach(function(m, mi) {
+    ctx.strokeStyle = modelColors[m];
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.moveTo(lx - 30, ly + mi * 20 + 6);
+    ctx.lineTo(lx - 14, ly + mi * 20 + 6);
+    ctx.stroke();
+    ctx.fillStyle = modelColors[m];
+    ctx.beginPath();
+    ctx.arc(lx - 22, ly + mi * 20 + 6, 3, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.fillStyle = "#333";
+    ctx.font = "12px sans-serif";
+    ctx.textAlign = "right";
+    ctx.fillText(m, lx - 34, ly + mi * 20 + 11);
+  });
+}
+
+function drawGroupedBar(canvasId, data, groups, yLabel) {
+  if (!data.length) return;
+  var canvas = document.getElementById(canvasId);
+  var ctx = canvas.getContext("2d");
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  var W = canvas.width, H = canvas.height;
+  var pad = {top: 30, right: 20, bottom: 100, left: 60};
+  var pW = W - pad.left - pad.right;
+  var pH = H - pad.top - pad.bottom;
+
+  var n = data.length;
+  var g = groups.length;
+  var groupWidth = pW / n;
+  var barWidth = (groupWidth * 0.8) / g;
+  var gap = groupWidth * 0.2;
+
+  var colors = ["#4e79a7","#f28e2b","#e15759","#76b7b2","#59a14f","#edc948","#b07aa1","#ff9da7"];
+
+  ctx.strokeStyle = "#999";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(pad.left, pad.top);
+  ctx.lineTo(pad.left, H - pad.bottom);
+  ctx.lineTo(W - pad.right, H - pad.bottom);
+  ctx.stroke();
+
+  ctx.fillStyle = "#666";
+  ctx.font = "12px sans-serif";
+  ctx.textAlign = "right";
+  for (var j = 0; j <= 5; j++) {
+    var yVal = j * 0.2;
+    var y = H - pad.bottom - yVal * pH;
+    ctx.fillText(yVal.toFixed(1), pad.left - 8, y + 4);
+    ctx.strokeStyle = "#eee";
+    ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(W - pad.right, y); ctx.stroke();
+  }
+
+  ctx.fillStyle = "#333";
+  ctx.font = "14px sans-serif";
+  ctx.save();
+  ctx.translate(15, H / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.textAlign = "center";
+  ctx.fillText(yLabel, 0, 0);
+  ctx.restore();
+
+  data.forEach(function(entry, i) {
+    var x0 = pad.left + i * groupWidth + gap / 2;
+    groups.forEach(function(gName, gi) {
+      var val = entry[gName];
+      if (val == null) return;
+      var bx = x0 + gi * barWidth;
+      var bh = val * pH;
+      var by = H - pad.bottom - bh;
+      ctx.fillStyle = colors[gi % colors.length];
+      ctx.fillRect(bx, by, barWidth - 1, bh);
+      ctx.fillStyle = "#333";
+      ctx.font = "10px sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText(val.toFixed(2), bx + barWidth / 2, by - 4);
+    });
+    ctx.fillStyle = "#333";
+    ctx.font = "11px sans-serif";
+    ctx.save();
+    ctx.translate(x0 + (g * barWidth) / 2, H - pad.bottom + 12);
+    ctx.rotate(-Math.PI / 6);
+    ctx.textAlign = "right";
+    ctx.fillText(entry.label, 0, 0);
+    ctx.restore();
+  });
+
+  var lx = W - pad.right - 10;
+  var ly = pad.top + 5;
+  groups.forEach(function(gName, gi) {
+    ctx.fillStyle = "#333";
+    ctx.font = "12px sans-serif";
+    ctx.textAlign = "right";
+    ctx.fillText(gName, lx - 16, ly + gi * 18 + 11);
+    ctx.fillStyle = colors[gi % colors.length];
+    ctx.fillRect(lx - 12, ly + gi * 18, 12, 12);
+  });
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+  var diffLabels = ["Easy", "Medium", "Hard"];
+  var qtypeLabels = ["Causal", "Comparative", "Factual", "Inferential", "Methodological"];
+  drawScatter("cost-acc-chart", [{"x": 4.93, "y": 0.9692, "label": "anthropic/claude-haiku-4-5"}, {"x": 19.33, "y": 0.9846, "label": "anthropic/claude-sonnet-4-5"}, {"x": 5.0, "y": 0.9923, "label": "openai/gpt-5.4"}], "Total Cost (USD)", "Accuracy", function(v) { return "$" + v.toFixed(2); });
+  drawScatter("time-acc-chart", [{"x": 2.9, "y": 0.9692, "label": "anthropic/claude-haiku-4-5"}, {"x": 7.583333333333333, "y": 0.9846, "label": "anthropic/claude-sonnet-4-5"}, {"x": 1.8166666666666667, "y": 0.9923, "label": "openai/gpt-5.4"}], "Total Time (minutes)", "Accuracy", function(v) { return v.toFixed(1) + "m"; });
+  drawScatter("cost-f1-chart", [{"x": 4.93, "y": 0.6383, "label": "anthropic/claude-haiku-4-5"}, {"x": 19.33, "y": 0.7403, "label": "anthropic/claude-sonnet-4-5"}, {"x": 5.0, "y": 0.7087, "label": "openai/gpt-5.4"}], "Total Cost (USD)", "Citation F1", function(v) { return "$" + v.toFixed(2); });
+  drawScatter("time-f1-chart", [{"x": 2.9, "y": 0.6383, "label": "anthropic/claude-haiku-4-5"}, {"x": 7.583333333333333, "y": 0.7403, "label": "anthropic/claude-sonnet-4-5"}, {"x": 1.8166666666666667, "y": 0.7087, "label": "openai/gpt-5.4"}], "Total Time (minutes)", "Citation F1", function(v) { return v.toFixed(1) + "m"; });
+  drawSlope("diff-acc-slope", [{"x": 0, "y": 0.9355, "label": "anthropic/claude-haiku-4-5"}, {"x": 1, "y": 0.9672, "label": "anthropic/claude-haiku-4-5"}, {"x": 2, "y": 1.0, "label": "anthropic/claude-haiku-4-5"}, {"x": 0, "y": 0.9677, "label": "anthropic/claude-sonnet-4-5"}, {"x": 1, "y": 0.9836, "label": "anthropic/claude-sonnet-4-5"}, {"x": 2, "y": 1.0, "label": "anthropic/claude-sonnet-4-5"}, {"x": 0, "y": 1.0, "label": "openai/gpt-5.4"}, {"x": 1, "y": 0.9836, "label": "openai/gpt-5.4"}, {"x": 2, "y": 1.0, "label": "openai/gpt-5.4"}], diffLabels, "Accuracy");
+  drawSlope("diff-f1-slope", [{"x": 0, "y": 0.4018, "label": "anthropic/claude-haiku-4-5"}, {"x": 1, "y": 0.7086, "label": "anthropic/claude-haiku-4-5"}, {"x": 2, "y": 0.7183, "label": "anthropic/claude-haiku-4-5"}, {"x": 0, "y": 0.6573, "label": "anthropic/claude-sonnet-4-5"}, {"x": 1, "y": 0.7899, "label": "anthropic/claude-sonnet-4-5"}, {"x": 2, "y": 0.7285, "label": "anthropic/claude-sonnet-4-5"}, {"x": 0, "y": 0.5948, "label": "openai/gpt-5.4"}, {"x": 1, "y": 0.7791, "label": "openai/gpt-5.4"}, {"x": 2, "y": 0.6886, "label": "openai/gpt-5.4"}], diffLabels, "Citation F1");
+  drawGroupedBar("qtype-acc-chart", [{"label": "anthropic/claude-haiku-4-5", "Causal": 1.0, "Comparative": 0.9655, "Factual": 0.9574, "Inferential": 1.0, "Methodological": 0.9677}, {"label": "anthropic/claude-sonnet-4-5", "Causal": 1.0, "Comparative": 1.0, "Factual": 0.9787, "Inferential": 1.0, "Methodological": 0.9677}, {"label": "openai/gpt-5.4", "Causal": 1.0, "Comparative": 1.0, "Factual": 0.9787, "Inferential": 1.0, "Methodological": 1.0}], qtypeLabels, "Accuracy");
+  drawGroupedBar("qtype-f1-chart", [{"label": "anthropic/claude-haiku-4-5", "Causal": 0.5857, "Comparative": 0.7338, "Factual": 0.5134, "Inferential": 0.6963, "Methodological": 0.7452}, {"label": "anthropic/claude-sonnet-4-5", "Causal": 0.6212, "Comparative": 0.7788, "Factual": 0.6966, "Inferential": 0.7062, "Methodological": 0.8343}, {"label": "openai/gpt-5.4", "Causal": 0.6204, "Comparative": 0.7491, "Factual": 0.6708, "Inferential": 0.6284, "Methodological": 0.7914}], qtypeLabels, "Citation F1");
+
+  // Token toggle
+  var tokenCols = document.querySelectorAll(".token-col");
+  var tokenVisible = false;
+  tokenCols.forEach(function(el) { el.style.display = "none"; });
+  document.getElementById("token-toggle").addEventListener("click", function() {
+    tokenVisible = !tokenVisible;
+    tokenCols.forEach(function(el) { el.style.display = tokenVisible ? "" : "none"; });
+    this.textContent = tokenVisible ? "Hide Token Details" : "Show Token Details";
+  });
+});
+</script>
+</body>
+</html>
