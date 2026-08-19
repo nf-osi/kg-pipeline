@@ -1,1697 +1,870 @@
 #!/usr/bin/env python3
-"""Generate HTML dashboard from evaluation/runs.json."""
+"""Build the NF knowledge graph evaluation dashboard.
+
+Reads the extracted run summaries (``evaluation/runs.json`` for the research
+tools discovery eval, ``evaluation/pubs_runs.json`` for the publication QA
+eval) plus the question metadata that sits alongside the ground truth, and
+emits a single self-contained ``index.html``.
+
+The page is one artifact with a tab per eval module. All aggregation and
+filtering happens client side from an embedded JSON payload, so the same file
+works from a web server or straight off disk. Presentation lives in
+``scripts/site/`` and is inlined at build time.
+"""
 from __future__ import annotations
 
 import argparse
-import html
 import json
+import re
 import sys
-from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 
 try:
     import yaml  # type: ignore[import-untyped]
-except ImportError:
+except ImportError:  # pragma: no cover - yaml is required for question metadata
     yaml = None  # type: ignore[assignment]
 
+SITE_DIR = Path(__file__).parent / "site"
 
-@dataclass
-class RunSummary:
-    """Reconstructed from JSON for compatibility with existing chart functions."""
-    name: str
-    model: str | None
-    solver: str | None
-    overall_score: float | None
-    overall_cost: float | None
-    started_at: str | None = None
-    completed_at: str | None = None
-    total_samples: int | None = None
-    git_commit: str | None = None
-    task_name: str | None = None
-    task_version: str | None = None
-    score_stderr: float | None = None
-    min_sample_time: float | None = None
-    max_sample_time: float | None = None
-    avg_sample_time: float | None = None
-    input_tokens: int | None = None
-    output_tokens: int | None = None
-    cache_write_tokens: int | None = None
-    cache_read_tokens: int | None = None
-    total_tokens: int | None = None
-    difficulty_scores: dict[str, float] = field(default_factory=dict)
-    category_scores: dict[str, float] = field(default_factory=dict)
-    frustration_scores: dict[str, float] = field(default_factory=dict)
-    frustration_samples: list[dict] = field(default_factory=list)
-    level_samples: list[dict] = field(default_factory=list)
-    complexity_samples: list[dict] = field(default_factory=list)
-    task_stats: dict[str, dict] = field(default_factory=dict)
+# --------------------------------------------------------------------------- #
+# Static labelling
+# --------------------------------------------------------------------------- #
+
+# Column order for the resource-category views. Any category found in the run
+# data but missing here is appended alphabetically, so a newly added module
+# shows up without a code change.
+CATEGORY_ORDER = ["MUT", "AM", "CL", "AB", "GR", "ST", "PUB", "PI", "CR"]
+
+# A question set's expected size is taken as the largest sample count recorded
+# for it. That breaks down when a set has only targeted development runs: the
+# largest is then tiny, and a 5-question run would certify itself as complete.
+# Every real full set here has been 34-46 questions and every development run
+# under 10, so a run must also clear this floor to count as complete. A set with
+# no complete run then simply does not appear as a filter option.
+MIN_FULL_RUN_SAMPLES = 20
+
+CATEGORY_LABELS = {
+    "MUT": "Mutation",
+    "AM": "Animal model",
+    "CL": "Cell line",
+    "AB": "Antibody",
+    "GR": "Genetic reagent",
+    "PI": "Investigator",
+    "CR": "Cross-resource",
+    "ST": "Study",
+    "PUB": "Publication & people",
+}
+
+# Longer framing shown when a category is new in the latest question set.
+CATEGORY_BLURBS = {
+    "PUB": (
+        "Publications and the people behind them: author counts, ORCID coverage, which "
+        "authors are Synapse users, publications cross-listed by two portals, and "
+        "co-authorship reach. These questions test whether the agent treats ORCID links "
+        "as the partial subset they are rather than as the full author list."
+    ),
+    "ST": (
+        "Study-level discovery: finding studies and their associated data files through "
+        "study metadata and file-level annotations."
+    ),
+}
+
+# Buckets for the level / complexity / frustration views. Which buckets appear
+# is read from the run data, exactly as categories are: the question set gains
+# new ones over time — complexity in particular is an open-ended hop count — and
+# a hardcoded list would drop them silently.
+LEVEL_LABELS = {"baseline": "Baseline", "advanced": "Advanced"}
+LEVEL_ORDER = ["baseline", "advanced"]
+
+COMPLEXITY_LABELS = {
+    "0-hop": "Direct lookup",
+    "1-hop": "One hop",
+    "2-hop": "Two hops",
+    "3-hop": "Three hops",
+}
+COMPLEXITY_ORDER = ["0-hop", "1-hop", "2-hop", "3-hop"]
+
+FRUSTRATION_LABELS = {
+    "low": "Low",
+    "moderate": "Moderate",
+    "high": "High",
+    "very_high": "Very high",
+}
+FRUSTRATION_ORDER = ["low", "moderate", "high", "very_high"]
+
+FRUSTRATION_HELP = [
+    ["Low", "Answerable with minimal effort through facets or text search."],
+    ["Moderate", "Needs the right approach, extra steps, or domain knowledge."],
+    ["High", "Incomplete or misleading results, painful workarounds, or a single weak path."],
+    ["Very high", "Cannot be answered at all, or needs expert workarounds most users would never find."],
+]
+
+PUBS_DIFFICULTIES = [("easy", "Easy"), ("medium", "Medium"), ("hard", "Hard")]
+
+PUBS_STYLES = [
+    ("user_query", "Natural", "Phrased the way a user would actually ask"),
+    ("precise", "Precise", "Phrased with the exact terminology of the paper"),
+]
+
+HIGH_IMPACT_THRESHOLD = 0.95
+
+TOOLS_ABOUT = [
+    "Each question is answered by an agent with SPARQL access to the NF portal knowledge "
+    "graph. Ground truth is a curated set of resource identifiers, and the score is recall "
+    "— the share of expected identifiers the agent returned. Precision is deliberately not "
+    "scored here: the task is discovery, where a missed resource costs a researcher more "
+    "than an extra one to skim.",
+    "Question sets are versioned. A later set is not a harder version of the earlier one — "
+    "it adds whole categories of question — so recall is only comparable within a single "
+    "set. That is why the question set is a filter rather than a column.",
+    "Only scored runs that covered a complete question set appear here. Development runs "
+    "over part of a set, and runs the harness could not score, are excluded when this page "
+    "is built, since a partial run is not comparable to a full one. The untouched extract, "
+    "including those runs, is published alongside as runs.json.",
+    "Every question also carries an estimate of how painful it is on today's portal, which "
+    "is what the high-impact table is built from: questions users struggle with now, and "
+    "that the graph already answers well.",
+]
+
+PUBS_ABOUT = [
+    "The agent answers multiple-choice questions over full-text publications, retrieved "
+    "with SPARQL over a text-indexed copy of the graph.",
+    "Answer accuracy is the share of questions answered correctly. Citation F1 is the mean "
+    "F1 over (PMID, passage) attribution tuples — precision is the share of cited passages "
+    "that were relevant, recall the share of expected passages that were cited.",
+    "Every question exists in two phrasings. Precise phrasing (question_style "
+    "\"precise\") uses the paper's own terminology; natural phrasing (\"user_query\") is "
+    "how a researcher would actually ask, with the ambiguity that implies. Scores are "
+    "close, and natural phrasing is the default view because it is the realistic one.",
+]
 
 
-QuestionMeta = dict[str, dict[str, str]]
+# --------------------------------------------------------------------------- #
+# Small helpers
+# --------------------------------------------------------------------------- #
 
-
-def load_question_metadata(yaml_path: Path) -> QuestionMeta:
-    """Load question difficulty metadata from dataset_attributes.yaml."""
-    if yaml is None:
-        return {}
-    if not yaml_path.exists():
-        return {}
-    try:
-        data = yaml.safe_load(yaml_path.read_text())
-    except Exception as exc:
-        print(f"Warning: failed to parse {yaml_path}: {exc}", file=sys.stderr)
-        return {}
-    meta: QuestionMeta = {}
-    for component in data.get("components", []):
-        for q in component.get("questions", []):
-            qid = q.get("id")
-            if qid:
-                meta[qid] = {
-                    "level": q.get("level", ""),
-                    "complexity": q.get("complexity", ""),
-                    "user_frustration": q.get("user_frustration", ""),
-                }
-    return meta
-
-
-def load_runs_from_json(json_path: Path) -> list[RunSummary]:
-    """Load runs from JSON and reconstruct RunSummary objects."""
-    data = json.loads(json_path.read_text())
-    runs = []
-    for r in data:
-        runs.append(
-            RunSummary(
-                name=r.get("run", ""),
-                model=r.get("model"),
-                solver=r.get("solver"),
-                overall_score=r.get("score"),
-                overall_cost=r.get("cost"),
-                started_at=r.get("started_at"),
-                completed_at=r.get("completed_at"),
-                total_samples=r.get("total_samples"),
-                git_commit=r.get("git_commit"),
-                task_name=r.get("task_name"),
-                task_version=r.get("task_version"),
-                score_stderr=r.get("score_stderr"),
-                min_sample_time=r.get("min_sample_time"),
-                max_sample_time=r.get("max_sample_time"),
-                avg_sample_time=r.get("avg_sample_time"),
-                input_tokens=r.get("input_tokens"),
-                output_tokens=r.get("output_tokens"),
-                cache_write_tokens=r.get("cache_write_tokens"),
-                cache_read_tokens=r.get("cache_read_tokens"),
-                total_tokens=r.get("total_tokens"),
-                difficulty_scores=r.get("difficulty_scores", {}),
-                category_scores=r.get("category_scores", {}),
-                frustration_scores=r.get("frustration_scores", {}),
-                frustration_samples=r.get("frustration_samples", []),
-                level_samples=r.get("level_samples", []),
-                complexity_samples=r.get("complexity_samples", []),
-                task_stats=r.get("task_stats", {}),
-            )
-        )
-    return runs
-
-
-def _format_cost(value: float | None) -> str:
-    if value is None:
-        return "N/A"
-    return f"${value:.2f}"
-
-
-def _format_date(iso_ts: str | None) -> str:
-    if iso_ts is None:
+def _iso_date(value: str | None) -> str:
+    if not value:
         return ""
     try:
-        dt = datetime.fromisoformat(iso_ts)
-        return dt.strftime("%Y-%m-%d")
+        return datetime.fromisoformat(value).strftime("%Y-%m-%d")
     except (ValueError, TypeError):
-        return html.escape(iso_ts)
-
-
-def _format_score_with_stderr(score: float | None, stderr: float | None) -> str:
-    if score is None:
-        return "N/A"
-    s = f"{score:.4f}"
-    if stderr is not None:
-        s += f" &plusmn; {stderr:.4f}"
-    return s
-
-
-def _format_score(value: float | None) -> str:
-    return f"{value:.4f}" if value is not None else ""
-
-
-def _esc(value: str | None) -> str:
-    return html.escape(value) if value else ""
-
-
-def _format_version(version: str | None) -> str:
-    """Format version string, prepending 'v' if not already present."""
-    if not version:
-        return ""
-    version = str(version)
-    if not version.startswith("v"):
-        return f"v{version}"
-    return version
+        return str(value)[:10]
 
 
 def _duration_seconds(start: str | None, end: str | None) -> float | None:
     if not start or not end:
         return None
     try:
-        s = datetime.fromisoformat(start)
-        e = datetime.fromisoformat(end)
-        return (e - s).total_seconds()
+        return (datetime.fromisoformat(end) - datetime.fromisoformat(start)).total_seconds()
     except (ValueError, TypeError):
         return None
 
 
-def _format_duration(seconds: float | None) -> str:
-    if seconds is None:
-        return ""
-    m, s = divmod(int(seconds), 60)
-    h, m = divmod(m, 60)
-    if h:
-        return f"{h}h {m:02d}m {s:02d}s"
-    return f"{m}m {s:02d}s"
+def _version_label(value) -> str:
+    if value is None or value == "":
+        return "unversioned"
+    text = str(value)
+    return text if text.startswith("v") else f"v{text}"
 
 
-# Ordered keys for difficulty columns
-DIFFICULTY_KEYS = [
-    "level/baseline",
-    "level/advanced",
-    "complexity/0-hop",
-    "complexity/1-hop",
-    "complexity/2-hop",
-]
-
-DIFFICULTY_LABELS = {
-    "level/baseline": "Baseline",
-    "level/advanced": "Advanced",
-    "complexity/0-hop": "0-hop",
-    "complexity/1-hop": "1-hop",
-    "complexity/2-hop": "2-hop",
-}
-
-LEVEL_KEYS = ["level/baseline", "level/advanced"]
-LEVEL_LABELS = {k: DIFFICULTY_LABELS[k] for k in LEVEL_KEYS}
-
-COMPLEXITY_KEYS = ["complexity/0-hop", "complexity/1-hop", "complexity/2-hop"]
-COMPLEXITY_LABELS = {k: DIFFICULTY_LABELS[k] for k in COMPLEXITY_KEYS}
-
-CATEGORY_KEYS = [
-    "category/MUT",
-    "category/AM",
-    "category/CL",
-    "category/AB",
-    "category/GR",
-    "category/PI",
-    "category/CR",
-]
-
-CATEGORY_LABELS = {
-    "category/MUT": "Mutation",
-    "category/AM": "Animal Model",
-    "category/CL": "Cell Line",
-    "category/AB": "Antibody",
-    "category/GR": "Genetic Reagent",
-    "category/PI": "Investigator",
-    "category/CR": "Cross-Resource",
-}
-
-FRUSTRATION_KEYS = [
-    "frustration/low",
-    "frustration/moderate",
-    "frustration/high",
-    "frustration/very_high",
-]
-
-FRUSTRATION_LABELS = {
-    "frustration/low": "Low",
-    "frustration/moderate": "Moderate",
-    "frustration/high": "High",
-    "frustration/very_high": "Very High",
-}
+def _sort_key(started_at: str | None) -> str:
+    return started_at or ""
 
 
-def render_table(
-    runs: list[RunSummary], has_difficulty: bool, has_categories: bool
-) -> str:
-    # Find best recall for bolding
-    best_recall = max((r.overall_score for r in runs if r.overall_score is not None), default=None)
-
-    # Find best values for each difficulty/complexity column
-    best_difficulty = {}
-    if has_difficulty:
-        for key in DIFFICULTY_KEYS:
-            best_difficulty[key] = max(
-                (r.difficulty_scores.get(key) for r in runs if r.difficulty_scores.get(key) is not None),
-                default=None
-            )
-
-    # Find best values for each category column
-    best_category = {}
-    if has_categories:
-        for key in CATEGORY_KEYS:
-            best_category[key] = max(
-                (r.category_scores.get(key) for r in runs if r.category_scores.get(key) is not None),
-                default=None
-            )
-
-    difficulty_cols = ""
-    if has_difficulty:
-        difficulty_cols = "".join(
-            f"<th class='perf'>{DIFFICULTY_LABELS[k]}</th>" for k in DIFFICULTY_KEYS
-        )
-    category_cols = ""
-    if has_categories:
-        category_cols = "".join(
-            f"<th class='category'>{CATEGORY_LABELS[k]}</th>" for k in CATEGORY_KEYS
-        )
-
-    def _difficulty_cells(run: RunSummary) -> str:
-        if not has_difficulty:
-            return ""
-        cells = []
-        for k in DIFFICULTY_KEYS:
-            score = run.difficulty_scores.get(k)
-            score_str = _format_score(score)
-            if score is not None and score == best_difficulty.get(k):
-                score_str = f"<strong>{score_str}</strong>"
-            cells.append(f"<td>{score_str}</td>")
-        return "".join(cells)
-
-    def _category_cells(run: RunSummary) -> str:
-        if not has_categories:
-            return ""
-        cells = []
-        for k in CATEGORY_KEYS:
-            score = run.category_scores.get(k)
-            score_str = _format_score(score)
-            if score is not None and score == best_category.get(k):
-                score_str = f"<strong>{score_str}</strong>"
-            cells.append(f"<td>{score_str}</td>")
-        return "".join(cells)
-
-    def _recall_cell(run: RunSummary) -> str:
-        recall_str = _format_score_with_stderr(run.overall_score, run.score_stderr)
-        if run.overall_score is not None and run.overall_score == best_recall:
-            recall_str = f"<strong>{recall_str}</strong>"
-        return recall_str
-
-    rows = "\n".join(
-        (
-            f"<tr><td>{_esc(run.task_name)}</td>"
-            f"<td>{_esc(run.model)}</td>"
-            f"<td>{run.total_samples if run.total_samples is not None else ''}</td>"
-            f"<td>{_recall_cell(run)}</td>"
-            + _difficulty_cells(run)
-            + _category_cells(run)
-            + f"<td>{_format_cost(run.overall_cost)}</td>"
-            + (f"<td class='token-col'>{run.input_tokens:,}</td>" if run.input_tokens is not None else "<td class='token-col'></td>")
-            + (f"<td class='token-col'>{run.output_tokens:,}</td>" if run.output_tokens is not None else "<td class='token-col'></td>")
-            + (f"<td class='token-col'>{run.cache_write_tokens:,}</td>" if run.cache_write_tokens is not None else "<td class='token-col'></td>")
-            + (f"<td class='token-col'>{run.cache_read_tokens:,}</td>" if run.cache_read_tokens is not None else "<td class='token-col'></td>")
-            + (f"<td class='token-col'>{run.total_tokens:,}</td>" if run.total_tokens is not None else "<td class='token-col'></td>")
-            + f"<td>{_format_date(run.started_at)}</td>"
-            f"<td>{_format_duration(_duration_seconds(run.started_at, run.completed_at))}</td>"
-            f"<td>{_format_duration(run.avg_sample_time)}</td>"
-            f"<td>{_format_duration(run.min_sample_time)}</td>"
-            f"<td>{_format_duration(run.max_sample_time)}</td>"
-            f"<td><code>{_esc(run.git_commit)}</code></td>"
-            f"<td>{_format_version(run.task_version)}</td></tr>"
-        )
-        for run in runs
-    )
-    return f"""
-<table id="runs-table">
-  <thead>
-    <tr>
-      <th class="info">Task</th>
-      <th class="info">Model</th>
-      <th class="info">Samples</th>
-      <th class="recall">Recall</th>
-      {difficulty_cols}
-      {category_cols}
-      <th class="cost">Total Cost (USD)</th>
-      <th class="token-col cost">Input Tokens</th>
-      <th class="token-col cost">Output Tokens</th>
-      <th class="token-col cost">Cache Write</th>
-      <th class="token-col cost">Cache Read</th>
-      <th class="token-col cost">Total Tokens</th>
-      <th class="time">Date</th>
-      <th class="time">Total Time</th>
-      <th class="time">Avg Time / Sample</th>
-      <th class="time">Shortest Sample</th>
-      <th class="time">Longest Sample</th>
-      <th class="meta">Task Harness Version</th>
-      <th class="meta">Task Dataset Version</th>
-    </tr>
-  </thead>
-  <tbody>
-    {rows}
-  </tbody>
-</table>
-"""
+def _per_question(cost: float | None, samples: int | None) -> float | None:
+    if cost is None or not samples:
+        return None
+    return cost / samples
 
 
-def _build_chart_data(runs: list[RunSummary]) -> tuple[str, str]:
-    cost_points = []
-    time_points = []
-    for run in runs:
-        if run.overall_score is None:
-            continue
-        label = _esc(run.model or run.name)
-        if run.overall_cost is not None:
-            cost_points.append(
-                {"x": run.overall_cost, "y": run.overall_score, "label": label}
-            )
-        total_secs = _duration_seconds(run.started_at, run.completed_at)
-        if total_secs is not None:
-            time_points.append(
-                {"x": total_secs / 60, "y": run.overall_score, "label": label}
-            )
-    return json.dumps(cost_points), json.dumps(time_points)
-
-
-def _build_bar_chart_data(
-    runs: list[RunSummary],
-    keys: list[str],
+def _buckets(
+    runs: list[dict],
+    field: str,
+    prefix: str,
     labels: dict[str, str],
-    score_attr: str,
-) -> str:
-    """Build model-averaged grouped bar chart data."""
-    model_scores: dict[str, list[dict[str, float | None]]] = {}
+    order: list[str],
+) -> list[dict]:
+    """Buckets the runs actually scored, in a stable, sensible order.
+
+    Known values keep their curated order and label. An unrecognised one still
+    appears rather than vanishing: an ``N-hop`` value sorts by N, anything else
+    sorts last alphabetically, and both fall back to the raw value as a label.
+    """
+    present: set[str] = set()
     for run in runs:
-        scores: dict[str, float] = getattr(run, score_attr)
-        if not scores:
+        for key in run[field]:
+            head, sep, name = key.partition("/")
+            if sep and head == prefix and name:
+                present.add(name)
+
+    def rank(name: str) -> tuple[int, int, str]:
+        if name in order:
+            return (0, order.index(name), "")
+        hops = name.partition("-")[0]
+        return (1, int(hops) if hops.isdigit() else 10**6, name)
+
+    return [
+        {"key": f"{prefix}/{name}", "label": labels.get(name, name)}
+        for name in sorted(present, key=rank)
+    ]
+
+
+def _clean(value):
+    """Drop NaN/inf so the payload stays valid JSON."""
+    if isinstance(value, float):
+        if value != value or value in (float("inf"), float("-inf")):
+            return None
+    return value
+
+
+# --------------------------------------------------------------------------- #
+# Question metadata
+# --------------------------------------------------------------------------- #
+
+def load_question_metadata(path: Path) -> dict[str, dict]:
+    """Per-question attributes from ``dataset_attributes.yaml``."""
+    if yaml is None or not path.exists():
+        if yaml is None:
+            print("Warning: pyyaml not installed; question metadata skipped", file=sys.stderr)
+        return {}
+    try:
+        data = yaml.safe_load(path.read_text()) or {}
+    except Exception as exc:
+        print(f"Warning: failed to parse {path}: {exc}", file=sys.stderr)
+        return {}
+    out: dict[str, dict] = {}
+    for component in data.get("components", []) or []:
+        for question in component.get("questions", []) or []:
+            qid = question.get("id")
+            if not qid:
+                continue
+            out[qid] = {
+                "question": question.get("question", ""),
+                "level": question.get("level", ""),
+                "complexity": question.get("complexity", ""),
+                "frustration": question.get("user_frustration", ""),
+                "component": component.get("name", ""),
+            }
+    return out
+
+
+def load_ground_truth_questions(paths: list[Path]) -> dict[str, str]:
+    """Question text for ids that only exist in the ground-truth files.
+
+    The newest question categories are curated straight into the ground truth
+    before they get an entry in ``dataset_attributes.yaml``, so this is how the
+    dashboard learns their wording.
+    """
+    if yaml is None:
+        return {}
+    out: dict[str, str] = {}
+    for path in paths:
+        if not path.exists():
             continue
-        label = _esc(run.model or run.name)
-        entry: dict[str, float | None] = {}
-        for key in keys:
-            entry[labels[key]] = scores.get(key)
-        model_scores.setdefault(label, []).append(entry)
-    entries = []
-    for label, score_list in model_scores.items():
-        entry_out: dict[str, object] = {"label": label}
-        for key in keys:
-            gl = labels[key]
-            vals = [s[gl] for s in score_list if s.get(gl) is not None]
-            entry_out[gl] = sum(vals) / len(vals) if vals else None
-        entries.append(entry_out)
-    return json.dumps(entries)
-
-
-_LEVEL_X = {"baseline": 0, "advanced": 1}
-_COMPLEXITY_X = {"0-hop": 0, "1-hop": 1, "2-hop": 2}
-_FRUSTRATION_X = {"low": 0, "moderate": 1, "high": 2, "very_high": 3}
-
-
-def _build_slope_data(
-    runs: list[RunSummary],
-    samples_attr: str,
-    key_field: str,
-    x_map: dict[str, int],
-) -> str:
-    """Build per-question scatter points for a slope chart."""
-    points = []
-    for run in runs:
-        label = _esc(run.model or run.name)
-        for s in getattr(run, samples_attr):
-            x = x_map.get(s[key_field])
-            if x is not None:
-                points.append(
-                    {"x": x, "y": s["score"], "label": label, "qid": s["id"]}
-                )
-    return json.dumps(points)
-
-
-def _build_sweet_spot_table(
-    runs: list[RunSummary],
-    question_meta: QuestionMeta,
-    recall_threshold: float = 0.95,
-) -> str:
-    """Build an HTML table of high/very_high frustration questions with best recall >= threshold."""
-    # Collect best recall per (question, model)
-    best: dict[str, dict[str, float]] = {}  # qid -> {model -> best_score}
-    frust_map: dict[str, str] = {}  # qid -> frustration level
-    for run in runs:
-        model = _esc(run.model or run.name)
-        for s in run.frustration_samples:
-            qid = s["id"]
-            frust_map[qid] = s["frustration"]
-            best.setdefault(qid, {})
-            if s["score"] > best[qid].get(model, -1):
-                best[qid][model] = s["score"]
-    # Filter: high/very_high frustration AND best recall across any model >= threshold
-    rows = []
-    for qid, model_scores in best.items():
-        frust = frust_map.get(qid, "")
-        if frust not in ("high", "very_high"):
+        try:
+            data = yaml.safe_load(path.read_text()) or {}
+        except Exception as exc:
+            print(f"Warning: failed to parse {path}: {exc}", file=sys.stderr)
             continue
-        top_score = max(model_scores.values())
-        if top_score < recall_threshold:
+        for qid, entry in (data.get("ground_truth") or {}).items():
+            if isinstance(entry, dict) and entry.get("question") and qid not in out:
+                out[qid] = entry["question"]
+    return out
+
+
+def load_paper_metadata(qa_dir: Path) -> dict[str, dict]:
+    """Paper titles and question counts from ``evaluation/qa/qa_PMC*.yaml``."""
+    if yaml is None or not qa_dir.exists():
+        return {}
+    out: dict[str, dict] = {}
+    for path in sorted(qa_dir.glob("qa_PMC*.yaml")):
+        try:
+            data = yaml.safe_load(path.read_text()) or {}
+        except Exception as exc:
+            print(f"Warning: failed to parse {path}: {exc}", file=sys.stderr)
             continue
-        # Get all models that achieved the top score (handle ties)
-        top_models = [m for m, score in model_scores.items() if score == top_score]
-        top_models_str = ", ".join(sorted(top_models))
-        meta = question_meta.get(qid, {})
-        rows.append(
+        pmcid = data.get("pmcid") or path.stem.replace("qa_", "")
+        out[pmcid] = {
+            "title": data.get("title", ""),
+            "questions": len(data.get("questions", []) or []),
+            "pmid": data.get("pmid", ""),
+        }
+    return out
+
+
+# --------------------------------------------------------------------------- #
+# Model registry — one colour slot per model, assigned once
+# --------------------------------------------------------------------------- #
+
+def build_model_registry(tools_runs: list[dict], pubs_runs: list[dict]) -> list[dict]:
+    """Assign each model a categorical slot in order of first appearance.
+
+    Slots are stable as new models arrive (a new model takes the next free
+    slot), and are shared across both tabs, so a model keeps one colour
+    everywhere. Colour therefore follows the model, never its current rank.
+    """
+    first_seen: dict[str, str] = {}
+    for run in tools_runs + pubs_runs:
+        model = run.get("model")
+        if not model:
+            continue
+        stamp = _sort_key(run.get("started_at"))
+        if model not in first_seen or stamp < first_seen[model]:
+            first_seen[model] = stamp
+
+    ordered = sorted(first_seen, key=lambda m: (first_seen[m], m))
+    registry = []
+    for index, model in enumerate(ordered):
+        provider, _, short = model.partition("/")
+        if not short:
+            provider, short = "", model
+        registry.append(
             {
-                "qid": qid,
-                "frustration": FRUSTRATION_LABELS.get(
-                    f"frustration/{frust}", frust
-                ),
-                "best_recall": top_score,
-                "best_model": top_models_str,
-                "complexity": meta.get("complexity", ""),
+                "id": model,
+                "label": short,
+                "provider": provider,
+                "slot": index,
+                # Eight categorical slots is the ceiling; past it the palette
+                # cannot keep pairs apart, so the tail recedes to gray rather
+                # than inventing a ninth hue.
+                "color": f"var(--series-{index + 1})" if index < 8 else "var(--muted-mark)",
             }
         )
-    if not rows:
-        return ""
-    rows.sort(key=lambda r: (-r["best_recall"], r["qid"]))
-    row_html = "\n".join(
-        f"<tr><td>{r['qid']}</td><td>{r['frustration']}</td>"
-        f"<td>{r['complexity']}</td>"
-        f"<td>{r['best_recall']:.2f}</td>"
-        f"<td>{r['best_model']}</td></tr>"
-        for r in rows
-    )
-    return f"""
-<h2>High-Impact Questions</h2>
-<p><small>Questions with high or very high user frustration where best recall &ge; {recall_threshold:.0%} &mdash;
-queries the current portal struggles with but the KG pipeline handles well.</small></p>
-<table id="sweet-spot-table">
-  <thead>
-    <tr>
-      <th>Question</th>
-      <th>User Frustration</th>
-      <th>Complexity</th>
-      <th>Best Recall</th>
-      <th>Best Model</th>
-    </tr>
-  </thead>
-  <tbody>
-    {row_html}
-  </tbody>
-</table>
-"""
-
-
-def write_site(
-    runs: list[RunSummary], destination: Path, question_meta: QuestionMeta
-) -> None:
-    destination.mkdir(parents=True, exist_ok=True)
-    has_difficulty = any(run.difficulty_scores for run in runs)
-    has_categories = any(run.category_scores for run in runs)
-    has_frustration = any(run.frustration_scores for run in runs)
-    data = [
-        {
-            "run": run.name,
-            "model": run.model,
-            "solver": run.solver,
-            "score": run.overall_score,
-            "cost": run.overall_cost,
-            "task_name": run.task_name,
-            "total_samples": run.total_samples,
-            "started_at": run.started_at,
-            "completed_at": run.completed_at,
-            "git_commit": run.git_commit,
-            "score_stderr": run.score_stderr,
-            "difficulty_scores": run.difficulty_scores,
-            "category_scores": run.category_scores,
-            "frustration_scores": run.frustration_scores,
-            "task_stats": run.task_stats,
-        }
-        for run in runs
-    ]
-    (destination / "runs.json").write_text(json.dumps(data, indent=2))
-    table_html = render_table(runs, has_difficulty, has_categories)
-    cost_chart_data, time_chart_data = _build_chart_data(runs)
-    level_chart_data = _build_bar_chart_data(
-        runs, LEVEL_KEYS, LEVEL_LABELS, "difficulty_scores"
-    )
-    complexity_slope_data = _build_slope_data(
-        runs, "complexity_samples", "complexity", _COMPLEXITY_X
-    )
-    category_chart_data = _build_bar_chart_data(
-        runs, CATEGORY_KEYS, CATEGORY_LABELS, "category_scores"
-    )
-    frustration_scatter_data = _build_slope_data(
-        runs, "frustration_samples", "frustration", _FRUSTRATION_X
-    )
-    sweet_spot_html = _build_sweet_spot_table(runs, question_meta)
-    generated = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
-    sort_script = """
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-  var table = document.getElementById("runs-table");
-  var headers = table.querySelectorAll("th");
-  var sortOrder = {};
-  headers.forEach(function(th, index) {
-    th.style.cursor = "pointer";
-    th.addEventListener("click", function() {
-      var asc = sortOrder[index] = !sortOrder[index];
-      var tbody = table.querySelector("tbody");
-      var rows = Array.from(tbody.querySelectorAll("tr"));
-      rows.sort(function(a, b) {
-        var aText = a.children[index].textContent;
-        var bText = b.children[index].textContent;
-        var aVal = parseFloat(aText.replace(/[$,]/g, ""));
-        var bVal = parseFloat(bText.replace(/[$,]/g, ""));
-        if (!isNaN(aVal) && !isNaN(bVal)) return asc ? aVal - bVal : bVal - aVal;
-        return asc ? aText.localeCompare(bText) : bText.localeCompare(aText);
-      });
-      rows.forEach(function(r) { tbody.appendChild(r); });
-    });
-  });
-
-  // Token toggle
-  var tokenCols = document.querySelectorAll(".token-col");
-  var tokenVisible = false;
-  tokenCols.forEach(function(el) { el.style.display = "none"; });
-  document.getElementById("token-toggle").addEventListener("click", function() {
-    tokenVisible = !tokenVisible;
-    tokenCols.forEach(function(el) { el.style.display = tokenVisible ? "" : "none"; });
-    this.textContent = tokenVisible ? "Hide Token Details" : "Show Token Details";
-  });
-});
-</script>
-"""
-    level_labels_json = json.dumps([LEVEL_LABELS[k] for k in LEVEL_KEYS])
-    complexity_labels_json = json.dumps(
-        [COMPLEXITY_LABELS[k] for k in COMPLEXITY_KEYS]
-    )
-    cat_labels_json = json.dumps([CATEGORY_LABELS[k] for k in CATEGORY_KEYS])
-    chart_script = f"""
-<script>
-function drawScatter(canvasId, data, xLabel, xFmt) {{
-  if (!data.length) return;
-  var canvas = document.getElementById(canvasId);
-  var ctx = canvas.getContext("2d");
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  var W = canvas.width, H = canvas.height;
-  var pad = {{top: 30, right: 30, bottom: 50, left: 60}};
-  var pW = W - pad.left - pad.right;
-  var pH = H - pad.top - pad.bottom;
-
-  var maxX = Math.max.apply(null, data.map(function(d) {{ return d.x; }})) * 1.15;
-  var maxY = Math.min(1, Math.max.apply(null, data.map(function(d) {{ return d.y; }})) * 1.25);
-
-  ctx.strokeStyle = "#999";
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.moveTo(pad.left, pad.top);
-  ctx.lineTo(pad.left, H - pad.bottom);
-  ctx.lineTo(W - pad.right, H - pad.bottom);
-  ctx.stroke();
-
-  ctx.fillStyle = "#666";
-  ctx.font = "12px sans-serif";
-  ctx.textAlign = "center";
-  for (var i = 0; i <= 5; i++) {{
-    var xVal = (maxX / 5) * i;
-    var x = pad.left + (xVal / maxX) * pW;
-    ctx.fillText(xFmt(xVal), x, H - pad.bottom + 18);
-    ctx.strokeStyle = "#eee";
-    ctx.beginPath(); ctx.moveTo(x, pad.top); ctx.lineTo(x, H - pad.bottom); ctx.stroke();
-  }}
-  ctx.textAlign = "right";
-  for (var j = 0; j <= 5; j++) {{
-    var yVal = (maxY / 5) * j;
-    var y = H - pad.bottom - (yVal / maxY) * pH;
-    ctx.fillText(yVal.toFixed(2), pad.left - 8, y + 4);
-    ctx.strokeStyle = "#eee";
-    ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(W - pad.right, y); ctx.stroke();
-  }}
-
-  ctx.fillStyle = "#333";
-  ctx.font = "14px sans-serif";
-  ctx.textAlign = "center";
-  ctx.fillText(xLabel, W / 2, H - 5);
-  ctx.save();
-  ctx.translate(15, H / 2);
-  ctx.rotate(-Math.PI / 2);
-  ctx.fillText("Recall", 0, 0);
-  ctx.restore();
-
-  var colors = ["#4e79a7","#f28e2b","#e15759","#76b7b2","#59a14f","#edc948","#b07aa1","#ff9da7"];
-  var modelColors = {{}};
-  var ci = 0;
-  data.forEach(function(d) {{
-    if (!modelColors[d.label]) modelColors[d.label] = colors[ci++ % colors.length];
-  }});
-
-  data.forEach(function(d) {{
-    var x = pad.left + (d.x / maxX) * pW;
-    var y = H - pad.bottom - (d.y / maxY) * pH;
-    ctx.fillStyle = modelColors[d.label];
-    ctx.beginPath();
-    ctx.arc(x, y, 6, 0, 2 * Math.PI);
-    ctx.fill();
-    ctx.strokeStyle = "#fff";
-    ctx.lineWidth = 1.5;
-    ctx.stroke();
-    ctx.fillStyle = "#333";
-    ctx.font = "11px sans-serif";
-    ctx.textAlign = "left";
-    ctx.fillText(d.label, x + 9, y + 4);
-  }});
-}}
-
-function drawGroupedBar(canvasId, data, groups) {{
-  if (!data.length) return;
-  var canvas = document.getElementById(canvasId);
-  var ctx = canvas.getContext("2d");
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  var W = canvas.width, H = canvas.height;
-  var pad = {{top: 30, right: 20, bottom: 80, left: 60}};
-  var pW = W - pad.left - pad.right;
-  var pH = H - pad.top - pad.bottom;
-
-  var n = data.length;
-  var g = groups.length;
-  var groupWidth = pW / n;
-  var barWidth = (groupWidth * 0.8) / g;
-  var gap = groupWidth * 0.2;
-
-  var colors = ["#4e79a7","#f28e2b","#e15759","#76b7b2","#59a14f","#edc948","#b07aa1","#ff9da7"];
-
-  // y-axis
-  ctx.strokeStyle = "#999";
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.moveTo(pad.left, pad.top);
-  ctx.lineTo(pad.left, H - pad.bottom);
-  ctx.lineTo(W - pad.right, H - pad.bottom);
-  ctx.stroke();
-
-  // y grid + labels
-  ctx.fillStyle = "#666";
-  ctx.font = "12px sans-serif";
-  ctx.textAlign = "right";
-  for (var j = 0; j <= 5; j++) {{
-    var yVal = j * 0.2;
-    var y = H - pad.bottom - (yVal) * pH;
-    ctx.fillText(yVal.toFixed(1), pad.left - 8, y + 4);
-    ctx.strokeStyle = "#eee";
-    ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(W - pad.right, y); ctx.stroke();
-  }}
-
-  // y-axis label
-  ctx.fillStyle = "#333";
-  ctx.font = "14px sans-serif";
-  ctx.save();
-  ctx.translate(15, H / 2);
-  ctx.rotate(-Math.PI / 2);
-  ctx.textAlign = "center";
-  ctx.fillText("Recall", 0, 0);
-  ctx.restore();
-
-  // bars
-  data.forEach(function(entry, i) {{
-    var x0 = pad.left + i * groupWidth + gap / 2;
-    groups.forEach(function(gName, gi) {{
-      var val = entry[gName];
-      if (val == null) return;
-      var bx = x0 + gi * barWidth;
-      var bh = val * pH;
-      var by = H - pad.bottom - bh;
-      ctx.fillStyle = colors[gi % colors.length];
-      ctx.fillRect(bx, by, barWidth - 1, bh);
-      // value label
-      ctx.fillStyle = "#333";
-      ctx.font = "10px sans-serif";
-      ctx.textAlign = "center";
-      ctx.fillText(val.toFixed(2), bx + barWidth / 2, by - 4);
-    }});
-    // model label
-    ctx.fillStyle = "#333";
-    ctx.font = "11px sans-serif";
-    ctx.save();
-    ctx.translate(x0 + (g * barWidth) / 2, H - pad.bottom + 12);
-    ctx.rotate(-Math.PI / 6);
-    ctx.textAlign = "right";
-    ctx.fillText(entry.label, 0, 0);
-    ctx.restore();
-  }});
-
-  // legend
-  var lx = W - pad.right - 10;
-  var ly = pad.top + 5;
-  groups.forEach(function(gName, gi) {{
-    ctx.fillStyle = "#333";
-    ctx.font = "12px sans-serif";
-    ctx.textAlign = "right";
-    ctx.fillText(gName, lx - 16, ly + gi * 18 + 11);
-    ctx.fillStyle = colors[gi % colors.length];
-    ctx.fillRect(lx - 12, ly + gi * 18, 12, 12);
-  }});
-}}
-
-function drawSlope(canvasId, data, categories) {{
-  if (!data.length) return;
-  var canvas = document.getElementById(canvasId);
-  var ctx = canvas.getContext("2d");
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  var W = canvas.width, H = canvas.height;
-  var pad = {{top: 30, right: 30, bottom: 50, left: 60}};
-  var pW = W - pad.left - pad.right;
-  var pH = H - pad.top - pad.bottom;
-  var nCat = categories.length;
-
-  // axes
-  ctx.strokeStyle = "#999";
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.moveTo(pad.left, pad.top);
-  ctx.lineTo(pad.left, H - pad.bottom);
-  ctx.lineTo(W - pad.right, H - pad.bottom);
-  ctx.stroke();
-
-  // y grid
-  ctx.fillStyle = "#666";
-  ctx.font = "12px sans-serif";
-  ctx.textAlign = "right";
-  for (var j = 0; j <= 5; j++) {{
-    var yVal = j * 0.2;
-    var y = H - pad.bottom - yVal * pH;
-    ctx.fillText(yVal.toFixed(1), pad.left - 8, y + 4);
-    ctx.strokeStyle = "#eee";
-    ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(W - pad.right, y); ctx.stroke();
-  }}
-
-  // y-axis label
-  ctx.fillStyle = "#333";
-  ctx.font = "14px sans-serif";
-  ctx.save();
-  ctx.translate(15, H / 2);
-  ctx.rotate(-Math.PI / 2);
-  ctx.textAlign = "center";
-  ctx.fillText("Recall", 0, 0);
-  ctx.restore();
-
-  // x positions for each category
-  var xPositions = [];
-  ctx.fillStyle = "#333";
-  ctx.font = "12px sans-serif";
-  ctx.textAlign = "center";
-  categories.forEach(function(cat, ci) {{
-    var x = pad.left + (ci / (nCat - 1)) * pW;
-    xPositions.push(x);
-    ctx.fillText(cat, x, H - pad.bottom + 20);
-  }});
-
-  // model colors
-  var colors = ["#4e79a7","#f28e2b","#e15759","#76b7b2","#59a14f","#edc948","#b07aa1","#ff9da7"];
-  var modelColors = {{}};
-  var ci = 0;
-  data.forEach(function(d) {{
-    if (!modelColors[d.label]) modelColors[d.label] = colors[ci++ % colors.length];
-  }});
-
-  // average by model per category
-  var modelList = Object.keys(modelColors);
-  var modelAvgs = {{}};
-  modelList.forEach(function(m) {{
-    var avgs = [];
-    for (var c = 0; c < nCat; c++) {{
-      var vals = [];
-      data.forEach(function(d) {{
-        if (d.label === m && d.x === c) vals.push(d.y);
-      }});
-      avgs.push(vals.length ? vals.reduce(function(a, b) {{ return a + b; }}, 0) / vals.length : null);
-    }}
-    modelAvgs[m] = avgs;
-  }});
-
-  // draw lines and dots
-  modelList.forEach(function(m) {{
-    var avgs = modelAvgs[m];
-    var color = modelColors[m];
-    // line segments
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 2.5;
-    ctx.beginPath();
-    var started = false;
-    avgs.forEach(function(val, ci) {{
-      if (val == null) return;
-      var x = xPositions[ci];
-      var y = H - pad.bottom - val * pH;
-      if (!started) {{ ctx.moveTo(x, y); started = true; }}
-      else ctx.lineTo(x, y);
-    }});
-    ctx.stroke();
-    // dots with value labels
-    avgs.forEach(function(val, ci) {{
-      if (val == null) return;
-      var x = xPositions[ci];
-      var y = H - pad.bottom - val * pH;
-      ctx.fillStyle = color;
-      ctx.beginPath();
-      ctx.arc(x, y, 5, 0, 2 * Math.PI);
-      ctx.fill();
-      ctx.strokeStyle = "#fff";
-      ctx.lineWidth = 1.5;
-      ctx.stroke();
-      ctx.fillStyle = "#333";
-      ctx.font = "10px sans-serif";
-      ctx.textAlign = "center";
-      ctx.fillText(val.toFixed(2), x, y - 10);
-    }});
-  }});
-
-  // legend
-  var lx = W - pad.right - 10;
-  var ly = pad.top + 5;
-  modelList.forEach(function(m, mi) {{
-    ctx.strokeStyle = modelColors[m];
-    ctx.lineWidth = 2.5;
-    ctx.beginPath();
-    ctx.moveTo(lx - 30, ly + mi * 20 + 6);
-    ctx.lineTo(lx - 14, ly + mi * 20 + 6);
-    ctx.stroke();
-    ctx.fillStyle = modelColors[m];
-    ctx.beginPath();
-    ctx.arc(lx - 22, ly + mi * 20 + 6, 3, 0, 2 * Math.PI);
-    ctx.fill();
-    ctx.fillStyle = "#333";
-    ctx.font = "12px sans-serif";
-    ctx.textAlign = "right";
-    ctx.fillText(m, lx - 34, ly + mi * 20 + 11);
-  }});
-}}
-
-// Store chart data globally for model-filter redraw
-var _costData = {cost_chart_data};
-var _timeData = {time_chart_data};
-var _levelData = {level_chart_data};
-var _complexityData = {complexity_slope_data};
-var _catData = {category_chart_data};
-var _frustScatterData = {frustration_scatter_data};
-var _frustCats = ["Low", "Moderate", "High", "Very High"];
-var _levelLabels = {level_labels_json};
-var _complexityLabels = {complexity_labels_json};
-var _catLabels = {cat_labels_json};
-
-function _redrawCharts(modelFilter) {{
-  function match(label) {{ return !modelFilter || label === modelFilter; }}
-  drawScatter("cost-recall-chart", _costData.filter(function(d) {{ return match(d.label); }}),
-    "Total Cost (USD)", function(v) {{ return "$" + v.toFixed(2); }});
-  drawScatter("time-recall-chart", _timeData.filter(function(d) {{ return match(d.label); }}),
-    "Total Time (minutes)", function(v) {{ return v.toFixed(1) + "m"; }});
-  drawGroupedBar("level-chart",
-    _levelData.filter(function(d) {{ return match(d.label); }}), _levelLabels);
-  drawSlope("complexity-chart",
-    _complexityData.filter(function(d) {{ return match(d.label); }}), _complexityLabels);
-  drawGroupedBar("category-chart",
-    _catData.filter(function(d) {{ return match(d.label); }}), _catLabels);
-  drawSlope("frustration-slope",
-    _frustScatterData.filter(function(d) {{ return match(d.label); }}), _frustCats);
-}}
-
-document.addEventListener("DOMContentLoaded", function() {{
-  _redrawCharts(null);
-
-  // Model filter dropdown
-  var table = document.getElementById("runs-table");
-  var rows = Array.from(table.querySelectorAll("tbody tr"));
-  var models = [];
-  rows.forEach(function(r) {{
-    var m = r.children[1].textContent;
-    if (m && models.indexOf(m) === -1) models.push(m);
-  }});
-  if (models.length > 1) {{
-    var sel = document.createElement("select");
-    sel.id = "model-filter";
-    sel.style.marginBottom = "1rem";
-    sel.style.padding = "0.3rem";
-    sel.style.fontSize = "14px";
-    var all = document.createElement("option");
-    all.value = "";
-    all.textContent = "All Models";
-    sel.appendChild(all);
-    models.sort().forEach(function(m) {{
-      var opt = document.createElement("option");
-      opt.value = m;
-      opt.textContent = m;
-      sel.appendChild(opt);
-    }});
-    table.parentNode.insertBefore(sel, table);
-    sel.addEventListener("change", function() {{
-      var v = sel.value;
-      rows.forEach(function(r) {{
-        r.style.display = (!v || r.children[1].textContent === v) ? "" : "none";
-      }});
-      _redrawCharts(v || null);
-    }});
-  }}
-}});
-</script>
-"""
-    level_section = ""
-    complexity_section = ""
-    if has_difficulty:
-        level_section = """
-    <figure>
-      <figcaption>Recall by Level</figcaption>
-      <canvas id="level-chart" width="900" height="420"></canvas>
-    </figure>"""
-        complexity_section = """
-    <figure>
-      <figcaption>Recall by Complexity</figcaption>
-      <canvas id="complexity-chart" width="900" height="420"></canvas>
-    </figure>"""
-    category_section = ""
-    if has_categories:
-        category_section = """
-    <figure>
-      <figcaption>Recall by Category</figcaption>
-      <canvas id="category-chart" width="900" height="420"></canvas>
-    </figure>"""
-    frustration_section = ""
-    if has_frustration:
-        frustration_section = """
-    <figure>
-      <figcaption>Recall Degradation by User Frustration</figcaption>
-      <details style="font-size:0.85rem; margin-bottom:0.5rem; max-width:900px; text-align:left;">
-        <summary style="cursor:pointer; color:#555;">What is user frustration?</summary>
-        <p style="margin:0.4rem 0;">User frustration estimates how difficult a query is to answer with the current portal&rsquo;s faceted search and text search.</p>
-        <ul style="margin:0.3rem 0; padding-left:1.3rem;">
-          <li><strong>Low</strong> &ndash; Answerable with minimal effort via facets or text search</li>
-          <li><strong>Moderate</strong> &ndash; Requires knowing the right approach, extra steps, or domain knowledge</li>
-          <li><strong>High</strong> &ndash; Incomplete/misleading results, painful workarounds, or only one weak path</li>
-          <li><strong>Very High</strong> &ndash; Cannot be answered at all, or requires expert-level workarounds that most users would never find</li>
-        </ul>
-      </details>
-      <canvas id="frustration-slope" width="900" height="420"></canvas>
-    </figure>"""
-
-    html_content = f"""
-<!DOCTYPE html>
-<html lang=\"en\">
-<head>
-  <meta charset=\"utf-8\" />
-  <title>NF Research Tools Discovery Evaluation</title>
-  <style>
-    body {{ font-family: sans-serif; margin: 2rem; }}
-    table {{ border-collapse: collapse; width: 100%; }}
-    th, td {{ border: 1px solid #ccc; padding: 0.5rem; text-align: left; }}
-    th {{ cursor: pointer; font-weight: 600; }}
-    /* Column group colors for better readability */
-    th.info {{ background: #e3f2fd; }}     /* Run info: soft blue */
-    th.recall {{ background: #c8e6c9; }}   /* Overall recall: emphasized green */
-    th.perf {{ background: #e8f5e9; }}     /* Difficulty breakdown: soft green */
-    th.category {{ background: #e0f2f1; }} /* Category breakdown: soft teal */
-    th.cost {{ background: #fff3e0; }}     /* Cost: soft amber */
-    th.time {{ background: #f3e5f5; }}     /* Timing: soft purple */
-    th.meta {{ background: #f5f5f5; }}     /* Metadata: light gray */
-    .charts {{ display: flex; flex-wrap: wrap; gap: 2rem; justify-content: center; }}
-    .charts figure {{ margin: 0; text-align: center; }}
-    .charts figcaption {{ font-weight: bold; margin-bottom: 0.5rem; }}
-    canvas {{ border: 1px solid #eee; }}
-    #token-toggle {{ margin-bottom: 1rem; padding: 0.5rem 1rem; cursor: pointer; }}
-  </style>
-</head>
-<body>
-  <h1>NF Research Tools Discovery Evaluation</h1>
-  <p>Generated {generated} &mdash; Structured SPARQL queries against the Synapse portal knowledge graph</p>
-  <button id="token-toggle">Show Token Details</button>
-  {table_html}
-  <p><small>Runs with different commit hashes may reflect prompt or task changes that affect performance.</small></p>
-  <div class="charts">
-    <figure>
-      <figcaption>Cost vs Recall</figcaption>
-      <canvas id="cost-recall-chart" width="720" height="420"></canvas>
-    </figure>
-    <figure>
-      <figcaption>Total Time vs Recall</figcaption>
-      <canvas id="time-recall-chart" width="720" height="420"></canvas>
-    </figure>
-    {level_section}
-    {complexity_section}
-    {category_section}
-    {frustration_section}
-  </div>
-  {sweet_spot_html}
-  <p>Raw data: <a href=\"runs.json\">runs.json</a></p>
-  {sort_script}
-  {chart_script}
-</body>
-</html>
-"""
-    (destination / "main.html").write_text(html_content)
-
-
-def write_pubs_site(pubs_data: list[dict], destination: Path) -> None:
-    """Generate HTML dashboard for nf_rag_pubs evaluation results."""
-    destination.mkdir(parents=True, exist_ok=True)
-    (destination / "pubs_runs.json").write_text(json.dumps(pubs_data, indent=2))
-
-    # Find best values for bolding
-    best_acc = max((r.get("accuracy") for r in pubs_data if r.get("status") == "success"), default=None)
-    best_f1 = max((r.get("citation_f1") or r.get("passage_f1") for r in pubs_data if r.get("status") == "success"), default=None)
-
-    # Build summary table rows
-    rows = []
-    for run in pubs_data:
-        model = _esc(run.get("model", ""))
-        style = _esc(run.get("question_style", ""))
-        status = run.get("status", "")
-        samples = run.get("samples", 0)
-        total = run.get("total_samples", 130)
-        acc = run.get("accuracy")
-        acc_se = run.get("accuracy_stderr")
-        # Current key is citation_f1; older extracts used passage_f1
-        f1 = run.get("citation_f1") or run.get("passage_f1")
-        f1_se = run.get("citation_f1_stderr") or run.get("passage_f1_stderr")
-        started = _format_date(run.get("started_at"))
-        task_version = run.get("task_version", "")
-        total_secs = _duration_seconds(run.get("started_at"), run.get("completed_at"))
-        cost = run.get("cost")
-        input_tok = run.get("input_tokens", 0)
-        output_tok = run.get("output_tokens", 0)
-        cache_write_tok = run.get("input_tokens_cache_write", 0)
-        cache_read_tok = run.get("input_tokens_cache_read", 0)
-        total_tok = run.get("total_tokens", 0)
-        avg_t = run.get("avg_sample_time")
-        min_t = run.get("min_sample_time")
-        max_t = run.get("max_sample_time")
-        samples_str = f"{samples}/{total}" if status != "success" else str(samples)
-        status_badge = status if status == "success" else f"<em>{status}</em>"
-
-        # Bold best values
-        acc_str = _format_score_with_stderr(acc, acc_se)
-        f1_str = _format_score_with_stderr(f1, f1_se)
-        if acc is not None and acc == best_acc:
-            acc_str = f"<strong>{acc_str}</strong>"
-        if f1 is not None and f1 == best_f1:
-            f1_str = f"<strong>{f1_str}</strong>"
-
-        rows.append(
-            f"<tr><td>{model}</td><td>{style}</td><td>{samples_str}</td>"
-            f"<td>{acc_str}</td>"
-            f"<td>{f1_str}</td>"
-            f"<td>{_format_cost(cost)}</td>"
-            f"<td class='token-col'>{input_tok:,}</td>"
-            f"<td class='token-col'>{output_tok:,}</td>"
-            f"<td class='token-col'>{cache_write_tok:,}</td>"
-            f"<td class='token-col'>{cache_read_tok:,}</td>"
-            f"<td class='token-col'>{total_tok:,}</td>"
-            f"<td>{_format_duration(total_secs)}</td>"
-            f"<td>{_format_duration(avg_t)}</td>"
-            f"<td>{_format_duration(min_t)}</td>"
-            f"<td>{_format_duration(max_t)}</td>"
-            f"<td>{started}</td>"
-            f"<td>{_format_version(task_version)}</td></tr>"
+    if len(ordered) > 8:
+        print(
+            f"Warning: {len(ordered)} models but only 8 categorical slots; "
+            "models past the eighth share the de-emphasis gray",
+            file=sys.stderr,
         )
-    rows_html = "\n".join(rows)
+    return registry
 
-    # Build chart data: difficulty breakdown (slope charts, user_query only)
-    difficulty_keys = ["easy", "medium", "hard"]
-    difficulty_labels = ["Easy", "Medium", "Hard"]
-    diff_acc_slope = []
-    diff_f1_slope = []
-    for run in pubs_data:
-        if run.get("status") != "success":
-            continue
-        if run.get("question_style") != "user_query":
-            continue
-        label = _esc(run.get('model', ''))
-        da = run.get("difficulty_accuracy", {})
-        df = run.get("difficulty_f1", {})
-        for i, k in enumerate(difficulty_keys):
-            if da.get(k) is not None:
-                diff_acc_slope.append({"x": i, "y": da[k], "label": label})
-            if df.get(k) is not None:
-                diff_f1_slope.append({"x": i, "y": df[k], "label": label})
 
-    # Build chart data: question type breakdown (user_query only)
-    qtype_keys = sorted({
-        k for run in pubs_data
-        for k in run.get("question_type_accuracy", {})
-    })
-    qtype_acc_chart = []
-    qtype_f1_chart = []
-    for run in pubs_data:
-        if run.get("status") != "success":
-            continue
-        if run.get("question_style") != "user_query":
-            continue
-        label = _esc(run.get('model', ''))
-        qa = run.get("question_type_accuracy", {})
-        qf = run.get("question_type_f1", {})
-        qa_entry = {"label": label}
-        qf_entry = {"label": label}
-        for k in qtype_keys:
-            qa_entry[k.title()] = qa.get(k)
-            qf_entry[k.title()] = qf.get(k)
-        qtype_acc_chart.append(qa_entry)
-        qtype_f1_chart.append(qf_entry)
+# --------------------------------------------------------------------------- #
+# Tools module (nf_rag)
+# --------------------------------------------------------------------------- #
 
-    # Build scatter plot data: cost and time vs accuracy and citation_f1 (user_query only)
-    cost_acc_data = []
-    cost_f1_data = []
-    time_acc_data = []
-    time_f1_data = []
-    for run in pubs_data:
-        if run.get("status") != "success":
+def _question_scores(run: dict) -> dict[str, float]:
+    """Per-question scores, unioned over whichever sample lists are present."""
+    scores: dict[str, float] = {}
+    for key in ("level_samples", "complexity_samples", "frustration_samples", "question_samples"):
+        for sample in run.get(key) or []:
+            qid = sample.get("id")
+            if qid and sample.get("score") is not None:
+                scores[qid] = sample["score"]
+    return scores
+
+
+def build_tools_payload(
+    runs_raw: list[dict],
+    question_meta: dict[str, dict],
+    ground_truth_text: dict[str, str],
+) -> dict:
+    # --- question-set sizes, measured over every recorded run --------------- #
+    # The expected size of a set has to come from the full extract: it is the
+    # yardstick a run is judged complete against, so it must be known before
+    # anything is filtered out.
+    version_samples: dict[str, int] = {}
+    version_first: dict[str, str] = {}
+    for run in runs_raw:
+        version = _version_label(run.get("task_version"))
+        samples = run.get("total_samples") or 0
+        version_samples[version] = max(version_samples.get(version, 0), samples)
+        stamp = _sort_key(run.get("started_at"))
+        if version not in version_first or stamp > version_first[version]:
+            version_first[version] = stamp
+
+    # --- runs: scored and complete only ------------------------------------- #
+    # Development runs that cover part of a set, or that the harness could not
+    # score, are dropped here rather than shown and dimmed. They are not
+    # comparable to a full run, so there is nothing useful to do with them on a
+    # dashboard. The untouched extract stays available as runs.json.
+    runs: list[dict] = []
+    excluded = 0
+    for index, raw in enumerate(runs_raw):
+        version = _version_label(raw.get("task_version"))
+        samples = raw.get("total_samples")
+        expected = version_samples.get(version, 0)
+        score = _clean(raw.get("score"))
+        threshold = max(MIN_FULL_RUN_SAMPLES, round(expected * 0.9))
+        if score is None or not samples or samples < threshold:
+            excluded += 1
             continue
-        if run.get("question_style") != "user_query":
+        cost = _clean(raw.get("cost"))
+        runs.append(
+            {
+                "id": raw.get("run") or f"run-{index}",
+                "model": raw.get("model") or "unknown",
+                "version": version,
+                "date": _iso_date(raw.get("started_at")),
+                "commit": raw.get("git_commit") or "",
+                "samples": samples,
+                "score": score,
+                "stderr": _clean(raw.get("score_stderr")),
+                "cost": cost,
+                "costPerQuestion": _clean(_per_question(cost, samples)),
+                "duration": _clean(_duration_seconds(raw.get("started_at"), raw.get("completed_at"))),
+                "avgSampleTime": _clean(raw.get("avg_sample_time")),
+                "minSampleTime": _clean(raw.get("min_sample_time")),
+                "maxSampleTime": _clean(raw.get("max_sample_time")),
+                "tokIn": raw.get("input_tokens"),
+                "tokOut": raw.get("output_tokens"),
+                "tokCacheWrite": raw.get("cache_write_tokens"),
+                "tokCacheRead": raw.get("cache_read_tokens"),
+                "tokTotal": raw.get("total_tokens"),
+                "difficulty": {k: _clean(v) for k, v in (raw.get("difficulty_scores") or {}).items()},
+                "category": {k: _clean(v) for k, v in (raw.get("category_scores") or {}).items()},
+                "frustration": {k: _clean(v) for k, v in (raw.get("frustration_scores") or {}).items()},
+                "questionScores": _question_scores(raw),
+            }
+        )
+
+    # Only offer a question set as a filter if a complete run actually used it.
+    version_order = sorted(
+        {r["version"] for r in runs}, key=lambda v: version_first.get(v, "")
+    )
+    latest_version = version_order[-1] if version_order else None
+    versions = [
+        {
+            "id": version,
+            "label": version,
+            "questions": version_samples[version],
+            "isLatest": version == latest_version,
+        }
+        for version in version_order
+    ]
+
+    # --- categories, discovered from the data ------------------------------ #
+    seen_versions: dict[str, set[str]] = {}
+    for run in runs:
+        for key in run["category"]:
+            seen_versions.setdefault(key, set()).add(run["version"])
+
+    def category_rank(key: str) -> tuple[int, str]:
+        code = key.split("/", 1)[-1]
+        if code in CATEGORY_ORDER:
+            return (CATEGORY_ORDER.index(code), code)
+        return (len(CATEGORY_ORDER), code)
+
+    # question ids per category prefix, across both metadata sources
+    all_question_ids = set(question_meta) | set(ground_truth_text)
+    per_category_ids: dict[str, list[str]] = {}
+    for qid in sorted(all_question_ids):
+        code = qid.rsplit("-", 1)[0]
+        per_category_ids.setdefault(code, []).append(qid)
+
+    categories = []
+    for key in sorted(seen_versions, key=category_rank):
+        code = key.split("/", 1)[-1]
+        # New = the category has only ever been scored on the latest set.
+        is_new = latest_version is not None and seen_versions[key] == {latest_version} and len(version_order) > 1
+        ids = per_category_ids.get(code, [])
+        entry = {
+            "key": key,
+            "code": code,
+            "label": CATEGORY_LABELS.get(code, code),
+            "isNew": is_new,
+            "questions": len(ids),
+        }
+        if is_new:
+            entry["blurb"] = CATEGORY_BLURBS.get(code)
+            entry["items"] = [
+                {
+                    "id": qid,
+                    "question": (question_meta.get(qid) or {}).get("question")
+                    or ground_truth_text.get(qid, ""),
+                }
+                for qid in ids
+            ]
+        categories.append(entry)
+
+    # --- question table ---------------------------------------------------- #
+    questions = []
+    for qid in sorted(all_question_ids):
+        code = qid.rsplit("-", 1)[0]
+        meta = question_meta.get(qid) or {}
+        questions.append(
+            {
+                "id": qid,
+                "category": code,
+                "categoryLabel": CATEGORY_LABELS.get(code, code),
+                "question": meta.get("question") or ground_truth_text.get(qid, ""),
+                "level": meta.get("level", ""),
+                "complexity": meta.get("complexity", ""),
+                "frustration": meta.get("frustration", ""),
+            }
+        )
+
+    # --- high-impact questions -------------------------------------------- #
+    # Questions that hurt on today's portal. Per-model recall is kept raw so
+    # the client can recompute "best" against the current model selection.
+    frustration_of: dict[str, str] = {}
+    for run in runs_raw:
+        for sample in run.get("frustration_samples") or []:
+            if sample.get("id") and sample.get("frustration"):
+                frustration_of[sample["id"]] = sample["frustration"]
+
+    by_question: dict[str, dict[str, list[float]]] = {}
+    for run in runs:
+        for qid, score in run["questionScores"].items():
+            by_question.setdefault(qid, {}).setdefault(run["model"], []).append(score)
+
+    high_impact = []
+    for qid, per_model in by_question.items():
+        frustration = frustration_of.get(qid) or (question_meta.get(qid) or {}).get("frustration", "")
+        if frustration not in ("high", "very_high"):
             continue
-        label = _esc(run.get('model', ''))
-        acc = run.get("accuracy")
-        f1 = run.get("citation_f1") or run.get("passage_f1")
-        cost = run.get("cost")
-        total_secs = _duration_seconds(run.get("started_at"), run.get("completed_at"))
+        means = {
+            model: sum(values) / len(values)
+            for model, values in per_model.items()
+            if values
+        }
+        if not means or max(means.values()) < HIGH_IMPACT_THRESHOLD:
+            continue
+        meta = question_meta.get(qid) or {}
+        code = qid.rsplit("-", 1)[0]
+        high_impact.append(
+            {
+                "id": qid,
+                "question": meta.get("question") or ground_truth_text.get(qid, ""),
+                "frustration": "Very high" if frustration == "very_high" else "High",
+                "complexity": meta.get("complexity", ""),
+                "category": CATEGORY_LABELS.get(code, code),
+                "byModel": means,
+            }
+        )
+    high_impact.sort(key=lambda q: (-max(q["byModel"].values()), q["id"]))
 
-        if cost is not None and acc is not None:
-            cost_acc_data.append({"x": cost, "y": acc, "label": label})
-        if cost is not None and f1 is not None:
-            cost_f1_data.append({"x": cost, "y": f1, "label": label})
-        if total_secs is not None and acc is not None:
-            time_acc_data.append({"x": total_secs / 60, "y": acc, "label": label})
-        if total_secs is not None and f1 is not None:
-            time_f1_data.append({"x": total_secs / 60, "y": f1, "label": label})
+    task_names = [r.get("task_name") for r in runs_raw if r.get("task_name")]
+    task = task_names[-1].rpartition("/")[2] if task_names else "nf_rag"
 
-    diff_labels_json = json.dumps([k.title() for k in difficulty_keys])
-    qtype_labels_json = json.dumps([k.title() for k in qtype_keys])
-    generated = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+    return {
+        "task": task,
+        "excluded": excluded,
+        "versions": versions,
+        "categories": categories,
+        "levels": _buckets(runs, "difficulty", "level", LEVEL_LABELS, LEVEL_ORDER),
+        "complexities": _buckets(
+            runs, "difficulty", "complexity", COMPLEXITY_LABELS, COMPLEXITY_ORDER
+        ),
+        "frustrations": _buckets(
+            runs, "frustration", "frustration", FRUSTRATION_LABELS, FRUSTRATION_ORDER
+        ),
+        "frustrationHelp": FRUSTRATION_HELP,
+        "runs": runs,
+        "questions": questions,
+        "highImpact": high_impact,
+        "highImpactThreshold": HIGH_IMPACT_THRESHOLD,
+        "about": TOOLS_ABOUT,
+    }
 
-    html_content = f"""<!DOCTYPE html>
+
+# --------------------------------------------------------------------------- #
+# Pubs module (nf_rag_pubs)
+# --------------------------------------------------------------------------- #
+
+def build_pubs_payload(runs_raw: list[dict], papers_meta: dict[str, dict]) -> dict | None:
+    if not runs_raw:
+        return None
+
+    runs = []
+    excluded = 0
+    for index, raw in enumerate(runs_raw):
+        cost = _clean(raw.get("cost"))
+        samples = raw.get("samples")
+        total = raw.get("total_samples")
+        # same rule as the tools eval: only scored, complete runs are shown
+        if raw.get("status") != "success" or not samples or (total and samples < total):
+            excluded += 1
+            continue
+        # citation_f1 is the current key; older extracts wrote passage_f1
+        f1 = _clean(raw.get("citation_f1") if raw.get("citation_f1") is not None else raw.get("passage_f1"))
+        f1_stderr = _clean(
+            raw.get("citation_f1_stderr")
+            if raw.get("citation_f1_stderr") is not None
+            else raw.get("passage_f1_stderr")
+        )
+        runs.append(
+            {
+                "id": raw.get("log_file") or f"pubs-{index}",
+                "model": raw.get("model") or "unknown",
+                "style": raw.get("question_style") or "unknown",
+                "status": raw.get("status") or "",
+                "samples": samples,
+                "totalSamples": raw.get("total_samples"),
+                "version": _version_label(raw.get("task_version")),
+                "date": _iso_date(raw.get("started_at")),
+                "accuracy": _clean(raw.get("accuracy")),
+                "accuracyStderr": _clean(raw.get("accuracy_stderr")),
+                "f1": f1,
+                "f1Stderr": f1_stderr,
+                "cost": cost,
+                "costPerQuestion": _clean(_per_question(cost, samples)),
+                "duration": _clean(_duration_seconds(raw.get("started_at"), raw.get("completed_at"))),
+                "avgSampleTime": _clean(raw.get("avg_sample_time")),
+                "minSampleTime": _clean(raw.get("min_sample_time")),
+                "maxSampleTime": _clean(raw.get("max_sample_time")),
+                "tokIn": raw.get("input_tokens"),
+                "tokOut": raw.get("output_tokens"),
+                "tokCacheWrite": raw.get("input_tokens_cache_write"),
+                "tokCacheRead": raw.get("input_tokens_cache_read"),
+                "tokTotal": raw.get("total_tokens"),
+                "difficultyAcc": {k: _clean(v) for k, v in (raw.get("difficulty_accuracy") or {}).items()},
+                "difficultyF1": {k: _clean(v) for k, v in (raw.get("difficulty_f1") or {}).items()},
+                "qtypeAcc": {k: _clean(v) for k, v in (raw.get("question_type_accuracy") or {}).items()},
+                "qtypeF1": {k: _clean(v) for k, v in (raw.get("question_type_f1") or {}).items()},
+                "paperAcc": {k: _clean(v) for k, v in (raw.get("paper_accuracy") or {}).items()},
+                "paperF1": {k: _clean(v) for k, v in (raw.get("paper_f1") or {}).items()},
+            }
+        )
+
+    if not runs:
+        return None
+
+    qtype_keys = sorted({key for run in runs for key in run["qtypeF1"]})
+    paper_ids = sorted({key for run in runs for key in run["paperF1"]})
+
+    present_styles = {run["style"] for run in runs}
+    styles = [
+        {"id": sid, "label": label, "title": title}
+        for sid, label, title in PUBS_STYLES
+        if sid in present_styles
+    ]
+    for sid in sorted(present_styles):
+        if not any(s["id"] == sid for s in styles):
+            styles.append({"id": sid, "label": sid, "title": sid})
+    default_style = "user_query" if any(s["id"] == "user_query" for s in styles) else styles[0]["id"]
+
+    papers = []
+    for pid in paper_ids:
+        meta = papers_meta.get(pid, {})
+        papers.append(
+            {
+                "id": pid,
+                "label": meta.get("title", ""),
+                "questions": meta.get("questions"),
+            }
+        )
+
+    question_count = max(
+        [run["totalSamples"] or 0 for run in runs]
+        + [sum(p["questions"] or 0 for p in papers)]
+    )
+
+    # the task name is not recorded in the pubs extract, so read it off a log name
+    task = "nf_rag_pubs"
+    for raw in runs_raw:
+        match = re.search(r"(nf[-_]rag[-_]pubs)", str(raw.get("log_file", "")))
+        if match:
+            task = match.group(1).replace("-", "_")
+            break
+
+    return {
+        "task": task,
+        "excluded": excluded,
+        "runs": runs,
+        "styles": styles,
+        "defaultStyle": default_style,
+        "styleLabel": {s["id"]: s["label"] for s in styles},
+        "difficulties": [
+            {"key": k, "label": v}
+            for k, v in PUBS_DIFFICULTIES
+            if any(k in run["difficultyF1"] for run in runs)
+        ],
+        "qtypes": [{"key": k, "label": k.replace("_", " ").capitalize()} for k in qtype_keys],
+        "papers": papers,
+        "paperCount": len(papers),
+        "questionCount": question_count,
+        "about": PUBS_ABOUT,
+    }
+
+
+# --------------------------------------------------------------------------- #
+# HTML shell
+# --------------------------------------------------------------------------- #
+
+REDIRECT_TEMPLATE = """<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>NF Publication RAG Evaluation</title>
+  <title>Moved &mdash; NF Knowledge Graph Evaluation</title>
+  <meta http-equiv="refresh" content="0; url=index.html#{anchor}" />
+  <link rel="canonical" href="index.html#{anchor}" />
   <style>
-    body {{ font-family: sans-serif; margin: 2rem; }}
-    table {{ border-collapse: collapse; width: 100%; margin-bottom: 2rem; }}
-    th, td {{ border: 1px solid #ccc; padding: 0.5rem; text-align: left; }}
-    th {{ font-weight: 600; cursor: pointer; }}
-    /* Column group colors for better readability */
-    th.info {{ background: #e3f2fd; }}     /* Run info: soft blue */
-    th.metrics {{ background: #c8e6c9; }}  /* Accuracy, F1: emphasized green */
-    th.cost {{ background: #fff3e0; }}     /* Cost: soft amber */
-    th.time {{ background: #f3e5f5; }}     /* Timing: soft purple */
-    th.meta {{ background: #f5f5f5; }}     /* Metadata: light gray */
-    .charts {{ display: flex; flex-wrap: wrap; gap: 2rem; justify-content: center; }}
-    .charts figure {{ margin: 0; text-align: center; }}
-    .charts figcaption {{ font-weight: bold; margin-bottom: 0.5rem; }}
-    canvas {{ border: 1px solid #eee; }}
-    em {{ color: #e65100; }}
-    #token-toggle {{ margin-bottom: 1rem; padding: 0.5rem 1rem; cursor: pointer; }}
+    body {{ font-family: system-ui, -apple-system, "Segoe UI", sans-serif; margin: 4rem auto;
+           max-width: 34rem; padding: 0 1.5rem; color: #0b0b0b; background: #f9f9f7; }}
   </style>
 </head>
 <body>
-  <h1>NF Publication RAG Evaluation</h1>
-  <p>Generated {generated} &mdash; 130 questions across 14 papers</p>
+  <p>This dashboard now lives on one page.
+     <a href="index.html#{anchor}">Continue to {name}</a>.</p>
+</body>
+</html>
+"""
 
-  <h2>Summary</h2>
-  <p><strong>Accuracy</strong> measures whether the agent selected the correct answer from the multiple-choice options.
-  <strong>Citation F1</strong> measures how well the agent cited the correct supporting passages (PMID + passage index tuples) &mdash;
-  precision is the fraction of cited passages that are relevant, and recall is the fraction of expected passages that were cited.</p>
-  <p><strong>Note:</strong> Charts below show results for the <em>user_query</em> question style only.
-  Performance is similar for both <em>precise</em> and <em>user_query</em> styles, but <em>user_query</em> better reflects realistic user interactions with natural phrasing and ambiguity.</p>
-  <button id="token-toggle">Show Token Details</button>
-  <table id="runs-table">
-    <thead>
-      <tr>
-        <th class="info">Model</th>
-        <th class="info">Question Style</th>
-        <th class="info">Samples</th>
-        <th class="metrics">Accuracy</th>
-        <th class="metrics">Citation F1</th>
-        <th class="cost">Total Cost (USD)</th>
-        <th class='token-col cost'>Input Tokens</th>
-        <th class='token-col cost'>Output Tokens</th>
-        <th class='token-col cost'>Cache Write</th>
-        <th class='token-col cost'>Cache Read</th>
-        <th class='token-col cost'>Total Tokens</th>
-        <th class="time">Total Time</th>
-        <th class="time">Avg / Sample</th>
-        <th class="time">Shortest</th>
-        <th class="time">Longest</th>
-        <th class="meta">Date</th>
-        <th class="meta">Task Dataset Version</th>
-      </tr>
-    </thead>
-    <tbody>
-      {rows_html}
-    </tbody>
-  </table>
 
-  <div class="charts">
-    <figure>
-      <figcaption>Cost vs Accuracy</figcaption>
-      <canvas id="cost-acc-chart" width="720" height="420"></canvas>
-    </figure>
-    <figure>
-      <figcaption>Time vs Accuracy</figcaption>
-      <canvas id="time-acc-chart" width="720" height="420"></canvas>
-    </figure>
-    <figure>
-      <figcaption>Cost vs Citation F1</figcaption>
-      <canvas id="cost-f1-chart" width="720" height="420"></canvas>
-    </figure>
-    <figure>
-      <figcaption>Time vs Citation F1</figcaption>
-      <canvas id="time-f1-chart" width="720" height="420"></canvas>
-    </figure>
-    <figure>
-      <figcaption>Accuracy by Difficulty</figcaption>
-      <canvas id="diff-acc-slope" width="900" height="420"></canvas>
-    </figure>
-    <figure>
-      <figcaption>Citation F1 by Difficulty</figcaption>
-      <canvas id="diff-f1-slope" width="900" height="420"></canvas>
-    </figure>
-    <figure>
-      <figcaption>Accuracy by Question Type</figcaption>
-      <canvas id="qtype-acc-chart" width="900" height="420"></canvas>
-    </figure>
-    <figure>
-      <figcaption>Citation F1 by Question Type</figcaption>
-      <canvas id="qtype-f1-chart" width="900" height="420"></canvas>
-    </figure>
+def _embed_json(payload: dict) -> str:
+    """Serialise for a <script type="application/json"> block."""
+    text = json.dumps(payload, separators=(",", ":"), allow_nan=False)
+    return text.replace("<", "\\u003c").replace(">", "\\u003e").replace("&", "\\u0026")
+
+
+def _read_asset(name: str) -> str:
+    path = SITE_DIR / name
+    if not path.exists():
+        raise SystemExit(f"Missing site asset: {path}")
+    return path.read_text()
+
+
+def render_html(payload: dict) -> str:
+    css = _read_asset("dashboard.css")
+    charts_js = _read_asset("charts.js")
+    dashboard_js = _read_asset("dashboard.js")
+    generated = payload["generated"]
+
+    tools_runs = len(payload["tools"]["runs"])
+    pubs_runs = len(payload["pubs"]["runs"]) if payload.get("pubs") else 0
+    description = (
+        "Benchmark results for agents answering neurofibromatosis research questions "
+        f"against the NF portal knowledge graph — {tools_runs} research-tools discovery "
+        f"runs and {pubs_runs} publication QA runs."
+    )
+
+    return f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NF Knowledge Graph Evaluation</title>
+<meta name="description" content="{description}" />
+<meta name="color-scheme" content="light dark" />
+<style>
+{css}
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <div class="brand">
+      <h1 class="brand-title">
+        <span class="brand-mark">NF&nbsp;KG</span>
+        <span>Evaluation</span>
+      </h1>
+    </div>
+    <div class="masthead-tools">
+      <span class="stamp">Updated {generated}</span>
+      <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Switch theme">
+        <svg class="icon-light" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"
+             stroke-linecap="round" aria-hidden="true">
+          <circle cx="8" cy="8" r="3.1" />
+          <path d="M8 1v1.6M8 13.4V15M1 8h1.6M13.4 8H15M3.05 3.05l1.13 1.13M11.82 11.82l1.13 1.13M12.95 3.05l-1.13 1.13M4.18 11.82l-1.13 1.13" />
+        </svg>
+        <svg class="icon-dark" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M13.5 9.9A5.6 5.6 0 0 1 6.1 2.5a5.9 5.9 0 1 0 7.4 7.4z" />
+        </svg>
+      </button>
+    </div>
+    <div class="tabs" id="tab-bar" role="tablist" aria-label="Evaluation modules"></div>
   </div>
+</header>
 
-  <p>Raw data: <a href="pubs_runs.json">pubs_runs.json</a></p>
+<main>
+  <noscript>
+    <p class="chart-empty">This dashboard renders its figures in the browser. The underlying data is
+      available as <a href="runs.json">runs.json</a> and <a href="pubs_runs.json">pubs_runs.json</a>.</p>
+  </noscript>
+  <section class="panel" id="panel-tools" role="tabpanel" aria-labelledby="tab-tools" tabindex="0" hidden></section>
+  <section class="panel" id="panel-pubs" role="tabpanel" aria-labelledby="tab-pubs" tabindex="0" hidden></section>
+</main>
 
+<footer class="site-footer">
+  <span>Generated {generated}</span>
+  <span class="spacer"></span>
+  <a href="runs.json">runs.json</a>
+  <a href="pubs_runs.json">pubs_runs.json</a>
+  <a href="https://github.com/nf-osi/kg-pipeline">kg-pipeline</a>
+  <a href="https://github.com/nf-osi/asta-bench">asta-bench</a>
+</footer>
+
+<script id="site-data" type="application/json">{_embed_json(payload)}</script>
 <script>
-function drawScatter(canvasId, data, xLabel, yLabel, xFmt) {{
-  if (!data.length) return;
-  var canvas = document.getElementById(canvasId);
-  var ctx = canvas.getContext("2d");
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  var W = canvas.width, H = canvas.height;
-  var pad = {{top: 30, right: 30, bottom: 50, left: 60}};
-  var pW = W - pad.left - pad.right;
-  var pH = H - pad.top - pad.bottom;
-
-  var maxX = Math.max.apply(null, data.map(function(d) {{ return d.x; }})) * 1.15;
-  var minY = Math.max(0, Math.min.apply(null, data.map(function(d) {{ return d.y; }})) - 0.05);
-  var maxY = Math.min(1, Math.max.apply(null, data.map(function(d) {{ return d.y; }})) + 0.05);
-  var rangeY = maxY - minY;
-
-  ctx.strokeStyle = "#999";
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.moveTo(pad.left, pad.top);
-  ctx.lineTo(pad.left, H - pad.bottom);
-  ctx.lineTo(W - pad.right, H - pad.bottom);
-  ctx.stroke();
-
-  ctx.fillStyle = "#666";
-  ctx.font = "12px sans-serif";
-  ctx.textAlign = "center";
-  for (var i = 0; i <= 5; i++) {{
-    var xVal = (maxX / 5) * i;
-    var x = pad.left + (xVal / maxX) * pW;
-    ctx.fillText(xFmt(xVal), x, H - pad.bottom + 18);
-    ctx.strokeStyle = "#eee";
-    ctx.beginPath(); ctx.moveTo(x, pad.top); ctx.lineTo(x, H - pad.bottom); ctx.stroke();
-  }}
-  ctx.textAlign = "right";
-  for (var j = 0; j <= 5; j++) {{
-    var yVal = minY + (rangeY / 5) * j;
-    var y = H - pad.bottom - ((yVal - minY) / rangeY) * pH;
-    ctx.fillText(yVal.toFixed(2), pad.left - 8, y + 4);
-    ctx.strokeStyle = "#eee";
-    ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(W - pad.right, y); ctx.stroke();
-  }}
-
-  ctx.fillStyle = "#333";
-  ctx.font = "14px sans-serif";
-  ctx.textAlign = "center";
-  ctx.fillText(xLabel, W / 2, H - 5);
-  ctx.save();
-  ctx.translate(15, H / 2);
-  ctx.rotate(-Math.PI / 2);
-  ctx.fillText(yLabel, 0, 0);
-  ctx.restore();
-
-  var colors = ["#4e79a7","#f28e2b","#e15759","#76b7b2","#59a14f","#edc948","#b07aa1","#ff9da7"];
-  var modelColors = {{}};
-  var ci = 0;
-  data.forEach(function(d) {{
-    if (!modelColors[d.label]) modelColors[d.label] = colors[ci++ % colors.length];
-  }});
-
-  data.forEach(function(d) {{
-    var x = pad.left + (d.x / maxX) * pW;
-    var y = H - pad.bottom - ((d.y - minY) / rangeY) * pH;
-    ctx.fillStyle = modelColors[d.label];
-    ctx.beginPath();
-    ctx.arc(x, y, 6, 0, 2 * Math.PI);
-    ctx.fill();
-    ctx.strokeStyle = "#fff";
-    ctx.lineWidth = 1.5;
-    ctx.stroke();
-    ctx.fillStyle = "#333";
-    ctx.font = "11px sans-serif";
-    ctx.textAlign = "center";
-    ctx.fillText(d.label, x, y - 10);
-  }});
-}}
-
-function drawSlope(canvasId, data, categories, yLabel) {{
-  if (!data.length) return;
-  var canvas = document.getElementById(canvasId);
-  var ctx = canvas.getContext("2d");
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  var W = canvas.width, H = canvas.height;
-  var pad = {{top: 30, right: 30, bottom: 50, left: 60}};
-  var pW = W - pad.left - pad.right;
-  var pH = H - pad.top - pad.bottom;
-  var nCat = categories.length;
-
-  // Dynamic y-axis range
-  var minY = Math.max(0, Math.min.apply(null, data.map(function(d) {{ return d.y; }})) - 0.05);
-  var maxY = Math.min(1, Math.max.apply(null, data.map(function(d) {{ return d.y; }})) + 0.05);
-  var rangeY = maxY - minY;
-
-  // axes
-  ctx.strokeStyle = "#999";
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.moveTo(pad.left, pad.top);
-  ctx.lineTo(pad.left, H - pad.bottom);
-  ctx.lineTo(W - pad.right, H - pad.bottom);
-  ctx.stroke();
-
-  // y grid
-  ctx.fillStyle = "#666";
-  ctx.font = "12px sans-serif";
-  ctx.textAlign = "right";
-  for (var j = 0; j <= 5; j++) {{
-    var yVal = minY + (rangeY / 5) * j;
-    var y = H - pad.bottom - ((yVal - minY) / rangeY) * pH;
-    ctx.fillText(yVal.toFixed(2), pad.left - 8, y + 4);
-    ctx.strokeStyle = "#eee";
-    ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(W - pad.right, y); ctx.stroke();
-  }}
-
-  // y-axis label
-  ctx.fillStyle = "#333";
-  ctx.font = "14px sans-serif";
-  ctx.save();
-  ctx.translate(15, H / 2);
-  ctx.rotate(-Math.PI / 2);
-  ctx.textAlign = "center";
-  ctx.fillText(yLabel, 0, 0);
-  ctx.restore();
-
-  // x positions for each category
-  var xPositions = [];
-  ctx.fillStyle = "#333";
-  ctx.font = "12px sans-serif";
-  ctx.textAlign = "center";
-  categories.forEach(function(cat, ci) {{
-    var x = pad.left + (ci / (nCat - 1)) * pW;
-    xPositions.push(x);
-    ctx.fillText(cat, x, H - pad.bottom + 20);
-  }});
-
-  // model colors
-  var colors = ["#4e79a7","#f28e2b","#e15759","#76b7b2","#59a14f","#edc948","#b07aa1","#ff9da7"];
-  var modelColors = {{}};
-  var ci = 0;
-  data.forEach(function(d) {{
-    if (!modelColors[d.label]) modelColors[d.label] = colors[ci++ % colors.length];
-  }});
-
-  // average by model per category
-  var modelList = Object.keys(modelColors);
-  var modelAvgs = {{}};
-  modelList.forEach(function(m) {{
-    var avgs = [];
-    for (var c = 0; c < nCat; c++) {{
-      var vals = [];
-      data.forEach(function(d) {{
-        if (d.label === m && d.x === c) vals.push(d.y);
-      }});
-      avgs.push(vals.length ? vals.reduce(function(a, b) {{ return a + b; }}, 0) / vals.length : null);
-    }}
-    modelAvgs[m] = avgs;
-  }});
-
-  // draw lines and dots
-  modelList.forEach(function(m) {{
-    var avgs = modelAvgs[m];
-    var color = modelColors[m];
-    // line segments
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 2.5;
-    ctx.beginPath();
-    var started = false;
-    avgs.forEach(function(val, ci) {{
-      if (val == null) return;
-      var x = xPositions[ci];
-      var y = H - pad.bottom - ((val - minY) / rangeY) * pH;
-      if (!started) {{ ctx.moveTo(x, y); started = true; }}
-      else ctx.lineTo(x, y);
-    }});
-    ctx.stroke();
-    // dots with value labels
-    avgs.forEach(function(val, ci) {{
-      if (val == null) return;
-      var x = xPositions[ci];
-      var y = H - pad.bottom - ((val - minY) / rangeY) * pH;
-      ctx.fillStyle = color;
-      ctx.beginPath();
-      ctx.arc(x, y, 5, 0, 2 * Math.PI);
-      ctx.fill();
-      ctx.strokeStyle = "#fff";
-      ctx.lineWidth = 1.5;
-      ctx.stroke();
-      ctx.fillStyle = "#333";
-      ctx.font = "10px sans-serif";
-      ctx.textAlign = "center";
-      ctx.fillText(val.toFixed(2), x, y - 10);
-    }});
-  }});
-
-  // legend
-  var lx = W - pad.right - 10;
-  var ly = pad.top + 5;
-  modelList.forEach(function(m, mi) {{
-    ctx.strokeStyle = modelColors[m];
-    ctx.lineWidth = 2.5;
-    ctx.beginPath();
-    ctx.moveTo(lx - 30, ly + mi * 20 + 6);
-    ctx.lineTo(lx - 14, ly + mi * 20 + 6);
-    ctx.stroke();
-    ctx.fillStyle = modelColors[m];
-    ctx.beginPath();
-    ctx.arc(lx - 22, ly + mi * 20 + 6, 3, 0, 2 * Math.PI);
-    ctx.fill();
-    ctx.fillStyle = "#333";
-    ctx.font = "12px sans-serif";
-    ctx.textAlign = "right";
-    ctx.fillText(m, lx - 34, ly + mi * 20 + 11);
-  }});
-}}
-
-function drawGroupedBar(canvasId, data, groups, yLabel) {{
-  if (!data.length) return;
-  var canvas = document.getElementById(canvasId);
-  var ctx = canvas.getContext("2d");
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  var W = canvas.width, H = canvas.height;
-  var pad = {{top: 30, right: 20, bottom: 100, left: 60}};
-  var pW = W - pad.left - pad.right;
-  var pH = H - pad.top - pad.bottom;
-
-  var n = data.length;
-  var g = groups.length;
-  var groupWidth = pW / n;
-  var barWidth = (groupWidth * 0.8) / g;
-  var gap = groupWidth * 0.2;
-
-  var colors = ["#4e79a7","#f28e2b","#e15759","#76b7b2","#59a14f","#edc948","#b07aa1","#ff9da7"];
-
-  ctx.strokeStyle = "#999";
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.moveTo(pad.left, pad.top);
-  ctx.lineTo(pad.left, H - pad.bottom);
-  ctx.lineTo(W - pad.right, H - pad.bottom);
-  ctx.stroke();
-
-  ctx.fillStyle = "#666";
-  ctx.font = "12px sans-serif";
-  ctx.textAlign = "right";
-  for (var j = 0; j <= 5; j++) {{
-    var yVal = j * 0.2;
-    var y = H - pad.bottom - yVal * pH;
-    ctx.fillText(yVal.toFixed(1), pad.left - 8, y + 4);
-    ctx.strokeStyle = "#eee";
-    ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(W - pad.right, y); ctx.stroke();
-  }}
-
-  ctx.fillStyle = "#333";
-  ctx.font = "14px sans-serif";
-  ctx.save();
-  ctx.translate(15, H / 2);
-  ctx.rotate(-Math.PI / 2);
-  ctx.textAlign = "center";
-  ctx.fillText(yLabel, 0, 0);
-  ctx.restore();
-
-  data.forEach(function(entry, i) {{
-    var x0 = pad.left + i * groupWidth + gap / 2;
-    groups.forEach(function(gName, gi) {{
-      var val = entry[gName];
-      if (val == null) return;
-      var bx = x0 + gi * barWidth;
-      var bh = val * pH;
-      var by = H - pad.bottom - bh;
-      ctx.fillStyle = colors[gi % colors.length];
-      ctx.fillRect(bx, by, barWidth - 1, bh);
-      ctx.fillStyle = "#333";
-      ctx.font = "10px sans-serif";
-      ctx.textAlign = "center";
-      ctx.fillText(val.toFixed(2), bx + barWidth / 2, by - 4);
-    }});
-    ctx.fillStyle = "#333";
-    ctx.font = "11px sans-serif";
-    ctx.save();
-    ctx.translate(x0 + (g * barWidth) / 2, H - pad.bottom + 12);
-    ctx.rotate(-Math.PI / 6);
-    ctx.textAlign = "right";
-    ctx.fillText(entry.label, 0, 0);
-    ctx.restore();
-  }});
-
-  var lx = W - pad.right - 10;
-  var ly = pad.top + 5;
-  groups.forEach(function(gName, gi) {{
-    ctx.fillStyle = "#333";
-    ctx.font = "12px sans-serif";
-    ctx.textAlign = "right";
-    ctx.fillText(gName, lx - 16, ly + gi * 18 + 11);
-    ctx.fillStyle = colors[gi % colors.length];
-    ctx.fillRect(lx - 12, ly + gi * 18, 12, 12);
-  }});
-}}
-
-document.addEventListener("DOMContentLoaded", function() {{
-  var diffLabels = {json.dumps(difficulty_labels)};
-  var qtypeLabels = {qtype_labels_json};
-  drawScatter("cost-acc-chart", {json.dumps(cost_acc_data)}, "Total Cost (USD)", "Accuracy", function(v) {{ return "$" + v.toFixed(2); }});
-  drawScatter("time-acc-chart", {json.dumps(time_acc_data)}, "Total Time (minutes)", "Accuracy", function(v) {{ return v.toFixed(1) + "m"; }});
-  drawScatter("cost-f1-chart", {json.dumps(cost_f1_data)}, "Total Cost (USD)", "Citation F1", function(v) {{ return "$" + v.toFixed(2); }});
-  drawScatter("time-f1-chart", {json.dumps(time_f1_data)}, "Total Time (minutes)", "Citation F1", function(v) {{ return v.toFixed(1) + "m"; }});
-  drawSlope("diff-acc-slope", {json.dumps(diff_acc_slope)}, diffLabels, "Accuracy");
-  drawSlope("diff-f1-slope", {json.dumps(diff_f1_slope)}, diffLabels, "Citation F1");
-  drawGroupedBar("qtype-acc-chart", {json.dumps(qtype_acc_chart)}, qtypeLabels, "Accuracy");
-  drawGroupedBar("qtype-f1-chart", {json.dumps(qtype_f1_chart)}, qtypeLabels, "Citation F1");
-
-  // Token toggle
-  var tokenCols = document.querySelectorAll(".token-col");
-  var tokenVisible = false;
-  tokenCols.forEach(function(el) {{ el.style.display = "none"; }});
-  document.getElementById("token-toggle").addEventListener("click", function() {{
-    tokenVisible = !tokenVisible;
-    tokenCols.forEach(function(el) {{ el.style.display = tokenVisible ? "" : "none"; }});
-    this.textContent = tokenVisible ? "Hide Token Details" : "Show Token Details";
-  }});
-}});
+{charts_js}
+</script>
+<script>
+{dashboard_js}
 </script>
 </body>
 </html>
 """
-    (destination / "pubs.html").write_text(html_content)
 
 
-def write_home_page(destination: Path) -> None:
-    """Generate home page linking to both dashboards."""
+# --------------------------------------------------------------------------- #
+# Entry point
+# --------------------------------------------------------------------------- #
+
+def build(
+    runs_json: Path,
+    pubs_json: Path | None,
+    destination: Path,
+    eval_metadata: Path,
+    ground_truth_dir: Path,
+    qa_dir: Path,
+) -> None:
+    tools_raw = json.loads(runs_json.read_text()) if runs_json.exists() else []
+    if not tools_raw:
+        raise SystemExit(f"No runs found in {runs_json}")
+
+    pubs_raw: list[dict] = []
+    if pubs_json and pubs_json.exists():
+        pubs_raw = json.loads(pubs_json.read_text())
+    elif pubs_json:
+        print(f"Warning: {pubs_json} not found; the publication QA tab will be empty", file=sys.stderr)
+
+    question_meta = load_question_metadata(eval_metadata)
+    ground_truth_text = load_ground_truth_questions(
+        sorted(ground_truth_dir.glob("eval_tools_ground_*.yaml"))
+    )
+    papers_meta = load_paper_metadata(qa_dir)
+
+    payload = {
+        "generated": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
+        "models": build_model_registry(tools_raw, pubs_raw),
+        "tools": build_tools_payload(tools_raw, question_meta, ground_truth_text),
+        "pubs": build_pubs_payload(pubs_raw, papers_meta) or {"runs": [], "styles": [], "about": []},
+    }
+
     destination.mkdir(parents=True, exist_ok=True)
-    generated = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+    (destination / "index.html").write_text(render_html(payload))
+    (destination / "runs.json").write_text(json.dumps(tools_raw, indent=2))
+    if pubs_raw:
+        (destination / "pubs_runs.json").write_text(json.dumps(pubs_raw, indent=2))
 
-    html_content = f"""<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <title>NF Knowledge Graph Evaluation</title>
-  <style>
-    body {{
-      font-family: sans-serif;
-      max-width: 900px;
-      margin: 3rem auto;
-      padding: 0 2rem;
-      line-height: 1.6;
-    }}
-    h1 {{ color: #1976d2; margin-bottom: 0.5rem; }}
-    .subtitle {{ color: #666; margin-top: 0; }}
-    .dashboards {{
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-      gap: 2rem;
-      margin-top: 2rem;
-    }}
-    .card {{
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      padding: 2rem;
-      background: #f9f9f9;
-      transition: transform 0.2s, box-shadow 0.2s;
-    }}
-    .card:hover {{
-      transform: translateY(-4px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }}
-    .card h2 {{ margin-top: 0; color: #1976d2; }}
-    .card p {{ color: #555; margin: 1rem 0; }}
-    .card a {{
-      display: inline-block;
-      padding: 0.75rem 1.5rem;
-      background: #1976d2;
-      color: white;
-      text-decoration: none;
-      border-radius: 4px;
-      font-weight: 600;
-      margin-top: 1rem;
-    }}
-    .card a:hover {{
-      background: #1565c0;
-    }}
-    footer {{ margin-top: 3rem; padding-top: 2rem; border-top: 1px solid #ddd; color: #666; font-size: 0.9rem; }}
-  </style>
-</head>
-<body>
-  <h1>NF Knowledge Graph Evaluation</h1>
-  <p class="subtitle">Model performance benchmarks for neurofibromatosis research tools</p>
+    # keep the previously published URLs working
+    (destination / "main.html").write_text(
+        REDIRECT_TEMPLATE.format(anchor="tools", name="research tools discovery")
+    )
+    (destination / "pubs.html").write_text(
+        REDIRECT_TEMPLATE.format(anchor="pubs", name="publication QA")
+    )
 
-  <div class="dashboards">
-    <div class="card">
-      <h2>Research Tools Discovery</h2>
-      <p>Structured SPARQL queries against the Synapse portal knowledge graph. Evaluates recall for discovering datasets, publications, tools, and cross-resource linkages.</p>
-      <p><strong>Task:</strong> <code>nf_rag</code><br>
-      <strong>Metrics:</strong> Recall by difficulty, complexity, and resource category</p>
-      <a href="main.html">View Dashboard →</a>
-    </div>
-
-    <div class="card">
-      <h2>Publication QA</h2>
-      <p>Question answering over full-text biomedical literature using SPARQL+Text retrieval. Evaluates accuracy and citation attribution across diverse question types.</p>
-      <p><strong>Task:</strong> <code>nf_rag_pubs</code><br>
-      <strong>Metrics:</strong> Accuracy, Citation F1</p>
-      <a href="pubs.html">View Dashboard →</a>
-    </div>
-  </div>
-
-  <footer>
-    Generated {generated} &mdash;
-    <a href="https://github.com/nf-osi/kg-pipeline">kg-pipeline</a> |
-    <a href="https://github.com/nf-osi/asta-bench">asta-bench</a>
-  </footer>
-</body>
-</html>
-"""
-    (destination / "index.html").write_text(html_content)
+    new_categories = [c["code"] for c in payload["tools"]["categories"] if c.get("isNew")]
+    tools, pubs = payload["tools"], payload["pubs"]
+    print(f"✓ Dashboard written to {destination / 'index.html'}")
+    print(
+        f"  {len(tools['runs'])} tools runs, {len(pubs.get('runs', []))} pubs runs, "
+        f"{len(payload['models'])} models"
+    )
+    dropped = tools.get("excluded", 0) + pubs.get("excluded", 0)
+    if dropped:
+        print(
+            f"  excluded {dropped} unscored or partial runs "
+            f"({tools.get('excluded', 0)} tools, {pubs.get('excluded', 0)} pubs)"
+        )
+    if new_categories:
+        print(f"  new question categories surfaced: {', '.join(new_categories)}")
 
 
 def main() -> None:
@@ -1699,45 +872,57 @@ def main() -> None:
     parser.add_argument(
         "runs_json",
         type=Path,
-        help="Path to runs.json file",
+        nargs="?",
+        default=Path("evaluation/runs.json"),
+        help="Path to the tools eval runs.json (default: evaluation/runs.json)",
     )
     parser.add_argument(
-        "--pubs",
-        action="store_true",
-        help="Generate pubs evaluation dashboard (input is pubs_runs.json)",
-    )
-    parser.add_argument(
-        "--out",
+        "--pubs-json",
         type=Path,
-        default=Path("_site"),
-        help="Output directory for generated site",
+        default=Path("evaluation/pubs_runs.json"),
+        help="Path to the pubs eval runs json (default: evaluation/pubs_runs.json)",
     )
+    parser.add_argument("--out", type=Path, default=Path("_site"), help="Output directory")
     parser.add_argument(
         "--eval-metadata",
         type=Path,
         default=Path("evaluation/main/dataset_attributes.yaml"),
-        help="Path to dataset_attributes.yaml for question metadata (for sweet spot table)",
+        help="Question metadata for the tools eval",
+    )
+    parser.add_argument(
+        "--ground-truth-dir",
+        type=Path,
+        default=Path("evaluation/main"),
+        help="Directory holding eval_tools_ground_*.yaml",
+    )
+    parser.add_argument(
+        "--qa-dir",
+        type=Path,
+        default=Path("evaluation/qa"),
+        help="Directory holding qa_PMC*.yaml (paper titles)",
+    )
+    parser.add_argument(
+        "--pubs",
+        action="store_true",
+        help=argparse.SUPPRESS,  # legacy: both modules are now built in one pass
     )
     args = parser.parse_args()
 
-    if not args.runs_json.exists():
-        raise SystemExit(f"Input file {args.runs_json} does not exist")
-
+    runs_json = args.runs_json
+    pubs_json = args.pubs_json
     if args.pubs:
-        pubs_data = json.loads(args.runs_json.read_text())
-        if not pubs_data:
-            raise SystemExit("No runs found in JSON file")
-        write_pubs_site(pubs_data, args.out)
-        print(f"✓ Pubs dashboard generated at {args.out}/pubs.html")
-    else:
-        runs = load_runs_from_json(args.runs_json)
-        if not runs:
-            raise SystemExit("No runs found in JSON file")
-        question_meta = load_question_metadata(args.eval_metadata)
-        write_site(runs, args.out, question_meta)
-        write_home_page(args.out)
-        print(f"✓ Site generated at {args.out}/main.html")
-        print(f"✓ Home page generated at {args.out}/index.html")
+        # Old call shape: `build_site.py evaluation/pubs_runs.json --pubs`.
+        print(
+            "Note: --pubs is no longer needed; both modules are built in one pass.",
+            file=sys.stderr,
+        )
+        pubs_json = args.runs_json
+        runs_json = Path("evaluation/runs.json")
+
+    if not runs_json.exists():
+        raise SystemExit(f"Input file {runs_json} does not exist")
+
+    build(runs_json, pubs_json, args.out, args.eval_metadata, args.ground_truth_dir, args.qa_dir)
 
 
 if __name__ == "__main__":
