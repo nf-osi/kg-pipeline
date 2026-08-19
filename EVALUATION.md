@@ -51,7 +51,7 @@ The `astabench.py` script can be used for all eval suites.
 The default invocation runs the main benchmark, first merging `evaluation/main/*_ground*.yaml` into `eval_data.yaml` before running eval.
 
 ```bash
-python scripts/astabench.py --full             # + gemini-2.5-pro, gpt-5.4
+python scripts/astabench.py --full             # + gemini-3.1-pro-preview, gpt-5.6-luna
 python scripts/astabench.py --google           # Gemini only (no Anthropic key needed)
 python scripts/astabench.py --openai           # OpenAI only (no Anthropic key needed)
 python scripts/astabench.py --google --openai  # both non-Anthropic providers
