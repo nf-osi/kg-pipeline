@@ -2,6 +2,76 @@
 
 All notable changes to the NF Research Tools Discovery evaluation dataset will be documented in this file.
 
+## [v1.3] - 2026-08-18
+
+Declares the publication and people questions, and corrects a species predicate
+that counted humanized mouse samples as human.
+
+### Added
+- **Publication & People Discovery (PUB)** component — 6 questions (PUB-001 – PUB-006) covering author counts, ORCID coverage, Synapse account linkage, cross-listing overlap, and co-authorship reach. All 6 are manually curated
+  - The ground truth for these landed in #75, together with the people and publication ingest that supports them: `people.rml.ttl`, `publication_author_orcids.rml.ttl`, `study_publications.rml.ttl`, and the `nf:authors` / `nf:authorOrcid` / `nf:hasSynapseProfile` ontology terms
+  - Several items deliberately probe known upstream data problems — duplicate listings and DOI normalisation — documented in `docs/publication-issues.md`
+- Question attributes for the PUB component: `level`, `complexity`, `facet_answerable`, `text_search_answerable`, `user_frustration`, `demo_priority`, and per-item notes. Without these, `extract_runs.py` had no metadata to join against, so the 6 items scored into `category/PUB` but contributed to **no** level, complexity, or frustration breakdown and had no per-question recall recorded
+
+### Fixed
+- **Species predicate matched humanized mouse samples as human.** `generate_ground_truth.py` tested species with a plain substring alternation, which also matches `Mus musculus (humanized)` — there is no word boundary between "human" and "ized". Replaced with a single `HUMAN_SPECIES_PATTERN` using word boundaries, applied to all four affected questions: **CL-005**, **CL-006**, **CR-002**, **ST-003**
+  - The pattern still matches multi-valued cells such as `Rattus norvegicus,Homo sapiens` and `Homo sapiens|Mus musculus`, so nothing legitimate is lost
+  - **No ground-truth answer changes.** Regenerated and diffed: the one humanized-mouse study in the snapshot already qualified on its human files, so every answer set is identical. This is a correctness-of-intent fix, and it invalidates no recorded result
+  - Found while investigating why claude-sonnet-5 scored 0.10 on ST-003. The model wrote `CONTAINS(LCASE(?species), "human")`, which excludes `Homo sapiens` and selects only humanized mice; it returned 1 of 10 studies. The graph and the ground truth were both right, but the ground truth relied on the same loose matching and was a latent version of the same bug
+
+- **Question wording in `dataset_attributes.yaml` drifted from the prompt actually in use** for AM-004 and CR-004. Both now match their ground-truth entry verbatim
+  - Aligned in that direction because the ground truth is what the agent sees: `astabench.py` builds `eval_data.yaml` from the `*_ground*.yaml` files, and the recorded eval logs confirm the prompt matches those files verbatim for all 10 manually curated questions. The attribute file is documentation, so no prompt changed and no result is invalidated
+  - CR-004 was not cosmetic drift: the attribute file offered lettered options `(A) Yes (B) No …`, while the prompt in use asks for the exact phrase. An agent answering "A" would fail the phrase-containment scorer, so promoting that wording into the ground truth would have broken the item
+  - AM-004's attribute wording ("Which mouse model has…?") reads better than the prompt in use ("Find mouse model with…"). Improving the prompt itself is a deliberate change that would invalidate recorded runs, so it is deliberately not done here
+
+- **Runs that executed the v1.3 set reported v1.2.** Because the PUB questions predate the version bump, their eval logs carry `task_version: v1.2`. `extract_runs.py` now corrects this when writing `runs.json`
+  - Keyed on `category/PUB`, which the harness derives from per-sample metadata in the log. That makes the rule independent of `dataset_attributes.yaml`, so it holds whether or not the PUB attributes are present, and a sample count would not work since most of these are targeted development runs covering one or two questions
+  - 19 runs relabelled v1.2 → v1.3; the 2026-05-27 ST-only development run correctly keeps v1.2. No other field on any run changes
+  - Done in the extractor rather than by editing `runs.json`, so it survives re-extraction
+
+### Changed
+- `complexity` now uses **3-hop** for the first time. PUB-003 and PUB-005 traverse Synapse profile → ORCID → DOI before filtering, one hop further than anything earlier
+- New personas in `user_story`: **Portal Contributor** (PUB-003, PUB-005) and **Data Curator** (PUB-004)
+
+### Notes
+- Re-extract with `python scripts/extract_runs.py` to pick up the PUB attributes on already-recorded runs
+- PUB-003 is a designed trap and both evaluated models currently fail it: 19 publication nodes deduplicate to 14 distinct papers, and a raw node count is the expected wrong answer
+- PUB-004 awards partial credit by construction — matching on `nf:pmid` yields the correct 22, while matching on DOI or title yields 19
+
+### Dataset Overview
+- **Total Questions:** 46 (36 automated + 10 manual)
+- **Question Categories:**
+  - Mutations (MUT): 6 questions
+  - Animal Models (AM): 6 questions
+  - Cell Lines (CL): 9 questions
+  - Genetic Reagents (GR): 5 questions
+  - Antibodies (AB): 3 questions
+  - Investigators (PI): 2 questions
+  - Cross-Resource (CR): 4 questions
+  - Studies (ST): 5 questions
+  - Publications & People (PUB): 6 questions
+- **Complexity Levels:** 0-hop, 1-hop, 2-hop, 3-hop queries
+- **Difficulty Levels:** Baseline (20), Advanced (26)
+- **Manual ground truth:** AM-004, CL-003, CR-001, CR-004, PUB-001 – PUB-006 (was AM-004, CL-003, CR-001, CR-004)
+
+## [v1.2] - 2026-05-27
+
+### Added
+- **Study Discovery (ST)** component — 5 questions (ST-001 – ST-005) finding studies and their data files by joining study metadata with file-level annotations (#66)
+- `data_sources_profile: evaluation` and `data_sources_version: KG v0.2-eval` in dataset metadata, so a question set records the graph build it was developed against (#66)
+
+### Dataset Overview
+- **Total Questions:** 40 (36 automated + 4 manual)
+- **Question Categories:** ST added with 5 questions; all others unchanged from v1.1
+- **Manual ground truth:** AM-004, CL-003, CR-001, CR-004 (unchanged)
+
+> **Note on runs reporting v1.2.** The 6 PUB questions were added to the ground
+> truth in #75 without a version bump, so eval logs from 2026-07-25 onward record
+> `task_version: v1.2` while already executing the 46-question set. v1.3 is the
+> first version to declare that set, and `extract_runs.py` now corrects the label
+> when writing `runs.json`, so those 19 runs report v1.3. The one genuine v1.2
+> run — an ST-only development run from 2026-05-27 — keeps its label.
+
 ## [v1.1] - 2026-04-17
 
 ### Added

@@ -6,7 +6,7 @@
     "score": 0.7025765257909558,
     "cost": 4.52,
     "task_name": "astabench/nf_rag",
-    "task_version": "v1.2",
+    "task_version": "v1.3",
     "total_samples": 46,
     "started_at": "2026-08-18T16:08:54-07:00",
     "completed_at": "2026-08-18T16:12:34-07:00",
@@ -21,11 +21,12 @@
     "cache_read_tokens": 14704594,
     "total_tokens": 16805975,
     "difficulty_scores": {
-      "level/baseline": 0.8145711500974658,
-      "complexity/0-hop": 0.8465608465608465,
-      "level/advanced": 0.7380952380952381,
+      "level/baseline": 0.8238425925925925,
+      "complexity/0-hop": 0.8567901234567901,
+      "level/advanced": 0.6940559440559441,
       "complexity/1-hop": 0.7524509803921569,
-      "complexity/2-hop": 0.7037037037037037
+      "complexity/2-hop": 0.73989898989899,
+      "complexity/3-hop": 0.0
     },
     "category_scores": {
       "category/AB": 1.0,
@@ -39,10 +40,10 @@
       "category/ST": 0.9
     },
     "frustration_scores": {
-      "frustration/low": 0.8636363636363636,
+      "frustration/low": 0.875,
       "frustration/moderate": 0.8538359788359788,
       "frustration/high": 0.6428571428571429,
-      "frustration/very_high": 0.7333333333333333
+      "frustration/very_high": 0.6772727272727272
     },
     "frustration_samples": [
       {
@@ -217,6 +218,36 @@
       },
       {
         "id": "PI-002",
+        "frustration": "very_high",
+        "score": 1.0
+      },
+      {
+        "id": "PUB-001",
+        "frustration": "low",
+        "score": 1.0
+      },
+      {
+        "id": "PUB-002",
+        "frustration": "very_high",
+        "score": 1.0
+      },
+      {
+        "id": "PUB-003",
+        "frustration": "very_high",
+        "score": 0.0
+      },
+      {
+        "id": "PUB-004",
+        "frustration": "very_high",
+        "score": 0.5454545454545454
+      },
+      {
+        "id": "PUB-005",
+        "frustration": "very_high",
+        "score": 0.0
+      },
+      {
+        "id": "PUB-006",
         "frustration": "very_high",
         "score": 1.0
       },
@@ -423,6 +454,36 @@
         "score": 1.0
       },
       {
+        "id": "PUB-001",
+        "level": "baseline",
+        "score": 1.0
+      },
+      {
+        "id": "PUB-002",
+        "level": "advanced",
+        "score": 1.0
+      },
+      {
+        "id": "PUB-003",
+        "level": "advanced",
+        "score": 0.0
+      },
+      {
+        "id": "PUB-004",
+        "level": "advanced",
+        "score": 0.5454545454545454
+      },
+      {
+        "id": "PUB-005",
+        "level": "advanced",
+        "score": 0.0
+      },
+      {
+        "id": "PUB-006",
+        "level": "advanced",
+        "score": 1.0
+      },
+      {
         "id": "ST-001",
         "level": "baseline",
         "score": 1.0
@@ -621,6 +682,36 @@
       },
       {
         "id": "PI-002",
+        "complexity": "2-hop",
+        "score": 1.0
+      },
+      {
+        "id": "PUB-001",
+        "complexity": "0-hop",
+        "score": 1.0
+      },
+      {
+        "id": "PUB-002",
+        "complexity": "2-hop",
+        "score": 1.0
+      },
+      {
+        "id": "PUB-003",
+        "complexity": "3-hop",
+        "score": 0.0
+      },
+      {
+        "id": "PUB-004",
+        "complexity": "2-hop",
+        "score": 0.5454545454545454
+      },
+      {
+        "id": "PUB-005",
+        "complexity": "3-hop",
+        "score": 0.0
+      },
+      {
+        "id": "PUB-006",
         "complexity": "2-hop",
         "score": 1.0
       },
@@ -659,7 +750,7 @@
     "score": 0.8038045889763893,
     "cost": 3.82,
     "task_name": "astabench/nf_rag",
-    "task_version": "v1.2",
+    "task_version": "v1.3",
     "total_samples": 46,
     "started_at": "2026-08-18T16:08:54-07:00",
     "completed_at": "2026-08-18T16:11:35-07:00",
@@ -674,11 +765,12 @@
     "cache_read_tokens": 4775053,
     "total_tokens": 5694607,
     "difficulty_scores": {
-      "level/baseline": 0.9539473684210527,
-      "complexity/0-hop": 0.9523809523809524,
-      "level/advanced": 0.7137566137566138,
+      "level/baseline": 0.95625,
+      "complexity/0-hop": 0.9555555555555556,
+      "level/advanced": 0.6988733488733488,
       "complexity/1-hop": 0.7916666666666667,
-      "complexity/2-hop": 0.7024691358024691
+      "complexity/2-hop": 0.7086700336700337,
+      "complexity/3-hop": 0.5
     },
     "category_scores": {
       "category/AB": 1.0,
@@ -692,10 +784,10 @@
       "category/ST": 0.7811111111111111
     },
     "frustration_scores": {
-      "frustration/low": 0.9318181818181818,
+      "frustration/low": 0.9375,
       "frustration/moderate": 0.9821428571428571,
       "frustration/high": 0.8412698412698413,
-      "frustration/very_high": 0.6733333333333333
+      "frustration/very_high": 0.6640909090909091
     },
     "frustration_samples": [
       {
@@ -870,6 +962,36 @@
       },
       {
         "id": "PI-002",
+        "frustration": "very_high",
+        "score": 1.0
+      },
+      {
+        "id": "PUB-001",
+        "frustration": "low",
+        "score": 1.0
+      },
+      {
+        "id": "PUB-002",
+        "frustration": "very_high",
+        "score": 1.0
+      },
+      {
+        "id": "PUB-003",
+        "frustration": "very_high",
+        "score": 0.0
+      },
+      {
+        "id": "PUB-004",
+        "frustration": "very_high",
+        "score": 0.18181818181818182
+      },
+      {
+        "id": "PUB-005",
+        "frustration": "very_high",
+        "score": 1.0
+      },
+      {
+        "id": "PUB-006",
         "frustration": "very_high",
         "score": 1.0
       },
@@ -1076,6 +1198,36 @@
         "score": 1.0
       },
       {
+        "id": "PUB-001",
+        "level": "baseline",
+        "score": 1.0
+      },
+      {
+        "id": "PUB-002",
+        "level": "advanced",
+        "score": 1.0
+      },
+      {
+        "id": "PUB-003",
+        "level": "advanced",
+        "score": 0.0
+      },
+      {
+        "id": "PUB-004",
+        "level": "advanced",
+        "score": 0.18181818181818182
+      },
+      {
+        "id": "PUB-005",
+        "level": "advanced",
+        "score": 1.0
+      },
+      {
+        "id": "PUB-006",
+        "level": "advanced",
+        "score": 1.0
+      },
+      {
         "id": "ST-001",
         "level": "baseline",
         "score": 0.9166666666666666
@@ -1278,6 +1430,36 @@
         "score": 1.0
       },
       {
+        "id": "PUB-001",
+        "complexity": "0-hop",
+        "score": 1.0
+      },
+      {
+        "id": "PUB-002",
+        "complexity": "2-hop",
+        "score": 1.0
+      },
+      {
+        "id": "PUB-003",
+        "complexity": "3-hop",
+        "score": 0.0
+      },
+      {
+        "id": "PUB-004",
+        "complexity": "2-hop",
+        "score": 0.18181818181818182
+      },
+      {
+        "id": "PUB-005",
+        "complexity": "3-hop",
+        "score": 1.0
+      },
+      {
+        "id": "PUB-006",
+        "complexity": "2-hop",
+        "score": 1.0
+      },
+      {
         "id": "ST-001",
         "complexity": "1-hop",
         "score": 0.9166666666666666
@@ -1312,7 +1494,7 @@
     "score": 0.5,
     "cost": 0.84,
     "task_name": "astabench/nf_rag",
-    "task_version": "v1.2",
+    "task_version": "v1.3",
     "total_samples": 6,
     "started_at": "2026-08-18T14:30:04-07:00",
     "completed_at": "2026-08-18T14:31:09-07:00",
@@ -1326,14 +1508,116 @@
     "cache_write_tokens": 387817,
     "cache_read_tokens": 2431303,
     "total_tokens": 2860451,
-    "difficulty_scores": {},
+    "difficulty_scores": {
+      "level/baseline": 1.0,
+      "complexity/0-hop": 1.0,
+      "level/advanced": 0.4,
+      "complexity/2-hop": 0.3333333333333333,
+      "complexity/3-hop": 0.5
+    },
     "category_scores": {
       "category/PUB": 0.5
     },
-    "frustration_scores": {},
-    "frustration_samples": [],
-    "level_samples": [],
-    "complexity_samples": [],
+    "frustration_scores": {
+      "frustration/low": 1.0,
+      "frustration/very_high": 0.4
+    },
+    "frustration_samples": [
+      {
+        "id": "PUB-001",
+        "frustration": "low",
+        "score": 1.0
+      },
+      {
+        "id": "PUB-002",
+        "frustration": "very_high",
+        "score": 0.0
+      },
+      {
+        "id": "PUB-003",
+        "frustration": "very_high",
+        "score": 0.0
+      },
+      {
+        "id": "PUB-004",
+        "frustration": "very_high",
+        "score": 0.0
+      },
+      {
+        "id": "PUB-005",
+        "frustration": "very_high",
+        "score": 1.0
+      },
+      {
+        "id": "PUB-006",
+        "frustration": "very_high",
+        "score": 1.0
+      }
+    ],
+    "level_samples": [
+      {
+        "id": "PUB-001",
+        "level": "baseline",
+        "score": 1.0
+      },
+      {
+        "id": "PUB-002",
+        "level": "advanced",
+        "score": 0.0
+      },
+      {
+        "id": "PUB-003",
+        "level": "advanced",
+        "score": 0.0
+      },
+      {
+        "id": "PUB-004",
+        "level": "advanced",
+        "score": 0.0
+      },
+      {
+        "id": "PUB-005",
+        "level": "advanced",
+        "score": 1.0
+      },
+      {
+        "id": "PUB-006",
+        "level": "advanced",
+        "score": 1.0
+      }
+    ],
+    "complexity_samples": [
+      {
+        "id": "PUB-001",
+        "complexity": "0-hop",
+        "score": 1.0
+      },
+      {
+        "id": "PUB-002",
+        "complexity": "2-hop",
+        "score": 0.0
+      },
+      {
+        "id": "PUB-003",
+        "complexity": "3-hop",
+        "score": 0.0
+      },
+      {
+        "id": "PUB-004",
+        "complexity": "2-hop",
+        "score": 0.0
+      },
+      {
+        "id": "PUB-005",
+        "complexity": "3-hop",
+        "score": 1.0
+      },
+      {
+        "id": "PUB-006",
+        "complexity": "2-hop",
+        "score": 1.0
+      }
+    ],
     "task_stats": {}
   },
   {
@@ -1343,7 +1627,7 @@
     "score": 0.7904761904761904,
     "cost": 0.4,
     "task_name": "astabench/nf_rag",
-    "task_version": "v1.2",
+    "task_version": "v1.3",
     "total_samples": 6,
     "started_at": "2026-08-18T14:29:16-07:00",
     "completed_at": "2026-08-18T14:29:54-07:00",
@@ -1357,14 +1641,116 @@
     "cache_write_tokens": 97634,
     "cache_read_tokens": 370481,
     "total_tokens": 476671,
-    "difficulty_scores": {},
+    "difficulty_scores": {
+      "level/baseline": 1.0,
+      "complexity/0-hop": 1.0,
+      "level/advanced": 0.7181818181818181,
+      "complexity/2-hop": 0.8636363636363636,
+      "complexity/3-hop": 0.5
+    },
     "category_scores": {
       "category/PUB": 0.7651515151515151
     },
-    "frustration_scores": {},
-    "frustration_samples": [],
-    "level_samples": [],
-    "complexity_samples": [],
+    "frustration_scores": {
+      "frustration/low": 1.0,
+      "frustration/very_high": 0.7181818181818181
+    },
+    "frustration_samples": [
+      {
+        "id": "PUB-001",
+        "frustration": "low",
+        "score": 1.0
+      },
+      {
+        "id": "PUB-002",
+        "frustration": "very_high",
+        "score": 1.0
+      },
+      {
+        "id": "PUB-003",
+        "frustration": "very_high",
+        "score": 0.0
+      },
+      {
+        "id": "PUB-004",
+        "frustration": "very_high",
+        "score": 0.5909090909090909
+      },
+      {
+        "id": "PUB-005",
+        "frustration": "very_high",
+        "score": 1.0
+      },
+      {
+        "id": "PUB-006",
+        "frustration": "very_high",
+        "score": 1.0
+      }
+    ],
+    "level_samples": [
+      {
+        "id": "PUB-001",
+        "level": "baseline",
+        "score": 1.0
+      },
+      {
+        "id": "PUB-002",
+        "level": "advanced",
+        "score": 1.0
+      },
+      {
+        "id": "PUB-003",
+        "level": "advanced",
+        "score": 0.0
+      },
+      {
+        "id": "PUB-004",
+        "level": "advanced",
+        "score": 0.5909090909090909
+      },
+      {
+        "id": "PUB-005",
+        "level": "advanced",
+        "score": 1.0
+      },
+      {
+        "id": "PUB-006",
+        "level": "advanced",
+        "score": 1.0
+      }
+    ],
+    "complexity_samples": [
+      {
+        "id": "PUB-001",
+        "complexity": "0-hop",
+        "score": 1.0
+      },
+      {
+        "id": "PUB-002",
+        "complexity": "2-hop",
+        "score": 1.0
+      },
+      {
+        "id": "PUB-003",
+        "complexity": "3-hop",
+        "score": 0.0
+      },
+      {
+        "id": "PUB-004",
+        "complexity": "2-hop",
+        "score": 0.5909090909090909
+      },
+      {
+        "id": "PUB-005",
+        "complexity": "3-hop",
+        "score": 1.0
+      },
+      {
+        "id": "PUB-006",
+        "complexity": "2-hop",
+        "score": 1.0
+      }
+    ],
     "task_stats": {}
   },
   {
@@ -1374,7 +1760,7 @@
     "score": 1.0,
     "cost": 0.47,
     "task_name": "astabench/nf_rag",
-    "task_version": "v1.2",
+    "task_version": "v1.3",
     "total_samples": 1,
     "started_at": "2026-07-25T12:41:31-07:00",
     "completed_at": "2026-07-25T12:43:14-07:00",
@@ -1388,14 +1774,37 @@
     "cache_write_tokens": 79459,
     "cache_read_tokens": 1078020,
     "total_tokens": 1163492,
-    "difficulty_scores": {},
+    "difficulty_scores": {
+      "level/advanced": 1.0,
+      "complexity/2-hop": 1.0
+    },
     "category_scores": {
       "category/PUB": 1.0
     },
-    "frustration_scores": {},
-    "frustration_samples": [],
-    "level_samples": [],
-    "complexity_samples": [],
+    "frustration_scores": {
+      "frustration/very_high": 1.0
+    },
+    "frustration_samples": [
+      {
+        "id": "PUB-006",
+        "frustration": "very_high",
+        "score": 1.0
+      }
+    ],
+    "level_samples": [
+      {
+        "id": "PUB-006",
+        "level": "advanced",
+        "score": 1.0
+      }
+    ],
+    "complexity_samples": [
+      {
+        "id": "PUB-006",
+        "complexity": "2-hop",
+        "score": 1.0
+      }
+    ],
     "task_stats": {}
   },
   {
@@ -1405,7 +1814,7 @@
     "score": 1.0,
     "cost": 0.04,
     "task_name": "astabench/nf_rag",
-    "task_version": "v1.2",
+    "task_version": "v1.3",
     "total_samples": 1,
     "started_at": "2026-07-25T12:32:53-07:00",
     "completed_at": "2026-07-25T12:33:24-07:00",
@@ -1419,14 +1828,37 @@
     "cache_write_tokens": 7137,
     "cache_read_tokens": 25379,
     "total_tokens": 34369,
-    "difficulty_scores": {},
+    "difficulty_scores": {
+      "level/advanced": 1.0,
+      "complexity/3-hop": 1.0
+    },
     "category_scores": {
       "category/PUB": 1.0
     },
-    "frustration_scores": {},
-    "frustration_samples": [],
-    "level_samples": [],
-    "complexity_samples": [],
+    "frustration_scores": {
+      "frustration/very_high": 1.0
+    },
+    "frustration_samples": [
+      {
+        "id": "PUB-005",
+        "frustration": "very_high",
+        "score": 1.0
+      }
+    ],
+    "level_samples": [
+      {
+        "id": "PUB-005",
+        "level": "advanced",
+        "score": 1.0
+      }
+    ],
+    "complexity_samples": [
+      {
+        "id": "PUB-005",
+        "complexity": "3-hop",
+        "score": 1.0
+      }
+    ],
     "task_stats": {}
   },
   {
@@ -1436,7 +1868,7 @@
     "score": 0.75,
     "cost": 0.17,
     "task_name": "astabench/nf_rag",
-    "task_version": "v1.2",
+    "task_version": "v1.3",
     "total_samples": 4,
     "started_at": "2026-07-25T12:29:05-07:00",
     "completed_at": "2026-07-25T12:29:22-07:00",
@@ -1450,14 +1882,86 @@
     "cache_write_tokens": 48047,
     "cache_read_tokens": 104113,
     "total_tokens": 155393,
-    "difficulty_scores": {},
+    "difficulty_scores": {
+      "level/baseline": 1.0,
+      "complexity/0-hop": 1.0,
+      "level/advanced": 0.6666666666666666,
+      "complexity/2-hop": 1.0,
+      "complexity/3-hop": 0.0
+    },
     "category_scores": {
       "category/PUB": 0.75
     },
-    "frustration_scores": {},
-    "frustration_samples": [],
-    "level_samples": [],
-    "complexity_samples": [],
+    "frustration_scores": {
+      "frustration/low": 1.0,
+      "frustration/very_high": 0.6666666666666666
+    },
+    "frustration_samples": [
+      {
+        "id": "PUB-001",
+        "frustration": "low",
+        "score": 1.0
+      },
+      {
+        "id": "PUB-002",
+        "frustration": "very_high",
+        "score": 1.0
+      },
+      {
+        "id": "PUB-003",
+        "frustration": "very_high",
+        "score": 0.0
+      },
+      {
+        "id": "PUB-004",
+        "frustration": "very_high",
+        "score": 1.0
+      }
+    ],
+    "level_samples": [
+      {
+        "id": "PUB-001",
+        "level": "baseline",
+        "score": 1.0
+      },
+      {
+        "id": "PUB-002",
+        "level": "advanced",
+        "score": 1.0
+      },
+      {
+        "id": "PUB-003",
+        "level": "advanced",
+        "score": 0.0
+      },
+      {
+        "id": "PUB-004",
+        "level": "advanced",
+        "score": 1.0
+      }
+    ],
+    "complexity_samples": [
+      {
+        "id": "PUB-001",
+        "complexity": "0-hop",
+        "score": 1.0
+      },
+      {
+        "id": "PUB-002",
+        "complexity": "2-hop",
+        "score": 1.0
+      },
+      {
+        "id": "PUB-003",
+        "complexity": "3-hop",
+        "score": 0.0
+      },
+      {
+        "id": "PUB-004",
+        "complexity": "2-hop",
+        "score": 1.0
+      }
+    ],
     "task_stats": {}
   },
   {
@@ -1467,7 +1971,7 @@
     "score": 1.0,
     "cost": 0.12,
     "task_name": "astabench/nf_rag",
-    "task_version": "v1.2",
+    "task_version": "v1.3",
     "total_samples": 1,
     "started_at": "2026-07-25T12:18:36-07:00",
     "completed_at": "2026-07-25T12:18:50-07:00",
@@ -1481,14 +1985,37 @@
     "cache_write_tokens": 35450,
     "cache_read_tokens": 105141,
     "total_tokens": 141529,
-    "difficulty_scores": {},
+    "difficulty_scores": {
+      "level/advanced": 1.0,
+      "complexity/2-hop": 1.0
+    },
     "category_scores": {
       "category/PUB": 1.0
     },
-    "frustration_scores": {},
-    "frustration_samples": [],
-    "level_samples": [],
-    "complexity_samples": [],
+    "frustration_scores": {
+      "frustration/very_high": 1.0
+    },
+    "frustration_samples": [
+      {
+        "id": "PUB-004",
+        "frustration": "very_high",
+        "score": 1.0
+      }
+    ],
+    "level_samples": [
+      {
+        "id": "PUB-004",
+        "level": "advanced",
+        "score": 1.0
+      }
+    ],
+    "complexity_samples": [
+      {
+        "id": "PUB-004",
+        "complexity": "2-hop",
+        "score": 1.0
+      }
+    ],
     "task_stats": {}
   },
   {
@@ -1498,7 +2025,7 @@
     "score": 0.6666666666666666,
     "cost": 0.05,
     "task_name": "astabench/nf_rag",
-    "task_version": "v1.2",
+    "task_version": "v1.3",
     "total_samples": 3,
     "started_at": "2026-07-25T12:09:02-07:00",
     "completed_at": "2026-07-25T12:09:21-07:00",
@@ -1512,14 +2039,71 @@
     "cache_write_tokens": 10649,
     "cache_read_tokens": 24767,
     "total_tokens": 37297,
-    "difficulty_scores": {},
+    "difficulty_scores": {
+      "level/baseline": 1.0,
+      "complexity/0-hop": 1.0,
+      "level/advanced": 0.5,
+      "complexity/2-hop": 1.0,
+      "complexity/3-hop": 0.0
+    },
     "category_scores": {
       "category/PUB": 0.6666666666666666
     },
-    "frustration_scores": {},
-    "frustration_samples": [],
-    "level_samples": [],
-    "complexity_samples": [],
+    "frustration_scores": {
+      "frustration/low": 1.0,
+      "frustration/very_high": 0.5
+    },
+    "frustration_samples": [
+      {
+        "id": "PUB-001",
+        "frustration": "low",
+        "score": 1.0
+      },
+      {
+        "id": "PUB-002",
+        "frustration": "very_high",
+        "score": 1.0
+      },
+      {
+        "id": "PUB-003",
+        "frustration": "very_high",
+        "score": 0.0
+      }
+    ],
+    "level_samples": [
+      {
+        "id": "PUB-001",
+        "level": "baseline",
+        "score": 1.0
+      },
+      {
+        "id": "PUB-002",
+        "level": "advanced",
+        "score": 1.0
+      },
+      {
+        "id": "PUB-003",
+        "level": "advanced",
+        "score": 0.0
+      }
+    ],
+    "complexity_samples": [
+      {
+        "id": "PUB-001",
+        "complexity": "0-hop",
+        "score": 1.0
+      },
+      {
+        "id": "PUB-002",
+        "complexity": "2-hop",
+        "score": 1.0
+      },
+      {
+        "id": "PUB-003",
+        "complexity": "3-hop",
+        "score": 0.0
+      }
+    ],
     "task_stats": {}
   },
   {
@@ -1529,7 +2113,7 @@
     "score": 1.0,
     "cost": 0.03,
     "task_name": "astabench/nf_rag",
-    "task_version": "v1.2",
+    "task_version": "v1.3",
     "total_samples": 1,
     "started_at": "2026-07-25T11:08:05-07:00",
     "completed_at": "2026-07-25T11:08:24-07:00",
@@ -1543,14 +2127,37 @@
     "cache_write_tokens": 4695,
     "cache_read_tokens": 15983,
     "total_tokens": 22238,
-    "difficulty_scores": {},
+    "difficulty_scores": {
+      "level/advanced": 1.0,
+      "complexity/3-hop": 1.0
+    },
     "category_scores": {
       "category/PUB": 1.0
     },
-    "frustration_scores": {},
-    "frustration_samples": [],
-    "level_samples": [],
-    "complexity_samples": [],
+    "frustration_scores": {
+      "frustration/very_high": 1.0
+    },
+    "frustration_samples": [
+      {
+        "id": "PUB-003",
+        "frustration": "very_high",
+        "score": 1.0
+      }
+    ],
+    "level_samples": [
+      {
+        "id": "PUB-003",
+        "level": "advanced",
+        "score": 1.0
+      }
+    ],
+    "complexity_samples": [
+      {
+        "id": "PUB-003",
+        "complexity": "3-hop",
+        "score": 1.0
+      }
+    ],
     "task_stats": {}
   },
   {
@@ -1560,7 +2167,7 @@
     "score": 0.0,
     "cost": 0.04,
     "task_name": "astabench/nf_rag",
-    "task_version": "v1.2",
+    "task_version": "v1.3",
     "total_samples": 1,
     "started_at": "2026-07-25T10:39:53-07:00",
     "completed_at": "2026-07-25T10:40:18-07:00",
@@ -1574,14 +2181,37 @@
     "cache_write_tokens": 5116,
     "cache_read_tokens": 25596,
     "total_tokens": 32490,
-    "difficulty_scores": {},
+    "difficulty_scores": {
+      "level/advanced": 0.0,
+      "complexity/3-hop": 0.0
+    },
     "category_scores": {
       "category/PUB": 0.0
     },
-    "frustration_scores": {},
-    "frustration_samples": [],
-    "level_samples": [],
-    "complexity_samples": [],
+    "frustration_scores": {
+      "frustration/very_high": 0.0
+    },
+    "frustration_samples": [
+      {
+        "id": "PUB-003",
+        "frustration": "very_high",
+        "score": 0.0
+      }
+    ],
+    "level_samples": [
+      {
+        "id": "PUB-003",
+        "level": "advanced",
+        "score": 0.0
+      }
+    ],
+    "complexity_samples": [
+      {
+        "id": "PUB-003",
+        "complexity": "3-hop",
+        "score": 0.0
+      }
+    ],
     "task_stats": {}
   },
   {
@@ -1591,7 +2221,7 @@
     "score": 1.0,
     "cost": 0.03,
     "task_name": "astabench/nf_rag",
-    "task_version": "v1.2",
+    "task_version": "v1.3",
     "total_samples": 3,
     "started_at": "2026-07-25T10:35:04-07:00",
     "completed_at": "2026-07-25T10:35:11-07:00",
@@ -1605,14 +2235,71 @@
     "cache_write_tokens": 7716,
     "cache_read_tokens": 8716,
     "total_tokens": 17377,
-    "difficulty_scores": {},
+    "difficulty_scores": {
+      "level/baseline": 1.0,
+      "complexity/0-hop": 1.0,
+      "level/advanced": 1.0,
+      "complexity/2-hop": 1.0,
+      "complexity/3-hop": 1.0
+    },
     "category_scores": {
       "category/PUB": 1.0
     },
-    "frustration_scores": {},
-    "frustration_samples": [],
-    "level_samples": [],
-    "complexity_samples": [],
+    "frustration_scores": {
+      "frustration/low": 1.0,
+      "frustration/very_high": 1.0
+    },
+    "frustration_samples": [
+      {
+        "id": "PUB-001",
+        "frustration": "low",
+        "score": 1.0
+      },
+      {
+        "id": "PUB-002",
+        "frustration": "very_high",
+        "score": 1.0
+      },
+      {
+        "id": "PUB-003",
+        "frustration": "very_high",
+        "score": 1.0
+      }
+    ],
+    "level_samples": [
+      {
+        "id": "PUB-001",
+        "level": "baseline",
+        "score": 1.0
+      },
+      {
+        "id": "PUB-002",
+        "level": "advanced",
+        "score": 1.0
+      },
+      {
+        "id": "PUB-003",
+        "level": "advanced",
+        "score": 1.0
+      }
+    ],
+    "complexity_samples": [
+      {
+        "id": "PUB-001",
+        "complexity": "0-hop",
+        "score": 1.0
+      },
+      {
+        "id": "PUB-002",
+        "complexity": "2-hop",
+        "score": 1.0
+      },
+      {
+        "id": "PUB-003",
+        "complexity": "3-hop",
+        "score": 1.0
+      }
+    ],
     "task_stats": {}
   },
   {
@@ -1622,7 +2309,7 @@
     "score": 1.0,
     "cost": 0.03,
     "task_name": "astabench/nf_rag",
-    "task_version": "v1.2",
+    "task_version": "v1.3",
     "total_samples": 2,
     "started_at": "2026-07-25T10:15:23-07:00",
     "completed_at": "2026-07-25T10:15:34-07:00",
@@ -1636,14 +2323,55 @@
     "cache_write_tokens": 6407,
     "cache_read_tokens": 13131,
     "total_tokens": 20553,
-    "difficulty_scores": {},
+    "difficulty_scores": {
+      "level/baseline": 1.0,
+      "complexity/0-hop": 1.0,
+      "level/advanced": 1.0,
+      "complexity/2-hop": 1.0
+    },
     "category_scores": {
       "category/PUB": 1.0
     },
-    "frustration_scores": {},
-    "frustration_samples": [],
-    "level_samples": [],
-    "complexity_samples": [],
+    "frustration_scores": {
+      "frustration/low": 1.0,
+      "frustration/very_high": 1.0
+    },
+    "frustration_samples": [
+      {
+        "id": "PUB-001",
+        "frustration": "low",
+        "score": 1.0
+      },
+      {
+        "id": "PUB-002",
+        "frustration": "very_high",
+        "score": 1.0
+      }
+    ],
+    "level_samples": [
+      {
+        "id": "PUB-001",
+        "level": "baseline",
+        "score": 1.0
+      },
+      {
+        "id": "PUB-002",
+        "level": "advanced",
+        "score": 1.0
+      }
+    ],
+    "complexity_samples": [
+      {
+        "id": "PUB-001",
+        "complexity": "0-hop",
+        "score": 1.0
+      },
+      {
+        "id": "PUB-002",
+        "complexity": "2-hop",
+        "score": 1.0
+      }
+    ],
     "task_stats": {}
   },
   {
@@ -1653,7 +2381,7 @@
     "score": 0.5,
     "cost": 0.2,
     "task_name": "astabench/nf_rag",
-    "task_version": "v1.2",
+    "task_version": "v1.3",
     "total_samples": 2,
     "started_at": "2026-07-25T10:05:01-07:00",
     "completed_at": "2026-07-25T10:07:08-07:00",
@@ -1667,14 +2395,55 @@
     "cache_write_tokens": 21509,
     "cache_read_tokens": 248488,
     "total_tokens": 279469,
-    "difficulty_scores": {},
+    "difficulty_scores": {
+      "level/baseline": 1.0,
+      "complexity/0-hop": 1.0,
+      "level/advanced": 0.0,
+      "complexity/2-hop": 0.0
+    },
     "category_scores": {
       "category/PUB": 0.5
     },
-    "frustration_scores": {},
-    "frustration_samples": [],
-    "level_samples": [],
-    "complexity_samples": [],
+    "frustration_scores": {
+      "frustration/low": 1.0,
+      "frustration/very_high": 0.0
+    },
+    "frustration_samples": [
+      {
+        "id": "PUB-001",
+        "frustration": "low",
+        "score": 1.0
+      },
+      {
+        "id": "PUB-002",
+        "frustration": "very_high",
+        "score": 0.0
+      }
+    ],
+    "level_samples": [
+      {
+        "id": "PUB-001",
+        "level": "baseline",
+        "score": 1.0
+      },
+      {
+        "id": "PUB-002",
+        "level": "advanced",
+        "score": 0.0
+      }
+    ],
+    "complexity_samples": [
+      {
+        "id": "PUB-001",
+        "complexity": "0-hop",
+        "score": 1.0
+      },
+      {
+        "id": "PUB-002",
+        "complexity": "2-hop",
+        "score": 0.0
+      }
+    ],
     "task_stats": {}
   },
   {
@@ -1684,7 +2453,7 @@
     "score": 0.0,
     "cost": 0.29,
     "task_name": "astabench/nf_rag",
-    "task_version": "v1.2",
+    "task_version": "v1.3",
     "total_samples": 2,
     "started_at": "2026-07-25T10:00:32-07:00",
     "completed_at": "2026-07-25T10:03:29-07:00",
@@ -1698,14 +2467,55 @@
     "cache_write_tokens": 32521,
     "cache_read_tokens": 330082,
     "total_tokens": 377300,
-    "difficulty_scores": {},
+    "difficulty_scores": {
+      "level/baseline": 0.0,
+      "complexity/0-hop": 0.0,
+      "level/advanced": 0.0,
+      "complexity/2-hop": 0.0
+    },
     "category_scores": {
       "category/PUB": 0.0
     },
-    "frustration_scores": {},
-    "frustration_samples": [],
-    "level_samples": [],
-    "complexity_samples": [],
+    "frustration_scores": {
+      "frustration/low": 0.0,
+      "frustration/very_high": 0.0
+    },
+    "frustration_samples": [
+      {
+        "id": "PUB-001",
+        "frustration": "low",
+        "score": 0.0
+      },
+      {
+        "id": "PUB-002",
+        "frustration": "very_high",
+        "score": 0.0
+      }
+    ],
+    "level_samples": [
+      {
+        "id": "PUB-001",
+        "level": "baseline",
+        "score": 0.0
+      },
+      {
+        "id": "PUB-002",
+        "level": "advanced",
+        "score": 0.0
+      }
+    ],
+    "complexity_samples": [
+      {
+        "id": "PUB-001",
+        "complexity": "0-hop",
+        "score": 0.0
+      },
+      {
+        "id": "PUB-002",
+        "complexity": "2-hop",
+        "score": 0.0
+      }
+    ],
     "task_stats": {}
   },
   {
@@ -1715,7 +2525,7 @@
     "score": 0.7499999999999999,
     "cost": 0.05,
     "task_name": "astabench/nf_rag",
-    "task_version": "v1.2",
+    "task_version": "v1.3",
     "total_samples": 1,
     "started_at": "2026-07-25T09:27:18-07:00",
     "completed_at": "2026-07-25T09:27:48-07:00",
@@ -1729,14 +2539,37 @@
     "cache_write_tokens": 7399,
     "cache_read_tokens": 34774,
     "total_tokens": 44492,
-    "difficulty_scores": {},
+    "difficulty_scores": {
+      "level/advanced": 0.6,
+      "complexity/2-hop": 0.6
+    },
     "category_scores": {
       "category/PUB": 0.6
     },
-    "frustration_scores": {},
-    "frustration_samples": [],
-    "level_samples": [],
-    "complexity_samples": [],
+    "frustration_scores": {
+      "frustration/very_high": 0.6
+    },
+    "frustration_samples": [
+      {
+        "id": "PUB-002",
+        "frustration": "very_high",
+        "score": 0.6
+      }
+    ],
+    "level_samples": [
+      {
+        "id": "PUB-002",
+        "level": "advanced",
+        "score": 0.6
+      }
+    ],
+    "complexity_samples": [
+      {
+        "id": "PUB-002",
+        "complexity": "2-hop",
+        "score": 0.6
+      }
+    ],
     "task_stats": {}
   },
   {
@@ -1746,7 +2579,7 @@
     "score": 0.875,
     "cost": 0.06,
     "task_name": "astabench/nf_rag",
-    "task_version": "v1.2",
+    "task_version": "v1.3",
     "total_samples": 2,
     "started_at": "2026-07-25T09:02:58-07:00",
     "completed_at": "2026-07-25T09:03:27-07:00",
@@ -1760,14 +2593,55 @@
     "cache_write_tokens": 9991,
     "cache_read_tokens": 32789,
     "total_tokens": 45968,
-    "difficulty_scores": {},
+    "difficulty_scores": {
+      "level/baseline": 1.0,
+      "complexity/0-hop": 1.0,
+      "level/advanced": 0.6,
+      "complexity/2-hop": 0.6
+    },
     "category_scores": {
       "category/PUB": 0.8
     },
-    "frustration_scores": {},
-    "frustration_samples": [],
-    "level_samples": [],
-    "complexity_samples": [],
+    "frustration_scores": {
+      "frustration/low": 1.0,
+      "frustration/very_high": 0.6
+    },
+    "frustration_samples": [
+      {
+        "id": "PUB-001",
+        "frustration": "low",
+        "score": 1.0
+      },
+      {
+        "id": "PUB-002",
+        "frustration": "very_high",
+        "score": 0.6
+      }
+    ],
+    "level_samples": [
+      {
+        "id": "PUB-001",
+        "level": "baseline",
+        "score": 1.0
+      },
+      {
+        "id": "PUB-002",
+        "level": "advanced",
+        "score": 0.6
+      }
+    ],
+    "complexity_samples": [
+      {
+        "id": "PUB-001",
+        "complexity": "0-hop",
+        "score": 1.0
+      },
+      {
+        "id": "PUB-002",
+        "complexity": "2-hop",
+        "score": 0.6
+      }
+    ],
     "task_stats": {}
   },
   {
@@ -1777,7 +2651,7 @@
     "score": 0.875,
     "cost": 0.08,
     "task_name": "astabench/nf_rag",
-    "task_version": "v1.2",
+    "task_version": "v1.3",
     "total_samples": 2,
     "started_at": "2026-07-25T08:57:39-07:00",
     "completed_at": "2026-07-25T08:58:16-07:00",
@@ -1791,14 +2665,55 @@
     "cache_write_tokens": 11595,
     "cache_read_tokens": 66006,
     "total_tokens": 81132,
-    "difficulty_scores": {},
+    "difficulty_scores": {
+      "level/baseline": 1.0,
+      "complexity/0-hop": 1.0,
+      "level/advanced": 0.6,
+      "complexity/2-hop": 0.6
+    },
     "category_scores": {
       "category/PUB": 0.8
     },
-    "frustration_scores": {},
-    "frustration_samples": [],
-    "level_samples": [],
-    "complexity_samples": [],
+    "frustration_scores": {
+      "frustration/low": 1.0,
+      "frustration/very_high": 0.6
+    },
+    "frustration_samples": [
+      {
+        "id": "PUB-001",
+        "frustration": "low",
+        "score": 1.0
+      },
+      {
+        "id": "PUB-002",
+        "frustration": "very_high",
+        "score": 0.6
+      }
+    ],
+    "level_samples": [
+      {
+        "id": "PUB-001",
+        "level": "baseline",
+        "score": 1.0
+      },
+      {
+        "id": "PUB-002",
+        "level": "advanced",
+        "score": 0.6
+      }
+    ],
+    "complexity_samples": [
+      {
+        "id": "PUB-001",
+        "complexity": "0-hop",
+        "score": 1.0
+      },
+      {
+        "id": "PUB-002",
+        "complexity": "2-hop",
+        "score": 0.6
+      }
+    ],
     "task_stats": {}
   },
   {
@@ -1808,7 +2723,7 @@
     "score": 0.625,
     "cost": 0.06,
     "task_name": "astabench/nf_rag",
-    "task_version": "v1.2",
+    "task_version": "v1.3",
     "total_samples": 2,
     "started_at": "2026-07-25T08:54:29-07:00",
     "completed_at": "2026-07-25T08:54:57-07:00",
@@ -1822,14 +2737,55 @@
     "cache_write_tokens": 10226,
     "cache_read_tokens": 31489,
     "total_tokens": 44746,
-    "difficulty_scores": {},
+    "difficulty_scores": {
+      "level/baseline": 1.0,
+      "complexity/0-hop": 1.0,
+      "level/advanced": 0.2,
+      "complexity/2-hop": 0.2
+    },
     "category_scores": {
       "category/PUB": 0.6
     },
-    "frustration_scores": {},
-    "frustration_samples": [],
-    "level_samples": [],
-    "complexity_samples": [],
+    "frustration_scores": {
+      "frustration/low": 1.0,
+      "frustration/very_high": 0.2
+    },
+    "frustration_samples": [
+      {
+        "id": "PUB-001",
+        "frustration": "low",
+        "score": 1.0
+      },
+      {
+        "id": "PUB-002",
+        "frustration": "very_high",
+        "score": 0.2
+      }
+    ],
+    "level_samples": [
+      {
+        "id": "PUB-001",
+        "level": "baseline",
+        "score": 1.0
+      },
+      {
+        "id": "PUB-002",
+        "level": "advanced",
+        "score": 0.2
+      }
+    ],
+    "complexity_samples": [
+      {
+        "id": "PUB-001",
+        "complexity": "0-hop",
+        "score": 1.0
+      },
+      {
+        "id": "PUB-002",
+        "complexity": "2-hop",
+        "score": 0.2
+      }
+    ],
     "task_stats": {}
   },
   {

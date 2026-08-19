@@ -59,7 +59,7 @@
 #   ✓ Can be explained clearly in <30 seconds
 
 metadata:
-  version: v1.2
+  version: v1.3
   data_sources_profile: evaluation
   data_sources_version: KG v0.2-eval
 
@@ -201,7 +201,7 @@ components:
         demo_rationale: "Simple species filter, not innovative"
 
       - id: AM-004
-        question: "Which mouse model has the earliest observed tumor development?"
+        question: "Find mouse model with the earliest observed tumor development"
         user_story: "As a researcher, I want to find mouse models with the earliest observed tumor development to study early tumorigenesis"
         level: advanced
         complexity: 1-hop
@@ -543,7 +543,7 @@ components:
         demo_rationale: "Cross-resource matching, donor-based integration"
 
       - id: CR-004
-        question: "I want to acquire the SZ-NF1 cell line. Does it require a Materials Transfer Agreement (MTA)? Return the exact phrasing of your choice: (A) Yes (B) No (C) Not explicitly documented but likely (D) Not explicitly documented so unlikely"
+        question: "Does the SZ-NF1 cell line require MTA? Please answer exactly: 'Yes', 'No', 'Not explicitly documented but likely', or 'Not explicitly documented so unlikely'"
         user_story: "As a researcher planning to acquire the SZ-NF1 cell line, I want to know whether I need to arrange an MTA before requesting materials"
         level: advanced
         complexity: 1-hop
@@ -621,3 +621,90 @@ components:
         user_frustration: high
         demo_priority: high
         demo_rationale: "Study-to-file join for drug discovery; practical for preclinical pipeline planning"
+
+  - name: "Publication & People Discovery"
+    description: "Finding publications and the people behind them via authorship, ORCID coverage, and Synapse account linkage"
+    questions:
+      - id: PUB-001
+        question: "How many authors are on 'Validating Techniques for Measurement of Cutaneous Neurofibromas: Recommendations for Clinical Trials' (PMID: 34230197, DOI: 10.1212/WNL.0000000000012428)?"
+        user_story: "As a program officer, I want an accurate author count for a publication so that I can credit every contributor"
+        level: baseline
+        complexity: 0-hop
+        facet_answerable: partial
+        facet_note: "Publication listing can be searched to reach the paper, but the authors must then be counted by hand"
+        text_search_answerable: yes
+        text_search_note: "Searching the title or PMID returns the paper together with its author list"
+        user_frustration: low
+        demo_priority: low
+        demo_rationale: "Calibration item rather than a showcase; its value is testing whether the agent respects ontology guidance"
+        note: "Discriminates nf:authors (the complete pipe-delimited list, 15 names) from nf:authorOrcid (a partial ORCID subset, 8). An agent counting ORCID links answers 8 and undercounts by 7. The paper is chosen because it exists as exactly one biolink:Publication node, so the count is unambiguous"
+
+      - id: PUB-002
+        question: "Which authors for 'Genetically engineered minipigs model the major clinical features of human neurofibromatosis type 1' (DOI: 10.1038/s42003-018-0163-y) are Synapse users? Answer with the Synapse profile id of each such author (the numeric id, e.g. '1234567')."
+        user_story: "As a researcher, I want to know which authors of a paper have Synapse accounts so that I can reach the right person about their data"
+        level: advanced
+        complexity: 2-hop
+        facet_answerable: no
+        facet_note: "No facet connects a publication's authors to portal accounts"
+        text_search_answerable: no
+        text_search_note: "Author names are searchable but nothing links them to a Synapse profile"
+        user_frustration: very_high
+        demo_priority: high
+        demo_rationale: "Turns a paper into contactable people; showcases the publication-to-person linkage added with the people ingest"
+        note: "Traverses nf:authorOrcid to reach authors, then nf:hasSynapseProfile to reach accounts. Only authors with both an ORCID and a Synapse profile are resolvable"
+
+      - id: PUB-003
+        question: "I have Synapse profile 3334263. How many of my publications are on the portal?"
+        user_story: "As a portal contributor, I want to see how many of my own publications the portal holds so that I can check my work is represented"
+        level: advanced
+        complexity: 3-hop
+        facet_answerable: no
+        facet_note: "Publications cannot be filtered by Synapse profile or by ORCID"
+        text_search_answerable: no
+        text_search_note: "A surname search over-matches: 'Wallace' returns 26 papers spanning every Wallace, not the 14 belonging to this profile"
+        user_frustration: very_high
+        demo_priority: high
+        demo_rationale: "Personalized discovery from issue #74 - a portal user asking about their own contributions, end to end from profile to publications"
+        note: "Profile -> ORCID -> DOI -> publication, then deduplicate across the two portal listings: 19 nodes collapse to 14 distinct papers, and a raw node count of 19 is the expected wrong answer"
+
+      - id: PUB-004
+        question: "Some publications are listed by both NF Research Tools Central and the main NF Data Portal. Which publications appear in both listings? Answer with the PubMed ID (PMID) of each one."
+        user_story: "As a data curator, I want to find publications that both portal listings carry so that I can reconcile the duplicated records"
+        level: advanced
+        complexity: 2-hop
+        facet_answerable: no
+        facet_note: "Neither listing exposes which collection a publication came from, so the overlap cannot be assembled in the UI"
+        text_search_answerable: no
+        text_search_note: "Provenance is not searchable text"
+        user_frustration: very_high
+        demo_priority: medium
+        demo_rationale: "Curator-facing rather than researcher-facing, but a clear demonstration that the graph exposes provenance the portal hides"
+        note: "Groups nodes by identifier across prov:wasDerivedFrom. The matching key changes the answer: 22 by nf:pmid (correct), 19 by nf:doi or title (partial credit); counting any paper with more than one node gives 23 and is wrong. See docs/publication-issues.md"
+
+      - id: PUB-005
+        question: "I have Synapse profile 3334263. Among the co-authors on my papers who have an ORCID on record, how many are NOT Synapse users?"
+        user_story: "As a portal contributor, I want to know which of my co-authors are not yet on Synapse so that I can invite them to the portal"
+        level: advanced
+        complexity: 3-hop
+        facet_answerable: no
+        facet_note: "Requires traversing co-authorship and then testing for an absent account; there is no portal equivalent"
+        text_search_answerable: no
+        text_search_note: "Text search cannot express a negative condition"
+        user_frustration: very_high
+        demo_priority: high
+        demo_rationale: "Outreach use case that shows the graph answering a negative question, which no search box can"
+        note: "Needs a negative condition (FILTER NOT EXISTS / MINUS) over nf:hasSynapseProfile rather than the positive lookup in PUB-002. Deliberately scoped to co-authors who have an ORCID on record, because authors without one cannot be identified as people at all"
+
+      - id: PUB-006
+        question: "Across the publications in this knowledge graph, which researcher has the most distinct co-authors? Answer with their ORCID."
+        user_story: "As a program officer, I want to identify the most connected researchers in the NF publication network so that I can find collaboration hubs"
+        level: advanced
+        complexity: 2-hop
+        facet_answerable: no
+        facet_note: "No facet ranks people, and co-authorship is not represented in the portal at all"
+        text_search_answerable: no
+        text_search_note: "Ranking over a co-authorship network is not expressible as a text query"
+        user_frustration: very_high
+        demo_priority: high
+        demo_rationale: "Network analysis over the publication graph with a clear, stable winner; compelling and impossible in the current portal"
+        note: "Aggregation over a self-join: pair ORCIDs sharing a DOI, exclude self-pairs, and count distinct partners rather than co-authorship edges. Scope is the 284 of ~937 publication nodes carrying nf:authorOrcid, so this ranks within ORCID-covered papers rather than being a true bibliometric rank"

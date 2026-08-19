@@ -156,51 +156,55 @@ There is only one question that returns a number (count) instead of uuid(s).
 
 ### Data Versioning
 
-**Dataset Version**: v1.1
+**Dataset Version**: v1.3
 
-Data archived at **syn73695746**
+Built against **KG v0.2-eval**, `evaluation` profile in `data_sources.yaml`
 
 ---
 
 ### Dataset Statistics
 
-- **Total Questions**: 35
-  - Complete: 35
+- **Total Questions**: 46
+  - Complete: 46
   - Incomplete/WIP: 0
 
 #### By Complexity
-- **0-hop**: 14
-- **1-hop**: 15
-- **2-hop**: 6
+- **0-hop**: 15
+- **1-hop**: 17
+- **2-hop**: 12
+- **3-hop**: 2
 
 #### By Difficulty Level
-- **advanced**: 18
-- **baseline**: 17
+- **advanced**: 26
+- **baseline**: 20
 
 #### By Persona
-- **Researcher**: 29
+- **Researcher**: 33
 - **Gene Therapy Developer**: 4
-- **Bioinformatician**: 1
-- **Program Officer**: 1
+- **Program Officer**: 3
+- **Bioinformatician**: 2
+- **Portal Contributor**: 2
+- **Data Curator**: 1
+- **Pharmacologist**: 1
 
-*Total unique personas: 4*
+*Total unique personas: 7*
 
 #### By Demo Priority
-- **high**: 15
-- **medium**: 13
-- **low**: 7
+- **high**: 22
+- **medium**: 16
+- **low**: 8
 
 #### Answerability via Current Technologies
 
 | Technology | Yes | Partial | No |
 |------------|-----|---------|-----|
-| **Facet Filters** | 9 | 3 | 23 |
-| **Text Search** | 13 | 8 | 14 |
+| **Facet Filters** | 11 | 4 | 31 |
+| **Text Search** | 14 | 10 | 22 |
 
 #### Ground Truth Availability
 
-- **Automated** (generated from CSV data): 31
-- **Manual** (curated, requires interpretation): 4
+- **Automated** (generated from CSV data): 36
+- **Manual** (curated, requires interpretation): 10
 
 ---
 
@@ -231,7 +235,7 @@ Data archived at **syn73695746**
 | AM-001 | I want animal models to study optic glioma | baseline | 0-hop | Yes | Yes |
 | AM-002 | Help me find animal models suitable for energy expenditure studies | baseline | 0-hop | Partial | Partial |
 | AM-003 | Are there any non-mouse mammalian models available? | baseline | 0-hop | Yes | Partial |
-| AM-004 | Which mouse model has the earliest observed tumor development? | advanced | 1-hop | No | No |
+| AM-004 | Find mouse model with the earliest observed tumor development | advanced | 1-hop | No | No |
 | AM-005 | Find transplantation mouse models (xenografts) and related donor cell lines | advanced | 2-hop | No | No |
 | AM-006 | Which animal models develop café-au-lait spots? | advanced | 1-hop | No | No |
 
@@ -301,7 +305,36 @@ Data archived at **syn73695746**
 | CR-001 | Which cell lines have shown sensitivity to HDAC inhibitors? | advanced | 1-hop | No | Partial |
 | CR-002 | Find human cell lines with the most diverse data types available on the portal. | advanced | 2-hop | No | No |
 | CR-003 | Find animal models and cell lines that are derived from the same donor | advanced | 2-hop | No | No |
-| CR-004 | I want to acquire the SZ-NF1 cell line. Does it require a Materials Transfer ... | advanced | 1-hop | No | No |
+| CR-004 | Does the SZ-NF1 cell line require MTA? Please answer exactly: 'Yes', 'No', 'N... | advanced | 1-hop | No | No |
+
+
+#### Study Discovery
+*Finding studies and their associated data files via study metadata and file-level annotations*
+
+**Questions: 5/5 complete**
+
+| ID | Question | Level | Complexity | Facet | Text Search |
+|----|----------|-------|------------|-------|-------------|
+| ST-001 | Find studies focused on schwannoma | baseline | 1-hop | Yes | Partial |
+| ST-002 | What studies for MPNST have RNA-seq data? | advanced | 2-hop | No | No |
+| ST-003 | Which studies have whole genome sequencing data from human female subjects? | advanced | 2-hop | No | No |
+| ST-004 | Which schwannomatosis studies have data available for download? | baseline | 1-hop | Yes | Partial |
+| ST-005 | What studies on plexiform neurofibroma have drug screening data? | advanced | 2-hop | No | No |
+
+
+#### Publication & People Discovery
+*Finding publications and the people behind them via authorship, ORCID coverage, and Synapse account linkage*
+
+**Questions: 6/6 complete**
+
+| ID | Question | Level | Complexity | Facet | Text Search |
+|----|----------|-------|------------|-------|-------------|
+| PUB-001 | How many authors are on 'Validating Techniques for Measurement of Cutaneous N... | baseline | 0-hop | Partial | Yes |
+| PUB-002 | Which authors for 'Genetically engineered minipigs model the major clinical f... | advanced | 2-hop | No | No |
+| PUB-003 | I have Synapse profile 3334263. How many of my publications are on the portal? | advanced | 3-hop | No | No |
+| PUB-004 | Some publications are listed by both NF Research Tools Central and the main N... | advanced | 2-hop | No | No |
+| PUB-005 | I have Synapse profile 3334263. Among the co-authors on my papers who have an... | advanced | 3-hop | No | No |
+| PUB-006 | Across the publications in this knowledge graph, which researcher has the mos... | advanced | 2-hop | No | No |
 
 
 ---
