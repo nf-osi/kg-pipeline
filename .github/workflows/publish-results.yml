@@ -7,7 +7,11 @@ on:
     paths:
       - 'evaluation/runs.json'
       - 'evaluation/pubs_runs.json'
+      - 'evaluation/main/dataset_attributes.yaml'
+      - 'evaluation/main/eval_tools_ground_*.yaml'
+      - 'evaluation/qa/qa_PMC*.yaml'
       - 'scripts/build_site.py'
+      - 'scripts/site/**'
       - 'scripts/extract_runs.py'
 
 concurrency:
@@ -36,8 +40,9 @@ jobs:
 
       - name: Build site
         run: |
-          python scripts/build_site.py evaluation/runs.json --out _site
-          python scripts/build_site.py evaluation/pubs_runs.json --pubs --out _site
+          python scripts/build_site.py evaluation/runs.json \
+            --pubs-json evaluation/pubs_runs.json \
+            --out _site
           touch _site/.nojekyll
 
       - name: Deploy to GitHub Pages

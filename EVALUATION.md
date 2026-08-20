@@ -82,20 +82,61 @@ The evaluation results dashboard is automatically published to GitHub Pages via 
 2. **Commit & push**: When `evaluation/runs.json` is pushed to `develop`, GitHub Actions builds and deploys the dashboard
 3. **View results**: Dashboard is available at the GitHub Pages URL
 
-The dashboard features:
+The dashboard is a single self-contained `index.html` with one tab per eval
+module. All aggregation happens in the browser from an embedded JSON payload, so
+the same file works served from Pages or opened straight off disk.
 
-**For `main` eval**
-- Summary table of all runs (sortable, filterable by model)
-- Cost vs recall and time vs recall scatter plots
-- Breakdown by difficulty level (baseline/advanced) and complexity (0-hop/1-hop/2-hop)
-- Category analysis (mutations, animal models, cell lines, etc.)
-- User frustration analysis showing recall degradation
-- High-impact questions table (queries users struggle with that the KG handles well)
+Shared shell:
 
-**For `pubs` eval**
-- Summary table with accuracy, citation F1, cost, and timing
-- Breakdown by difficulty (easy/medium/hard)
-- Breakdown by question type (causal, comparative, factual, inferential, methodological)
+- Filter row that scopes every figure and table below it
+- Headline figure plus KPI row, with the full run tables behind disclosures
+- Chart/table toggle on every figure &mdash; no value is reachable only by hovering
+- Light and dark themes, each with its own selected colour steps. Series colours
+  come from a colourblind-safe categorical palette; the text and accent-as-text
+  tokens are stepped to clear WCAG AA (4.5:1) on both the page and card surfaces,
+  verified by walking every rendered text node in both themes
+- Deep links: `index.html#tools` and `index.html#pubs` (the old `main.html` and
+  `pubs.html` URLs redirect to these)
+
+**For `main` eval** (`#tools`)
+
+- Filters: question set version, model
+- Recall against cost per question, with the cost/quality frontier emphasised
+- Recall by reasoning complexity and a baseline-vs-advanced dumbbell. The complexity,
+  level and frustration axes are read from the run data like the categories are, so a
+  new bucket (3-hop arrived with the PUB questions) appears without a code change
+- Recall by resource category as a heatmap &mdash; **driven by the data, so a newly
+  added question category appears automatically and is flagged `new`**
+- A dedicated section per new category, listing its questions
+- Recall against portal pain (user frustration), with the grading explained inline
+- Progress over time as two charts on a shared time axis: best recall, and best
+  (lowest) cost per question. Both are recomputed against the selected models and
+  span every question-set version
+- High-impact questions, all runs, and per-question per-model recall as tables
+
+**For `pubs` eval** (`#pubs`)
+
+- Filters: question phrasing (natural / precise / compare), model
+- Answer accuracy against citation F1 as a dumbbell &mdash; the attribution gap
+- Citation F1 against cost per question, frontier emphasised
+- Citation F1 by difficulty and by question type
+- Citation F1 per paper
+- All runs and per-paper tables
+
+Only scored runs that covered a complete question set are included. Partial
+development runs and runs the harness could not score are dropped when the page
+is built, so they never reach the payload — `build_site.py` reports how many it
+excluded. The untouched extract, including those runs, is published alongside as
+`runs.json`.
+
+Question-set versions are not comparable to each other: a later set adds whole
+categories of question rather than making the same questions harder. The
+dashboard therefore treats the question set as a filter (defaulting to the
+latest) rather than as a table column.
+
+Presentation lives in `scripts/site/` (`dashboard.css`, `charts.js`,
+`dashboard.js`) and is inlined into the output at build time. Edit those files
+rather than the Python string templates.
 
 #### Adding New Runs
 
@@ -131,18 +172,18 @@ Optional arguments for `extract_runs.py`:
 To preview the dashboard:
 
 ```bash
-# Main eval dashboard
-python scripts/build_site.py evaluation/runs.json --out preview/
+python scripts/build_site.py --out preview/
 # View preview/index.html in a browser
-
-# Pubs eval dashboard
-python scripts/build_site.py evaluation/pubs_runs.json --pubs --out preview/
-# View preview/pubs.html in a browser
 ```
 
-Optional arguments for `build_site.py`:
-- `--pubs`: Generate pubs eval dashboard (input is `pubs_runs.json`)
+Both modules are built in one pass. Optional arguments for `build_site.py`:
+- `runs_json`: Tools eval runs (default: `evaluation/runs.json`)
+- `--pubs-json PATH`: Pubs eval runs (default: `evaluation/pubs_runs.json`)
 - `--out PATH`: Output directory (default: `_site`)
-- `--eval-metadata PATH`: Custom metadata file (default: `evaluation/main/eval_tools.yaml`)
+- `--eval-metadata PATH`: Question attributes (default: `evaluation/main/dataset_attributes.yaml`)
+- `--ground-truth-dir PATH`: Where `eval_tools_ground_*.yaml` live, used for the
+  wording of questions that do not yet have a `dataset_attributes.yaml` entry
+  (default: `evaluation/main`)
+- `--qa-dir PATH`: Where `qa_PMC*.yaml` live, used for paper titles (default: `evaluation/qa`)
 
 
