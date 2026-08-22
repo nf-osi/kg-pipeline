@@ -589,7 +589,7 @@ nf:sex a owl:DatatypeProperty ;
 
 nf:species a owl:DatatypeProperty ;
     rdfs:label "species" ;
-    rdfs:comment "Taxonomic group of the associated organism." ;
+    rdfs:comment "Taxonomic group of the associated organism. Expected as a string in scientific nomenclature for most cases, e.g. \"Homo sapiens\", not \"Human\"." ;
     rdfs:range xsd:string .
 
 nf:cellType a owl:DatatypeProperty ;
