@@ -3,6 +3,7 @@
 # (files will remain locally but will not be tracked)
 data/
 tmp/
+todo/
 
 # Node embeddings — generated artifacts, not tracked
 # data/embeddings/kg.edgelist and data/embeddings/kg.emd are excluded by data/ above.
