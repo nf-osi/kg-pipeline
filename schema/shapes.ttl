@@ -1038,6 +1038,7 @@ shapes:ObservationShape a sh:NodeShape ;
     sh:property [
         sh:path nf:investigatorSynapseId ;
         sh:nodeKind sh:IRI ;
+        sh:class biolink:Person ;
         sh:maxCount 1 ;
     ] ;
     sh:property [
@@ -1048,6 +1049,12 @@ shapes:ObservationShape a sh:NodeShape ;
     sh:property [
         sh:path nf:referencesPublication ;
         sh:nodeKind sh:IRI ;
+    ] ;
+    sh:property [
+        sh:path nf:aboutResource ;
+        sh:nodeKind sh:IRI ;
+        sh:class nf:Tool ;
+        sh:maxCount 1 ;
     ] .
 
 ################################################################################
@@ -1629,4 +1636,9 @@ shapes:ToolShape a sh:NodeShape ;
     sh:property [
         sh:path nf:hasInvestigator ;
         sh:nodeKind sh:IRI ;
+    ] ;
+    sh:property [
+        sh:path nf:hasObservation ;
+        sh:nodeKind sh:IRI ;
+        sh:class nf:Observation ;
     ] .

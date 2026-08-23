@@ -102,43 +102,48 @@ class TestObservationsCore:
 
 
 class TestObservationsMultiValue:
-    """Test multi-value field handling (pipe-delimited lists)"""
+    """Test multi-value field handling (pipe-delimited lists)
 
-    def test_observation_type_multi_value_split(self, observations_graph, namespaces):
-        """ObservationType should split on pipe delimiter"""
+    observationType (raw free text) is intentionally not materialized as an
+    RDF property -- see mappings/rml/observations.rml.ttl. The same
+    pipe-delimited split mechanism is instead exercised here via
+    observationClass, which drives rdf:type.
+    """
+
+    def test_observation_class_multi_value_split(self, observations_graph, namespaces):
+        """observationClass should split on pipe delimiter into multiple rdf:type values"""
         NF = namespaces["nf"]
 
-        query = """
-        SELECT ?observation ?type
-        WHERE {
-            ?observation a nf:Observation ;
-                        nf:observationType ?type .
+        types = {
+            str(t) for t in observations_graph.objects(
+                NF["observation/obs-002"], RDF.type
+            )
         }
-        """
-        results = observations_graph.query(query, initNs={"nf": NF})
-        observation_types = [str(row.type) for row in results]
 
-        # Should have multiple values from pipe-delimited list
-        # "Phenotype|Growth Rate" should split into separate values
-        assert "Phenotype" in observation_types, "Expected 'Phenotype' observation type"
-        assert "Growth Rate" in observation_types, "Expected 'Growth Rate' observation type"
+        # obs-002 has "PhenotypeObservation|AssayObservation" in test data
+        assert str(NF.PhenotypeObservation) in types, "Expected PhenotypeObservation class"
+        assert str(NF.AssayObservation) in types, "Expected AssayObservation class"
 
-    def test_observation_type_single_value(self, observations_graph, namespaces):
-        """Single-value observationType should not be split"""
+    def test_observation_class_single_value(self, observations_graph, namespaces):
+        """Single-value observationClass should not be split"""
         NF = namespaces["nf"]
 
-        query = """
-        SELECT ?observation ?type
-        WHERE {
-            ?observation a nf:Observation ;
-                        nf:observationType ?type .
+        types = {
+            str(t) for t in observations_graph.objects(
+                NF["observation/obs-003"], RDF.type
+            )
         }
-        """
-        results = observations_graph.query(query, initNs={"nf": NF})
-        observation_types = [str(row.type) for row in results]
 
-        # Should have "Specificity" as a single value
-        assert "Specificity" in observation_types, "Expected 'Specificity' observation type"
+        # obs-003 has a single class, "AssayObservation", in test data
+        assert str(NF.AssayObservation) in types, "Expected AssayObservation class"
+        assert str(NF.PhenotypeObservation) not in types, "Did not expect PhenotypeObservation class"
+
+    def test_observation_type_not_materialized(self, observations_graph, namespaces):
+        """Raw observationType should not appear as an RDF property"""
+        NF = namespaces["nf"]
+
+        results = list(observations_graph.subject_objects(NF.observationType))
+        assert len(results) == 0, "nf:observationType should not be materialized in the graph"
 
 
 class TestObservationsIRIFields:

@@ -676,7 +676,7 @@ TABLES: Dict[str, Dict[str, Any]] = {
             {"target": "observationSubmitterName", "source": "observationSubmitterName", "type": "text"},
             {"target": "synapseId", "source": "synapseId", "type": "iri", "transform": "synapse_id"},
             {"target": "observationText", "source": "observationText", "type": "text"},
-            {"target": "observationType", "source": "observationType", "type": "text"},
+            {"target": "observationType", "source": "observationType", "type": "text+", "transform": "string_list"},
             {"target": "observationPhase", "source": "observationPhase", "type": "text"},
             {"target": "observationTime", "source": "observationTime", "type": "text"},
             {"target": "observationTimeUnits", "source": "observationTimeUnits", "type": "text"},

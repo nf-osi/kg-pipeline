@@ -313,6 +313,35 @@ def shared_donor_links_asset(context: AssetExecutionContext) -> Path:
 
 
 @asset(
+    name="observation_links",
+    key_prefix=["portal", "rdf"],
+    compute_kind="python",
+    group_name="relationships",
+    deps=[["portal", "rdf", "resources"], ["portal", "rdf", "observations"]],
+)
+def observation_links_asset(context: AssetExecutionContext) -> Path:
+    """Generate derived hasObservation/aboutResource links after core RDF is available."""
+    from scripts.materialize_observation_links import materialize_observation_links
+
+    project_root = Path(__file__).parent.parent.parent
+    output_file = project_root / "data" / "rdf" / "observation_links.ttl"
+
+    materialize_observation_links(
+        resources_ttl=project_root / "data" / "rdf" / "resources.ttl",
+        observations_ttl=project_root / "data" / "rdf" / "observations.ttl",
+        output_ttl=output_file,
+    )
+
+    size_mb = output_file.stat().st_size / (1024 * 1024)
+    context.add_output_metadata({
+        "path": str(output_file.relative_to(project_root)),
+        "size_mb": round(size_mb, 4),
+    })
+
+    return output_file
+
+
+@asset(
     name="nf1_mutation_sets",
     key_prefix=["portal", "rdf"],
     compute_kind="python",
@@ -353,7 +382,7 @@ def create_build_metadata_asset(rdf_asset_keys: list):
         key_prefix=["portal", "rdf"],
         compute_kind="python",
         group_name="relationships",
-        deps=rdf_asset_keys + [["portal", "rdf", "shared_donor_links"], ["portal", "rdf", "nf1_mutation_sets"]],
+        deps=rdf_asset_keys + [["portal", "rdf", "shared_donor_links"], ["portal", "rdf", "nf1_mutation_sets"], ["portal", "rdf", "observation_links"]],
     )
     def _build_metadata_asset(context: AssetExecutionContext) -> Path:
         """Generate graph-level VoID/PROV build metadata TTL."""
@@ -412,6 +441,7 @@ def generate_portal_assets() -> List:
     assets.append(validation_asset)
     assets.append(shared_donor_links_asset)
     assets.append(nf1_mutation_sets_asset)
+    assets.append(observation_links_asset)
     assets.append(create_build_metadata_asset(rdf_asset_keys))
 
     return assets
