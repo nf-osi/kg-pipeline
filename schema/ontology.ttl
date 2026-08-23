@@ -702,7 +702,7 @@ nf:institutions a owl:DatatypeProperty ;
 
 nf:manifestation a owl:DatatypeProperty ;
     rdfs:label "manifestation" ;
-    rdfs:comment "Disease phenotype modeled or studied by the resource." ;
+    rdfs:comment "Disease phenotype modeled or studied by the resource, as a broad controlled-vocabulary category (e.g. 'Growth', 'Cognition', 'Plexiform Neurofibroma'). Currently, this carries **incomplete** categorization for linked diseases and phenotypes, which is free text in the observationText of a linked nf:Observation and not guaranteed to be reflected in this field." ;
     rdfs:range xsd:string .
 
 nf:diseaseFocus a owl:DatatypeProperty ;
@@ -1646,10 +1646,11 @@ nf:externalRepositoryUri a owl:ObjectProperty ;
 # Properties - Development related
 ################################################################################
 
-nf:resourceId a owl:ObjectProperty ;
+nf:resourceId a owl:DatatypeProperty ;
     rdfs:label "resourceId" ;
-    rdfs:comment "Canonical resource ID." ;
-    rdfs:range nf:Tool .
+    rdfs:comment "Canonical resource ID, as a string. Used as a join key by nf:forResourceId to link an nf:Observation or nf:Development record back to this resource." ;
+    rdfs:domain nf:Tool ;
+    rdfs:range xsd:string .
 
 # Funder
 nf:hasFunder a owl:ObjectProperty ;
@@ -1790,7 +1791,7 @@ nf:observationId a owl:DatatypeProperty ;
 
 nf:observationText a owl:DatatypeProperty ;
     rdfs:label "observationText" ;
-    rdfs:comment "The text content of an observation." ;
+    rdfs:comment "The free-text content of an observation. This may be the only place a specific detail is recorded, since related structured fields only hold a mappable category." ;
     rdfs:domain nf:Observation ;
     rdfs:range xsd:string .
 
@@ -1841,9 +1842,15 @@ nf:easeOfUseRating a owl:DatatypeProperty ;
     rdfs:domain nf:Observation ;
     rdfs:range xsd:string .
 
+nf:forResourceId a owl:DatatypeProperty ;
+    rdfs:label "forResourceId" ;
+    rdfs:comment "The nf:resourceId of the nf:Tool this record is about, as a string -- not an IRI reference. To find the actual resource, join this value against nf:resourceId; there is no direct edge to the resource node." ;
+    rdfs:domain [ a owl:Class ; owl:unionOf (nf:Observation nf:Development) ] ;
+    rdfs:range xsd:string .
+
 nf:aboutResource a owl:ObjectProperty ;
     rdfs:label "aboutResource" ;
-    rdfs:comment "Links an observation to the resource it describes." ;
+    rdfs:comment "Links an observation to the resource it describes. NOTE: not currently populated by the pipeline -- use nf:forResourceId (a string join key) instead until this is implemented." ;
     rdfs:domain nf:Observation ;
     rdfs:range nf:Tool .
 
