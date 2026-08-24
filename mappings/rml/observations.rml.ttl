@@ -86,42 +86,12 @@ map:ObservationReferencesPublication a rr:TriplesMap ;
     ] .
 
 ################################################################################
-# Multi-valued fields (StringList)
-################################################################################
-
-map:ObservationType a rr:TriplesMap ;
-    rdfs:label "Observation Type" ;
-    rml:logicalSource map:ObservationsSource ;
-    rr:subjectMap [
-        rr:template "http://nf-osi.github.com/terms#observation/{observationId}" ;
-        rr:termType rr:IRI
-    ] ;
-    rr:predicateObjectMap [
-        rr:predicate nf:observationType ;
-        rr:objectMap [
-            a fnml:FunctionTermMap ;
-            rr:datatype xsd:string ;
-            fnml:functionValue [
-                a fno:Execution ;
-                rml:logicalSource map:ObservationsSource ;
-                rr:predicateObjectMap [
-                    rr:predicate fno:executes ;
-                    rr:objectMap [ rr:constant grel:string_split ; rr:termType rr:IRI ]
-                ] ;
-                rr:predicateObjectMap [
-                    rr:predicate grel:valueParameter ;
-                    rr:objectMap [ rml:reference "observationType" ; rr:termType rr:Literal ]
-                ] ;
-                rr:predicateObjectMap [
-                    rr:predicate grel:p_string_sep ;
-                    rr:objectMap [ rr:constant "\\|" ; rr:termType rr:Literal ]
-                ]
-            ]
-        ]
-    ] .
-
-################################################################################
 # Observation class (IRI-typed via rdf:type)
+#
+# Note: raw observationType (free-text, ~340 distinct values, noisy casing
+# and near-duplicates) is intentionally NOT materialized as an RDF property.
+# It is only used as input to classify_observations.py, which resolves it to
+# the controlled observationClass values mapped below.
 ################################################################################
 
 map:ObservationClass a rr:TriplesMap ;

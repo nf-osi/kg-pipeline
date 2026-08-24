@@ -396,7 +396,7 @@ nf:Investigator a owl:Class ;
 
 biolink:Person a owl:Class ;
     rdfs:label "Person" ;
-    skos:scopeNote "A person in the NF-OSI portal people registry. IRI KEYING -- a biolink:Person node is keyed by ONE of two schemes depending on which identifiers the person has: https://www.synapse.org/Profile:{id} when they have a Synapse account, or https://orcid.org/{orcid} when they do not and are known only from authorship. The two are mutually exclusive per person, so counting instances of this class counts people rather than identifiers. Do NOT assume a Person subject is a Profile IRI -- most people in the registry have no Synapse account, so most are ORCID-keyed. Where the person has both identifiers, owl:sameAs links them in both directions. Names are on foaf:name (mirrored to rdfs:label) for both kinds of node, when a name is on record. To ask whether a person has a Synapse account, use nf:hasSynapseProfile; there is deliberately no class for this. nf:Investigator is a subclass, used for curated resource-development records." .
+    skos:scopeNote "A person in the NF-OSI portal registry. IMPORTANT: A biolink:Person node is keyed by ONE of two schemes depending on which identifiers the person has: https://www.synapse.org/Profile:{id} when they have a Synapse account, or https://orcid.org/{orcid} when they do not and associated only from authorship. The two are mutually exclusive per person, so counting instances of this class counts people rather than identifiers. Do NOT assume a Person subject is a Profile IRI -- most people in the registry have no Synapse account, so most are ORCID-keyed. Where the person has both identifiers, owl:sameAs links them in both directions. Names are on foaf:name (mirrored to rdfs:label) for both kinds of node, when a name is on record. To ask whether a person has a Synapse account, use nf:hasSynapseProfile." .
 
 biolink:Publication a owl:Class ;
     rdfs:label "Publication" ;
@@ -417,7 +417,7 @@ nf:UnknownOrNA a owl:Class ;
 
 nf:Observation a owl:Class ;
     rdfs:label "Observation" ;
-    rdfs:comment "An observation for a resource" .
+    rdfs:comment "An observation for a resource. Subclasses are a multi-label classification; an observation is commonly typed as more than one subclass at once (e.g. both nf:AssayObservation and nf:PhenotypeObservation, when an assay result is itself the evidence for a phenotype)." .
 
 nf:PhenotypeObservation a owl:Class ;
     rdfs:subClassOf nf:Observation ;
@@ -437,7 +437,7 @@ nf:MethodObservation a owl:Class ;
 nf:ContributedObservation a owl:Class ;
     rdfs:subClassOf nf:Observation ;
     rdfs:label "Contributed observation" ;
-    rdfs:comment "Any commentary from community members or depositors; not classified into more specific observation type" .
+    rdfs:comment "Any commentary from community members or depositors; this is more general than other observation types" .
 
 nf:UsageObservation a owl:Class ;
     rdfs:subClassOf nf:Observation ;
@@ -456,7 +456,7 @@ nf:MaterialsTransferAgreement a owl:Class ;
 nf:IssueObservation a owl:Class ;
     rdfs:subClassOf nf:Observation ;
     rdfs:label "Issue observation" ;
-    rdfs:comment "An observation regarding an issue for a resource, e.g. a QC issue" .
+    rdfs:comment "An observation regarding potential problems about a resource, e.g. potential misidentification" .
 
 nf:AIAgent a owl:Class ;
     rdfs:subClassOf prov:Agent ;
@@ -465,7 +465,7 @@ nf:AIAgent a owl:Class ;
 
 nf:ObservationExtraction a prov:Activity ;
     rdfs:label "Observation Extraction" ;
-    rdfs:comment "An activity in which structured observations are extracted from unstructured text." .
+    rdfs:comment "An activity in which observations are extracted from text." .
 
 nf:KGBuild a void:Dataset ;
     rdfs:label "NF-OSI Knowledge Graph" ;
@@ -589,7 +589,7 @@ nf:sex a owl:DatatypeProperty ;
 
 nf:species a owl:DatatypeProperty ;
     rdfs:label "species" ;
-    rdfs:comment "Taxonomic group of the associated organism." ;
+    rdfs:comment "Taxonomic group of the associated organism. Expected as a string in scientific nomenclature for most cases, e.g. \"Homo sapiens\", not \"Human\"." ;
     rdfs:range xsd:string .
 
 nf:cellType a owl:DatatypeProperty ;
@@ -702,7 +702,7 @@ nf:institutions a owl:DatatypeProperty ;
 
 nf:manifestation a owl:DatatypeProperty ;
     rdfs:label "manifestation" ;
-    rdfs:comment "Disease phenotype modeled or studied by the resource." ;
+    rdfs:comment "Disease phenotype modeled or studied by the resource, as a broad controlled-vocabulary category (e.g. 'Growth', 'Cognition', 'Plexiform Neurofibroma'). Currently, this carries **incomplete** categorization for linked diseases and phenotypes, which is free text in the observationText of a linked nf:Observation and not guaranteed to be reflected in this field." ;
     rdfs:range xsd:string .
 
 nf:diseaseFocus a owl:DatatypeProperty ;
@@ -994,6 +994,13 @@ nf:sharedDonor a owl:ObjectProperty ;
     rdfs:label "sharedDonor" ;
     rdfs:comment "Links a resource to a donor only when that donor is used to match animal models and cell lines across resource types. In the current graph this is materialized for cases where an animal model transplantationDonorId matches a cell line donorId." ;
     rdfs:range nf:Donor .
+
+nf:hasObservation a owl:ObjectProperty ;
+    rdfs:label "hasObservation" ;
+    rdfs:comment "Links a resource directly to an nf:Observation about it. Resources can have more than one observation/different types of observations." ;
+    rdfs:domain nf:Tool ;
+    rdfs:range nf:Observation ;
+    owl:inverseOf nf:aboutResource .
 
 # Do not use this yet 
 #
@@ -1646,10 +1653,11 @@ nf:externalRepositoryUri a owl:ObjectProperty ;
 # Properties - Development related
 ################################################################################
 
-nf:resourceId a owl:ObjectProperty ;
+nf:resourceId a owl:DatatypeProperty ;
     rdfs:label "resourceId" ;
-    rdfs:comment "Canonical resource ID." ;
-    rdfs:range nf:Tool .
+    rdfs:comment "Canonical resource ID, as a string. Used as a join key by nf:forResourceId to link an nf:Observation or nf:Development record back to this resource." ;
+    rdfs:domain nf:Tool ;
+    rdfs:range xsd:string .
 
 # Funder
 nf:hasFunder a owl:ObjectProperty ;
@@ -1761,7 +1769,7 @@ nf:publicationType a owl:DatatypeProperty ;
 
 nf:hasSynapseProfile a owl:ObjectProperty ;
     rdfs:label "hasSynapseProfile" ;
-    rdfs:comment "Links a person to the Synapse Profile IRI that identifies them, i.e. asserts that this researcher has a Synapse account. This is the test for 'is this author on Synapse', and it returns the profile in the same triple pattern rather than requiring a follow-up hop: `?pub nf:doi ?doi . ?doi nf:authorOrcid ?orcid . ?orcid nf:hasSynapseProfile ?profile .` The subject is the ORCID IRI, which is the identifier a publication's nf:authorOrcid gives you and the only identifier every person in the registry has. Prefer this over filtering owl:sameAs objects by IRI prefix -- owl:sameAs also links ORCIDs to nf:Investigator records, so a bare sameAs traversal does not mean 'has an account'. A person with an ORCID but no known Synapse account simply has no nf:hasSynapseProfile triple. NOTE the relation is one-to-many: a person may hold more than one Synapse account, so count DISTINCT subjects, not objects, when counting people with accounts. NOTE this property intentionally has no rdfs:domain: its subject is an ORCID IRI, which for an account-holder is NOT that person's biolink:Person node (their Profile IRI is), so declaring a domain would let a reasoner type the ORCID IRI as a second person and duplicate every account-holder. Like owl:sameAs it relates two identifiers rather than describing one entity. This property replaces a former nf:SynapseUser class, which was removed for that same duplication defect: the class declared rdfs:subClassOf biolink:Person while sitting on a second IRI for an already-typed person, and it carried no data of its own." .
+    rdfs:comment "Links a person to the Synapse Profile IRI that identifies them, i.e. asserts that this researcher has a Synapse account. A person with an ORCID but no known Synapse account simply has no nf:hasSynapseProfile triple. Relation is one-to-many: a person may hold more than one Synapse account. Property intentionally has no rdfs:domain: its subject is an ORCID IRI, which for an account-holder is NOT that person's biolink:Person node (their Profile IRI is), so declaring a domain would let a reasoner type the ORCID IRI as a second person and duplicate every account-holder. Like owl:sameAs it relates two identifiers rather than describing one entity." .
 
 nf:onProject a owl:ObjectProperty ;
     rdfs:label "onProject" ;
@@ -1790,7 +1798,7 @@ nf:observationId a owl:DatatypeProperty ;
 
 nf:observationText a owl:DatatypeProperty ;
     rdfs:label "observationText" ;
-    rdfs:comment "The text content of an observation." ;
+    rdfs:comment "The free-text content of an observation. This may be the only place a specific detail is recorded, since related structured fields may hold limited labels." ;
     rdfs:domain nf:Observation ;
     rdfs:range xsd:string .
 
@@ -1823,11 +1831,11 @@ nf:observationLink a owl:ObjectProperty ;
     rdfs:comment "Link to supporting material." ;
     rdfs:domain nf:Observation .
 
-nf:investigatorSynapseId a owl:DatatypeProperty ;
+nf:investigatorSynapseId a owl:ObjectProperty ;
     rdfs:label "investigatorSynapseId" ;
-    rdfs:comment "Synapse user ID of the observation's submitter." ;
+    rdfs:comment "Synapse Profile IRI (https://www.synapse.org/Profile:{id}) of the observation's submitter. This IS the submitter's biolink:Person node, not a separate identifier -- see the biolink:Person scopeNote for the two ways a person is keyed in this graph." ;
     rdfs:domain nf:Observation ;
-    rdfs:range xsd:string .
+    rdfs:range biolink:Person .
 
 nf:reliabilityRating a owl:DatatypeProperty ;
     rdfs:label "reliabilityRating" ;
@@ -1841,9 +1849,16 @@ nf:easeOfUseRating a owl:DatatypeProperty ;
     rdfs:domain nf:Observation ;
     rdfs:range xsd:string .
 
+nf:forResourceId a owl:DatatypeProperty ;
+    rdfs:label "forResourceId" ;
+    rdfs:comment "The nf:resourceId of the nf:Tool this object is about, as a string." ;
+    rdfs:domain [ a owl:Class ; owl:unionOf (nf:Observation nf:Development) ] ;
+    rdfs:seeAlso nf:aboutResource ;
+    rdfs:range xsd:string .
+
 nf:aboutResource a owl:ObjectProperty ;
     rdfs:label "aboutResource" ;
-    rdfs:comment "Links an observation to the resource it describes." ;
+    rdfs:comment "Links an observation to the resource it describes. Materialized as the inverse of nf:hasObservation. Exactly one resource per observation." ;
     rdfs:domain nf:Observation ;
     rdfs:range nf:Tool .
 
