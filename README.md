@@ -70,6 +70,7 @@ scripts/
   validate_fks.py                CSV-level foreign key validation (see HARMONIZATION.md)
   archive_rdf.py                 Merge and upload RDF snapshot to Synapse
   diff_rdf.py                    Diff current build against previous Synapse archive
+  check_source_versions.py       Check data_sources.yaml pins against latest stable Synapse snapshots
   rdf_to_edgelist.py             RDF -> weighted edgelist for node embeddings
   astabench.py                   Prepare eval data and run astabench across models
 docs/
@@ -121,6 +122,23 @@ fixture CSV and validates the output graph with SPARQL. See `test/README.md`.
 Publication full-text from 139 NF papers is indexed alongside the RDF graph,
 enabling combined text search and graph queries. See
 [PLUS_PUB_TEXT.md](PLUS_PUB_TEXT.md) for design, scripts, and query examples.
+
+### Source Version Checks
+
+A daily [`check-source-versions`](.github/workflows/check-source-versions.yml)
+workflow compares each `release`-profile `source_version` pin in
+`data_sources.yaml` against the latest *committed snapshot* of that table/view
+on Synapse (never the mutable "in progress" draft) and opens a PR re-pinning
+any that are behind. This lets rebuilds be triggered when source data has
+actually changed, rather than on a fixed schedule regardless of upstream
+changes. Merging the PR does not itself trigger a rebuild -- that's still a
+deliberate follow-up (tag push or manual dispatch of `build-image.yml`).
+
+To run manually:
+
+```bash
+python scripts/check_source_versions.py --dry-run
+```
 
 ### RDF Archiving and Diff Generation
 
