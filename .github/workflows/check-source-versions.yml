@@ -1,0 +1,41 @@
+# Watch for new stable Synapse snapshots of pinned source tables and open a
+# PR to re-pin data_sources.yaml when one appears, instead of rebuilding on a
+# fixed schedule regardless of whether anything changed upstream.
+name: Check source data versions
+
+on:
+  schedule:
+    - cron: "0 12 * * *"  # daily, 12:00 UTC
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install Python dependencies
+        run: pip install synapseclient pyyaml
+
+      - name: Check pinned source table versions
+        env:
+          SYNAPSE_AUTH_TOKEN: ${{ secrets.SYNAPSE_AUTH_TOKEN }}
+        run: python scripts/check_source_versions.py --summary-out /tmp/summary.md
+
+      - name: Open PR for any version updates
+        uses: peter-evans/create-pull-request@v7
+        with:
+          add-paths: data_sources.yaml
+          commit-message: "chore: repin source tables to latest stable Synapse snapshot"
+          branch: bot/update-source-versions
+          delete-branch: true
+          title: "Repin source tables to latest stable Synapse snapshot"
+          body-path: /tmp/summary.md
