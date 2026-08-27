@@ -22,12 +22,23 @@ from prepare_portal_tables import TABLES
 
 @dataclass
 class FKConstraint:
-    """A single FK relationship to check."""
+    """A single FK relationship to check.
+
+    ``target_tables`` holds one or more tables. A resourceId FK has nine valid
+    targets (the concrete tool-type tables) because upstream retired the central
+    Resource table, so the check passes if the value exists in ANY of them.
+    """
 
     source_table: str
     source_column: str
-    target_table: str
+    target_tables: List[str]
     target_column: str
+
+    @property
+    def target_label(self) -> str:
+        if len(self.target_tables) == 1:
+            return f"{self.target_tables[0]}.{self.target_column}"
+        return f"<{len(self.target_tables)} tool tables>.{self.target_column}"
 
 
 @dataclass
@@ -59,11 +70,12 @@ def discover_constraints() -> List[FKConstraint]:
             ref = col.get("references")
             if ref is None:
                 continue
+            targets = ref["tables"] if "tables" in ref else [ref["table"]]
             constraints.append(
                 FKConstraint(
                     source_table=table_name,
                     source_column=col["target"],
-                    target_table=ref["table"],
+                    target_tables=list(targets),
                     target_column=ref["column"],
                 )
             )
@@ -99,14 +111,17 @@ def check_constraint(
     pk_cache: Dict[str, Set[str]],
 ) -> FKResult:
     """Check a single FK constraint and return the result."""
-    # Load target PK set (with caching)
-    cache_key = f"{constraint.target_table}.{constraint.target_column}"
+    # Load target PK set, unioned across all target tables (with caching)
+    cache_key = f"{'+'.join(constraint.target_tables)}.{constraint.target_column}"
     if cache_key not in pk_cache:
-        target_path = _csv_path_for(constraint.target_table, data_dir)
-        if not target_path.exists():
-            # Cannot validate — target CSV missing
-            return FKResult(constraint=constraint)
-        pk_cache[cache_key] = _load_pk_set(target_path, constraint.target_column)
+        pk_set: Set[str] = set()
+        for target_table in constraint.target_tables:
+            target_path = _csv_path_for(target_table, data_dir)
+            if not target_path.exists():
+                # Cannot validate — a target CSV is missing
+                return FKResult(constraint=constraint)
+            pk_set |= _load_pk_set(target_path, constraint.target_column)
+        pk_cache[cache_key] = pk_set
     pk_set = pk_cache[cache_key]
 
     # Load source FK values
@@ -143,7 +158,7 @@ def print_human(results: List[FKResult]) -> None:
     failures = 0
     for r in results:
         label = f"{r.constraint.source_table}.{r.constraint.source_column}"
-        target = f"{r.constraint.target_table}.{r.constraint.target_column}"
+        target = r.constraint.target_label
         if r.passed:
             print(f" ok   {label} -> {target}")
         else:
@@ -166,7 +181,7 @@ def print_json(results: List[FKResult]) -> None:
         records.append({
             "source_table": r.constraint.source_table,
             "source_column": r.constraint.source_column,
-            "target_table": r.constraint.target_table,
+            "target_tables": r.constraint.target_tables,
             "target_column": r.constraint.target_column,
             "populated": r.populated,
             "orphaned": r.orphaned,

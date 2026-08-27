@@ -87,8 +87,25 @@ animalModelMutation as animalModelMutation,
 mutationType as mutationType
 """
 
-GENETIC_REAGENTS_SELECT = """
-geneticReagentId as geneticReagentId,
+# Core nf:Tool fields. Upstream's LinkML migration retired the central Resource
+# table (syn26450069) and denormalized these into every tool-type table, so each
+# table is now self-describing and there is nothing left to join through. Every
+# tool-type SELECT below is CORE_TOOL_SELECT + its own type-specific columns.
+CORE_TOOL_SELECT = """
+resourceId as resourceId,
+rrid as rrid,
+resourceName as resourceName,
+synonyms as synonyms,
+resourceType as resourceType,
+description as description,
+aiSummary as aiSummary,
+usageRequirements as usageRequirements,
+howToAcquire as howToAcquire,
+dateAdded as dateAdded,
+dateModified as dateModified
+"""
+
+GENETIC_REAGENTS_SELECT = CORE_TOOL_SELECT + """
 vectorType as vectorType,
 insertEntrezId as insertEntrezId,
 insertName as insertName,
@@ -116,32 +133,31 @@ gRNAshRNASequence as gRNAshRNASequence,
 hazardous as hazardous
 """
 
-ANIMAL_MODELS_SELECT = """
-animalModelId as animalModelId,
+ANIMAL_MODELS_SELECT = CORE_TOOL_SELECT + """
 donorId as donorId,
 transplantationDonorId as transplantationDonorId,
 backgroundStrain as backgroundStrain,
 backgroundSubstrain as backgroundSubstrain,
 strainNomenclature as strainNomenclature,
-animalModelOfManifestation as animalModelOfManifestation,
-animalModelGeneticDisorder as animalModelGeneticDisorder,
+manifestation as manifestation,
+geneticDisorder as geneticDisorder,
 transplantationType as transplantationType,
 animalState as animalState,
 generation as generation
 """
 
-CELL_LINES_SELECT = """
-cellLineId as cellLineId,
+# `contaminatedMisidentified` was dropped upstream. `race` is not selected here --
+# it is merged in from donors by apply_derived_columns, same as animal_models.species.
+CELL_LINES_SELECT = CORE_TOOL_SELECT + """
 donorId as donorId,
 originYear as originYear,
 organ as organ,
 strProfile as strProfile,
 tissue as tissue,
-cellLineManifestation as cellLineManifestation,
+manifestation as manifestation,
 resistance as resistance,
 cellLineCategory as cellLineCategory,
-contaminatedMisidentified as contaminatedMisidentified,
-cellLineGeneticDisorder as cellLineGeneticDisorder,
+geneticDisorder as geneticDisorder,
 populationDoublingTime as populationDoublingTime
 """
 
@@ -155,8 +171,7 @@ age as age,
 transplantationDonorId as transplantationDonorId
 """
 
-ANTIBODIES_SELECT = """
-antibodyId as antibodyId,
+ANTIBODIES_SELECT = CORE_TOOL_SELECT + """
 uniprotId as uniprotId,
 cloneId as cloneId,
 reactiveSpecies as reactiveSpecies,
@@ -207,14 +222,10 @@ resourceId as resourceId
 
 MUTATION_MODEL_SELECT = """
 mutationDetailsId as mutationId,
-animalModelId as animalModelId,
-cellLineId as cellLineId
+resourceId as resourceId
 """
 
-BIOBANKS_SELECT = """
-biobankId as biobankId,
-resourceId as resourceId,
-diseaseType as diseaseType,
+BIOBANKS_SELECT = CORE_TOOL_SELECT + """
 biobankURL as biobankURL,
 biobankName as biobankName,
 specimenPreparationMethod as specimenPreparationMethod,
@@ -225,8 +236,7 @@ specimenTissueType as specimenTissueType,
 contact as contact
 """
 
-CLINICAL_ASSESSMENT_TOOLS_SELECT = """
-clinicalAssessmentToolId as clinicalAssessmentToolId,
+CLINICAL_ASSESSMENT_TOOLS_SELECT = CORE_TOOL_SELECT + """
 assessmentName as assessmentName,
 assessmentType as assessmentType,
 targetPopulation as targetPopulation,
@@ -241,8 +251,7 @@ licensingRequirements as licensingRequirements,
 digitalVersion as digitalVersion
 """
 
-PATIENT_DERIVED_MODELS_SELECT = """
-patientDerivedModelId as patientDerivedModelId,
+PATIENT_DERIVED_MODELS_SELECT = CORE_TOOL_SELECT + """
 modelSystemType as modelSystemType,
 patientDiagnosis as patientDiagnosis,
 hostStrain as hostStrain,
@@ -256,8 +265,7 @@ validationMethods as validationMethods,
 donorId as donorId
 """
 
-ORGANOID_PROTOCOLS_SELECT = """
-organoidProtocolId as organoidProtocolId,
+ORGANOID_PROTOCOLS_SELECT = CORE_TOOL_SELECT + """
 modelType as modelType,
 derivationSource as derivationSource,
 cellTypes as cellTypes,
@@ -272,8 +280,7 @@ qualityControlMetrics as qualityControlMetrics,
 cultureMedia as cultureMedia
 """
 
-COMPUTATIONAL_TOOLS_SELECT = """
-computationalToolId as computationalToolId,
+COMPUTATIONAL_TOOLS_SELECT = CORE_TOOL_SELECT + """
 softwareName as softwareName,
 softwareType as softwareType,
 softwareVersion as softwareVersion,
@@ -379,28 +386,6 @@ easeOfUseRating as easeOfUseRating,
 observationLink as observationLink
 """
 
-RESOURCES_SELECT = """
-resourceId as resourceId,
-geneticReagentId as geneticReagentId,
-antibodyId as antibodyId,
-cellLineId as cellLineId,
-animalModelId as animalModelId,
-biobankId as biobankId,
-usageRequirements as usageRequirements,
-resourceName as resourceName,
-resourceType as resourceType,
-synonyms as synonyms,
-dateModified as dateModified,
-rrid as rrid,
-description as description,
-dateAdded as dateAdded,
-howToAcquire as howToAcquire,
-computationalToolId as computationalToolId,
-organoidProtocolId as organoidProtocolId,
-patientDerivedModelId as patientDerivedModelId,
-clinicalAssessmentToolId as clinicalAssessmentToolId
-"""
-
 # Short name aliases for convenience
 TABLE_ALIASES = {
     "study": "studies",
@@ -411,7 +396,6 @@ TABLE_ALIASES = {
     "cell": "cell_lines",
     "donor": "donors",
     "antibody": "antibodies",
-    "resource": "resources",
     "observation": "observations",
     "dev": "development",
     "funder": "funders",
@@ -429,6 +413,46 @@ TABLE_ALIASES = {
     "person": "people",
     "pub_author_orcid": "publication_author_orcids",
 }
+
+# The nine concrete tool-type tables. Since upstream retired the central Resource
+# table, a `resourceId` may live in any one of these, so FK checks on resourceId
+# validate against the union rather than a single target table.
+TOOL_TABLES = [
+    "cell_lines",
+    "animal_models",
+    "antibodies",
+    "genetic_reagents",
+    "biobanks",
+    "clinical_assessment_tools",
+    "patient_derived_models",
+    "organoid_protocols",
+    "computational_tools",
+]
+
+# Reusable FK spec for any column holding a tool's resourceId.
+TOOL_RESOURCE_REF = {"tables": TOOL_TABLES, "column": "resourceId"}
+
+
+def _core_tool_columns() -> List[Dict[str, Any]]:
+    """Column specs for the core nf:Tool fields carried by every tool-type table.
+
+    Pairs with CORE_TOOL_SELECT. Returns a fresh list each call so callers can
+    append type-specific columns without mutating a shared default.
+    """
+    return [
+        {"target": "resourceId", "source": "resourceId", "type": "iri"},
+        {"target": "rrid", "source": "rrid", "type": "iri"},
+        {"target": "resourceName", "source": "resourceName", "type": "text"},
+        {"target": "synonyms", "source": "synonyms", "type": "text+", "transform": "string_list"},
+        {"target": "resourceType", "source": "resourceType", "type": "text"},
+        {"target": "description", "source": "description", "type": "text"},
+        {"target": "aiSummary", "source": "aiSummary", "type": "text"},
+        {"target": "usageRequirements", "source": "usageRequirements", "type": "text+", "transform": "string_list"},
+        {"target": "howToAcquire", "source": "howToAcquire", "type": "text"},
+        {"target": "dateAdded", "source": "dateAdded", "type": "text", "transform": "number"},
+        {"target": "dateModified", "source": "dateModified", "type": "text", "transform": "number"},
+    ]
+
 
 TABLES: Dict[str, Dict[str, Any]] = {
     "studies": {
@@ -537,7 +561,7 @@ TABLES: Dict[str, Dict[str, Any]] = {
         "raw_filename": "genetic_reagents_raw.csv",
         "select_clause": GENETIC_REAGENTS_SELECT,
         "columns": [
-            {"target": "geneticReagentId", "source": "geneticReagentId", "type": "iri"},
+            *_core_tool_columns(),
             {"target": "vectorType", "source": "vectorType", "type": "text+", "transform": "string_list"},
             {"target": "insertEntrezId", "source": "insertEntrezId", "type": "text"},
             {"target": "insertName", "source": "insertName", "type": "text"},
@@ -571,15 +595,15 @@ TABLES: Dict[str, Dict[str, Any]] = {
         "raw_filename": "animal_models_raw.csv",
         "select_clause": ANIMAL_MODELS_SELECT,
         "columns": [
-            {"target": "animalModelId", "source": "animalModelId", "type": "iri"},
+            *_core_tool_columns(),
             {"target": "donorId", "source": "donorId", "type": "iri", "references": {"table": "donors", "column": "donorId"}},
             {"target": "species", "source": "species", "type": "text+", "transform": "string_list"},
             {"target": "transplantationDonorId", "source": "transplantationDonorId", "type": "iri", "references": {"table": "donors", "column": "donorId"}},
             {"target": "backgroundStrain", "source": "backgroundStrain", "type": "text"},
             {"target": "backgroundSubstrain", "source": "backgroundSubstrain", "type": "text"},
             {"target": "strainNomenclature", "source": "strainNomenclature", "type": "text"},
-            {"target": "animalModelOfManifestation", "source": "animalModelOfManifestation", "type": "text+", "transform": "string_list"},
-            {"target": "animalModelGeneticDisorder", "source": "animalModelGeneticDisorder", "type": "text+", "transform": "string_list"},
+            {"target": "manifestation", "source": "manifestation", "type": "text+", "transform": "string_list"},
+            {"target": "geneticDisorder", "source": "geneticDisorder", "type": "text+", "transform": "string_list"},
             {"target": "transplantationType", "source": "transplantationType", "type": "text"},
             {"target": "animalState", "source": "animalState", "type": "text"},
             {"target": "generation", "source": "generation", "type": "text"},
@@ -591,18 +615,17 @@ TABLES: Dict[str, Dict[str, Any]] = {
         "raw_filename": "cell_lines_raw.csv",
         "select_clause": CELL_LINES_SELECT,
         "columns": [
-            {"target": "cellLineId", "source": "cellLineId", "type": "iri"},
+            *_core_tool_columns(),
             {"target": "donorId", "source": "donorId", "type": "iri", "references": {"table": "donors", "column": "donorId"}},
             {"target": "originYear", "source": "originYear", "type": "text"},
             {"target": "organ", "source": "organ", "type": "text"},
             {"target": "race", "source": "race", "type": "text"},
             {"target": "strProfile", "source": "strProfile", "type": "text"},
             {"target": "tissue", "source": "tissue", "type": "text"},
-            {"target": "cellLineManifestation", "source": "cellLineManifestation", "type": "text+", "transform": "string_list"},
+            {"target": "manifestation", "source": "manifestation", "type": "text+", "transform": "string_list"},
             {"target": "resistance", "source": "resistance", "type": "text"},
             {"target": "cellLineCategory", "source": "cellLineCategory", "type": "text"},
-            {"target": "contaminatedMisidentified", "source": "contaminatedMisidentified", "type": "text"},
-            {"target": "cellLineGeneticDisorder", "source": "cellLineGeneticDisorder", "type": "text+", "transform": "string_list"},
+            {"target": "geneticDisorder", "source": "geneticDisorder", "type": "text+", "transform": "string_list"},
             {"target": "populationDoublingTime", "source": "populationDoublingTime", "type": "text"},
         ],
     },
@@ -627,7 +650,7 @@ TABLES: Dict[str, Dict[str, Any]] = {
         "raw_filename": "antibodies_raw.csv",
         "select_clause": ANTIBODIES_SELECT,
         "columns": [
-            {"target": "antibodyId", "source": "antibodyId", "type": "iri"},
+            *_core_tool_columns(),
             {"target": "uniprotId", "source": "uniprotId", "type": "iri"},
             {"target": "cloneId", "source": "cloneId", "type": "text"},
             {"target": "reactiveSpecies", "source": "reactiveSpecies", "type": "text+", "transform": "string_list"},
@@ -637,33 +660,6 @@ TABLES: Dict[str, Dict[str, Any]] = {
             {"target": "targetAntigen", "source": "targetAntigen", "type": "text"},
         ],
     },
-    "resources": {
-        "synapse_id": "syn26450069",
-        "csv_path": Path("data/csv/resources.csv"),
-        "raw_filename": "resources_raw.csv",
-        "select_clause": RESOURCES_SELECT,
-        "columns": [
-            {"target": "resourceId", "source": "resourceId", "type": "iri"},
-            {"target": "geneticReagentId", "source": "geneticReagentId", "type": "iri", "references": {"table": "genetic_reagents", "column": "geneticReagentId"}},
-            {"target": "antibodyId", "source": "antibodyId", "type": "iri", "references": {"table": "antibodies", "column": "antibodyId"}},
-            {"target": "cellLineId", "source": "cellLineId", "type": "iri", "references": {"table": "cell_lines", "column": "cellLineId"}},
-            {"target": "animalModelId", "source": "animalModelId", "type": "iri", "references": {"table": "animal_models", "column": "animalModelId"}},
-            {"target": "biobankId", "source": "biobankId", "type": "iri", "references": {"table": "biobanks", "column": "biobankId"}},
-            {"target": "computationalToolId", "source": "computationalToolId", "type": "iri", "references": {"table": "computational_tools", "column": "computationalToolId"}},
-            {"target": "organoidProtocolId", "source": "organoidProtocolId", "type": "iri", "references": {"table": "organoid_protocols", "column": "organoidProtocolId"}},
-            {"target": "patientDerivedModelId", "source": "patientDerivedModelId", "type": "iri", "references": {"table": "patient_derived_models", "column": "patientDerivedModelId"}},
-            {"target": "clinicalAssessmentToolId", "source": "clinicalAssessmentToolId", "type": "iri", "references": {"table": "clinical_assessment_tools", "column": "clinicalAssessmentToolId"}},
-            {"target": "usageRequirements", "source": "usageRequirements", "type": "text"},
-            {"target": "resourceName", "source": "resourceName", "type": "text"},
-            {"target": "resourceType", "source": "resourceType", "type": "text"},
-            {"target": "synonyms", "source": "synonyms", "type": "text+", "transform": "string_list"},
-            {"target": "dateModified", "source": "dateModified", "type": "text", "transform": "number"},
-            {"target": "rrid", "source": "rrid", "type": "iri"},
-            {"target": "description", "source": "description", "type": "text"},
-            {"target": "dateAdded", "source": "dateAdded", "type": "text", "transform": "number"},
-            {"target": "howToAcquire", "source": "howToAcquire", "type": "text"},
-        ],
-    },
     "observations": {
         "synapse_id": "syn26486836",
         "csv_path": Path("data/csv/observations.csv"),
@@ -671,7 +667,7 @@ TABLES: Dict[str, Dict[str, Any]] = {
         "select_clause": OBSERVATIONS_SELECT,
         "columns": [
             {"target": "observationId", "source": "observationId", "type": "iri"},
-            {"target": "resourceId", "source": "resourceId", "type": "iri", "references": {"table": "resources", "column": "resourceId"}},
+            {"target": "resourceId", "source": "resourceId", "type": "iri", "references": TOOL_RESOURCE_REF},
             {"target": "publicationId", "source": "publicationId", "type": "iri", "references": {"table": "publications", "column": "publicationId"}},
             {"target": "observationSubmitterName", "source": "observationSubmitterName", "type": "text"},
             {"target": "synapseId", "source": "synapseId", "type": "iri", "transform": "synapse_id"},
@@ -692,7 +688,7 @@ TABLES: Dict[str, Dict[str, Any]] = {
         "select_clause": DEVELOPMENT_SELECT,
         "columns": [
             {"target": "developmentId", "source": "developmentId", "type": "iri"},
-            {"target": "resourceId", "source": "resourceId", "type": "iri", "references": {"table": "resources", "column": "resourceId"}},
+            {"target": "resourceId", "source": "resourceId", "type": "iri", "references": TOOL_RESOURCE_REF},
             {"target": "investigatorId", "source": "investigatorId", "type": "iri", "references": {"table": "investigators", "column": "investigatorId"}},
             {"target": "publicationId", "source": "publicationId", "type": "iri", "references": {"table": "publications", "column": "publicationId"}},
             {"target": "funderId", "source": "funderId", "type": "iri", "references": {"table": "funders", "column": "funderId"}},
@@ -746,7 +742,7 @@ TABLES: Dict[str, Dict[str, Any]] = {
         "select_clause": DONOR_TOOL_SELECT,
         "columns": [
             {"target": "donorId", "source": "donorId", "type": "iri", "references": {"table": "donors", "column": "donorId"}},
-            {"target": "resourceId", "source": "resourceId", "type": "iri", "references": {"table": "resources", "column": "resourceId"}},
+            {"target": "resourceId", "source": "resourceId", "type": "iri", "references": TOOL_RESOURCE_REF},
         ],
     },
     "mutation_model": {
@@ -756,8 +752,7 @@ TABLES: Dict[str, Dict[str, Any]] = {
         "select_clause": MUTATION_MODEL_SELECT,
         "columns": [
             {"target": "mutationId", "source": "mutationId", "type": "iri", "references": {"table": "mutations", "column": "mutationId"}},
-            {"target": "animalModelId", "source": "animalModelId", "type": "iri", "references": {"table": "animal_models", "column": "animalModelId"}},
-            {"target": "cellLineId", "source": "cellLineId", "type": "iri", "references": {"table": "cell_lines", "column": "cellLineId"}},
+            {"target": "resourceId", "source": "resourceId", "type": "iri", "references": TOOL_RESOURCE_REF},
         ],
     },
     "biobanks": {
@@ -766,9 +761,7 @@ TABLES: Dict[str, Dict[str, Any]] = {
         "raw_filename": "biobanks_raw.csv",
         "select_clause": BIOBANKS_SELECT,
         "columns": [
-            {"target": "biobankId", "source": "biobankId", "type": "iri"},
-            {"target": "resourceId", "source": "resourceId", "type": "iri", "references": {"table": "resources", "column": "resourceId"}},
-            {"target": "diseaseType", "source": "diseaseType", "type": "text+", "transform": "string_list"},
+            *_core_tool_columns(),
             {"target": "biobankURL", "source": "biobankURL", "type": "iri"},
             {"target": "biobankName", "source": "biobankName", "type": "text"},
             {"target": "specimenPreparationMethod", "source": "specimenPreparationMethod", "type": "text+", "transform": "string_list"},
@@ -785,7 +778,7 @@ TABLES: Dict[str, Dict[str, Any]] = {
         "raw_filename": "clinical_assessment_tools_raw.csv",
         "select_clause": CLINICAL_ASSESSMENT_TOOLS_SELECT,
         "columns": [
-            {"target": "clinicalAssessmentToolId", "source": "clinicalAssessmentToolId", "type": "iri"},
+            *_core_tool_columns(),
             {"target": "assessmentName", "source": "assessmentName", "type": "text"},
             {"target": "assessmentType", "source": "assessmentType", "type": "text"},
             {"target": "targetPopulation", "source": "targetPopulation", "type": "text"},
@@ -806,7 +799,7 @@ TABLES: Dict[str, Dict[str, Any]] = {
         "raw_filename": "patient_derived_models_raw.csv",
         "select_clause": PATIENT_DERIVED_MODELS_SELECT,
         "columns": [
-            {"target": "patientDerivedModelId", "source": "patientDerivedModelId", "type": "iri"},
+            *_core_tool_columns(),
             {"target": "modelSystemType", "source": "modelSystemType", "type": "text"},
             {"target": "patientDiagnosis", "source": "patientDiagnosis", "type": "text"},
             {"target": "hostStrain", "source": "hostStrain", "type": "text"},
@@ -826,7 +819,7 @@ TABLES: Dict[str, Dict[str, Any]] = {
         "raw_filename": "organoid_protocols_raw.csv",
         "select_clause": ORGANOID_PROTOCOLS_SELECT,
         "columns": [
-            {"target": "organoidProtocolId", "source": "organoidProtocolId", "type": "iri"},
+            *_core_tool_columns(),
             {"target": "modelType", "source": "modelType", "type": "text"},
             {"target": "derivationSource", "source": "derivationSource", "type": "text"},
             {"target": "cellTypes", "source": "cellTypes", "type": "text+", "transform": "string_list"},
@@ -847,7 +840,7 @@ TABLES: Dict[str, Dict[str, Any]] = {
         "raw_filename": "computational_tools_raw.csv",
         "select_clause": COMPUTATIONAL_TOOLS_SELECT,
         "columns": [
-            {"target": "computationalToolId", "source": "computationalToolId", "type": "iri"},
+            *_core_tool_columns(),
             {"target": "softwareName", "source": "softwareName", "type": "text"},
             {"target": "softwareType", "source": "softwareType", "type": "text"},
             {"target": "softwareVersion", "source": "softwareVersion", "type": "text"},
@@ -1459,17 +1452,28 @@ def check_config(config_path: Path) -> int:
         ds_names = set(ds_tables.keys())
         local_names = set(TABLES.keys())
 
+        # An archive-only profile is a historical record of a build that already
+        # happened; it is not rebuildable from current code and may legitimately
+        # name tables TABLES no longer knows about (e.g. the retired Resource
+        # table). Its table list is therefore informational, not a contract.
+        archive_only = not profile.get("rebuildable", True)
+
         only_ds = sorted(ds_names - local_names)
         only_local = sorted(local_names - ds_names)
-        if only_ds:
+        if only_ds and not archive_only:
             errors.append(
                 f"[{profile_name}] in data_sources.yaml but not in TABLES: "
                 + ", ".join(only_ds)
             )
-        if only_local:
+        if only_local and not archive_only:
             errors.append(
                 f"[{profile_name}] in TABLES but not in data_sources.yaml: "
                 + ", ".join(only_local)
+            )
+        if archive_only and (only_ds or only_local):
+            print(
+                f"  note: [{profile_name}] is archive-only (rebuildable: false); "
+                f"skipping table-name contract check"
             )
 
         for name in sorted(ds_names & local_names):
