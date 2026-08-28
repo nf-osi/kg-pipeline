@@ -233,8 +233,7 @@ RML ([spec](https://rml.io/specs/rml/), [RMLMapper](https://github.com/RMLio/rml
 **IRI design decisions:**
 - Synapse entities (studies, files, datasets) use `https://www.synapse.org/Synapse:{id}` — these are human-browsable and globally unique
 - Portal-specific entities (donors, mutations) use `http://nf-osi.github.com/terms#{entityType}/{entityId}` — scoped to the portal namespace
-- Tools use a single `http://nf-osi.github.com/terms#resource/{resourceId}` template regardless of tool type. There is deliberately no per-type template (`cellLine/`, `antibody/`, …): the type is carried by `rdf:type` (`nf:CellLine`, `nf:Antibody`, …), which every per-type mapping asserts, so baking it into the IRI would duplicate that for no query benefit. This replaced per-type IRIs in KG v0.4 — see `docs/resource-shortcut-iris.md`
-- Text-keyed entities (initiatives, funders) use name-derived IRIs with spaces replaced by underscores
+- Tools use a single `http://nf-osi.github.com/terms#resource/{resourceId}` template regardless of tool type. There is deliberately no per-type template (`cellLine/`, `antibody/`, …): the type is carried by `rdf:type` (`nf:CellLine`, `nf:Antibody`, …), which every per-type mapping asserts, so baking it into the IRI would duplicate that for no query benefit.
 
 **Tools:** RMLMapper (Java 21+). GREL function support is required for multi-value splitting. The pipeline depends on the released JAR.
 
