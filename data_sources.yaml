@@ -122,7 +122,7 @@ profiles:
         synapse_id: syn26486834
         concrete_type: TableEntity
         note: Junction table linking mutations to animal models and cell lines
-        source_version: 19
+        source_version: 21
       biobanks:
         synapse_id: syn26486821
         concrete_type: TableEntity
