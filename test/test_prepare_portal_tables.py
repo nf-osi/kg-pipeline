@@ -14,11 +14,9 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 
 from prepare_portal_tables import (
     apply_derived_columns,
-    build_legacy_id_crosswalk,
     format_doi,
     format_orcid,
     format_synapse_id,
-    translate_legacy_resource_ids,
 )
 
 
@@ -260,127 +258,6 @@ class TestFormatDoi:
 
     def test_empty(self):
         assert format_doi(None) == ""
-
-
-class TestLegacyResourceIdTranslation:
-    """Workaround for an upstream bug: syn26486834 renamed its
-    animalModelId/cellLineId columns to `resourceId` without migrating the
-    values. See docs/upstream-mutation-resourceid-bug.md.
-
-    Delete this class together with the workaround once upstream is fixed.
-    """
-
-    @staticmethod
-    def _crosswalk_frame():
-        return pd.DataFrame([
-            {"resourceId": "res-1", "cellLineId": "cl-1", "animalModelId": ""},
-            {"resourceId": "res-2", "cellLineId": "", "animalModelId": "am-2"},
-            {"resourceId": "res-3", "cellLineId": "", "animalModelId": ""},
-        ])
-
-    def test_crosswalk_maps_every_legacy_id(self):
-        crosswalk = build_legacy_id_crosswalk(self._crosswalk_frame())
-        assert crosswalk == {"cl-1": "res-1", "am-2": "res-2"}
-
-    def test_crosswalk_skips_rows_without_legacy_ids(self):
-        """res-3 has no legacy id, so it contributes no entry -- and must not
-        map an empty string to itself, which would translate blank cells."""
-        crosswalk = build_legacy_id_crosswalk(self._crosswalk_frame())
-        assert "" not in crosswalk
-        assert "res-3" not in crosswalk
-
-    def test_translates_legacy_values(self):
-        df = pd.DataFrame({"mutationId": ["m1", "m2"], "resourceId": ["cl-1", "am-2"]})
-        out, translated, untouched = translate_legacy_resource_ids(
-            df, {"cl-1": "res-1", "am-2": "res-2"})
-        assert list(out["resourceId"]) == ["res-1", "res-2"]
-        assert (translated, untouched) == (2, 0)
-
-    def test_leaves_real_resource_ids_alone(self):
-        """A value already absent from the crosswalk is either a genuine
-        resourceId or unresolvable; either way it must pass through unchanged."""
-        df = pd.DataFrame({"mutationId": ["m1"], "resourceId": ["res-9"]})
-        out, translated, untouched = translate_legacy_resource_ids(df, {"cl-1": "res-1"})
-        assert list(out["resourceId"]) == ["res-9"]
-        assert (translated, untouched) == (0, 1)
-
-    def test_blank_values_are_not_counted(self):
-        df = pd.DataFrame({"mutationId": ["m1"], "resourceId": [""]})
-        out, translated, untouched = translate_legacy_resource_ids(df, {"cl-1": "res-1"})
-        assert (translated, untouched) == (0, 0)
-
-    def test_does_not_mutate_input_frame(self):
-        df = pd.DataFrame({"mutationId": ["m1"], "resourceId": ["cl-1"]})
-        translate_legacy_resource_ids(df, {"cl-1": "res-1"})
-        assert list(df["resourceId"]) == ["cl-1"]
-
-    def test_missing_column_is_a_noop(self):
-        df = pd.DataFrame({"mutationId": ["m1"]})
-        out, translated, untouched = translate_legacy_resource_ids(df, {"cl-1": "res-1"})
-        assert (translated, untouched) == (0, 0)
-        assert list(out.columns) == ["mutationId"]
-
-    def test_crosswalk_loader_never_logs_in(self, monkeypatch):
-        """These are public tables and CI runs without credentials on purpose, so
-        the crosswalk fetch must never call login(). Regression test: an earlier
-        version did, and broke the CI build with SynapseNoCredentialsError.
-        """
-        import prepare_portal_tables as ppt
-
-        monkeypatch.setattr(ppt, "_LEGACY_CROSSWALK", None)
-
-        calls = {"login": 0, "query": 0}
-
-        class FakeResult:
-            @staticmethod
-            def asDataFrame():
-                return pd.DataFrame([
-                    {"resourceId": "res-1", "cellLineId": "cl-1"},
-                ])
-
-        class FakeSyn:
-            def login(self, *a, **kw):
-                calls["login"] += 1
-                raise AssertionError("login() must not be called")
-
-            def tableQuery(self, q):
-                calls["query"] += 1
-                return FakeResult()
-
-        crosswalk = ppt._load_legacy_resource_crosswalk(FakeSyn())
-        assert calls == {"login": 0, "query": 1}
-        assert crosswalk == {"cl-1": "res-1"}
-
-    def test_crosswalk_loader_reuses_caller_client(self, monkeypatch):
-        """When the caller has a client, no second one should be constructed."""
-        import prepare_portal_tables as ppt
-
-        monkeypatch.setattr(ppt, "_LEGACY_CROSSWALK", None)
-
-        def _no_new_client(*a, **kw):
-            raise AssertionError("should reuse the caller's client")
-
-        monkeypatch.setattr(ppt.synapseclient, "Synapse", _no_new_client)
-
-        class FakeSyn:
-            def tableQuery(self, q):
-                class R:
-                    @staticmethod
-                    def asDataFrame():
-                        return pd.DataFrame([{"resourceId": "res-1", "cellLineId": "cl-1"}])
-                return R()
-
-        assert ppt._load_legacy_resource_crosswalk(FakeSyn()) == {"cl-1": "res-1"}
-
-    def test_apply_derived_columns_uses_injected_crosswalk(self):
-        """apply_derived_columns must accept a crosswalk via processed_tables so
-        it never reaches out to Synapse during tests."""
-        df = pd.DataFrame({"mutationId": ["m1"], "resourceId": ["cl-1"]})
-        out = apply_derived_columns(
-            "mutation_model", df,
-            {"_legacy_resource_crosswalk": {"cl-1": "res-1"}},
-        )
-        assert list(out["resourceId"]) == ["res-1"]
 
 
 # Run with: pytest test/test_prepare_portal_tables.py -v

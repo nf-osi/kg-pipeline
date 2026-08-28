@@ -1252,136 +1252,11 @@ def _find_raw_csv(raw_dir: Path, raw_filename: str) -> Optional[Path]:
 
 
 
-# ---------------------------------------------------------------------------
-# Legacy resourceId translation (mutation_model)
-# ---------------------------------------------------------------------------
-#
-# UPSTREAM DATA BUG, not a modelling choice. syn26486834 ("Mutation") renamed
-# its animalModelId/cellLineId columns to a single `resourceId` column but did
-# NOT migrate the values: 125 of its 127 distinct values are still legacy
-# <type>Id keys. Taking them at face value would mint nf:resource/{<type>Id}
-# IRIs that match no tool -- exactly the defect class this migration removes.
-#
-# The retired Resource table is the only surviving <type>Id -> resourceId
-# crosswalk, so it is read here purely as a translation table (never as a
-# source of Tool facts). Measured coverage: 277/277 rows resolve with it,
-# 12/277 without.
-#
-# DELETE THIS once upstream migrates the values -- see
-# docs/upstream-schema-migration.md.
-
-LEGACY_RESOURCE_TABLE = "syn26450069"
-LEGACY_ID_COLUMNS = [
-    "cellLineId",
-    "animalModelId",
-    "antibodyId",
-    "geneticReagentId",
-    "biobankId",
-    "computationalToolId",
-    "organoidProtocolId",
-    "patientDerivedModelId",
-    "clinicalAssessmentToolId",
-]
-
-_LEGACY_CROSSWALK: Optional[Dict[str, str]] = None
-
-
-def build_legacy_id_crosswalk(crosswalk_df: pd.DataFrame) -> Dict[str, str]:
-    """Map every legacy <type>Id to its resourceId, from the Resource table."""
-    mapping: Dict[str, str] = {}
-    for _, row in crosswalk_df.iterrows():
-        resource_id = format_string(row.get("resourceId", "")).strip()
-        if not resource_id:
-            continue
-        for column in LEGACY_ID_COLUMNS:
-            legacy = format_string(row.get(column, "")).strip()
-            if legacy:
-                mapping[legacy] = resource_id
-    return mapping
-
-
-def translate_legacy_resource_ids(
-    df: pd.DataFrame,
-    crosswalk: Dict[str, str],
-    column: str = "resourceId",
-) -> tuple[pd.DataFrame, int, int]:
-    """Rewrite legacy <type>Id values in ``column`` to real resourceIds.
-
-    Values already absent from the crosswalk are left untouched: they are
-    either genuine resourceIds or unresolvable either way. Returns the frame
-    plus (translated, untouched) counts for logging.
-    """
-    if column not in df.columns:
-        return df, 0, 0
-
-    translated = 0
-    untouched = 0
-
-    def _translate(value: Any) -> Any:
-        nonlocal translated, untouched
-        key = format_string(value).strip()
-        if key and key in crosswalk:
-            translated += 1
-            return crosswalk[key]
-        if key:
-            untouched += 1
-        return value
-
-    df = df.copy()
-    df[column] = df[column].map(_translate)
-    return df, translated, untouched
-
-
-def _load_legacy_resource_crosswalk(
-    syn: Optional[synapseclient.Synapse] = None,
-) -> Dict[str, str]:
-    """Fetch and cache the legacy crosswalk from the retired Resource table.
-
-    Reuses the caller's client when given one. Do NOT call login() -- these are
-    public tables and both fetch paths (main() and the Dagster SynapseResource)
-    read them anonymously, so logging in here would break CI, which runs
-    without credentials on purpose.
-    """
-    global _LEGACY_CROSSWALK
-    if _LEGACY_CROSSWALK is None:
-        if syn is None:
-            syn = synapseclient.Synapse()
-        columns = ["resourceId"] + LEGACY_ID_COLUMNS
-        result = syn.tableQuery(
-            f"select {', '.join(columns)} from {LEGACY_RESOURCE_TABLE}"
-        )
-        _LEGACY_CROSSWALK = build_legacy_id_crosswalk(result.asDataFrame())
-    return _LEGACY_CROSSWALK
-
-
 def apply_derived_columns(
     table_name: str,
     df: pd.DataFrame,
     processed_tables: Dict[str, pd.DataFrame],
-    syn: Optional[synapseclient.Synapse] = None,
 ) -> pd.DataFrame:
-    if table_name == "mutation_model":
-        crosswalk = processed_tables.get("_legacy_resource_crosswalk")
-        if crosswalk is None:
-            crosswalk = _load_legacy_resource_crosswalk(syn)
-        df, translated, untouched = translate_legacy_resource_ids(df, crosswalk)
-        if translated:
-            print(
-                f"  Translated {translated} legacy <type>Id values to resourceId "
-                f"({untouched} already valid or unresolvable)"
-            )
-        elif untouched:
-            # Nothing left to translate: upstream has migrated the values, so
-            # this workaround (and its crosswalk read of the retired Resource
-            # table) is now dead code. See the removal checklist in
-            # docs/upstream-schema-migration.md.
-            print(
-                "  NOTE: no legacy <type>Id values found in mutation_model -- "
-                "upstream appears fixed, the resourceId translation workaround "
-                "can be removed (docs/upstream-schema-migration.md)"
-            )
-        return df
-
     if table_name == "animal_models":
         if "species" in df.columns:
             return df
@@ -1551,7 +1426,6 @@ def normalize_fetched_df(
     table_name: str,
     df: pd.DataFrame,
     processed_tables: Dict[str, pd.DataFrame],
-    syn: Optional[synapseclient.Synapse] = None,
 ) -> tuple[pd.DataFrame, int]:
     """Apply post-fetch normalization so all fetch paths behave the same."""
     n_before = len(df)
@@ -1564,7 +1438,7 @@ def normalize_fetched_df(
 
     df = df.drop_duplicates()
     n_dupes = n_before - len(df)
-    df = apply_derived_columns(table_name, df, processed_tables, syn)
+    df = apply_derived_columns(table_name, df, processed_tables)
     return df, n_dupes
 
 
@@ -1736,7 +1610,7 @@ def main(argv: List[str] | None = None) -> int:
             print(f"  Retrieved {len(df)} rows", flush=True)
             write_raw(args.raw_dir, config["raw_filename"], df)
 
-        df, n_dupes = normalize_fetched_df(table_name, df, processed_tables, syn)
+        df, n_dupes = normalize_fetched_df(table_name, df, processed_tables)
         if n_dupes:
             print(f"  Dropped {n_dupes} duplicate rows", flush=True)
 
