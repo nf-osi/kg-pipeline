@@ -132,19 +132,11 @@ pipeline run (not stable across runs).
 
 ### resourceId / entity ID confusion (mutation_model, donors)
 
-- **mutation_model.cellLineId**: ~~77 of 268 rows (29%) contain a `resourceId`
-  instead of a `cellLineId`~~ — **resolved in KG v0.4.** Upstream's LinkML
-  migration collapsed the polymorphic `resources` wrapper and its per-type FKs
-  into a single `resourceId` key, so a `resourceId` sitting in a `cellLineId`
-  column is no longer representable. See `docs/upstream-schema-migration.md`.
-
-  The migration did, however, introduce the *mirror* of this bug: upstream
+- **mutation_model.cellLineId**: An upstream migration introduce 
   renamed `Mutation`'s (syn26486834) `animalModelId`/`cellLineId` columns to
-  `resourceId` **without migrating the values**, so 265 of 277 rows now hold a
+  `resourceId` **without migrating previous type-specific ID values**, so 265 of 277 rows now hold a
   legacy `<type>Id` in a column named `resourceId`. `prepare_portal_tables.py`
-  translates these at build time; see
-  `docs/upstream-mutation-resourceid-bug.md` for the draft upstream report and
-  the removal checklist for that workaround.
+  translates these at build time; upstream fix is pending.
 
 - **donors.parentDonorId**: 6 of 7 orphaned `parentDonorId` values are
   actually `resourceId` UUIDs for cell line resources, not donor UUIDs.
