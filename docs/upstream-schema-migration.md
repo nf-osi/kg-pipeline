@@ -164,7 +164,17 @@ Keep the literal-join CONSTRUCT rather than templating the IRI directly from
   strategy. The strategy here is an explicit clean break, on the grounds that `nf:resourceId` is
   carried on every tool node in every archived graph and is therefore sufficient to resolve any
   old IRI retrospectively. Write that down rather than leaving the policy silently contradicted.
-- **Evaluation:** leave the profile frozen and archive-only. Ground truth stores bare `resourceId`
+- **Evaluation:** leave the profile frozen and archive-only. A minimal correctness
+  pass shipped with this change (eval dataset v1.4): the agent prompt no longer
+  advertises the removed `nf:cellLineId`-style properties, and 2 never-resolvable
+  answers were dropped from MUT-001. **Still open:** ground truth is the v0.2-eval
+  answer set, so questions whose correct answer grew under the repin now
+  under-count (NF1 MPNST cell lines went 19 → 29). Re-baselining requires porting
+  `generate_ground_truth.py` to the new schema (~56 references to removed columns,
+  the deleted `resources.csv`, and two `development_*` CSVs the pipeline no longer
+  emits) and resets comparability for all 52 recorded runs — deliberately deferred
+  to its own change. Also worth adding FK validation to that generator: the 2 bad
+  MUT-001 answers came from it emitting orphaned FK values unchecked. Ground truth stores bare `resourceId`
   UUIDs (not IRIs) and `astabench` grading regex-matches them, so the IRI change does **not**
   break grading. Reproducibility already rests on the pinned `ghcr.io/nf-osi/kg-qlever:eval-*`
   images. Two hazards to note in the doc: `create_archive.py` fetches tables *without* version
