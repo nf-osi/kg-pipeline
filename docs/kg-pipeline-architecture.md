@@ -418,8 +418,8 @@ This pipeline was built for the NF Research Tools Portal but is designed with ge
 - **`data_sources.yaml`** — version pinning for your Synapse tables
 
 ### What to keep in mind
-- **IRI stability matters**: once published, IRIs should not change without a deprecation strategy. Choose your IRI templates carefully before going live. This project has broken that rule exactly once, in KG v0.4, when upstream retired the keys the tool IRIs were built on; the deprecation strategy there was a clean break justified by every tool node carrying its `nf:resourceId` as a literal, so old IRIs stay resolvable from any archived graph without a bridge. See `docs/upstream-schema-migration.md`.
-- **Vocabulary governance**: SSSOM files reflect a design decision about what your portal labels *mean*. This requires domain expertise and may involve iteration with data contributors.
+- **IRI stability matters**: once published, IRIs should not change without a deprecation strategy.
+- **Vocabulary governance**: SSSOM files reflect a design decision about what portal labels *mean*. This requires domain expertise and may involve iteration with data contributors.
 - **Start with 3–5 core tables**: get the Extract → Map loop working end-to-end before adding harmonization and derived layers. A small working graph is more valuable than a large planned graph.
 
 ### Rough total effort for a new implementation
