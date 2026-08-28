@@ -3,15 +3,7 @@ profiles:
     version: KG v0.4
     date: '2026-08-27'
     comment: >-
-      Adopt the upstream LinkML schema (nf-osi/nf-research-tools-schema). Tool
-      identity moves from type-specific IRIs (nf:cellLine/{cellLineId}) to
-      nf:resource/{resourceId}, since upstream re-keyed every tool-type table
-      onto a shared resourceId and retired the central Resource table
-      (syn26450069, dropped as a source here). Core Tool fields now come from
-      the nine per-type tables, which carry them denormalized. This is a
-      breaking IRI change; old IRIs are resolvable from any archived graph via
-      the nf:resourceId literal every tool node carries. See
-      docs/upstream-schema-migration.md.
+      syn26450069 is deprecated and will be removed soon
     csv_archive:
       archive_id: null
       archive_version: null
@@ -219,12 +211,7 @@ profiles:
     comment: >-
       Evaluation snapshot matching KG v0.2. ARCHIVE-ONLY as of KG v0.4: this is
       a historical record of a build that already happened, not a buildable
-      target. The pipeline code (SELECT clauses, RML mappings, TABLES) is
-      profile-agnostic and now speaks the post-LinkML schema, so it can no
-      longer reproduce these pinned pre-migration snapshots -- the table list
-      below still names the retired `resources` table, deliberately. Eval
-      reproducibility rests on the pinned ghcr.io/nf-osi/kg-qlever:eval-*
-      images. Do not run create_archive.py against this profile: it queries
+      target. Do not run create_archive.py against this profile: it queries
       tables WITHOUT version pinning and would silently overwrite this record
       with current data.
     rebuildable: false
