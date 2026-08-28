@@ -2,8 +2,8 @@ profiles:
   release:
     version: KG v0.3
     date: '2026-07-23'
-    comment: Add publication author ORCID linkage and person names (people,
-      publication_author_orcids; both now sourced from the people table syn23564971)
+    comment: Add publication author ORCID linkage and person names (people, publication_author_orcids;
+      both now sourced from the people table syn23564971)
     csv_archive:
       archive_id: null
       archive_version: null
@@ -36,88 +36,86 @@ profiles:
         concrete_type: EntityView
         note: File-level annotations (assay, platform, data type, diagnosis, species,
           tissue, etc.)
-        source_version: 259
+        source_version: 268
       mutations:
         synapse_id: syn26486835
         concrete_type: TableEntity
         note: Mutation details (affected gene, allele type, mutation method, sequence/protein
           variation)
-        source_version: 4
+        source_version: 11
       genetic_reagents:
         synapse_id: syn26486832
         concrete_type: TableEntity
         note: Genetic reagent details (vector type, insert, cloning method, primers,
           tags)
-        source_version: 4
+        source_version: 11
       animal_models:
         synapse_id: syn26486808
         concrete_type: TableEntity
         note: Animal model details (strain, nomenclature, manifestation, genetic disorder,
           transplantation)
-        source_version: 8
+        source_version: 33
       cell_lines:
         synapse_id: syn26486823
         concrete_type: TableEntity
         note: Cell line details (origin, organ, tissue, manifestation, resistance,
           genetic disorder)
-        source_version: 9
+        source_version: 51
       donors:
         synapse_id: syn26486829
         concrete_type: TableEntity
         note: Donor demographics (species, race, sex, age, parent/transplantation
           donor links)
-        source_version: 4
+        source_version: 29
       antibodies:
         synapse_id: syn26486811
         concrete_type: TableEntity
         note: Antibody details (UniProt ID, clone, reactive species, host organism,
           target antigen)
-        source_version: 4
+        source_version: 20
       resources:
         synapse_id: syn26450069
         concrete_type: TableEntity
         note: Central resource registry linking to reagents, antibodies, cell lines,
           animal models, and biobanks
-        source_version: 19
+        source_version: 22
       observations:
         synapse_id: syn26486836
         concrete_type: TableEntity
         note: Curator/community observations about resources with ratings and links
-        source_version: 7
+        source_version: 14
       development:
         synapse_id: syn26486807
         concrete_type: TableEntity
         note: Junction table linking development records to resources, investigators,
           publications, and funders
-        source_version: 4
+        source_version: 46
       funders:
         synapse_id: syn26486830
         concrete_type: TableEntity
         note: Funder details (name); linked from development table via funderId
-        source_version: 4
+        source_version: 6
       investigators:
         synapse_id: syn26486833
         concrete_type: TableEntity
         note: Investigator details (name, institution, ORCID, Synapse ID); linked
           from development table via investigatorId
-        source_version: 4
+        source_version: 14
       publications:
         synapse_id: syn26486839
         concrete_type: TableEntity
         note: Publication details (title, DOI, PMID, abstract, journal, authors, date);
           linked from development table via publicationId
-        source_version: 9
+        source_version: 17
         collection_name: ToolsCentralPublications
         collection_label: NF Research Tools Central publications
-        collection_comment: >-
-          Publications catalogued by NF Research Tools Central (Synapse project
-          syn26338068) -- papers associated with research tools and resources,
-          reachable from a resource via nf:Development. This is a PARTIAL view
-          of NF publications on the portal: study-associated publications are
-          maintained separately in the main portal listing (syn16857542,
-          project syn26451327) and form their own collection. Do not assume
-          this collection is every NF publication, and group or filter by
-          prov:wasDerivedFrom when counting publications.
+        collection_comment: 'Publications catalogued by NF Research Tools Central
+          (Synapse project syn26338068) -- papers associated with research tools and
+          resources, reachable from a resource via nf:Development. This is a PARTIAL
+          view of NF publications on the portal: study-associated publications are
+          maintained separately in the main portal listing (syn16857542, project syn26451327)
+          and form their own collection. Do not assume this collection is every NF
+          publication, and group or filter by prov:wasDerivedFrom when counting publications.'
       donor_tool:
         synapse_id: syn51735419
         concrete_type: MaterializedView
@@ -128,37 +126,37 @@ profiles:
         synapse_id: syn26486834
         concrete_type: TableEntity
         note: Junction table linking mutations to animal models and cell lines
-        source_version: 9
+        source_version: 21
       biobanks:
         synapse_id: syn26486821
         concrete_type: TableEntity
         note: Biobank details (disease type, specimen type/format/tissue, tumor type,
           contact)
-        source_version: 4
+        source_version: 13
       clinical_assessment_tools:
         synapse_id: syn73709229
         concrete_type: TableEntity
         note: Clinical assessment tool details (assessment type, scoring, validated
           languages, psychometric properties, etc.)
-        source_version: 9
+        source_version: 15
       patient_derived_models:
         synapse_id: syn73709228
         concrete_type: TableEntity
         note: Patient derived model details (PDX, model system type, tumor type, molecular
           characterization, donor link, etc.)
-        source_version: 9
+        source_version: 22
       organoid_protocols:
         synapse_id: syn73709227
         concrete_type: TableEntity
         note: Organoid protocol details (model type, derivation source, culture system,
           cell types, etc.)
-        source_version: 8
+        source_version: 24
       computational_tools:
         synapse_id: syn73709226
         concrete_type: TableEntity
         note: Computational tool details (software name, type, version, programming
           language, repository, license, etc.)
-        source_version: 8
+        source_version: 19
       initiatives:
         synapse_id: syn24189696
         concrete_type: TableEntity
@@ -169,47 +167,41 @@ profiles:
         concrete_type: TableEntity
         note: Portal datasets with rich metadata (data type, species, assay, disease
           focus, access type, etc.); links to studies
-        source_version: 15
+        source_version: 16
       study_publications:
         synapse_id: syn16857542
         concrete_type: TableEntity
         note: Main portal publication listing (doi, pmid, title, journal, year, author,
           studyId); study-associated papers, keyed by DOI with a pmid-<id> fallback
-        source_version: 5
+        source_version: 6
         collection_name: MainPortalPublications
         collection_label: NF main portal publications
-        collection_comment: >-
-          Publications listed by the main NF Data Portal (Synapse project
-          syn26451327) -- papers associated with portal STUDIES, carrying
-          studyId, diseaseFocus and manifestation. This is a PARTIAL view of NF
-          publications: tool- and resource-associated papers are maintained
-          separately in NF Research Tools Central (syn26486839) as
-          nf:ToolsCentralPublications. The two listings overlap, and because
-          they are keyed differently (this one by DOI, Tools Central by an
-          internal publicationId) the SAME paper can appear as two distinct
-          biolink:Publication nodes. Deduplicate on pmid, doi or title before
-          counting publications; do not treat a raw count of
-          biolink:Publication as a count of distinct papers.
+        collection_comment: 'Publications listed by the main NF Data Portal (Synapse
+          project syn26451327) -- papers associated with portal STUDIES, carrying
+          studyId, diseaseFocus and manifestation. This is a PARTIAL view of NF publications:
+          tool- and resource-associated papers are maintained separately in NF Research
+          Tools Central (syn26486839) as nf:ToolsCentralPublications. The two listings
+          overlap, and because they are keyed differently (this one by DOI, Tools
+          Central by an internal publicationId) the SAME paper can appear as two distinct
+          biolink:Publication nodes. Deduplicate on pmid, doi or title before counting
+          publications; do not treat a raw count of biolink:Publication as a count
+          of distinct papers.'
       people:
         synapse_id: syn23564971
         concrete_type: TableEntity
-        note: >-
-          Portal people registry (ownerID, orcid, name, onProject). No longer
-          Synapse-profile-only: 458 of 1518 rows are Synapse accounts, the rest
-          are publication-derived researchers with an ORCID and a name but no
-          ownerID. Supplies person nodes, their ORCID linkage, display names
-          and project memberships.
+        note: 'Portal people registry (ownerID, orcid, name, onProject). No longer
+          Synapse-profile-only: 458 of 1518 rows are Synapse accounts, the rest are
+          publication-derived researchers with an ORCID and a name but no ownerID.
+          Supplies person nodes, their ORCID linkage, display names and project memberships.'
         source_version: 10
       publication_author_orcids:
         synapse_id: syn23564971
         concrete_type: TableEntity
-        note: >-
-          Per-publication author ORCID links (doi, orcid). Reads the SAME
-          Synapse table as `people` but a different projection: the person's
-          `orcid` crossed with their `publications` DOI list, exploded to one
-          (doi, orcid) row per pair in apply_derived_columns. Formerly its own
-          table (syn76406574), which was deleted upstream once the people table
-          absorbed the publication list.
+        note: 'Per-publication author ORCID links (doi, orcid). Reads the SAME Synapse
+          table as `people` but a different projection: the person''s `orcid` crossed
+          with their `publications` DOI list, exploded to one (doi, orcid) row per
+          pair in apply_derived_columns. Formerly its own table (syn76406574), which
+          was deleted upstream once the people table absorbed the publication list.'
         source_version: 10
   evaluation:
     version: KG v0.2-eval
