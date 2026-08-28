@@ -320,6 +320,58 @@ class TestLegacyResourceIdTranslation:
         assert (translated, untouched) == (0, 0)
         assert list(out.columns) == ["mutationId"]
 
+    def test_crosswalk_loader_never_logs_in(self, monkeypatch):
+        """These are public tables and CI runs without credentials on purpose, so
+        the crosswalk fetch must never call login(). Regression test: an earlier
+        version did, and broke the CI build with SynapseNoCredentialsError.
+        """
+        import prepare_portal_tables as ppt
+
+        monkeypatch.setattr(ppt, "_LEGACY_CROSSWALK", None)
+
+        calls = {"login": 0, "query": 0}
+
+        class FakeResult:
+            @staticmethod
+            def asDataFrame():
+                return pd.DataFrame([
+                    {"resourceId": "res-1", "cellLineId": "cl-1"},
+                ])
+
+        class FakeSyn:
+            def login(self, *a, **kw):
+                calls["login"] += 1
+                raise AssertionError("login() must not be called")
+
+            def tableQuery(self, q):
+                calls["query"] += 1
+                return FakeResult()
+
+        crosswalk = ppt._load_legacy_resource_crosswalk(FakeSyn())
+        assert calls == {"login": 0, "query": 1}
+        assert crosswalk == {"cl-1": "res-1"}
+
+    def test_crosswalk_loader_reuses_caller_client(self, monkeypatch):
+        """When the caller has a client, no second one should be constructed."""
+        import prepare_portal_tables as ppt
+
+        monkeypatch.setattr(ppt, "_LEGACY_CROSSWALK", None)
+
+        def _no_new_client(*a, **kw):
+            raise AssertionError("should reuse the caller's client")
+
+        monkeypatch.setattr(ppt.synapseclient, "Synapse", _no_new_client)
+
+        class FakeSyn:
+            def tableQuery(self, q):
+                class R:
+                    @staticmethod
+                    def asDataFrame():
+                        return pd.DataFrame([{"resourceId": "res-1", "cellLineId": "cl-1"}])
+                return R()
+
+        assert ppt._load_legacy_resource_crosswalk(FakeSyn()) == {"cl-1": "res-1"}
+
     def test_apply_derived_columns_uses_injected_crosswalk(self):
         """apply_derived_columns must accept a crosswalk via processed_tables so
         it never reaches out to Synapse during tests."""

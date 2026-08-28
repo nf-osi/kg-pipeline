@@ -78,7 +78,9 @@ def create_csv_asset(table_name: str, config: TableConfig):
                 raise RuntimeError(f"{table_name} requires data/csv/donors.csv before processing")
             processed_tables["donors"] = pd.read_csv(donors_csv, keep_default_na=False, dtype=str)
 
-        df, n_dupes = normalize_fetched_df(table_name, df, processed_tables)
+        # Pass the resource's anonymous client so derived-column logic reuses it
+        # rather than constructing its own (and never logs in -- CI has no creds).
+        df, n_dupes = normalize_fetched_df(table_name, df, processed_tables, synapse.client)
         if n_dupes:
             context.log.info(f"Dropped {n_dupes} duplicate rows for {table_name}")
 
@@ -195,7 +197,7 @@ def create_validation_asset(csv_asset_keys: list):
         failures = 0
         for r in results:
             label = f"{r.constraint.source_table}.{r.constraint.source_column}"
-            target = f"{r.constraint.target_table}.{r.constraint.target_column}"
+            target = r.constraint.target_label
             if r.passed:
                 context.log.info(f" ok   {label} -> {target}")
             else:

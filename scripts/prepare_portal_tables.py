@@ -1332,12 +1332,20 @@ def translate_legacy_resource_ids(
     return df, translated, untouched
 
 
-def _load_legacy_resource_crosswalk() -> Dict[str, str]:
-    """Fetch and cache the legacy crosswalk from the retired Resource table."""
+def _load_legacy_resource_crosswalk(
+    syn: Optional[synapseclient.Synapse] = None,
+) -> Dict[str, str]:
+    """Fetch and cache the legacy crosswalk from the retired Resource table.
+
+    Reuses the caller's client when given one. Do NOT call login() -- these are
+    public tables and both fetch paths (main() and the Dagster SynapseResource)
+    read them anonymously, so logging in here would break CI, which runs
+    without credentials on purpose.
+    """
     global _LEGACY_CROSSWALK
     if _LEGACY_CROSSWALK is None:
-        syn = synapseclient.Synapse()
-        syn.login(silent=True)
+        if syn is None:
+            syn = synapseclient.Synapse()
         columns = ["resourceId"] + LEGACY_ID_COLUMNS
         result = syn.tableQuery(
             f"select {', '.join(columns)} from {LEGACY_RESOURCE_TABLE}"
@@ -1350,11 +1358,12 @@ def apply_derived_columns(
     table_name: str,
     df: pd.DataFrame,
     processed_tables: Dict[str, pd.DataFrame],
+    syn: Optional[synapseclient.Synapse] = None,
 ) -> pd.DataFrame:
     if table_name == "mutation_model":
         crosswalk = processed_tables.get("_legacy_resource_crosswalk")
         if crosswalk is None:
-            crosswalk = _load_legacy_resource_crosswalk()
+            crosswalk = _load_legacy_resource_crosswalk(syn)
         df, translated, untouched = translate_legacy_resource_ids(df, crosswalk)
         if translated:
             print(
@@ -1542,6 +1551,7 @@ def normalize_fetched_df(
     table_name: str,
     df: pd.DataFrame,
     processed_tables: Dict[str, pd.DataFrame],
+    syn: Optional[synapseclient.Synapse] = None,
 ) -> tuple[pd.DataFrame, int]:
     """Apply post-fetch normalization so all fetch paths behave the same."""
     n_before = len(df)
@@ -1554,7 +1564,7 @@ def normalize_fetched_df(
 
     df = df.drop_duplicates()
     n_dupes = n_before - len(df)
-    df = apply_derived_columns(table_name, df, processed_tables)
+    df = apply_derived_columns(table_name, df, processed_tables, syn)
     return df, n_dupes
 
 
@@ -1726,7 +1736,7 @@ def main(argv: List[str] | None = None) -> int:
             print(f"  Retrieved {len(df)} rows", flush=True)
             write_raw(args.raw_dir, config["raw_filename"], df)
 
-        df, n_dupes = normalize_fetched_df(table_name, df, processed_tables)
+        df, n_dupes = normalize_fetched_df(table_name, df, processed_tables, syn)
         if n_dupes:
             print(f"  Dropped {n_dupes} duplicate rows", flush=True)
 

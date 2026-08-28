@@ -30,6 +30,11 @@ class SynapseResource(ConfigurableResource):
         )
         return _fetch_table(self._client, table_id, columns, select_clause)
 
+    @property
+    def client(self) -> synapseclient.Synapse:
+        """The underlying anonymous client, for code that needs to query directly."""
+        return self._client
+
     def write_processed_csv(
         self,
         path: Path,
