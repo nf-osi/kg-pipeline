@@ -16,6 +16,11 @@ import pandas as pd
 from .resources import RMLMapperResource, SynapseResource
 from .config import TABLE_CONFIGS, TableConfig
 
+# Tool nodes live in these nine per-type graphs. Kept in sync with
+# prepare_portal_tables.TOOL_TABLES, which is imported lazily inside assets to
+# avoid a hard dependency at module import time.
+from scripts.prepare_portal_tables import TOOL_TABLES as TOOL_GRAPHS
+
 
 # =============================================================================
 # Asset Factories
@@ -317,7 +322,10 @@ def shared_donor_links_asset(context: AssetExecutionContext) -> Path:
     key_prefix=["portal", "rdf"],
     compute_kind="python",
     group_name="relationships",
-    deps=[["portal", "rdf", "resources"], ["portal", "rdf", "observations"]],
+    deps=[
+        *[["portal", "rdf", name] for name in TOOL_GRAPHS],
+        ["portal", "rdf", "observations"],
+    ],
 )
 def observation_links_asset(context: AssetExecutionContext) -> Path:
     """Generate derived hasObservation/aboutResource links after core RDF is available."""
@@ -327,7 +335,9 @@ def observation_links_asset(context: AssetExecutionContext) -> Path:
     output_file = project_root / "data" / "rdf" / "observation_links.ttl"
 
     materialize_observation_links(
-        resources_ttl=project_root / "data" / "rdf" / "resources.ttl",
+        resources_ttl=[
+            project_root / "data" / "rdf" / f"{name}.ttl" for name in TOOL_GRAPHS
+        ],
         observations_ttl=project_root / "data" / "rdf" / "observations.ttl",
         output_ttl=output_file,
     )

@@ -36,11 +36,11 @@ class TestClinicalAssessmentToolCore:
             assert isinstance(tool, URIRef), f"Subject should be IRI, got {type(tool)}"
 
     def test_iri_uses_correct_template(self, cat_graph, namespaces):
-        """IRI should use clinicalAssessmentTool/{id} pattern"""
+        """IRI should use resource/{id} pattern"""
         tools = list(cat_graph.subjects(RDF.type, namespaces["nf"].ClinicalAssessmentTool))
         iris = [str(t) for t in tools]
-        assert any("clinicalAssessmentTool/cat-001" in iri for iri in iris), \
-            f"Expected IRI with clinicalAssessmentTool/cat-001, got: {iris}"
+        assert any("resource/cat-001" in iri for iri in iris), \
+            f"Expected IRI with resource/cat-001, got: {iris}"
 
     def test_assessment_name_present(self, cat_graph, namespaces):
         """Entries should have assessmentName property"""

@@ -25,7 +25,15 @@ map:BiobanksSource a rml:LogicalSource ;
 map:BiobankCore a rr:TriplesMap ;
     rdfs:label "Biobank Core" ;
     rml:logicalSource map:BiobanksSource ;
-    rr:subjectMap [ rr:template "http://nf-osi.github.com/terms#biobank/{biobankId}" ; rr:termType rr:IRI ] ;
+    rr:subjectMap [ rr:template "http://nf-osi.github.com/terms#resource/{resourceId}" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [ rr:predicate rdf:type ; rr:objectMap [ rr:constant nf:Tool ; rr:termType rr:IRI ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:resourceType ; rr:objectMap [ rml:reference "resourceType" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:description ; rr:objectMap [ rml:reference "description" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:aiSummary ; rr:objectMap [ rml:reference "aiSummary" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:rrid ; rr:objectMap [ rml:reference "rrid" ; rr:termType rr:IRI ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:howToAcquire ; rr:objectMap [ rml:reference "howToAcquire" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:dateAdded ; rr:objectMap [ rml:reference "dateAdded" ; rr:datatype xsd:long ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:dateModified ; rr:objectMap [ rml:reference "dateModified" ; rr:datatype xsd:long ] ] ;
     rr:predicateObjectMap [ rr:predicate rdf:type ; rr:objectMap [ rr:constant nf:Biobank ; rr:termType rr:IRI ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:name ; rr:objectMap [ rml:reference "biobankName" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [ rr:predicate rdfs:label ; rr:objectMap [ rml:reference "biobankName" ; rr:datatype xsd:string ] ] ;
@@ -37,38 +45,10 @@ map:BiobankCore a rr:TriplesMap ;
 # Multi-valued fields (StringList, pipe-delimited)
 ################################################################################
 
-map:BiobankDiseaseType a rr:TriplesMap ;
-    rdfs:label "Biobank Disease Type" ;
-    rml:logicalSource map:BiobanksSource ;
-    rr:subjectMap [ rr:template "http://nf-osi.github.com/terms#biobank/{biobankId}" ; rr:termType rr:IRI ] ;
-    rr:predicateObjectMap [
-        rr:predicate nf:diseaseType ;
-        rr:objectMap [
-            a fnml:FunctionTermMap ;
-            rr:datatype xsd:string ;
-            fnml:functionValue [
-                a fno:Execution ;
-                rml:logicalSource map:BiobanksSource ;
-                rr:predicateObjectMap [
-                    rr:predicate fno:executes ;
-                    rr:objectMap [ rr:constant grel:string_split ; rr:termType rr:IRI ]
-                ] ;
-                rr:predicateObjectMap [
-                    rr:predicate grel:valueParameter ;
-                    rr:objectMap [ rml:reference "diseaseType" ; rr:termType rr:Literal ]
-                ] ;
-                rr:predicateObjectMap [
-                    rr:predicate grel:p_string_sep ;
-                    rr:objectMap [ rr:constant "\\|" ; rr:termType rr:Literal ]
-                ]
-            ]
-        ]
-    ] .
-
 map:BiobankSpecimenPreparationMethod a rr:TriplesMap ;
     rdfs:label "Biobank Specimen Preparation Method" ;
     rml:logicalSource map:BiobanksSource ;
-    rr:subjectMap [ rr:template "http://nf-osi.github.com/terms#biobank/{biobankId}" ; rr:termType rr:IRI ] ;
+    rr:subjectMap [ rr:template "http://nf-osi.github.com/terms#resource/{resourceId}" ; rr:termType rr:IRI ] ;
     rr:predicateObjectMap [
         rr:predicate nf:specimenPreparationMethod ;
         rr:objectMap [
@@ -96,7 +76,7 @@ map:BiobankSpecimenPreparationMethod a rr:TriplesMap ;
 map:BiobankSpecimenType a rr:TriplesMap ;
     rdfs:label "Biobank Specimen Type" ;
     rml:logicalSource map:BiobanksSource ;
-    rr:subjectMap [ rr:template "http://nf-osi.github.com/terms#biobank/{biobankId}" ; rr:termType rr:IRI ] ;
+    rr:subjectMap [ rr:template "http://nf-osi.github.com/terms#resource/{resourceId}" ; rr:termType rr:IRI ] ;
     rr:predicateObjectMap [
         rr:predicate nf:specimenType ;
         rr:objectMap [
@@ -124,7 +104,7 @@ map:BiobankSpecimenType a rr:TriplesMap ;
 map:BiobankTumorType a rr:TriplesMap ;
     rdfs:label "Biobank Tumor Type" ;
     rml:logicalSource map:BiobanksSource ;
-    rr:subjectMap [ rr:template "http://nf-osi.github.com/terms#biobank/{biobankId}" ; rr:termType rr:IRI ] ;
+    rr:subjectMap [ rr:template "http://nf-osi.github.com/terms#resource/{resourceId}" ; rr:termType rr:IRI ] ;
     rr:predicateObjectMap [
         rr:predicate nf:tumorType ;
         rr:objectMap [
@@ -152,7 +132,7 @@ map:BiobankTumorType a rr:TriplesMap ;
 map:BiobankSpecimenFormat a rr:TriplesMap ;
     rdfs:label "Biobank Specimen Format" ;
     rml:logicalSource map:BiobanksSource ;
-    rr:subjectMap [ rr:template "http://nf-osi.github.com/terms#biobank/{biobankId}" ; rr:termType rr:IRI ] ;
+    rr:subjectMap [ rr:template "http://nf-osi.github.com/terms#resource/{resourceId}" ; rr:termType rr:IRI ] ;
     rr:predicateObjectMap [
         rr:predicate nf:specimenFormat ;
         rr:objectMap [
@@ -180,7 +160,7 @@ map:BiobankSpecimenFormat a rr:TriplesMap ;
 map:BiobankSpecimenTissueType a rr:TriplesMap ;
     rdfs:label "Biobank Specimen Tissue Type" ;
     rml:logicalSource map:BiobanksSource ;
-    rr:subjectMap [ rr:template "http://nf-osi.github.com/terms#biobank/{biobankId}" ; rr:termType rr:IRI ] ;
+    rr:subjectMap [ rr:template "http://nf-osi.github.com/terms#resource/{resourceId}" ; rr:termType rr:IRI ] ;
     rr:predicateObjectMap [
         rr:predicate nf:specimenTissueType ;
         rr:objectMap [
@@ -196,6 +176,68 @@ map:BiobankSpecimenTissueType a rr:TriplesMap ;
                 rr:predicateObjectMap [
                     rr:predicate grel:valueParameter ;
                     rr:objectMap [ rml:reference "specimenTissueType" ; rr:termType rr:Literal ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:p_string_sep ;
+                    rr:objectMap [ rr:constant "\\|" ; rr:termType rr:Literal ]
+                ]
+            ]
+        ]
+    ] .
+
+map:BiobankSynonyms a rr:TriplesMap ;
+    rdfs:label "Biobank Synonyms" ;
+    rml:logicalSource map:BiobanksSource ;
+    rr:subjectMap [
+        rr:template "http://nf-osi.github.com/terms#resource/{resourceId}" ;
+        rr:termType rr:IRI
+    ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:synonyms ;
+        rr:objectMap [
+            a fnml:FunctionTermMap ;
+            rr:datatype xsd:string ;
+            fnml:functionValue [
+                a fno:Execution ;
+                rml:logicalSource map:BiobanksSource ;
+                rr:predicateObjectMap [
+                    rr:predicate fno:executes ;
+                    rr:objectMap [ rr:constant grel:string_split ; rr:termType rr:IRI ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:valueParameter ;
+                    rr:objectMap [ rml:reference "synonyms" ; rr:termType rr:Literal ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:p_string_sep ;
+                    rr:objectMap [ rr:constant "\\|" ; rr:termType rr:Literal ]
+                ]
+            ]
+        ]
+    ] .
+
+map:BiobankUsageRequirements a rr:TriplesMap ;
+    rdfs:label "Biobank Usage Requirements" ;
+    rml:logicalSource map:BiobanksSource ;
+    rr:subjectMap [
+        rr:template "http://nf-osi.github.com/terms#resource/{resourceId}" ;
+        rr:termType rr:IRI
+    ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:usageRequirements ;
+        rr:objectMap [
+            a fnml:FunctionTermMap ;
+            rr:datatype xsd:string ;
+            fnml:functionValue [
+                a fno:Execution ;
+                rml:logicalSource map:BiobanksSource ;
+                rr:predicateObjectMap [
+                    rr:predicate fno:executes ;
+                    rr:objectMap [ rr:constant grel:string_split ; rr:termType rr:IRI ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:valueParameter ;
+                    rr:objectMap [ rml:reference "usageRequirements" ; rr:termType rr:Literal ]
                 ] ;
                 rr:predicateObjectMap [
                     rr:predicate grel:p_string_sep ;

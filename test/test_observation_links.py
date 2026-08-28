@@ -19,8 +19,8 @@ def test_materialize_observation_links_joins_on_resource_id(tmp_path):
 
     resource_graph = Graph()
     resource_graph.bind("nf", NF)
-    cell_1 = NF["cellLine/test-cell-1"]
-    cell_2 = NF["cellLine/test-cell-2"]
+    cell_1 = NF["resource/test-cell-1"]
+    cell_2 = NF["resource/test-cell-2"]
 
     resource_graph.add((cell_1, RDF.type, NF.CellLine))
     resource_graph.add((cell_1, NF.resourceId, Literal("res-1")))

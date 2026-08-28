@@ -265,7 +265,7 @@ class TestAntibodiesBasicProperties:
         SELECT ?antibody ?antibodyId
         WHERE {
             ?antibody a nf:Antibody ;
-                      nf:antibodyId ?antibodyId .
+                      nf:resourceId ?antibodyId .
         }
         """
         results = list(antibodies_graph.query(query, initNs={"nf": NF}))

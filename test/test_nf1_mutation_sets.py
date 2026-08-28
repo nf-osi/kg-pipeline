@@ -19,9 +19,9 @@ def test_materialize_nf1_mutation_sets_reuses_stable_set_ids_and_comments(tmp_pa
 
     cell_graph = Graph()
     cell_graph.bind("nf", NF)
-    cell_a = NF["cellLine/test-a"]
-    cell_b = NF["cellLine/test-b"]
-    cell_c = NF["cellLine/test-c"]
+    cell_a = NF["resource/test-a"]
+    cell_b = NF["resource/test-b"]
+    cell_c = NF["resource/test-c"]
     mut_1 = NF["mutation/11111111-1111-1111-1111-111111111111"]
     mut_2 = NF["mutation/22222222-2222-2222-2222-222222222222"]
     mut_3 = NF["mutation/33333333-3333-3333-3333-333333333333"]

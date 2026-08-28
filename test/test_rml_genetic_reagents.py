@@ -42,7 +42,7 @@ class TestGeneticReagentsMultiValue:
     def test_reagent_class_emits_rdf_type(self, genetic_reagents_graph, namespaces):
         """reagentClass IRI should be emitted as rdf:type"""
         NF = namespaces["nf"]
-        reagent = URIRef("http://nf-osi.github.com/terms#geneticReagent/test-reagent-003")
+        reagent = URIRef("http://nf-osi.github.com/terms#resource/test-reagent-003")
         types = list(genetic_reagents_graph.objects(reagent, RDF.type))
         assert NF.CRISPRReagent in types, \
             f"Expected CRISPRReagent from reagentClass, got {types}"
@@ -117,7 +117,7 @@ class TestGeneticReagentsFields:
         SELECT ?reagent ?reagentId
         WHERE {
             ?reagent a nf:GeneticReagent ;
-                      nf:geneticReagentId ?reagentId .
+                      nf:resourceId ?reagentId .
         }
         """
         results = list(genetic_reagents_graph.query(query, initNs={"nf": NF}))
@@ -185,7 +185,7 @@ class TestGeneticReagentsReagentClass:
     def test_crispr_reagent_has_subclass_type(self, genetic_reagents_graph, namespaces):
         """test-reagent-003 with reagentClass should get CRISPRReagent type"""
         NF = namespaces["nf"]
-        reagent = URIRef("http://nf-osi.github.com/terms#geneticReagent/test-reagent-003")
+        reagent = URIRef("http://nf-osi.github.com/terms#resource/test-reagent-003")
         types = list(genetic_reagents_graph.objects(reagent, RDF.type))
         assert NF.CRISPRReagent in types, \
             f"Expected CRISPRReagent type, got {types}"
@@ -193,10 +193,12 @@ class TestGeneticReagentsReagentClass:
     def test_empty_reagent_class_no_extra_type(self, genetic_reagents_graph, namespaces):
         """Reagents with empty reagentClass should only have base GeneticReagent type"""
         NF = namespaces["nf"]
-        reagent = URIRef("http://nf-osi.github.com/terms#geneticReagent/test-reagent-001")
+        reagent = URIRef("http://nf-osi.github.com/terms#resource/test-reagent-001")
         types = list(genetic_reagents_graph.objects(reagent, RDF.type))
         assert NF.GeneticReagent in types, "Should have base GeneticReagent type"
-        non_base = [t for t in types if t != NF.GeneticReagent]
+        # nf:Tool comes from the shared core Tool block on every tool-type
+        # mapping, so it is a base type here too, not an "extra".
+        non_base = [t for t in types if t not in (NF.GeneticReagent, NF.Tool)]
         assert len(non_base) == 0, \
             f"Should not have extra types, got {non_base}"
 

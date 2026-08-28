@@ -70,7 +70,9 @@ TABLE_CONFIGS["files"].harmonize_script = "scripts/harmonize_files.py"
 TABLE_CONFIGS["files"].harmonize_output = Path("data/csv/files_harmonized.csv")
 TABLE_CONFIGS["files"].harmonize_args = [
     "--files", "data/csv/files.csv",
-    "--resources", "data/csv/resources.csv",
+    # Animal models take precedence over cell lines on a name collision, which
+    # is why they are listed first (see harmonize_files.build_lookup).
+    "--resources", "data/csv/animal_models.csv", "data/csv/cell_lines.csv",
     "--output", "data/csv/files_harmonized.csv",
     "--lookup", "mappings/sssom/data_lookup.sssom.tsv",
     "--nf1-lookup", "mappings/sssom/nf1_genotype_lookup.sssom.tsv",

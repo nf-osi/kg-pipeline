@@ -177,6 +177,38 @@ Keep the literal-join CONSTRUCT rather than templating the IRI directly from
 
 ---
 
+## Workaround to retire: `mutation_model.resourceId`
+
+Upstream renamed `Mutation`'s (syn26486834) `animalModelId`/`cellLineId` columns
+to a single `resourceId` **without migrating the values** — 265 of 277 rows still
+hold a legacy `<type>Id`. Taking them at face value would mint
+`nf:resource/{<type>Id}` IRIs matching no tool, re-creating in mirror image the
+very defect this migration removes. Only `Mutation` is affected at scale
+(`VendorItem` has 5 such rows); every other `resourceId` column checks out.
+
+So `prepare_portal_tables.py` translates these at build time, reading the retired
+Resource table (syn26450069) **purely as a crosswalk, never for Tool facts**.
+Coverage is complete: 277/277 rows resolve, vs 12/277 without it.
+
+Draft bug report for upstream:
+`docs/upstream-mutation-resourceid-bug.md` (not yet filed).
+
+**Removal checklist** — the pipeline prints `upstream appears fixed` when a build
+finds nothing left to translate. That is the signal. Then delete:
+
+1. `scripts/prepare_portal_tables.py` — `LEGACY_RESOURCE_TABLE`,
+   `LEGACY_ID_COLUMNS`, `_LEGACY_CROSSWALK`, `build_legacy_id_crosswalk`,
+   `translate_legacy_resource_ids`, `_load_legacy_resource_crosswalk`, and the
+   `mutation_model` branch of `apply_derived_columns`.
+2. `test/test_prepare_portal_tables.py` — `TestLegacyResourceIdTranslation`.
+3. This section, and `docs/upstream-mutation-resourceid-bug.md`.
+
+Nothing else depends on syn26450069 after that, so its deletion upstream becomes
+harmless — but note the crosswalk is unrecoverable once that table is gone, so
+the upstream backfill has to happen first.
+
+---
+
 ## Deferred
 
 **P2 — new tables (highest data value once P1 lands; all keyed on `resourceId`).**

@@ -353,11 +353,6 @@ shapes:CellLineShape a sh:NodeShape ;
         sh:maxCount 1 ;
     ] ;
     sh:property [
-        sh:path nf:cellLineId ;
-        sh:datatype xsd:string ;
-        sh:maxCount 1 ;
-    ] ;
-    sh:property [
         sh:path nf:donorId ;
         sh:nodeKind sh:IRI ;
         sh:class nf:Donor ;
@@ -476,11 +471,6 @@ shapes:AnimalModelShape a sh:NodeShape ;
         sh:maxCount 1 ;
     ] ;
     sh:property [
-        sh:path nf:animalModelId ;
-        sh:datatype xsd:string ;
-        sh:maxCount 1 ;
-    ] ;
-    sh:property [
         sh:path nf:donorId ;
         sh:nodeKind sh:IRI ;
         sh:class nf:Donor ;
@@ -564,11 +554,6 @@ shapes:AntibodyShape a sh:NodeShape ;
         sh:maxCount 1 ;
     ] ;
     sh:property [
-        sh:path nf:antibodyId ;
-        sh:datatype xsd:string ;
-        sh:maxCount 1 ;
-    ] ;
-    sh:property [
         sh:path nf:targetAntigen ;
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
@@ -613,11 +598,6 @@ shapes:GeneticReagentShape a sh:NodeShape ;
     rdfs:comment "Expected properties for GeneticReagent instances." ;
     sh:property [
         sh:path nf:resourceId ;
-        sh:datatype xsd:string ;
-        sh:maxCount 1 ;
-    ] ;
-    sh:property [
-        sh:path nf:geneticReagentId ;
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
     ] ;
@@ -1071,11 +1051,6 @@ shapes:ClinicalAssessmentToolShape a sh:NodeShape ;
         sh:maxCount 1 ;
     ] ;
     sh:property [
-        sh:path nf:clinicalAssessmentToolId ;
-        sh:datatype xsd:string ;
-        sh:maxCount 1 ;
-    ] ;
-    sh:property [
         sh:path nf:assessmentName ;
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
@@ -1142,11 +1117,6 @@ shapes:PatientDerivedModelShape a sh:NodeShape ;
     rdfs:comment "Expected properties for PatientDerivedModel instances." ;
     sh:property [
         sh:path nf:resourceId ;
-        sh:datatype xsd:string ;
-        sh:maxCount 1 ;
-    ] ;
-    sh:property [
-        sh:path nf:patientDerivedModelId ;
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
     ] ;
@@ -1223,11 +1193,6 @@ shapes:OrganoidProtocolShape a sh:NodeShape ;
         sh:maxCount 1 ;
     ] ;
     sh:property [
-        sh:path nf:organoidProtocolId ;
-        sh:datatype xsd:string ;
-        sh:maxCount 1 ;
-    ] ;
-    sh:property [
         sh:path nf:modelType ;
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
@@ -1295,11 +1260,6 @@ shapes:ComputationalToolShape a sh:NodeShape ;
     rdfs:comment "Expected properties for ComputationalTool instances." ;
     sh:property [
         sh:path nf:resourceId ;
-        sh:datatype xsd:string ;
-        sh:maxCount 1 ;
-    ] ;
-    sh:property [
-        sh:path nf:computationalToolId ;
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
     ] ;

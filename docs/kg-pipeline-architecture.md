@@ -232,7 +232,8 @@ RML ([spec](https://rml.io/specs/rml/), [RMLMapper](https://github.com/RMLio/rml
 
 **IRI design decisions:**
 - Synapse entities (studies, files, datasets) use `https://www.synapse.org/Synapse:{id}` — these are human-browsable and globally unique
-- Portal-specific entities (tools, donors, mutations) use `http://nf-osi.github.com/terms#{entityType}/{entityId}` — scoped to the portal namespace
+- Portal-specific entities (donors, mutations) use `http://nf-osi.github.com/terms#{entityType}/{entityId}` — scoped to the portal namespace
+- Tools use a single `http://nf-osi.github.com/terms#resource/{resourceId}` template regardless of tool type. There is deliberately no per-type template (`cellLine/`, `antibody/`, …): the type is carried by `rdf:type` (`nf:CellLine`, `nf:Antibody`, …), which every per-type mapping asserts, so baking it into the IRI would duplicate that for no query benefit. This replaced per-type IRIs in KG v0.4 — see `docs/resource-shortcut-iris.md`
 - Text-keyed entities (initiatives, funders) use name-derived IRIs with spaces replaced by underscores
 
 **Tools:** RMLMapper (Java 21+). GREL function support is required for multi-value splitting. The pipeline depends on the released JAR.
@@ -417,7 +418,7 @@ This pipeline was built for the NF Research Tools Portal but is designed with ge
 - **`data_sources.yaml`** — version pinning for your Synapse tables
 
 ### What to keep in mind
-- **IRI stability matters**: once published, IRIs should not change without a deprecation strategy. Choose your IRI templates carefully before going live.
+- **IRI stability matters**: once published, IRIs should not change without a deprecation strategy. Choose your IRI templates carefully before going live. This project has broken that rule exactly once, in KG v0.4, when upstream retired the keys the tool IRIs were built on; the deprecation strategy there was a clean break justified by every tool node carrying its `nf:resourceId` as a literal, so old IRIs stay resolvable from any archived graph without a bridge. See `docs/upstream-schema-migration.md`.
 - **Vocabulary governance**: SSSOM files reflect a design decision about what your portal labels *mean*. This requires domain expertise and may involve iteration with data contributors.
 - **Start with 3–5 core tables**: get the Extract → Map loop working end-to-end before adding harmonization and derived layers. A small working graph is more valuable than a large planned graph.
 

@@ -1,4 +1,4 @@
-patientDerivedModelId,modelSystemType,patientDiagnosis,hostStrain,passageNumber,tumorType,engraftmentSite,establishmentRate,molecularCharacterization,clinicalData,validationMethods,donorId
-pdm-001,PDX,NF1-associated MPNST,NSG,P3,MPNST,Subcutaneous,75%,WGS|RNA-seq,Available,IHC|Drug response,donor-001
-pdm-002,Organoid,NF1 plexiform neurofibroma,,P5,Plexiform Neurofibroma,,60%,Exome sequencing,,IHC|Western blot,
-pdm-003,PDX,Schwannoma,NOD-SCID,P2,Schwannoma,Subcutaneous,50%,WGS,,Drug response|IHC,donor-002
+resourceId,rrid,resourceName,synonyms,resourceType,description,aiSummary,usageRequirements,howToAcquire,dateAdded,dateModified,modelSystemType,patientDiagnosis,hostStrain,passageNumber,tumorType,engraftmentSite,establishmentRate,molecularCharacterization,clinicalData,validationMethods,donorId
+pdm-001,rrid:TEST_PAT001,Test PDM 1,Test PDM 1 alt|Test PDM 1 syn,Patient Derived Model,A test patient derived model fixture row 1.,AI summary for Test PDM 1.,Unknown,This tool is available from a commercial vendor or non-profit repository.,1634241592000,1700000000000,PDX,NF1-associated MPNST,NSG,P3,MPNST,Subcutaneous,75%,WGS|RNA-seq,Available,IHC|Drug response,donor-001
+pdm-002,,Test PDM 2,,Patient Derived Model,A test patient derived model fixture row 2.,,non-commercial use only|MTA required,Contact the originating investigator.,1634241592000,1700000000000,Organoid,NF1 plexiform neurofibroma,,P5,Plexiform Neurofibroma,,60%,Exome sequencing,,IHC|Western blot,
+pdm-003,rrid:TEST_PAT003,Test PDM 3,,Patient Derived Model,A test patient derived model fixture row 3.,,Unknown,This tool is available from a commercial vendor or non-profit repository.,1634241592000,1700000000000,PDX,Schwannoma,NOD-SCID,P2,Schwannoma,Subcutaneous,50%,WGS,,Drug response|IHC,donor-002

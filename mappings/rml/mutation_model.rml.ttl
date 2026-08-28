@@ -15,29 +15,17 @@ map:MutationModelSource a rml:LogicalSource ;
     rml:referenceFormulation ql:CSV .
 
 ################################################################################
-# Animal Model -> Mutation relationship
+# Resource -> Mutation relationship
 ################################################################################
 
-map:AnimalModelHasMutation a rr:TriplesMap ;
-    rdfs:label "Animal Model Has Mutation" ;
+# Upstream re-keyed this junction from separate animalModelId / cellLineId
+# columns onto a single resourceId, so the two former per-type triples maps
+# (map:AnimalModelHasMutation, map:CellLineHasMutation) collapse into one. Any
+# tool type can now carry a mutation, not just animal models and cell lines.
+map:ResourceHasMutation a rr:TriplesMap ;
+    rdfs:label "Resource Has Mutation" ;
     rml:logicalSource map:MutationModelSource ;
-    rr:subjectMap [ rr:template "http://nf-osi.github.com/terms#animalModel/{animalModelId}" ; rr:termType rr:IRI ] ;
-    rr:predicateObjectMap [
-        rr:predicate nf:hasMutation ;
-        rr:objectMap [
-            rr:template "http://nf-osi.github.com/terms#mutation/{mutationId}" ;
-            rr:termType rr:IRI
-        ]
-    ] .
-
-################################################################################
-# Cell Line -> Mutation relationship
-################################################################################
-
-map:CellLineHasMutation a rr:TriplesMap ;
-    rdfs:label "Cell Line Has Mutation" ;
-    rml:logicalSource map:MutationModelSource ;
-    rr:subjectMap [ rr:template "http://nf-osi.github.com/terms#cellLine/{cellLineId}" ; rr:termType rr:IRI ] ;
+    rr:subjectMap [ rr:template "http://nf-osi.github.com/terms#resource/{resourceId}" ; rr:termType rr:IRI ] ;
     rr:predicateObjectMap [
         rr:predicate nf:hasMutation ;
         rr:objectMap [

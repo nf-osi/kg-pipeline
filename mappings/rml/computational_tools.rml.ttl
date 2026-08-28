@@ -26,11 +26,21 @@ map:ComputationalToolCore a rr:TriplesMap ;
     rdfs:label "Computational Tool Core" ;
     rml:logicalSource map:ComputationalToolsSource ;
     rr:subjectMap [
-        rr:template "http://nf-osi.github.com/terms#computationalTool/{computationalToolId}" ;
+        rr:template "http://nf-osi.github.com/terms#resource/{resourceId}" ;
         rr:termType rr:IRI
     ] ;
+    rr:predicateObjectMap [ rr:predicate rdf:type ; rr:objectMap [ rr:constant nf:Tool ; rr:termType rr:IRI ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:resourceId ; rr:objectMap [ rml:reference "resourceId" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:name ; rr:objectMap [ rml:reference "resourceName" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate rdfs:label ; rr:objectMap [ rml:reference "resourceName" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:resourceType ; rr:objectMap [ rml:reference "resourceType" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:description ; rr:objectMap [ rml:reference "description" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:aiSummary ; rr:objectMap [ rml:reference "aiSummary" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:rrid ; rr:objectMap [ rml:reference "rrid" ; rr:termType rr:IRI ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:howToAcquire ; rr:objectMap [ rml:reference "howToAcquire" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:dateAdded ; rr:objectMap [ rml:reference "dateAdded" ; rr:datatype xsd:long ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:dateModified ; rr:objectMap [ rml:reference "dateModified" ; rr:datatype xsd:long ] ] ;
     rr:predicateObjectMap [ rr:predicate rdf:type ; rr:objectMap [ rr:constant nf:ComputationalTool ; rr:termType rr:IRI ] ] ;
-    rr:predicateObjectMap [ rr:predicate nf:computationalToolId ; rr:objectMap [ rml:reference "computationalToolId" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:softwareName ; rr:objectMap [ rml:reference "softwareName" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:softwareType ; rr:objectMap [ rml:reference "softwareType" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:softwareVersion ; rr:objectMap [ rml:reference "softwareVersion" ; rr:datatype xsd:string ] ] ;
@@ -52,7 +62,7 @@ map:ComputationalToolProgrammingLanguage a rr:TriplesMap ;
     rdfs:label "Computational Tool Programming Language" ;
     rml:logicalSource map:ComputationalToolsSource ;
     rr:subjectMap [
-        rr:template "http://nf-osi.github.com/terms#computationalTool/{computationalToolId}" ;
+        rr:template "http://nf-osi.github.com/terms#resource/{resourceId}" ;
         rr:termType rr:IRI
     ] ;
     rr:predicateObjectMap [
@@ -83,7 +93,7 @@ map:ComputationalToolDependencies a rr:TriplesMap ;
     rdfs:label "Computational Tool Dependencies" ;
     rml:logicalSource map:ComputationalToolsSource ;
     rr:subjectMap [
-        rr:template "http://nf-osi.github.com/terms#computationalTool/{computationalToolId}" ;
+        rr:template "http://nf-osi.github.com/terms#resource/{resourceId}" ;
         rr:termType rr:IRI
     ] ;
     rr:predicateObjectMap [
@@ -101,6 +111,68 @@ map:ComputationalToolDependencies a rr:TriplesMap ;
                 rr:predicateObjectMap [
                     rr:predicate grel:valueParameter ;
                     rr:objectMap [ rml:reference "dependencies" ; rr:termType rr:Literal ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:p_string_sep ;
+                    rr:objectMap [ rr:constant "\\|" ; rr:termType rr:Literal ]
+                ]
+            ]
+        ]
+    ] .
+
+map:ComputationalToolSynonyms a rr:TriplesMap ;
+    rdfs:label "ComputationalTool Synonyms" ;
+    rml:logicalSource map:ComputationalToolsSource ;
+    rr:subjectMap [
+        rr:template "http://nf-osi.github.com/terms#resource/{resourceId}" ;
+        rr:termType rr:IRI
+    ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:synonyms ;
+        rr:objectMap [
+            a fnml:FunctionTermMap ;
+            rr:datatype xsd:string ;
+            fnml:functionValue [
+                a fno:Execution ;
+                rml:logicalSource map:ComputationalToolsSource ;
+                rr:predicateObjectMap [
+                    rr:predicate fno:executes ;
+                    rr:objectMap [ rr:constant grel:string_split ; rr:termType rr:IRI ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:valueParameter ;
+                    rr:objectMap [ rml:reference "synonyms" ; rr:termType rr:Literal ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:p_string_sep ;
+                    rr:objectMap [ rr:constant "\\|" ; rr:termType rr:Literal ]
+                ]
+            ]
+        ]
+    ] .
+
+map:ComputationalToolUsageRequirements a rr:TriplesMap ;
+    rdfs:label "ComputationalTool Usage Requirements" ;
+    rml:logicalSource map:ComputationalToolsSource ;
+    rr:subjectMap [
+        rr:template "http://nf-osi.github.com/terms#resource/{resourceId}" ;
+        rr:termType rr:IRI
+    ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:usageRequirements ;
+        rr:objectMap [
+            a fnml:FunctionTermMap ;
+            rr:datatype xsd:string ;
+            fnml:functionValue [
+                a fno:Execution ;
+                rml:logicalSource map:ComputationalToolsSource ;
+                rr:predicateObjectMap [
+                    rr:predicate fno:executes ;
+                    rr:objectMap [ rr:constant grel:string_split ; rr:termType rr:IRI ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:valueParameter ;
+                    rr:objectMap [ rml:reference "usageRequirements" ; rr:termType rr:Literal ]
                 ] ;
                 rr:predicateObjectMap [
                     rr:predicate grel:p_string_sep ;

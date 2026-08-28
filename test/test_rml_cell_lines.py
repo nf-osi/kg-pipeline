@@ -90,9 +90,17 @@ class TestCellLineCategoryType:
         """
         types = [str(r.type) for r in cell_lines_graph.query(query, initNs={"nf": NF})]
         assert "http://nf-osi.github.com/terms#CellLine" in types
-        # Should only have CellLine, no subclass type
-        nf_types = [t for t in types if t.startswith("http://nf-osi.github.com/terms#")]
-        assert len(nf_types) == 1, f"Expected only nf:CellLine type, got {nf_types}"
+        # Should have only the base types (nf:Tool from the core Tool block and
+        # nf:CellLine), no cellLineCategory-derived subclass.
+        base = {
+            "http://nf-osi.github.com/terms#Tool",
+            "http://nf-osi.github.com/terms#CellLine",
+        }
+        extra = [
+            t for t in types
+            if t.startswith("http://nf-osi.github.com/terms#") and t not in base
+        ]
+        assert not extra, f"Expected no subclass type beyond {base}, got {extra}"
 
     def test_all_cell_lines_have_base_type(self, cell_lines_graph, namespaces):
         """All cell lines should still have nf:CellLine as rdf:type"""
@@ -308,7 +316,7 @@ class TestCellLinesBasicProperties:
         SELECT ?cellLine ?cellLineId
         WHERE {
             ?cellLine a nf:CellLine ;
-                      nf:cellLineId ?cellLineId .
+                      nf:resourceId ?cellLineId .
         }
         """
         results = list(cell_lines_graph.query(query, initNs={"nf": NF}))

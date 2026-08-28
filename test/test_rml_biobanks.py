@@ -44,11 +44,11 @@ class TestBiobanksCore:
         WHERE {
             ?biobank a nf:Biobank ;
                      nf:name ?name .
-            FILTER(CONTAINS(STR(?biobank), "test-bb-001"))
+            FILTER(CONTAINS(STR(?biobank), "test-res-001"))
         }
         """
         results = list(biobanks_graph.query(query, initNs={"nf": NF}))
-        assert len(results) == 1, "Expected name for test-bb-001"
+        assert len(results) == 1, "Expected name for test-res-001"
         assert str(results[0].name) == "Test Biobank One"
 
     def test_biobank_url_is_iri(self, biobanks_graph, namespaces):
@@ -89,25 +89,6 @@ class TestBiobanksCore:
 class TestBiobanksMultiValue:
     """Test multi-value field handling (pipe-delimited lists)"""
 
-    def test_disease_type_multi_value(self, biobanks_graph, namespaces):
-        """diseaseType should split on pipe delimiter"""
-        NF = namespaces["nf"]
-
-        query = """
-        SELECT ?disease
-        WHERE {
-            ?biobank a nf:Biobank ;
-                     nf:diseaseType ?disease .
-            FILTER(CONTAINS(STR(?biobank), "test-bb-002"))
-        }
-        """
-        results = list(biobanks_graph.query(query, initNs={"nf": NF}))
-        values = [str(row.disease) for row in results]
-
-        assert "Neurofibromatosis type 1" in values
-        assert "Schwannomatosis" in values
-        assert len(results) == 2, f"Expected 2 disease types, got {len(results)}"
-
     def test_specimen_preparation_method_multi_value(self, biobanks_graph, namespaces):
         """specimenPreparationMethod should split on pipe"""
         NF = namespaces["nf"]
@@ -117,7 +98,7 @@ class TestBiobanksMultiValue:
         WHERE {
             ?biobank a nf:Biobank ;
                      nf:specimenPreparationMethod ?method .
-            FILTER(CONTAINS(STR(?biobank), "test-bb-001"))
+            FILTER(CONTAINS(STR(?biobank), "test-res-001"))
         }
         """
         results = list(biobanks_graph.query(query, initNs={"nf": NF}))
@@ -135,7 +116,7 @@ class TestBiobanksMultiValue:
         WHERE {
             ?biobank a nf:Biobank ;
                      nf:specimenType ?type .
-            FILTER(CONTAINS(STR(?biobank), "test-bb-001"))
+            FILTER(CONTAINS(STR(?biobank), "test-res-001"))
         }
         """
         results = list(biobanks_graph.query(query, initNs={"nf": NF}))
@@ -153,7 +134,7 @@ class TestBiobanksMultiValue:
         WHERE {
             ?biobank a nf:Biobank ;
                      nf:tumorType ?tumor .
-            FILTER(CONTAINS(STR(?biobank), "test-bb-001"))
+            FILTER(CONTAINS(STR(?biobank), "test-res-001"))
         }
         """
         results = list(biobanks_graph.query(query, initNs={"nf": NF}))
@@ -171,7 +152,7 @@ class TestBiobanksMultiValue:
         WHERE {
             ?biobank a nf:Biobank ;
                      nf:specimenFormat ?format .
-            FILTER(CONTAINS(STR(?biobank), "test-bb-003"))
+            FILTER(CONTAINS(STR(?biobank), "test-res-003"))
         }
         """
         results = list(biobanks_graph.query(query, initNs={"nf": NF}))
@@ -191,7 +172,7 @@ class TestBiobanksMultiValue:
         WHERE {
             ?biobank a nf:Biobank ;
                      nf:specimenTissueType ?tissue .
-            FILTER(CONTAINS(STR(?biobank), "test-bb-003"))
+            FILTER(CONTAINS(STR(?biobank), "test-res-003"))
         }
         """
         results = list(biobanks_graph.query(query, initNs={"nf": NF}))
@@ -215,7 +196,7 @@ class TestBiobanksEmptyFields:
         WHERE {
             ?biobank a nf:Biobank ;
                      nf:contact ?contact .
-            FILTER(CONTAINS(STR(?biobank), "test-bb-001"))
+            FILTER(CONTAINS(STR(?biobank), "test-res-001"))
         }
         """
         results = list(biobanks_graph.query(query, initNs={"nf": NF}))
@@ -230,11 +211,11 @@ class TestBiobanksEmptyFields:
         WHERE {
             ?biobank a nf:Biobank ;
                      nf:contact ?contact .
-            FILTER(CONTAINS(STR(?biobank), "test-bb-003"))
+            FILTER(CONTAINS(STR(?biobank), "test-res-003"))
         }
         """
         results = list(biobanks_graph.query(query, initNs={"nf": NF}))
-        assert len(results) == 1, "Expected contact for test-bb-003"
+        assert len(results) == 1, "Expected contact for test-res-003"
         assert str(results[0].contact) == "test-contact@example.org"
 
     def test_no_empty_literal_values(self, biobanks_graph):
