@@ -1,5 +1,5 @@
-antibodyId,uniprotId,cloneId,reactiveSpecies,hostOrganism,conjugate,clonality,targetAntigen
-test-ab-001,P12345,Clone123,Human|Mouse|Rat,Rabbit,Nonconjugated,Polyclonal,NF1
-test-ab-002,Q67890,,Human,Goat,HRP,Monoclonal,NF2
-test-ab-003,,,Mouse,,Nonconjugated,Polyclonal,EGFR
-test-ab-004,P11111,Clone456,Human|Mouse,Rabbit,,Polyclonal,
+resourceId,rrid,resourceName,synonyms,resourceType,description,aiSummary,usageRequirements,howToAcquire,dateAdded,dateModified,uniprotId,cloneId,reactiveSpecies,hostOrganism,conjugate,clonality,targetAntigen
+test-ab-001,rrid:TEST_ANT001,Test Antibody 1,Test Antibody 1 alt|Test Antibody 1 syn,Antibody,A test antibody fixture row 1.,AI summary for Test Antibody 1.,Unknown,This tool is available from a commercial vendor or non-profit repository.,1634241592000,1700000000000,P12345,Clone123,Human|Mouse|Rat,Rabbit,Nonconjugated,Polyclonal,NF1
+test-ab-002,,Test Antibody 2,,Antibody,A test antibody fixture row 2.,,non-commercial use only|MTA required,Contact the originating investigator.,1634241592000,1700000000000,Q67890,,Human,Goat,HRP,Monoclonal,NF2
+test-ab-003,rrid:TEST_ANT003,Test Antibody 3,,Antibody,A test antibody fixture row 3.,,Unknown,This tool is available from a commercial vendor or non-profit repository.,1634241592000,1700000000000,,,Mouse,,Nonconjugated,Polyclonal,EGFR
+test-ab-004,,Test Antibody 4,,Antibody,A test antibody fixture row 4.,,non-commercial use only|MTA required,Contact the originating investigator.,1634241592000,1700000000000,P11111,Clone456,Human|Mouse,Rabbit,,Polyclonal,

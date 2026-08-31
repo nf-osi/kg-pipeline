@@ -26,12 +26,22 @@ map:AnimalModelCore a rr:TriplesMap ;
     rdfs:label "Animal Model Core" ;
     rml:logicalSource map:PortalAnimalModelsSource ;
     rr:subjectMap [
-        rr:template "http://nf-osi.github.com/terms#animalModel/{animalModelId}" ;
+        rr:template "http://nf-osi.github.com/terms#resource/{resourceId}" ;
         rr:termType rr:IRI
     ] ;
+    rr:predicateObjectMap [ rr:predicate rdf:type ; rr:objectMap [ rr:constant nf:Tool ; rr:termType rr:IRI ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:resourceId ; rr:objectMap [ rml:reference "resourceId" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:name ; rr:objectMap [ rml:reference "resourceName" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate rdfs:label ; rr:objectMap [ rml:reference "resourceName" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:resourceType ; rr:objectMap [ rml:reference "resourceType" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:description ; rr:objectMap [ rml:reference "description" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:aiSummary ; rr:objectMap [ rml:reference "aiSummary" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:rrid ; rr:objectMap [ rml:reference "rrid" ; rr:termType rr:IRI ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:howToAcquire ; rr:objectMap [ rml:reference "howToAcquire" ; rr:datatype xsd:string ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:dateAdded ; rr:objectMap [ rml:reference "dateAdded" ; rr:datatype xsd:long ] ] ;
+    rr:predicateObjectMap [ rr:predicate nf:dateModified ; rr:objectMap [ rml:reference "dateModified" ; rr:datatype xsd:long ] ] ;
     rr:predicateObjectMap [ rr:predicate rdf:type ; rr:objectMap [ rr:constant nf:AnimalModel ; rr:termType rr:IRI ] ] ;
     rr:predicateObjectMap [ rr:predicate rdf:type ; rr:objectMap [ rml:reference "animalModelClass" ; rr:termType rr:IRI ] ] ;
-    rr:predicateObjectMap [ rr:predicate nf:animalModelId ; rr:objectMap [ rml:reference "animalModelId" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:donorId ; rr:objectMap [ rr:template "http://nf-osi.github.com/terms#donor/{donorId}" ; rr:termType rr:IRI ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:fromDonor ; rr:objectMap [ rr:template "http://nf-osi.github.com/terms#donor/{donorId}" ; rr:termType rr:IRI ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:species ; rr:objectMap [ rml:reference "species" ; rr:datatype xsd:string ] ] ;
@@ -51,7 +61,7 @@ map:AnimalModelManifestation a rr:TriplesMap ;
     rdfs:label "Animal Model Manifestation" ;
     rml:logicalSource map:PortalAnimalModelsSource ;
     rr:subjectMap [
-        rr:template "http://nf-osi.github.com/terms#animalModel/{animalModelId}" ;
+        rr:template "http://nf-osi.github.com/terms#resource/{resourceId}" ;
         rr:termType rr:IRI
     ] ;
     rr:predicateObjectMap [
@@ -68,7 +78,7 @@ map:AnimalModelManifestation a rr:TriplesMap ;
                 ] ;
                 rr:predicateObjectMap [
                     rr:predicate grel:valueParameter ;
-                    rr:objectMap [ rml:reference "animalModelOfManifestation" ; rr:termType rr:Literal ]
+                    rr:objectMap [ rml:reference "manifestation" ; rr:termType rr:Literal ]
                 ] ;
                 rr:predicateObjectMap [
                     rr:predicate grel:p_string_sep ;
@@ -82,7 +92,7 @@ map:AnimalModelGeneticDisorder a rr:TriplesMap ;
     rdfs:label "Animal Model Genetic Disorder" ;
     rml:logicalSource map:PortalAnimalModelsSource ;
     rr:subjectMap [
-        rr:template "http://nf-osi.github.com/terms#animalModel/{animalModelId}" ;
+        rr:template "http://nf-osi.github.com/terms#resource/{resourceId}" ;
         rr:termType rr:IRI
     ] ;
     rr:predicateObjectMap [
@@ -99,7 +109,69 @@ map:AnimalModelGeneticDisorder a rr:TriplesMap ;
                 ] ;
                 rr:predicateObjectMap [
                     rr:predicate grel:valueParameter ;
-                    rr:objectMap [ rml:reference "animalModelGeneticDisorder" ; rr:termType rr:Literal ]
+                    rr:objectMap [ rml:reference "geneticDisorder" ; rr:termType rr:Literal ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:p_string_sep ;
+                    rr:objectMap [ rr:constant "\\|" ; rr:termType rr:Literal ]
+                ]
+            ]
+        ]
+    ] .
+
+map:AnimalModelSynonyms a rr:TriplesMap ;
+    rdfs:label "AnimalModel Synonyms" ;
+    rml:logicalSource map:PortalAnimalModelsSource ;
+    rr:subjectMap [
+        rr:template "http://nf-osi.github.com/terms#resource/{resourceId}" ;
+        rr:termType rr:IRI
+    ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:synonyms ;
+        rr:objectMap [
+            a fnml:FunctionTermMap ;
+            rr:datatype xsd:string ;
+            fnml:functionValue [
+                a fno:Execution ;
+                rml:logicalSource map:PortalAnimalModelsSource ;
+                rr:predicateObjectMap [
+                    rr:predicate fno:executes ;
+                    rr:objectMap [ rr:constant grel:string_split ; rr:termType rr:IRI ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:valueParameter ;
+                    rr:objectMap [ rml:reference "synonyms" ; rr:termType rr:Literal ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:p_string_sep ;
+                    rr:objectMap [ rr:constant "\\|" ; rr:termType rr:Literal ]
+                ]
+            ]
+        ]
+    ] .
+
+map:AnimalModelUsageRequirements a rr:TriplesMap ;
+    rdfs:label "AnimalModel Usage Requirements" ;
+    rml:logicalSource map:PortalAnimalModelsSource ;
+    rr:subjectMap [
+        rr:template "http://nf-osi.github.com/terms#resource/{resourceId}" ;
+        rr:termType rr:IRI
+    ] ;
+    rr:predicateObjectMap [
+        rr:predicate nf:usageRequirements ;
+        rr:objectMap [
+            a fnml:FunctionTermMap ;
+            rr:datatype xsd:string ;
+            fnml:functionValue [
+                a fno:Execution ;
+                rml:logicalSource map:PortalAnimalModelsSource ;
+                rr:predicateObjectMap [
+                    rr:predicate fno:executes ;
+                    rr:objectMap [ rr:constant grel:string_split ; rr:termType rr:IRI ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:valueParameter ;
+                    rr:objectMap [ rml:reference "usageRequirements" ; rr:termType rr:Literal ]
                 ] ;
                 rr:predicateObjectMap [
                     rr:predicate grel:p_string_sep ;

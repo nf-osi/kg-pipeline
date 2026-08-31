@@ -31,7 +31,7 @@ enrichments, and writes a `*_harmonized.csv` consumed by RML:
 | `classify_cell_lines.py` | `cell_lines.csv` | Maps `cellLineCategory` to CellLine subclass IRIs |
 | `classify_mutations.py` | `mutations.csv` | Maps `mutationType` to mutation class IRIs |
 | `classify_genetic_reagents.py` | `genetic_reagents.csv` | Maps `vectorType` to reagent class IRIs |
-| `harmonize_files.py` | `files.csv` + `resources.csv` | Resolves `modelSystemName` to resource IRIs; maps `dataType`, `nf1Genotype`, `nf2Genotype` labels to class IRIs |
+| `harmonize_files.py` | `files.csv` + `animal_models.csv` + `cell_lines.csv` | Resolves `modelSystemName` to resource IRIs; maps `dataType`, `nf1Genotype`, `nf2Genotype` labels to class IRIs |
 
 ### 3. RML mapping
 
@@ -42,9 +42,15 @@ Multi-value pipe-delimited fields are split using `grel:string_split`.
 
 Foreign key relationships between tables are declared inline in the `TABLES`
 dict in `prepare_portal_tables.py` (a `references` key on each FK column) and
-checked by `scripts/validate_fks.py`. 22 FK constraints are tracked across 9
+checked by `scripts/validate_fks.py`. 16 FK constraints are tracked across 8
 tables. Validation is non-blocking — it reports orphaned FK values but does not
 stop the pipeline.
+
+A `references` entry may name either a single target table (`"table"`) or several
+(`"tables"`), in which case the FK passes if the value exists in ANY of them. The
+multi-target form exists because a `resourceId` can live in any of the nine
+tool-type tables now that the central Resource table is retired; the shared spec
+is `TOOL_RESOURCE_REF` in `prepare_portal_tables.py`.
 
 ### Running
 
@@ -68,16 +74,16 @@ python scripts/prepare_portal_tables.py --from-cache --validate
 ### Reading the output
 
 ```
-FK validation: 22 constraints across 9 tables
+FK validation: 16 constraints across 8 tables
 
-FAIL  mutation_model.cellLineId -> cell_lines.cellLineId
-      76 / 263 populated rows orphaned (28.9%), 50 unique values
-      sample: 0360411b-..., 09c988ab-...
+FAIL  donors.parentDonorId -> donors.donorId
+      11 / 57 populated rows orphaned (19.3%), 7 unique values
+      sample: 077ce9fd-..., 2eb64d9c-...
 
- ok   development.resourceId -> resources.resourceId
+ ok   development.resourceId -> <9 tool tables>.resourceId
  ...
 
-Summary: 5 failures, 17 passed
+Summary: 4 failures, 12 passed
 ```
 
 Each line shows a FK constraint. `FAIL` means some populated FK values were not
@@ -104,7 +110,11 @@ To add a new FK constraint, add a `references` key to the column definition in
 the `TABLES` dict:
 
 ```python
-{"target": "cellLineId", "type": "iri", "references": {"table": "cell_lines", "column": "cellLineId"}}
+# single target
+{"target": "donorId", "type": "iri", "references": {"table": "donors", "column": "donorId"}}
+
+# union of targets — passes if the value exists in any of them
+{"target": "resourceId", "type": "iri", "references": TOOL_RESOURCE_REF}
 ```
 
 The validator discovers constraints automatically — no changes to
@@ -122,21 +132,18 @@ pipeline run (not stable across runs).
 
 ### resourceId / entity ID confusion (mutation_model, donors)
 
-Two tables have foreign key columns populated with `resourceId` values from
-`resources.csv` instead of the expected entity-specific IDs:
-
-- **mutation_model.cellLineId**: 77 of 268 rows (29%) contain a `resourceId`
-  instead of a `cellLineId`. The `resources` table is a polymorphic wrapper
-  with its own primary key (`resourceId`) and a separate `cellLineId` FK.
-  Upstream data entry confused the two. The affected rows produce broken
-  `nf:cellLine/{resourceId}` IRIs in the RDF graph.
+- **mutation_model.cellLineId**: An upstream migration introduce 
+  renamed `Mutation`'s (syn26486834) `animalModelId`/`cellLineId` columns to
+  `resourceId` **without migrating previous type-specific ID values**, so 265 of 277 rows now hold a
+  legacy `<type>Id` in a column named `resourceId`. `prepare_portal_tables.py`
+  translates these at build time; upstream fix is pending.
 
 - **donors.parentDonorId**: 6 of 7 orphaned `parentDonorId` values are
   actually `resourceId` UUIDs for cell line resources, not donor UUIDs.
-  1 additional value is completely dangling (not found anywhere).
-
-Both issues originate in the upstream Synapse tables and need to be corrected
-there. The pipeline currently passes them through as-is.
+  1 additional value is completely dangling (not found anywhere). Still
+  outstanding — `donors` was not re-keyed by the migration, so this one is
+  unaffected by the above and needs correcting upstream. The pipeline passes
+  it through as-is.
 
 ### Duplicated publications and conflicting author lists
 

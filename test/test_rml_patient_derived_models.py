@@ -36,11 +36,11 @@ class TestPatientDerivedModelCore:
             assert isinstance(model, URIRef), f"Subject should be IRI, got {type(model)}"
 
     def test_iri_uses_correct_template(self, pdm_graph, namespaces):
-        """IRI should use patientDerivedModel/{id} pattern"""
+        """IRI should use resource/{id} pattern"""
         models = list(pdm_graph.subjects(RDF.type, namespaces["nf"].PatientDerivedModel))
         iris = [str(m) for m in models]
-        assert any("patientDerivedModel/pdm-001" in iri for iri in iris), \
-            f"Expected IRI with patientDerivedModel/pdm-001, got: {iris}"
+        assert any("resource/pdm-001" in iri for iri in iris), \
+            f"Expected IRI with resource/pdm-001, got: {iris}"
 
     def test_model_system_type_present(self, pdm_graph, namespaces):
         """modelSystemType should be present"""

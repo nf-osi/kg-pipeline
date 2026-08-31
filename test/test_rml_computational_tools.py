@@ -36,11 +36,11 @@ class TestComputationalToolCore:
             assert isinstance(tool, URIRef), f"Subject should be IRI, got {type(tool)}"
 
     def test_iri_uses_correct_template(self, ct_graph, namespaces):
-        """IRI should use computationalTool/{id} pattern"""
+        """IRI should use resource/{id} pattern"""
         tools = list(ct_graph.subjects(RDF.type, namespaces["nf"].ComputationalTool))
         iris = [str(t) for t in tools]
-        assert any("computationalTool/ct-001" in iri for iri in iris), \
-            f"Expected IRI with computationalTool/ct-001, got: {iris}"
+        assert any("resource/ct-001" in iri for iri in iris), \
+            f"Expected IRI with resource/ct-001, got: {iris}"
 
     def test_software_name_present(self, ct_graph, namespaces):
         """softwareName should be present"""

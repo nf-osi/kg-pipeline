@@ -1,9 +1,9 @@
 profiles:
   release:
-    version: KG v0.3
-    date: '2026-07-23'
-    comment: Add publication author ORCID linkage and person names (people,
-      publication_author_orcids; both now sourced from the people table syn23564971)
+    version: KG v0.4
+    date: '2026-08-27'
+    comment: >-
+      syn26450069 is deprecated and will be removed soon
     csv_archive:
       archive_id: null
       archive_version: null
@@ -36,77 +36,71 @@ profiles:
         concrete_type: EntityView
         note: File-level annotations (assay, platform, data type, diagnosis, species,
           tissue, etc.)
-        source_version: 259
+        source_version: 268
       mutations:
         synapse_id: syn26486835
         concrete_type: TableEntity
         note: Mutation details (affected gene, allele type, mutation method, sequence/protein
           variation)
-        source_version: 4
+        source_version: 11
       genetic_reagents:
         synapse_id: syn26486832
         concrete_type: TableEntity
         note: Genetic reagent details (vector type, insert, cloning method, primers,
           tags)
-        source_version: 4
+        source_version: 11
       animal_models:
         synapse_id: syn26486808
         concrete_type: TableEntity
         note: Animal model details (strain, nomenclature, manifestation, genetic disorder,
           transplantation)
-        source_version: 8
+        source_version: 33
       cell_lines:
         synapse_id: syn26486823
         concrete_type: TableEntity
         note: Cell line details (origin, organ, tissue, manifestation, resistance,
           genetic disorder)
-        source_version: 9
+        source_version: 51
       donors:
         synapse_id: syn26486829
         concrete_type: TableEntity
         note: Donor demographics (species, race, sex, age, parent/transplantation
           donor links)
-        source_version: 4
+        source_version: 29
       antibodies:
         synapse_id: syn26486811
         concrete_type: TableEntity
         note: Antibody details (UniProt ID, clone, reactive species, host organism,
           target antigen)
-        source_version: 4
-      resources:
-        synapse_id: syn26450069
-        concrete_type: TableEntity
-        note: Central resource registry linking to reagents, antibodies, cell lines,
-          animal models, and biobanks
-        source_version: 19
+        source_version: 20
       observations:
         synapse_id: syn26486836
         concrete_type: TableEntity
         note: Curator/community observations about resources with ratings and links
-        source_version: 7
+        source_version: 14
       development:
         synapse_id: syn26486807
         concrete_type: TableEntity
         note: Junction table linking development records to resources, investigators,
           publications, and funders
-        source_version: 4
+        source_version: 46
       funders:
         synapse_id: syn26486830
         concrete_type: TableEntity
         note: Funder details (name); linked from development table via funderId
-        source_version: 4
+        source_version: 6
       investigators:
         synapse_id: syn26486833
         concrete_type: TableEntity
         note: Investigator details (name, institution, ORCID, Synapse ID); linked
           from development table via investigatorId
-        source_version: 4
+        source_version: 14
       publications:
         synapse_id: syn26486839
         concrete_type: TableEntity
         note: Publication details (title, DOI, PMID, abstract, journal, authors, date);
           linked from development table via publicationId
-        source_version: 9
+        source_version: 17
         collection_name: ToolsCentralPublications
         collection_label: NF Research Tools Central publications
         collection_comment: >-
@@ -128,37 +122,37 @@ profiles:
         synapse_id: syn26486834
         concrete_type: TableEntity
         note: Junction table linking mutations to animal models and cell lines
-        source_version: 9
+        source_version: 21
       biobanks:
         synapse_id: syn26486821
         concrete_type: TableEntity
         note: Biobank details (disease type, specimen type/format/tissue, tumor type,
           contact)
-        source_version: 4
+        source_version: 13
       clinical_assessment_tools:
         synapse_id: syn73709229
         concrete_type: TableEntity
         note: Clinical assessment tool details (assessment type, scoring, validated
           languages, psychometric properties, etc.)
-        source_version: 9
+        source_version: 15
       patient_derived_models:
         synapse_id: syn73709228
         concrete_type: TableEntity
         note: Patient derived model details (PDX, model system type, tumor type, molecular
           characterization, donor link, etc.)
-        source_version: 9
+        source_version: 22
       organoid_protocols:
         synapse_id: syn73709227
         concrete_type: TableEntity
         note: Organoid protocol details (model type, derivation source, culture system,
           cell types, etc.)
-        source_version: 8
+        source_version: 24
       computational_tools:
         synapse_id: syn73709226
         concrete_type: TableEntity
         note: Computational tool details (software name, type, version, programming
           language, repository, license, etc.)
-        source_version: 8
+        source_version: 19
       initiatives:
         synapse_id: syn24189696
         concrete_type: TableEntity
@@ -169,13 +163,13 @@ profiles:
         concrete_type: TableEntity
         note: Portal datasets with rich metadata (data type, species, assay, disease
           focus, access type, etc.); links to studies
-        source_version: 15
+        source_version: 16
       study_publications:
         synapse_id: syn16857542
         concrete_type: TableEntity
         note: Main portal publication listing (doi, pmid, title, journal, year, author,
           studyId); study-associated papers, keyed by DOI with a pmid-<id> fallback
-        source_version: 5
+        source_version: 6
         collection_name: MainPortalPublications
         collection_label: NF main portal publications
         collection_comment: >-
@@ -214,7 +208,13 @@ profiles:
   evaluation:
     version: KG v0.2-eval
     date: '2026-05-26'
-    comment: Evaluation snapshot matching KG v0.2
+    comment: >-
+      Evaluation snapshot matching KG v0.2. ARCHIVE-ONLY as of KG v0.4: this is
+      a historical record of a build that already happened, not a buildable
+      target. Do not run create_archive.py against this profile: it queries
+      tables WITHOUT version pinning and would silently overwrite this record
+      with current data.
+    rebuildable: false
     csv_archive:
       archive_id: syn73695746
       archive_version: 1

@@ -725,12 +725,6 @@ nf:grantDOI a owl:ObjectProperty ;
 ################################################################################
 
 # Genetic Reagent - universal properties
-nf:geneticReagentId a owl:DatatypeProperty ;
-    rdfs:label "geneticReagentId" ;
-    rdfs:comment "A unique identifier for a genetic reagent." ;
-    rdfs:domain nf:GeneticReagent ;
-    rdfs:range xsd:string .
-
 nf:insertName a owl:DatatypeProperty ;
     rdfs:label "insertName" ;
     rdfs:comment "Name of the insert in the genetic reagent." ;
@@ -1011,10 +1005,6 @@ nf:hasObservation a owl:ObjectProperty ;
 #    owl:inverseOf nf:fromDonor .
 
 # Cell Line
-nf:cellLineId a owl:DatatypeProperty ;
-    rdfs:domain nf:CellLine ;
-    rdfs:range xsd:string .
-
 nf:cellLineCategory a owl:DatatypeProperty ;
     rdfs:domain nf:CellLine ;
     rdfs:range xsd:string .
@@ -1050,10 +1040,6 @@ nf:populationDoublingTime a owl:DatatypeProperty ;
     rdfs:range xsd:string .
 
 # Antibody
-nf:antibodyId a owl:DatatypeProperty ;
-    rdfs:domain nf:Antibody ;
-    rdfs:range xsd:string .
-
 nf:targetAntigen a owl:DatatypeProperty ;
     rdfs:domain nf:Antibody ;
     rdfs:range xsd:string .
@@ -1094,10 +1080,6 @@ nf:reactiveSpecies a owl:DatatypeProperty ;
     rdfs:range xsd:string .
 
 # Animal Model
-nf:animalModelId a owl:DatatypeProperty ;
-    rdfs:domain nf:AnimalModel ;
-    rdfs:range xsd:string .
-
 nf:backgroundStrain a owl:DatatypeProperty ;
     rdfs:domain nf:AnimalModel ;
     rdfs:range xsd:string .
@@ -1222,10 +1204,6 @@ nf:dateModified a owl:DatatypeProperty ;
 # Properties - Clinical Assessment Tool
 ################################################################################
 
-nf:clinicalAssessmentToolId a owl:DatatypeProperty ;
-    rdfs:domain nf:ClinicalAssessmentTool ;
-    rdfs:range xsd:string .
-
 nf:assessmentName a owl:DatatypeProperty ;
     rdfs:label "assessmentName" ;
     rdfs:comment "Name of the clinical assessment instrument." ;
@@ -1302,10 +1280,6 @@ nf:digitalVersion a owl:DatatypeProperty ;
 # Properties - Patient Derived Model
 ################################################################################
 
-nf:patientDerivedModelId a owl:DatatypeProperty ;
-    rdfs:domain nf:PatientDerivedModel ;
-    rdfs:range xsd:string .
-
 nf:modelSystemType a owl:DatatypeProperty ;
     rdfs:label "modelSystemType" ;
     rdfs:comment "Type of patient-derived model system (e.g. PDX, organoid, cell line)." ;
@@ -1363,10 +1337,6 @@ nf:validationMethods a owl:DatatypeProperty ;
 ################################################################################
 # Properties - Organoid Protocol
 ################################################################################
-
-nf:organoidProtocolId a owl:DatatypeProperty ;
-    rdfs:domain nf:OrganoidProtocol ;
-    rdfs:range xsd:string .
 
 nf:derivationSource a owl:DatatypeProperty ;
     rdfs:label "derivationSource" ;
@@ -1431,10 +1401,6 @@ nf:cultureMedia a owl:DatatypeProperty ;
 ################################################################################
 # Properties - Computational Tool
 ################################################################################
-
-nf:computationalToolId a owl:DatatypeProperty ;
-    rdfs:domain nf:ComputationalTool ;
-    rdfs:range xsd:string .
 
 nf:softwareName a owl:DatatypeProperty ;
     rdfs:label "softwareName" ;

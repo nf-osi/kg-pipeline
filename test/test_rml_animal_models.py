@@ -236,7 +236,7 @@ class TestAnimalModelsBasicProperties:
         SELECT ?model ?animalModelId
         WHERE {
             ?model a nf:AnimalModel ;
-                      nf:animalModelId ?animalModelId .
+                      nf:resourceId ?animalModelId .
         }
         """
         results = list(animal_models_graph.query(query, initNs={"nf": NF}))

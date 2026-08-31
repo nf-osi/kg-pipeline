@@ -2,7 +2,7 @@
 """Link file modelSystemName values to AnimalModel/CellLine entity IRIs,
 classify dataType values to IRIs, and classify genotype values to class IRIs.
 
-Reads the files CSV and resources CSV, builds a name-to-IRI lookup from
+Reads the files CSV and the animal-model/cell-line CSVs, builds a name-to-IRI lookup from
 resourceName and synonyms, then adds a modelSystemId column with resolved IRIs.
 Also maps dataType labels to IRIs using data_lookup.sssom.tsv and genotype
 labels to class IRIs using nf1/nf2_genotype_lookup.sssom.tsv.
@@ -10,7 +10,7 @@ Runs after prepare_portal_tables.py and before RML mapping.
 
 Usage:
     python scripts/harmonize_files.py
-    python scripts/harmonize_files.py --files data/csv/files.csv --resources data/csv/resources.csv
+    python scripts/harmonize_files.py --files data/csv/files.csv --resources data/csv/animal_models.csv data/csv/cell_lines.csv
     python scripts/harmonize_files.py --check-only
 """
 
@@ -26,7 +26,14 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from scripts.classify_datatypes import build_label_to_iri, classify_datatype
 
 DEFAULT_FILES = Path("data/csv/files.csv")
-DEFAULT_RESOURCES = Path("data/csv/resources.csv")
+# files.modelSystemName names animal models and cell lines, so only those two
+# tool-type CSVs are consulted. The central resources.csv this used to read no
+# longer exists: upstream retired the Resource table and each tool-type table
+# now carries resourceName/synonyms itself.
+DEFAULT_RESOURCES = [
+    Path("data/csv/animal_models.csv"),
+    Path("data/csv/cell_lines.csv"),
+]
 DEFAULT_OUTPUT = Path("data/csv/files_harmonized.csv")
 DEFAULT_LOOKUP = Path("mappings/sssom/data_lookup.sssom.tsv")
 DEFAULT_NF1_LOOKUP = Path("mappings/sssom/nf1_genotype_lookup.sssom.tsv")
@@ -35,37 +42,36 @@ DEFAULT_NF2_LOOKUP = Path("mappings/sssom/nf2_genotype_lookup.sssom.tsv")
 NF_NS = "http://nf-osi.github.com/terms#"
 
 
-def build_lookup(resources_path: Path) -> dict[str, str]:
-    """Build a case-insensitive name-to-IRI lookup from resources.csv.
+def build_lookup(resources_paths: Path | list[Path]) -> dict[str, str]:
+    """Build a case-insensitive name-to-IRI lookup from tool-type CSVs.
 
-    Maps resourceName (and each pipe-delimited synonym) to the corresponding
-    animalModel or cellLine IRI. If a resource has both animalModelId and
-    cellLineId, animalModelId takes precedence.
+    Maps resourceName (and each pipe-delimited synonym) to the resource's IRI.
+    Accepts a single path or several; when the same name appears in more than
+    one file the first occurrence wins, so caller order sets precedence
+    (animal models before cell lines, matching the previous behaviour where
+    animalModelId took precedence over cellLineId).
     """
+    if isinstance(resources_paths, (str, Path)):
+        resources_paths = [Path(resources_paths)]
+
     lookup: dict[str, str] = {}
-    with open(resources_path, "r") as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            animal_model_id = row.get("animalModelId", "").strip()
-            cell_line_id = row.get("cellLineId", "").strip()
+    for resources_path in resources_paths:
+        with open(resources_path, "r") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                resource_id = (row.get("resourceId") or "").strip()
+                if not resource_id:
+                    continue
+                iri = f"{NF_NS}resource/{resource_id}"
 
-            if animal_model_id:
-                iri = f"{NF_NS}animalModel/{animal_model_id}"
-            elif cell_line_id:
-                iri = f"{NF_NS}cellLine/{cell_line_id}"
-            else:
-                continue
-
-            name = row.get("resourceName", "").strip()
-            if name:
-                lookup[name.lower()] = iri
-
-            synonyms = row.get("synonyms", "").strip()
-            if synonyms:
-                for syn in synonyms.split("|"):
-                    syn = syn.strip()
-                    if syn:
-                        lookup[syn.lower()] = iri
+                names = [(row.get("resourceName") or "").strip()]
+                names += [
+                    syn.strip()
+                    for syn in (row.get("synonyms") or "").strip().split("|")
+                ]
+                for name in names:
+                    if name:
+                        lookup.setdefault(name.lower(), iri)
 
     return lookup
 
@@ -106,8 +112,14 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--resources",
         type=Path,
+        nargs="+",
         default=DEFAULT_RESOURCES,
-        help=f"Resources CSV (default: {DEFAULT_RESOURCES})",
+        help=(
+            "Tool-type CSVs supplying resourceName/synonyms/resourceId, in "
+            "precedence order (default: "
+            + " ".join(str(p) for p in DEFAULT_RESOURCES)
+            + ")"
+        ),
     )
     parser.add_argument(
         "--output",
@@ -143,8 +155,10 @@ def main(argv: list[str] | None = None) -> int:
     if not args.files.exists():
         print(f"Error: files CSV not found: {args.files}", file=sys.stderr)
         return 1
-    if not args.resources.exists():
-        print(f"Error: resources CSV not found: {args.resources}", file=sys.stderr)
+    missing = [p for p in args.resources if not p.exists()]
+    if missing:
+        for path in missing:
+            print(f"Error: resources CSV not found: {path}", file=sys.stderr)
         return 1
     if not args.lookup.exists():
         print(f"Error: lookup file not found: {args.lookup}", file=sys.stderr)

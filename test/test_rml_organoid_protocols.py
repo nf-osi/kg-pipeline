@@ -36,11 +36,11 @@ class TestOrganoidProtocolCore:
             assert isinstance(p, URIRef), f"Subject should be IRI, got {type(p)}"
 
     def test_iri_uses_correct_template(self, op_graph, namespaces):
-        """IRI should use organoidProtocol/{id} pattern"""
+        """IRI should use resource/{id} pattern"""
         protocols = list(op_graph.subjects(RDF.type, namespaces["nf"].OrganoidProtocol))
         iris = [str(p) for p in protocols]
-        assert any("organoidProtocol/op-001" in iri for iri in iris), \
-            f"Expected IRI with organoidProtocol/op-001, got: {iris}"
+        assert any("resource/op-001" in iri for iri in iris), \
+            f"Expected IRI with resource/op-001, got: {iris}"
 
     def test_model_type_present(self, op_graph, namespaces):
         """modelType should be present"""

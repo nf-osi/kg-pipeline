@@ -91,7 +91,7 @@ class TestMutationModelRelationship:
             f"Expected hasMutation relationship for cell line {test_cell_line}"
 
     def test_animal_model_iri_pattern(self, mutation_model_graph, namespaces):
-        """Animal model subjects should use animalModel/ IRI pattern"""
+        """Animal model subjects should use resource/ IRI pattern"""
         NF = namespaces["nf"]
 
         test_animal_model = "a067f136-f956-4355-a76f-a5eec7c196f0"
@@ -105,11 +105,11 @@ class TestMutationModelRelationship:
         """
         results = list(mutation_model_graph.query(query, initNs={"nf": NF}))
         assert len(results) > 0
-        assert "animalModel/" in str(results[0].subject), \
-            f"Expected animalModel/ IRI pattern, got {results[0].subject}"
+        assert "resource/" in str(results[0].subject), \
+            f"Expected resource/ IRI pattern, got {results[0].subject}"
 
     def test_cell_line_iri_pattern(self, mutation_model_graph, namespaces):
-        """Cell line subjects should use cellLine/ IRI pattern"""
+        """Cell line subjects should use resource/ IRI pattern"""
         NF = namespaces["nf"]
 
         test_cell_line = "a9638c45-74f3-4d0d-8bac-67631503f437"
@@ -123,8 +123,8 @@ class TestMutationModelRelationship:
         """
         results = list(mutation_model_graph.query(query, initNs={"nf": NF}))
         assert len(results) > 0
-        assert "cellLine/" in str(results[0].subject), \
-            f"Expected cellLine/ IRI pattern, got {results[0].subject}"
+        assert "resource/" in str(results[0].subject), \
+            f"Expected resource/ IRI pattern, got {results[0].subject}"
 
 
 class TestDonorToolRelationship:
@@ -224,7 +224,7 @@ class TestRelationshipConsistency:
         SELECT ?subject ?mutation
         WHERE {
             ?subject nf:hasMutation ?mutation .
-            FILTER(CONTAINS(STR(?subject), "animalModel/"))
+            FILTER(CONTAINS(STR(?subject), "resource/"))
         }
         """
         animal_results = list(graph.query(animal_query, initNs={"nf": NF}))
@@ -234,7 +234,7 @@ class TestRelationshipConsistency:
         SELECT ?subject ?mutation
         WHERE {
             ?subject nf:hasMutation ?mutation .
-            FILTER(CONTAINS(STR(?subject), "cellLine/"))
+            FILTER(CONTAINS(STR(?subject), "resource/"))
         }
         """
         cell_results = list(graph.query(cell_query, initNs={"nf": NF}))

@@ -19,8 +19,8 @@ def test_materialize_shared_donor_links_only_for_transplant_matches(tmp_path):
 
     cell_graph = Graph()
     cell_graph.bind("nf", NF)
-    cell_1 = NF["cellLine/test-cell-1"]
-    cell_2 = NF["cellLine/test-cell-2"]
+    cell_1 = NF["resource/test-cell-1"]
+    cell_2 = NF["resource/test-cell-2"]
     donor_a = NF["donor/test-donor-a"]
     donor_b = NF["donor/test-donor-b"]
 
@@ -32,8 +32,8 @@ def test_materialize_shared_donor_links_only_for_transplant_matches(tmp_path):
 
     animal_graph = Graph()
     animal_graph.bind("nf", NF)
-    animal_1 = NF["animalModel/test-animal-1"]
-    animal_2 = NF["animalModel/test-animal-2"]
+    animal_1 = NF["resource/test-animal-1"]
+    animal_2 = NF["resource/test-animal-2"]
 
     animal_graph.add((animal_1, RDF.type, NF.AnimalModel))
     animal_graph.add((animal_1, NF.transplantationDonorId, donor_a))

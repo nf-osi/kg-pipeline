@@ -19,9 +19,55 @@ CASES = [
         "nf:File",
         "nf:name",
     ),
+    # Core Tool fields (including nf:name) now come from each per-type mapping
+    # rather than the retired polymorphic resources.rml.ttl, so every tool type
+    # is checked. biobanks is listed separately below: its nf:name comes from
+    # biobankName, not resourceName.
     (
-        "resources.rml.ttl",
-        {"data/csv/resources.csv": "test/resources.csv"},
+        "cell_lines.rml.ttl",
+        {"data/csv/cell_lines_harmonized.csv": "test/cell_lines.csv"},
+        "nf:Tool",
+        "nf:name",
+    ),
+    (
+        "animal_models.rml.ttl",
+        {"data/csv/animal_models_harmonized.csv": "test/animal_models.csv"},
+        "nf:Tool",
+        "nf:name",
+    ),
+    (
+        "antibodies.rml.ttl",
+        {"data/csv/antibodies.csv": "test/antibodies.csv"},
+        "nf:Tool",
+        "nf:name",
+    ),
+    (
+        "genetic_reagents.rml.ttl",
+        {"data/csv/genetic_reagents_harmonized.csv": "test/genetic_reagents.csv"},
+        "nf:Tool",
+        "nf:name",
+    ),
+    (
+        "clinical_assessment_tools.rml.ttl",
+        {"data/csv/clinical_assessment_tools.csv": "test/clinical_assessment_tools.csv"},
+        "nf:Tool",
+        "nf:name",
+    ),
+    (
+        "patient_derived_models.rml.ttl",
+        {"data/csv/patient_derived_models.csv": "test/patient_derived_models.csv"},
+        "nf:Tool",
+        "nf:name",
+    ),
+    (
+        "organoid_protocols.rml.ttl",
+        {"data/csv/organoid_protocols.csv": "test/organoid_protocols.csv"},
+        "nf:Tool",
+        "nf:name",
+    ),
+    (
+        "computational_tools.rml.ttl",
+        {"data/csv/computational_tools.csv": "test/computational_tools.csv"},
         "nf:Tool",
         "nf:name",
     ),

@@ -2,6 +2,56 @@
 
 All notable changes to the NF Research Tools Discovery evaluation dataset will be documented in this file.
 
+## [v1.4] - 2026-08-27
+
+Minimal correctness pass for KG v0.4 (the upstream LinkML schema adoption, #87).
+Deliberately **not** a re-baseline: ground truth is still the v0.2-eval answer
+set, so the additions-direction staleness described below is a known, open gap.
+
+### Fixed
+- **MUT-001 listed 2 answers that never existed.** `03ecfea8-e812-40a8-8938-0979f15b3f53`
+  and `530e83c9-385e-40f5-8f89-5728f5db211d` were emitted by
+  `generate_ground_truth.py` straight from `mutation_model.animalModelId` /
+  `.cellLineId`, which are orphaned FK values — they resolve to no tool in the
+  eval's own frozen snapshot, nor in any table before or since. This is the
+  `mutation_model` FK orphan bug (`HARMONIZATION.md`) leaking into ground truth,
+  **not** a consequence of the KG v0.4 migration; it was equally broken under
+  the old pins
+  - **This one does move a score.** MUT-001's achievable recall was 14/16 = 0.875
+    and is now 14/14 = 1.0, so recorded MUT-001 recall is not comparable across
+    this change. Every other question is untouched
+  - Checked exhaustively afterwards: 0 unresolvable uuid answers remain across
+    both `eval_tools_ground_auto.yaml` and `eval_tools_ground_manual.yaml`
+  - The generator still has no FK validation on the ids it emits, so this class
+    of bad answer can recur. Worth adding when the generator is ported (below)
+
+- **Agent prompt advertised properties that no longer exist.** `task.py`'s
+  `INSTRUCTION_PREFIX` said "Prefer using nf:resourceId over type-specific IDs
+  (e.g. cellLineId, animalModelId)". KG v0.4 removed `nf:cellLineId` and its
+  eight siblings entirely, so that sentence pointed at a fallback that silently
+  returns nothing. Replaced with the actual rule: one IRI template
+  (`terms#resource/{resourceId}`) for every tool type, uuid from `nf:resourceId`,
+  type from `rdf:type`
+  - Also documented the direct `nf:Tool -> nf:hasInvestigator / nf:hasFunder /
+    nf:hasPublication` shortcut in the topology block. Those 415 triples existed
+    but landed on unreachable IRIs before v0.4; they now resolve, and the
+    one-hop path is cheaper than going via `nf:Development`
+  - Prompt changes normally invalidate recorded runs, and this is no exception —
+    but it only takes effect against a v0.4 graph, which needs a newly built
+    `eval-*` image, and the underlying data change already breaks comparability
+    at that point. It adds no breakage that building that image does not
+
+### Known gap (not addressed)
+- **Answer sets are stale in the additions direction.** KG v0.4 repinned every
+  source table forward, and upstream curation moved the data — e.g. NF1 MPNST
+  cell lines went from 19 to 29 between `cell_lines` v9 and v51. Questions whose
+  correct answer grew now under-count, penalising an agent that finds the new
+  resources. Re-baselining means porting `generate_ground_truth.py` to the new
+  schema (~56 references to removed columns, the deleted `resources.csv`, and
+  `development_investigator.csv` / `development_funder.csv` which the current
+  pipeline does not emit) and would reset comparability for all 52 recorded runs.
+  Tracked as its own change; see `docs/upstream-schema-migration.md`
+
 ## [v1.3] - 2026-08-18
 
 Declares the publication and people questions, and corrects a species predicate

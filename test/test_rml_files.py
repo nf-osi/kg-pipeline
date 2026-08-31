@@ -345,8 +345,8 @@ class TestFilesIRIFields:
         }
         """
         iris = [str(r.ms) for r in files_graph.query(query, initNs={"nf": NF})]
-        assert "http://nf-osi.github.com/terms#cellLine/1" in iris
-        assert "http://nf-osi.github.com/terms#animalModel/2" in iris
+        assert "http://nf-osi.github.com/terms#resource/1" in iris
+        assert "http://nf-osi.github.com/terms#resource/2" in iris
 
     def test_data_type_iri(self, files_graph, namespaces):
         """dataType should emit IRI from dataTypeIRI column"""
