@@ -107,12 +107,28 @@ def create_harmonize_asset(table_name: str, config: TableConfig):
 
     csv_asset_key = ["portal", "csv", table_name]
 
+    # Some harmonization scripts read other tables' CSVs as lookups (files, for
+    # instance, resolves modelSystemName against animal_models and cell_lines),
+    # so those CSV assets have to materialize first. Derive the extra deps from
+    # the script arguments rather than restating them, so a new lookup argument
+    # cannot drift out of sync with the dependency graph.
+    csv_path_to_table = {
+        str(cfg.csv_path): name for name, cfg in TABLE_CONFIGS.items()
+    }
+    deps = [csv_asset_key]
+    for arg in config.harmonize_args or []:
+        dep_table = csv_path_to_table.get(arg)
+        if dep_table and dep_table != table_name:
+            dep_key = ["portal", "csv", dep_table]
+            if dep_key not in deps:
+                deps.append(dep_key)
+
     @asset(
         name=table_name,
         key_prefix=["portal", "harmonized"],
         compute_kind="python",
         group_name=table_name,
-        deps=[csv_asset_key],
+        deps=deps,
         metadata={
             "table": table_name,
             "script": config.harmonize_script,
