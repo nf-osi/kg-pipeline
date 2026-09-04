@@ -122,48 +122,6 @@ below. **Breaks comparability with all 52 previously recorded runs.**
   - The other 33 automated answers are unchanged, CL-010 (31) included, and it was
     independently confirmed by querying the running `build-32` image
 
-- **Removed the six draft `v2.0` runs from `evaluation/runs.json`.** They were recorded
-  against `build-30` and scored against the pre-correction ST-002/CR-002 answers, and
-  were never published. `runs.json` is now byte-identical to `develop` at 52 runs
-  (v1.3/v1.2/0), so v2.0 starts clean against `build-32`
-
-### Fixed
-- **`mutation_model` source pin was two versions behind its own backfill,
-  producing ~95% orphaned tool-mutation edges in the first v0.4 eval image
-  (`build-29`).** Commit 9ea26ba8 removed the client-side legacy-`<type>Id`
-  crosswalk workaround on the grounds that upstream had backfilled
-  `Mutation.resourceId` live (`nf-research-tools-schema#316`), but never bumped
-  `data_sources.yaml`'s pinned `mutation_model.source_version` off `19` —
-  two versions before the backfill snapshot (`21`). Pins are point-in-time
-  snapshots, so v19 still held the pre-backfill legacy ids regardless of what
-  upstream's live table looked like. Fixed in `fd8aa5f2` (`source_version: 19
-  → 21`); rebuilt as `build-30`, confirmed 0 orphaned `nf:hasMutation` subjects
-  (excluding the unrelated `nf:MutationSet` aggregation nodes, which correctly
-  have no `resourceId`)
-  - Found via a 6-run recall crater on the `MUT` category (0.76–1.0 on every
-    prior run across task_version `0`/`v1.3`, every model, down to 0.11–0.17 on
-    the first `build-29` run) — traced through eval transcripts, confirmed live
-    against the graph, and confirmed via `check_source_versions.py --dry-run`
-    that `21` is upstream's own backfill commit
-  - `astabench` (separate repo) got a companion fix in the same investigation:
-    `nf_rag`'s topology block named `hasInvestigator`/`hasFunder`/
-    `hasPublication` explicitly but never named `hasMutation`, so agents burned
-    their 50-message budget rediscovering it via schema exploration before this
-    bug made that path return empty anyway. Also dropped a `-> nf:Genotype`
-    topology line pointing at a class with zero instances
-
-### Known gap (not addressed)
-- **Not archived as a frozen `evaluation` snapshot.** This regenerates ground
-  truth from `data/csv` under the `release` profile's *current* pins, which will
-  keep moving forward on every rebuild — unlike every prior eval version, which
-  was computed against an immutable snapshot (`data_sources_version: KG
-  v0.2-eval`, archived to `syn73695746`). Re-pinning the `evaluation` profile to
-  specific v0.4-era source versions and archiving a new frozen CSV snapshot (plus
-  retagging `build-32` as `eval-main-v2` in the registry, which needs
-  `write:packages` scope this session's token didn't have) is real,
-  Synapse- and CI-touching work, deliberately left as its own follow-up rather
-  than done as a side effect of a ground-truth regeneration
-
 ## [v1.4] - 2026-08-27
 
 Minimal correctness pass for KG v0.4 (the upstream LinkML schema adoption, #87).
