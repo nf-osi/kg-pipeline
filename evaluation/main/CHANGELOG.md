@@ -2,6 +2,168 @@
 
 All notable changes to the NF Research Tools Discovery evaluation dataset will be documented in this file.
 
+## [v2.0] - 2026-08-28
+
+Re-baseline for KG v0.4 (the upstream LinkML schema adoption, #87). This is the
+"re-baselining" work that v1.4 explicitly deferred — see its "Known gap" entry
+below. **Breaks comparability with all 52 previously recorded runs.**
+
+### Added
+- **CL-010: "How many MPNST cell lines?"** (baseline, 0-hop, count → 31).
+  Trivial for a user who reaches for the `manifestation` facet, and carried
+  precisely because it is trivial there: it is a control for agents that
+  substitute substring matching for the structured property. `manifestation`
+  stores the full label `Malignant Peripheral Nerve Sheath Tumor`, and the
+  acronym appears nowhere in that column, so the two natural shortcuts both
+  give the wrong number — filtering `manifestation` on `MPNST` returns 0, and
+  matching `MPNST` across `resourceName`/`synonyms`/`description` returns 36
+  (15 rows that mention the acronym without carrying the manifestation, while
+  missing 10 that carry it without spelling it out). Only PI-002 and CL-010
+  return a count rather than resourceIds
+- Regenerating `eval_tools_ground_auto.yaml` for this reproduced all 36 prior
+  answers byte-identically, so CL-010 and the question counts are the only
+  ground-truth changes
+
+### Changed
+- **`generate_ground_truth.py` ported to the v0.4 schema.** The central `resources`
+  table is gone upstream, so every tool-type table (`animal_models`, `cell_lines`,
+  `genetic_reagents`, `antibodies`, `mutation_model`) now carries a shared
+  `resourceId` directly instead of a `<type>Id`, and core Tool fields
+  (`resourceName`, `description`, `synonyms`, ...) are denormalized onto each of
+  them. Net effect: the old `ensure_resource_id`/`primary_to_res`/`name_to_res`
+  crosswalk machinery (built by joining against `resources.csv`) is gone —
+  IDs are already resourceIds at the source, so most queries got simpler, not
+  just renamed
+  - `mutation_model` collapsed `animalModelId`/`cellLineId` into one `resourceId`
+    column with no type marker; MUT-002/003/004/005/006 and CL-008 now
+    disambiguate animal-model vs. cell-line rows by checking `resourceId`
+    membership against `animal_models`/`cell_lines`, rather than by which of two
+    columns was populated
+  - `development_investigator.csv` / `development_funder.csv` no longer exist as
+    precomputed exports. PI-001, PI-002, and CR-001 now join `development.csv`
+    (which carries `resourceId` + `investigatorId` + `funderId` directly) against
+    `investigators.csv` / `funders.csv` themselves
+  - AM-001/002/003 and CL-001/002/004/007 dropped their `models_resources` /
+    `cells_donors_resources` merges — `manifestation`, `geneticDisorder`,
+    `resourceName`, `description`, `synonyms`, and (for cell lines) `race` are
+    already on the per-type table, donor-derived where applicable. `cells_donors`
+    (for `species`, still not denormalized onto `cell_lines`) is the one donor
+    join that's still needed
+  - Column renames throughout: `animalModelOfManifestation`/`cellLineManifestation`
+    → `manifestation`, `animalModelGeneticDisorder`/`cellLineGeneticDisorder` →
+    `geneticDisorder`, and the nine `<type>Id` primary keys → `resourceId`
+  - `DATA_DIR` now points at the top-level `data/csv` (the `release` profile,
+    KG v0.4) instead of `evaluation/data/csv` (the frozen `KG v0.2-eval` snapshot)
+
+- **Answer sets regenerated and diffed against v1.4.** 4 of 34 automated
+  questions changed, all growing (no removals except where an edge was
+  genuinely dropped upstream — see PI-001 below); the rest are byte-identical:
+  - **CL-001** (plexiform neurofibroma cell lines): 10 → 28
+  - **MUT-002** (NF1 floxed mice): 2 → 6
+  - **PI-001** (Piotr Topilko resources): 1 → 2, and it's not a strict add —
+    the v1.4 answer (`15c3bd82-...`, a cell line) is no longer linked to Topilko
+    in current `development.csv`; two different resources are now linked
+    instead (confirmed against `data/csv`, not a join bug)
+  - **PI-002** (Gilbert Family Foundation-funded resource count): 4 → 6
+  - This is exactly the "additions-direction staleness" v1.4 flagged as an open
+    gap (e.g. `cell_lines` grew from 637 to 665 rows between the v0.2-eval and
+    v0.4 pins) — recall for these 4 questions is not comparable to any prior run
+
+- **Manual ground truth (`eval_tools_ground_manual.yaml`) re-verified against
+  KG v0.4.** AM-004, CL-003, CR-001, CR-004, PUB-001–006 each re-run against
+  current data by hand. 8 of 10 unchanged; 2 real changes found:
+  - **AM-004** (earliest mouse tumor detection): answer changed from a tie at
+    120 days to a single new answer at 90 days (`9971e47e-...`,
+    "Nf1+/-GFAPCKO", optic glioma). Not a schema effect — a large batch of new
+    observations (many LLM-extracted, submitter tagged "🤖 AI-extracted...")
+    was ingested since v0.2-eval and surfaced a genuinely earlier, human-curated
+    (submitter "James Goss") detection record. The two previous 120-day
+    observations are still present and valid, just no longer earliest
+  - **PUB-004** (publications cross-listed in both portal listings): grew from
+    22 to 34 PMIDs — all 22 original PMIDs still cross-listed, plus 12 newly
+    overlapping. `nf:pmid` is also now an IRI, not a literal (query accordingly)
+  - **CL-003**: unchanged (same 4 cell lines). Side finding: 4 of the 5
+    "recommended corrections" noted in v1.x for miscategorized `geneticDisorder`
+    values have been fixed upstream since; the YST-1 schwannoma mislabeling has
+    not (doesn't affect the answer regardless, since YST-1 is independently
+    excluded on `cellLineCategory`)
+  - CR-001, CR-004, PUB-001, PUB-002, PUB-003, PUB-005, PUB-006: unchanged,
+    each re-run and confirmed identical
+
+- **Baseline image is `build-32`.** Built by build-image run 32 from
+  `fix/harmonize-files-lookup-deps` (`31ae5cf7`) — `develop` plus one commit that
+  declares the cross-table CSV deps for the harmonize assets. `data_sources.yaml`
+  there is byte-identical to `develop`, so the graph content is exactly develop's
+  pins; this branch no longer carries pins of its own. (Run 31, straight off
+  `develop`, failed: with no edge between `portal/harmonized/files` and the
+  `cell_lines` fetch, the multiprocess executor raced and the harmonize step died
+  on `resources CSV not found: data/csv/cell_lines.csv`. No data difference.)
+  `build-30` was the same v0.4 schema but built off `issue-87`, whose `files` pin
+  was one version behind (`268` vs `269`). Of the 36 automated questions, only
+  CR-002, ST-002, ST-003 and ST-005 read `files.csv`, so those four are the only
+  answers that can move with that bump and are the ones to re-verify against
+  `build-32`; the other 32 draw solely from tables pinned identically in both
+  configs
+
+- **Ground truth regenerated against `build-32`'s own CSVs.** The earlier v2.0 pass ran
+  against a local `data/csv` snapshot that predated the pins the image is built from
+  (414,160 file rows vs `build-32`'s 545,103), so a few answers were stale. The `kg-data`
+  artifact attached to every build-image run carries the exact `data/csv/` the image was
+  built from, so the regeneration read those directly — `gh run download <run-id> -n
+  kg-data`, no Synapse access involved. Three answers moved, all upstream data changes
+  rather than schema-migration effects:
+  - **ST-002** (MPNST studies with RNA-seq data): 12 → 14. `syn62031004` had no file rows
+    at all in the older snapshot, and `syn68634225` had 252 but none annotated `RNA-seq`;
+    both gained annotations upstream
+  - **CR-002** (human cell lines with the most diverse data types): 3 → 4. All three
+    previous winners still tie at the maximum; `ST88-14` (`202c110b-...`) joins them
+  - **ST-001** (schwannoma studies): 24 → 23. `syn62809145` is gone from `studies.csv`
+    entirely — it carried `Schwannoma|Hearing Loss` in the older snapshot
+  - The other 33 automated answers are unchanged, CL-010 (31) included, and it was
+    independently confirmed by querying the running `build-32` image
+
+- **Removed the six draft `v2.0` runs from `evaluation/runs.json`.** They were recorded
+  against `build-30` and scored against the pre-correction ST-002/CR-002 answers, and
+  were never published. `runs.json` is now byte-identical to `develop` at 52 runs
+  (v1.3/v1.2/0), so v2.0 starts clean against `build-32`
+
+### Fixed
+- **`mutation_model` source pin was two versions behind its own backfill,
+  producing ~95% orphaned tool-mutation edges in the first v0.4 eval image
+  (`build-29`).** Commit 9ea26ba8 removed the client-side legacy-`<type>Id`
+  crosswalk workaround on the grounds that upstream had backfilled
+  `Mutation.resourceId` live (`nf-research-tools-schema#316`), but never bumped
+  `data_sources.yaml`'s pinned `mutation_model.source_version` off `19` —
+  two versions before the backfill snapshot (`21`). Pins are point-in-time
+  snapshots, so v19 still held the pre-backfill legacy ids regardless of what
+  upstream's live table looked like. Fixed in `fd8aa5f2` (`source_version: 19
+  → 21`); rebuilt as `build-30`, confirmed 0 orphaned `nf:hasMutation` subjects
+  (excluding the unrelated `nf:MutationSet` aggregation nodes, which correctly
+  have no `resourceId`)
+  - Found via a 6-run recall crater on the `MUT` category (0.76–1.0 on every
+    prior run across task_version `0`/`v1.3`, every model, down to 0.11–0.17 on
+    the first `build-29` run) — traced through eval transcripts, confirmed live
+    against the graph, and confirmed via `check_source_versions.py --dry-run`
+    that `21` is upstream's own backfill commit
+  - `astabench` (separate repo) got a companion fix in the same investigation:
+    `nf_rag`'s topology block named `hasInvestigator`/`hasFunder`/
+    `hasPublication` explicitly but never named `hasMutation`, so agents burned
+    their 50-message budget rediscovering it via schema exploration before this
+    bug made that path return empty anyway. Also dropped a `-> nf:Genotype`
+    topology line pointing at a class with zero instances
+
+### Known gap (not addressed)
+- **Not archived as a frozen `evaluation` snapshot.** This regenerates ground
+  truth from `data/csv` under the `release` profile's *current* pins, which will
+  keep moving forward on every rebuild — unlike every prior eval version, which
+  was computed against an immutable snapshot (`data_sources_version: KG
+  v0.2-eval`, archived to `syn73695746`). Re-pinning the `evaluation` profile to
+  specific v0.4-era source versions and archiving a new frozen CSV snapshot (plus
+  retagging `build-32` as `eval-main-v2` in the registry, which needs
+  `write:packages` scope this session's token didn't have) is real,
+  Synapse- and CI-touching work, deliberately left as its own follow-up rather
+  than done as a side effect of a ground-truth regeneration
+
 ## [v1.4] - 2026-08-27
 
 Minimal correctness pass for KG v0.4 (the upstream LinkML schema adoption, #87).

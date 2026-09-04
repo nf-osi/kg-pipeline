@@ -16,7 +16,7 @@ cd astabench
 
 | Task | Data | Docker Image | Metrics | Description |
 |------|------|-------------|---------|-------------|
-| `nf_rag` | `evaluation/main/` | `kg-qlever:eval-main-v1` | recall | Research tools discovery — structured SPARQL queries against the portal KG |
+| `nf_rag` | `evaluation/main/` | `kg-qlever:build-32` | recall | Research tools discovery — structured SPARQL queries against the portal KG |
 | `nf_rag_pubs` | `evaluation/qa/` | `kg-qlever:eval-pubs-v*` (text-indexed) | accuracy, citation_f1 | Publication QA — SPARQL+Text retrieval with passage attribution |
 
 ### Running Evals
@@ -29,7 +29,14 @@ pull and run the appropriate [eval-tagged image](https://github.com/orgs/nf-osi/
 
 ```bash
 # For nf_rag (Synapse portal graph only)
-docker run -p 7001:7001 ghcr.io/nf-osi/kg-qlever:eval-main-v1
+# build-32 is the current v0.4-schema baseline (effectively "eval-main-v2";
+# not yet retagged in the registry -- see evaluation/main/CHANGELOG.md v2.0).
+# It is develop plus a Dagster dependency fix; data_sources.yaml is identical to
+# develop, so the graph content matches those pins.
+# build-31 (develop) failed to build -- a harmonize step race, fixed in build-32.
+# build-30 was the same schema but built off issue-87's older `files` pin (268).
+# build-29 was built from a stale mutation_model pin and is broken -- do not use it.
+docker run -p 7001:7001 ghcr.io/nf-osi/kg-qlever:build-32
 
 # For nf_rag_pubs (adds full-text index)
 docker run -p 7001:7001 ghcr.io/nf-osi/kg-qlever:eval-pubs-v0.1

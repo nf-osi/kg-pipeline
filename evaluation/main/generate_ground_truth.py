@@ -4,8 +4,10 @@ import os
 import re
 from datetime import datetime
 
-# Path adjusted for script location in evaluation/main/
-DATA_DIR = '../data/csv'
+# Points at the release-profile CSVs (KG v0.4 schema), two directories up from
+# evaluation/main/. Not yet a pinned/archived "evaluation" snapshot -- see
+# CHANGELOG.md for what that still requires.
+DATA_DIR = '../../data/csv'
 DATASET_ATTRIBUTES_FILE = 'dataset_attributes.yaml'
 OUTPUT_FILE = 'eval_tools_ground_auto.yaml'
 
@@ -21,7 +23,12 @@ HUMAN_SPECIES_PATTERN = r'\b(?:Homo sapiens|Human)\b'
 
 def load_data():
     data = {}
-    # New filenames without portal_ prefix
+    # KG v0.4: every tool-type table is keyed on resourceId and carries the
+    # core Tool fields (resourceName, description, synonyms, ...) directly --
+    # there is no more central `resources` table to join through, and
+    # `development_investigator.csv` / `development_funder.csv` no longer
+    # exist as precomputed exports (join `development` with `investigators`
+    # / `funders` instead).
     files = {
         'models': 'animal_models.csv',
         'cell_lines': 'cell_lines.csv',
@@ -30,9 +37,9 @@ def load_data():
         'antibodies': 'antibodies.csv',
         'mutations': 'mutations.csv',
         'mutation_model': 'mutation_model.csv',
-        'resources': 'resources.csv',
-        'investigators': 'development_investigator.csv',
-        'funders': 'development_funder.csv',
+        'investigators': 'investigators.csv',
+        'funders': 'funders.csv',
+        'development': 'development.csv',
         'files': 'files.csv',
         'donor_tool': 'donor_tool.csv',
         'studies': 'studies.csv',
@@ -68,21 +75,19 @@ def get_all_questions():
             questions[q['id']] = q['question']
     return questions
 
+def clean_ids(id_list):
+    return sorted({str(i) for i in id_list if pd.notna(i) and str(i) != ''})
+
 def run_queries(data):
     results = {}
-    
-    # Pre-compute joins
-    if not data['models'].empty and not data['donors'].empty:
-        models_donors = pd.merge(
-            data['models'],
-            data['donors'],
-            on='donorId',
-            how='left',
-            suffixes=('_model', '_donor'),
-        )
-    else:
-        models_donors = pd.DataFrame()
-        
+
+    # resourceId membership per tool type, used to disambiguate rows in
+    # tables (like mutation_model) that no longer distinguish animal-model
+    # vs. cell-line subjects by column name -- both now carry plain
+    # `resourceId`.
+    animal_model_ids = set(data['models']['resourceId'].dropna()) if not data['models'].empty else set()
+    cell_line_ids = set(data['cell_lines']['resourceId'].dropna()) if not data['cell_lines'].empty else set()
+
     if not data['cell_lines'].empty and not data['donors'].empty:
         cells_donors = pd.merge(
             data['cell_lines'],
@@ -94,74 +99,29 @@ def run_queries(data):
     else:
         cells_donors = pd.DataFrame()
 
-    if not data['models'].empty and not data['resources'].empty:
-        models_resources = pd.merge(
-            data['models'],
-            data['resources'],
-            on='animalModelId',
-            how='left',
-            suffixes=('', '_resource'),
-        )
-    else:
-        models_resources = pd.DataFrame()
-
-    if not cells_donors.empty and not data['resources'].empty:
-        cells_donors_resources = pd.merge(
-            cells_donors,
-            data['resources'],
-            on='cellLineId',
-            how='left',
-            suffixes=('_cell', '_resource'),
-        )
-    else:
-        cells_donors_resources = pd.DataFrame()
-
     # Mutation joins
     if not data['mutations'].empty and not data['mutation_model'].empty:
         mut_joined = pd.merge(data['mutations'], data['mutation_model'], on='mutationId', how='inner')
     else:
         mut_joined = pd.DataFrame()
 
-    # Create mapping from primary tool IDs to resourceId using the new resources table
-    primary_to_res = {}
-    if not data['resources'].empty:
-        res = data['resources']
-        # Map each tool type ID to the resourceId
-        for _, row in res.iterrows():
-            rid = row['resourceId']
-            for col in ['cellLineId', 'animalModelId', 'antibodyId', 'geneticReagentId']:
-                if col in res.columns and pd.notna(row[col]):
-                    tid = str(row[col])
-                    if tid:
-                        if tid not in primary_to_res:
-                            primary_to_res[tid] = set()
-                        primary_to_res[tid].add(rid)
-
-    # Create mapping from resourceName/synonyms to resourceId
+    # Name -> resourceId lookup, for resolving files.modelSystemName (a plain
+    # display name) back to a resourceId. Only animal models and cell lines
+    # are named this way (see harmonize_files.py).
     name_to_res = {}
-    if not data['resources'].empty:
-        res = data['resources']
-        for _, row in res.iterrows():
+    for df in (data['models'], data['cell_lines']):
+        if df.empty:
+            continue
+        for _, row in df.iterrows():
             rid = row['resourceId']
-            # Map primary name
-            if pd.notna(row['resourceName']):
+            if pd.notna(row.get('resourceName')):
                 name_to_res[str(row['resourceName']).strip()] = rid
-            # Map synonyms
-            if pd.notna(row['synonyms']):
+            if pd.notna(row.get('synonyms')):
                 for s in str(row['synonyms']).split('|'):
                     name_to_res[s.strip()] = rid
 
-    def ensure_resource_id(id_list):
-        final_ids = set()
-        for tid in id_list:
-            tid_str = str(tid)
-            if tid_str in primary_to_res:
-                final_ids.update(primary_to_res[tid_str])
-            elif tid_str in name_to_res:
-                final_ids.add(name_to_res[tid_str])
-            else:
-                final_ids.add(tid) # Fallback
-        return [i for i in final_ids if pd.notna(i) and i != 'nan' and i != '']
+    def names_to_resource_ids(names):
+        return clean_ids(name_to_res[n] for n in names if n in name_to_res)
 
     # --- Mutations Discovery ---
 
@@ -169,12 +129,7 @@ def run_queries(data):
     term_mut001 = "NM_000267.3(NF1):c.2041C>T (p.Arg681Ter)"
     if not mut_joined.empty:
         matched = mut_joined[mut_joined['humanClinVarMutation'] == term_mut001]
-        ids = []
-        ids.extend(matched['animalModelId'].dropna().tolist())
-        ids.extend(matched['cellLineId'].dropna().tolist())
-        ids = ensure_resource_id(ids)
-        if ids:
-            results['MUT-001'] = [i for i in set(ids) if pd.notna(i)]
+        results['MUT-001'] = clean_ids(matched['resourceId'].tolist())
 
     # MUT-002: NF1 floxed mice
     ids_mut002 = []
@@ -186,75 +141,70 @@ def run_queries(data):
         ]['mutationId'].tolist()
         if flox_mut_ids and not data['mutation_model'].empty:
             matched = data['mutation_model'][data['mutation_model']['mutationId'].isin(flox_mut_ids)]
-            ids_mut002.extend(ensure_resource_id(matched['animalModelId'].dropna().tolist()))
+            ids_mut002.extend(matched[matched['resourceId'].isin(animal_model_ids)]['resourceId'].dropna().tolist())
     if not data['models'].empty:
-        ids_mut002.extend(ensure_resource_id(data['models'][data['models']['strainNomenclature'].str.contains('flox', case=False, na=False)]['animalModelId'].tolist()))
+        ids_mut002.extend(data['models'][data['models']['strainNomenclature'].str.contains('flox', case=False, na=False)]['resourceId'].tolist())
     if ids_mut002:
-        results['MUT-002'] = [i for i in set(ids_mut002) if pd.notna(i)]
+        results['MUT-002'] = clean_ids(ids_mut002)
 
     # MUT-003: c.104del sequence variation
     if not mut_joined.empty:
         matched = mut_joined[mut_joined['sequenceVariation'].str.contains('c.104del', case=False, na=False)]
-        ids = ensure_resource_id(matched['cellLineId'].dropna().tolist())
-        results['MUT-003'] = [i for i in set(ids) if pd.notna(i)]
+        matched = matched[matched['resourceId'].isin(cell_line_ids)]
+        results['MUT-003'] = clean_ids(matched['resourceId'].tolist())
 
     # MUT-004: splice-site variants
     splice_patterns = r'\+1|\+2|\-1|\-2|splice'
-    ids_mut004 = []
     if not mut_joined.empty:
         matched = mut_joined[
             (mut_joined['humanClinVarMutation'].str.contains(splice_patterns, case=False, na=False)) |
             (mut_joined['mutationType'].str.contains('splice', case=False, na=False))
         ]
-        ids_mut004.extend(ensure_resource_id(matched['animalModelId'].dropna().tolist()))
-        ids_mut004.extend(ensure_resource_id(matched['cellLineId'].dropna().tolist()))
-    if ids_mut004:
-        results['MUT-004'] = [i for i in set(ids_mut004) if pd.notna(i)]
+        results['MUT-004'] = clean_ids(matched['resourceId'].tolist())
 
     # MUT-005: Cell lines with mutations in multiple genes
     ids_mut005 = []
     if not mut_joined.empty:
         # Filter to cell line rows only
-        mut_cells = mut_joined[mut_joined['cellLineId'].notna()]
+        mut_cells = mut_joined[mut_joined['resourceId'].isin(cell_line_ids)]
         if not mut_cells.empty:
             # Count unique genes per cell line
-            res_gene_counts = mut_cells.groupby('cellLineId')['affectedGeneSymbol'].nunique()
+            res_gene_counts = mut_cells.groupby('resourceId')['affectedGeneSymbol'].nunique()
             # Find cell lines with mutations in multiple genes (>1)
-            multi_gene_cell_lines = res_gene_counts[res_gene_counts > 1].index.tolist()
-            ids_mut005.extend(ensure_resource_id(multi_gene_cell_lines))
-    results['MUT-005'] = [i for i in set(ids_mut005) if pd.notna(i)]
+            ids_mut005.extend(res_gene_counts[res_gene_counts > 1].index.tolist())
+    results['MUT-005'] = clean_ids(ids_mut005)
 
     # MUT-006: Mutations present in both animal models and cell lines
     if not mut_joined.empty:
-        am_mutations = set(mut_joined[mut_joined['animalModelId'].notna()]['mutationId'].dropna())
-        cl_mutations = set(mut_joined[mut_joined['cellLineId'].notna()]['mutationId'].dropna())
+        am_mutations = set(mut_joined[mut_joined['resourceId'].isin(animal_model_ids)]['mutationId'].dropna())
+        cl_mutations = set(mut_joined[mut_joined['resourceId'].isin(cell_line_ids)]['mutationId'].dropna())
         shared_mutations = am_mutations & cl_mutations
 
         if shared_mutations:
             results['MUT-006'] = sorted([str(mid) for mid in shared_mutations if pd.notna(mid)])
 
     # --- Animal Models ---
-    
+
     # AM-001: Optic glioma models
-    if not models_resources.empty:
-        df = models_resources
+    if not data['models'].empty:
+        df = data['models']
         matches = df[
-            df['animalModelOfManifestation'].str.contains('Optic Nerve Glioma', case=False, na=False) |
+            df['manifestation'].str.contains('Optic Nerve Glioma', case=False, na=False) |
             df['description'].str.contains('optic glioma', case=False, na=False)
         ]
-        results['AM-001'] = ensure_resource_id(matches['animalModelId'].tolist())
+        results['AM-001'] = clean_ids(matches['resourceId'].tolist())
 
     # AM-002: Energy expenditure
     if not data['models'].empty:
         df = data['models']
-        matches = df[df['animalModelOfManifestation'].str.contains('Metabolic Function', case=False, na=False)]
-        results['AM-002'] = ensure_resource_id(matches['animalModelId'].tolist())
+        matches = df[df['manifestation'].str.contains('Metabolic Function', case=False, na=False)]
+        results['AM-002'] = clean_ids(matches['resourceId'].tolist())
 
     # AM-003: Non-mouse mammalian models
-    if not models_donors.empty:
-        df = models_donors
+    if not data['models'].empty:
+        df = data['models']
         matches = df[df['backgroundStrain'].str.contains('Ossabaw|Yucatan', case=False, na=False)]
-        results['AM-003'] = ensure_resource_id(matches['animalModelId'].tolist())
+        results['AM-003'] = clean_ids(matches['resourceId'].tolist())
 
     # AM-004: Manually maintained (requires nuanced interpretation of observation text)
     # Earliest mouse tumor detection is at 120 days (4 months):
@@ -266,16 +216,15 @@ def run_queries(data):
         # Find xenograft models
         xenografts = data['models'][data['models']['transplantationDonorId'].notna() | data['models']['transplantationType'].notna()]
         if not xenografts.empty:
-            # Get xenograft resourceIds
-            xenograft_ids = ensure_resource_id(xenografts['animalModelId'].tolist())
+            xenograft_ids = clean_ids(xenografts['resourceId'].tolist())
 
             # Find cell lines from the same donors
             donor_ids = xenografts['transplantationDonorId'].dropna().unique().tolist()
             donor_cell_lines = data['cell_lines'][data['cell_lines']['donorId'].isin(donor_ids)]
-            cell_line_ids = ensure_resource_id(donor_cell_lines['cellLineId'].tolist())
+            cell_line_result_ids = clean_ids(donor_cell_lines['resourceId'].tolist())
 
             # Combine both xenografts and their donor cell lines
-            results['AM-005'] = xenograft_ids + cell_line_ids
+            results['AM-005'] = clean_ids(xenograft_ids + cell_line_result_ids)
 
     # AM-006: Café-au-lait spots
     if not data['observations'].empty:
@@ -288,53 +237,57 @@ def run_queries(data):
         ]
 
         if not cafe_observations.empty:
-            # Get unique resource IDs and verify they're animal models
-            resource_ids = cafe_observations['resourceId'].dropna().unique().tolist()
-            # Filter to only animal models using resources table
-            if not data['resources'].empty and resource_ids:
-                res = data['resources']
-                animal_model_ids = []
-                for rid in resource_ids:
-                    match = res[res['resourceId'] == rid]
-                    if not match.empty and match.iloc[0]['resourceType'] == 'Animal Model':
-                        animal_model_ids.append(rid)
-                if animal_model_ids:
-                    results['AM-006'] = sorted(animal_model_ids)
+            # Get unique resource IDs and filter to only animal models
+            resource_ids = set(cafe_observations['resourceId'].dropna().unique().tolist())
+            animal_model_result_ids = resource_ids & animal_model_ids
+            if animal_model_result_ids:
+                results['AM-006'] = sorted(animal_model_result_ids)
 
     # --- Cell Lines ---
 
     # CL-001: Plexiform neurofibroma
     if not data['cell_lines'].empty:
         df = data['cell_lines']
-        matches = df[df['cellLineManifestation'].str.contains('Plexiform Neurofibroma', case=False, na=False)]
-        results['CL-001'] = ensure_resource_id(matches['cellLineId'].tolist())
+        matches = df[df['manifestation'].str.contains('Plexiform Neurofibroma', case=False, na=False)]
+        results['CL-001'] = clean_ids(matches['resourceId'].tolist())
+
+    # CL-010: MPNST cell line count.
+    #
+    # Counted off the structured `manifestation` property, which stores the full
+    # label -- the string "MPNST" appears nowhere in that column, so filtering it
+    # on the acronym yields 0. Substring-matching the acronym across
+    # resourceName/synonyms/description instead yields 36: it picks up 15 rows
+    # that mention MPNST without carrying the manifestation, and misses 10 that
+    # carry it without spelling out the acronym.
+    if not data['cell_lines'].empty:
+        df = data['cell_lines']
+        matches = df[df['manifestation'].str.contains(
+            'Malignant Peripheral Nerve Sheath Tumor', case=False, na=False)]
+        results['CL-010'] = len(matches)
 
     # CL-002: Hybridoma
     if not data['cell_lines'].empty:
         df = data['cell_lines']
         matches = df[df['cellLineCategory'].str.contains('Hybridoma', case=False, na=False)]
-        results['CL-002'] = ensure_resource_id(matches['cellLineId'].tolist())
+        results['CL-002'] = clean_ids(matches['resourceId'].tolist())
 
     # CL-003: Moved to eval_tools_ground_manual.yaml — defining "normal" requires
     # excluding schwannoma, NF1 knockouts, and certain cell line categories (cancer,
     # transformed, iPSC, etc.) which is better handled by manual curation.
 
     # CL-004: Black patients
-    if not cells_donors_resources.empty:
-        df = cells_donors_resources
-        race_series = df.get('race_cell', pd.Series('', index=df.index)).fillna('')
-        if 'race_donor' in df.columns:
-            race_series = race_series.mask(race_series.eq(''), df['race_donor'].fillna(''))
+    if not data['cell_lines'].empty:
+        df = data['cell_lines']
         matches = df[
-            race_series.str.contains('Black|African', case=False, na=False) &
+            df['race'].str.contains('Black|African', case=False, na=False) &
             (
-                df['cellLineGeneticDisorder'].str.contains('Neurofibromatosis type 1', case=False, na=False) |
+                df['geneticDisorder'].str.contains('Neurofibromatosis type 1', case=False, na=False) |
                 df['resourceName'].str.contains(r'\bNF1\b|Neurofibromin', case=False, na=False, regex=True) |
                 df['synonyms'].str.contains(r'\bNF1\b|Neurofibromin', case=False, na=False, regex=True) |
                 df['description'].str.contains(r'\bNF1\b|Neurofibromin', case=False, na=False, regex=True)
             )
         ]
-        results['CL-004'] = ensure_resource_id(matches['cellLineId'].tolist())
+        results['CL-004'] = clean_ids(matches['resourceId'].tolist())
 
     # CL-005: pediatric donors
     def is_pediatric(age_val):
@@ -353,7 +306,7 @@ def run_queries(data):
             df['age'].apply(is_pediatric) &
             df['species'].str.contains(HUMAN_SPECIES_PATTERN, case=False, na=False)
         ]
-        results['CL-005'] = ensure_resource_id(ped_human['cellLineId'].tolist())
+        results['CL-005'] = clean_ids(ped_human['resourceId'].tolist())
 
     # CL-006: Human lung cell lines
     if not cells_donors.empty:
@@ -362,7 +315,7 @@ def run_queries(data):
             (df['organ'].str.contains('Lung', case=False, na=False)) &
             (df['species'].str.contains(HUMAN_SPECIES_PATTERN, case=False, na=False))
         ]
-        results['CL-006'] = ensure_resource_id(matches['cellLineId'].tolist())
+        results['CL-006'] = clean_ids(matches['resourceId'].tolist())
 
     # CL-007: MPNST cell lines with doubling time < 48h
     if not data['cell_lines'].empty:
@@ -377,10 +330,10 @@ def run_queries(data):
         df['dt_hours'] = df['populationDoublingTime'].apply(parse_doubling_time)
         # Filter for MPNST manifestation and PDT < 48h
         matches = df[
-            (df['cellLineManifestation'].str.contains('MPNST|Malignant Peripheral Nerve Sheath', case=False, na=False)) &
+            (df['manifestation'].str.contains('MPNST|Malignant Peripheral Nerve Sheath', case=False, na=False)) &
             (df['dt_hours'] < 48)
         ]
-        results['CL-007'] = ensure_resource_id(matches['cellLineId'].tolist())
+        results['CL-007'] = clean_ids(matches['resourceId'].tolist())
 
     # CL-008: Isogenic pairs that differ only in NF1 status (by exactly 1 mutation)
     if not data['cell_lines'].empty and not data['donors'].empty and not data['mutations'].empty and not data['mutation_model'].empty:
@@ -404,16 +357,16 @@ def run_queries(data):
             family_groups.setdefault(root, set()).add(did)
 
         # Count mutations per cell line (total and NF1-only)
-        cl_mut = data['mutation_model'][data['mutation_model']['cellLineId'].notna()]
-        total_mut_count = cl_mut.groupby('cellLineId')['mutationId'].nunique()
+        cl_mut = data['mutation_model'][data['mutation_model']['resourceId'].isin(cell_line_ids)]
+        total_mut_count = cl_mut.groupby('resourceId')['mutationId'].nunique()
         nf1_mut_ids = data['mutations'][data['mutations']['affectedGeneSymbol'] == 'NF1']['mutationId']
         nf1_cl_mut = cl_mut[cl_mut['mutationId'].isin(nf1_mut_ids)]
-        nf1_mut_count = nf1_cl_mut.groupby('cellLineId')['mutationId'].nunique()
+        nf1_mut_count = nf1_cl_mut.groupby('resourceId')['mutationId'].nunique()
 
         # Cell lines with exactly 1 total mutation and that mutation is NF1
         one_nf1_only = set(nf1_mut_count[nf1_mut_count == 1].index) & set(total_mut_count[total_mut_count == 1].index)
         # Cell lines with 0 total mutations
-        all_cl_ids = set(cls_df['cellLineId'])
+        all_cl_ids = set(cls_df['resourceId'])
         zero_mut_ids = all_cl_ids - set(total_mut_count.index)
 
         # Find families with both 0-mutation and exactly-1-NF1-only-mutation members
@@ -424,8 +377,8 @@ def run_queries(data):
             family_cls = cls_df[cls_df['donorId'].isin(family_donors)]
             if family_cls.empty:
                 continue
-            zero_mut = family_cls[family_cls['cellLineId'].isin(zero_mut_ids)]
-            one_mut = family_cls[family_cls['cellLineId'].isin(one_nf1_only)]
+            zero_mut = family_cls[family_cls['resourceId'].isin(zero_mut_ids)]
+            one_mut = family_cls[family_cls['resourceId'].isin(one_nf1_only)]
             if zero_mut.empty or one_mut.empty:
                 continue
             # Only pair lines with matching tissue type (tissue, organ, cellLineCategory)
@@ -436,67 +389,73 @@ def run_queries(data):
                     (zero_mut['cellLineCategory'].fillna('') == (om['cellLineCategory'] if pd.notna(om['cellLineCategory']) else ''))
                 ]
                 if not matched_wt.empty:
-                    qualifying_ids.append(om['cellLineId'])
-                    qualifying_ids.extend(matched_wt['cellLineId'].tolist())
+                    qualifying_ids.append(om['resourceId'])
+                    qualifying_ids.extend(matched_wt['resourceId'].tolist())
 
-        results['CL-008'] = ensure_resource_id(qualifying_ids)
+        results['CL-008'] = clean_ids(qualifying_ids)
 
     # CL-009: Different tissues same donor
     if not data['cell_lines'].empty:
         donor_tissues = data['cell_lines'].groupby('donorId')['tissue'].nunique()
         multi_tissue_donors = donor_tissues[donor_tissues > 1].index.tolist()
-        results['CL-009'] = ensure_resource_id(data['cell_lines'][data['cell_lines']['donorId'].isin(multi_tissue_donors)]['cellLineId'].tolist())
+        results['CL-009'] = clean_ids(data['cell_lines'][data['cell_lines']['donorId'].isin(multi_tissue_donors)]['resourceId'].tolist())
 
     # --- Reagents & Antibodies ---
     if not data['reagents'].empty:
         df = data['reagents']
-        results['GR-001'] = ensure_resource_id(df[df['vectorType'].str.contains('CRISPR', case=False, na=False)]['geneticReagentId'].tolist())
-        results['GR-002'] = ensure_resource_id(df[
+        results['GR-001'] = clean_ids(df[df['vectorType'].str.contains('CRISPR', case=False, na=False)]['resourceId'].tolist())
+        results['GR-002'] = clean_ids(df[
             (df['vectorType'].str.contains('Lentiviral', case=False, na=False)) &
             (df['vectorType'].str.contains('RNAi', case=False, na=False))
-        ]['geneticReagentId'].tolist())
-        results['GR-003'] = ensure_resource_id(df[df['promoter'].str.contains('CMV', case=False, na=False)]['geneticReagentId'].tolist())
-        results['GR-004'] = ensure_resource_id(df[
+        ]['resourceId'].tolist())
+        results['GR-003'] = clean_ids(df[df['promoter'].str.contains('CMV', case=False, na=False)]['resourceId'].tolist())
+        results['GR-004'] = clean_ids(df[
             (df['copyNumber'].str.contains('High Copy', case=False, na=False)) &
             (df['insertName'].str.contains('NF1', case=False, na=False) | (df['insertEntrezId'].astype(str) == '4763'))
-        ]['geneticReagentId'].tolist())
+        ]['resourceId'].tolist())
         mam_markers = ['Puromycin', 'Neomycin', 'G418', 'Hygromycin', 'Blasticidin', 'Zeocin']
-        results['GR-005'] = ensure_resource_id(df[df['selectableMarker'].str.contains('|'.join(mam_markers), case=False, na=False)]['geneticReagentId'].tolist())
+        results['GR-005'] = clean_ids(df[df['selectableMarker'].str.contains('|'.join(mam_markers), case=False, na=False)]['resourceId'].tolist())
 
     if not data['antibodies'].empty:
         df = data['antibodies']
-        results['AB-001'] = ensure_resource_id(df[df['reactiveSpecies'].str.contains('Drosophila', case=False, na=False)]['antibodyId'].tolist())
+        results['AB-001'] = clean_ids(df[df['reactiveSpecies'].str.contains('Drosophila', case=False, na=False)]['resourceId'].tolist())
         # AB-002: C-terminal antibodies for detecting full-length protein
-        results['AB-002'] = ensure_resource_id(df[
+        results['AB-002'] = clean_ids(df[
             df['targetAntigen'].str.contains('C-term', case=False, na=False)
-        ]['antibodyId'].tolist())
+        ]['resourceId'].tolist())
         # AB-003: Phospho-specific antibodies for PTM studies
-        results['AB-003'] = ensure_resource_id(df[
+        results['AB-003'] = clean_ids(df[
             df['targetAntigen'].str.contains('phospho', case=False, na=False)
-        ]['antibodyId'].tolist())
+        ]['resourceId'].tolist())
 
     # --- By Investigator ---
-    if not data['investigators'].empty:
-        matches = data['investigators'][data['investigators']['investigatorName'].str.contains('Piotr Topilko', case=False, na=False)]
-        results['PI-001'] = [i for i in set(matches['resourceId'].dropna().unique().tolist()) if pd.notna(i)]
+    # `development` carries the resourceId <-> investigatorId / funderId
+    # edges directly; join in investigator/funder names to filter on.
+    dev_inv = pd.DataFrame()
+    if not data['development'].empty and not data['investigators'].empty:
+        dev_inv = pd.merge(data['development'], data['investigators'], on='investigatorId', how='inner')
 
-    if not data['funders'].empty:
-        gff_funders = data['funders'][data['funders']['funderName'].str.contains('Gilbert Family Foundation|GFF', case=False, na=False)]
+    if not dev_inv.empty:
+        matches = dev_inv[dev_inv['investigatorName'].str.contains('Piotr Topilko', case=False, na=False)]
+        results['PI-001'] = clean_ids(matches['resourceId'].tolist())
+
+    if not data['development'].empty and not data['funders'].empty:
+        dev_fund = pd.merge(data['development'], data['funders'], on='funderId', how='inner')
+        gff_funders = dev_fund[dev_fund['funderName'].str.contains('Gilbert Family Foundation|GFF', case=False, na=False)]
         results['PI-002'] = int(gff_funders['resourceId'].nunique())
 
     # --- Cross-Resource ---
 
     # CR-001 (New): Animal models developed by investigators who also contributed reagents
-    if not data['investigators'].empty and not data['resources'].empty:
-        res = data['resources']
-        am_res_ids = set(res[res['animalModelId'].notna()]['resourceId'])
-        gr_res_ids = set(res[res['geneticReagentId'].notna()]['resourceId'])
-        inv_df = data['investigators']
-        am_invs = set(inv_df[inv_df['resourceId'].isin(am_res_ids)]['investigatorName'])
-        gr_invs = set(inv_df[inv_df['resourceId'].isin(gr_res_ids)]['investigatorName'])
+    if not dev_inv.empty:
+        am_invs = set(dev_inv[dev_inv['resourceId'].isin(animal_model_ids)]['investigatorName'])
+        gr_res_ids = set(data['reagents']['resourceId'].dropna()) if not data['reagents'].empty else set()
+        gr_invs = set(dev_inv[dev_inv['resourceId'].isin(gr_res_ids)]['investigatorName'])
         common_invs = am_invs & gr_invs
         if common_invs:
-            results['CR-001'] = [rid for rid in set(inv_df[inv_df['investigatorName'].isin(common_invs) & inv_df['resourceId'].isin(am_res_ids)]['resourceId'].tolist()) if pd.notna(rid)]
+            results['CR-001'] = clean_ids(
+                dev_inv[dev_inv['investigatorName'].isin(common_invs) & dev_inv['resourceId'].isin(animal_model_ids)]['resourceId'].tolist()
+            )
 
     # CR-002: Human cell line with most diverse data types
     if not data['files'].empty:
@@ -506,7 +465,7 @@ def run_queries(data):
         if not stats.empty:
             max_diverse = stats.max()
             winners = stats[stats == max_diverse].index.tolist()
-            results['CR-002'] = ensure_resource_id(winners)
+            results['CR-002'] = names_to_resource_ids(winners)
 
     # --- Study Discovery ---
 
@@ -573,21 +532,15 @@ def run_queries(data):
         # 2. Transplantation donor match (xenografts)
         am_trans = set(data['models']['transplantationDonorId'].dropna())
         common_trans = am_trans & cl_d
-        ids_cr003_models = []
-        ids_cr003_cells = []
+        ids_cr003 = []
         if common_donors:
-            ids_cr003_models.extend(data['models'][data['models']['donorId'].isin(common_donors)]['animalModelId'].tolist())
-            ids_cr003_cells.extend(data['cell_lines'][data['cell_lines']['donorId'].isin(common_donors)]['cellLineId'].tolist())
+            ids_cr003.extend(data['models'][data['models']['donorId'].isin(common_donors)]['resourceId'].tolist())
+            ids_cr003.extend(data['cell_lines'][data['cell_lines']['donorId'].isin(common_donors)]['resourceId'].tolist())
         if common_trans:
-            ids_cr003_models.extend(data['models'][data['models']['transplantationDonorId'].isin(common_trans)]['animalModelId'].tolist())
-            ids_cr003_cells.extend(data['cell_lines'][data['cell_lines']['donorId'].isin(common_trans)]['cellLineId'].tolist())
-        final_cr003 = set()
-        if ids_cr003_models:
-            final_cr003.update(ensure_resource_id(ids_cr003_models))
-        if ids_cr003_cells:
-            final_cr003.update(ensure_resource_id(ids_cr003_cells))
-        if final_cr003:
-            results['CR-003'] = [i for i in final_cr003 if pd.notna(i)]
+            ids_cr003.extend(data['models'][data['models']['transplantationDonorId'].isin(common_trans)]['resourceId'].tolist())
+            ids_cr003.extend(data['cell_lines'][data['cell_lines']['donorId'].isin(common_trans)]['resourceId'].tolist())
+        if ids_cr003:
+            results['CR-003'] = clean_ids(ids_cr003)
 
     return results
 
