@@ -90,37 +90,7 @@ below. **Breaks comparability with all 52 previously recorded runs.**
   - CR-001, CR-004, PUB-001, PUB-002, PUB-003, PUB-005, PUB-006: unchanged,
     each re-run and confirmed identical
 
-- **Baseline image is `build-32`.** Built by build-image run 32 from
-  `fix/harmonize-files-lookup-deps` (`31ae5cf7`) — `develop` plus one commit that
-  declares the cross-table CSV deps for the harmonize assets. `data_sources.yaml`
-  there is byte-identical to `develop`, so the graph content is exactly develop's
-  pins; this branch no longer carries pins of its own. (Run 31, straight off
-  `develop`, failed: with no edge between `portal/harmonized/files` and the
-  `cell_lines` fetch, the multiprocess executor raced and the harmonize step died
-  on `resources CSV not found: data/csv/cell_lines.csv`. No data difference.)
-  `build-30` was the same v0.4 schema but built off `issue-87`, whose `files` pin
-  was one version behind (`268` vs `269`). Of the 36 automated questions, only
-  CR-002, ST-002, ST-003 and ST-005 read `files.csv`, so those four are the only
-  answers that can move with that bump and are the ones to re-verify against
-  `build-32`; the other 32 draw solely from tables pinned identically in both
-  configs
-
-- **Ground truth regenerated against `build-32`'s own CSVs.** The earlier v2.0 pass ran
-  against a local `data/csv` snapshot that predated the pins the image is built from
-  (414,160 file rows vs `build-32`'s 545,103), so a few answers were stale. The `kg-data`
-  artifact attached to every build-image run carries the exact `data/csv/` the image was
-  built from, so the regeneration read those directly — `gh run download <run-id> -n
-  kg-data`, no Synapse access involved. Three answers moved, all upstream data changes
-  rather than schema-migration effects:
-  - **ST-002** (MPNST studies with RNA-seq data): 12 → 14. `syn62031004` had no file rows
-    at all in the older snapshot, and `syn68634225` had 252 but none annotated `RNA-seq`;
-    both gained annotations upstream
-  - **CR-002** (human cell lines with the most diverse data types): 3 → 4. All three
-    previous winners still tie at the maximum; `ST88-14` (`202c110b-...`) joins them
-  - **ST-001** (schwannoma studies): 24 → 23. `syn62809145` is gone from `studies.csv`
-    entirely — it carried `Schwannoma|Hearing Loss` in the older snapshot
-  - The other 33 automated answers are unchanged, CL-010 (31) included, and it was
-    independently confirmed by querying the running `build-32` image
+- **Ground truth regenerated against baseline image `build-32`.**
 
 ## [v1.4] - 2026-08-27
 
