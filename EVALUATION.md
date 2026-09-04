@@ -16,7 +16,7 @@ cd astabench
 
 | Task | Data | Docker Image | Metrics | Description |
 |------|------|-------------|---------|-------------|
-| `nf_rag` | `evaluation/main/` | `kg-qlever:eval-main-v1` | recall | Research tools discovery — structured SPARQL queries against the portal KG |
+| `nf_rag` | `evaluation/main/` | `kg-qlever:build-32` / `eval-main-v2` | recall | Research tools discovery — structured SPARQL queries against the portal KG |
 | `nf_rag_pubs` | `evaluation/qa/` | `kg-qlever:eval-pubs-v*` (text-indexed) | accuracy, citation_f1 | Publication QA — SPARQL+Text retrieval with passage attribution |
 
 ### Running Evals
@@ -29,7 +29,8 @@ pull and run the appropriate [eval-tagged image](https://github.com/orgs/nf-osi/
 
 ```bash
 # For nf_rag (Synapse portal graph only)
-docker run -p 7001:7001 ghcr.io/nf-osi/kg-qlever:eval-main-v1
+# build-32 is the current v0.4-schema baseline (effectively "eval-main-v2"
+docker run -p 7001:7001 ghcr.io/nf-osi/kg-qlever:build-32
 
 # For nf_rag_pubs (adds full-text index)
 docker run -p 7001:7001 ghcr.io/nf-osi/kg-qlever:eval-pubs-v0.1

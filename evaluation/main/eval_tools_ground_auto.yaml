@@ -1,5 +1,5 @@
 metadata:
-  generated_at: '2026-08-18T22:56:49.787822'
+  generated_at: '2026-09-02T17:49:27.711273'
   skipped_questions:
   - AM-004
   - CL-003
@@ -11,8 +11,8 @@ metadata:
   - PUB-004
   - PUB-005
   - PUB-006
-  total_questions: 46
-  generated_questions: 36
+  total_questions: 47
+  generated_questions: 37
 ground_truth:
   AB-001:
     question: Find drosophila neurofibromin antibodies
@@ -73,14 +73,32 @@ ground_truth:
     question: Show me plexiform neurofibroma cell lines
     results:
     - 00f8dcc6-a2b2-4fc2-a327-e87367bffa21
+    - 11cdd265-a98a-5512-8cdd-520fb93fb5cf
+    - 16efb9c3-dc8e-52bd-b0aa-c7e1525409e8
+    - 17c62f13-88d2-5275-83ed-c07d98e8f43d
+    - 23d83c87-acef-552c-8206-89753968fe3f
+    - 25ad11a4-ee47-5549-8f77-a701b3afc1b0
+    - 2d56cdf1-03ad-51b9-bfa4-24081e6f9985
+    - 3a66555d-59c6-5652-9acc-9e302bebdb39
     - 3dedf9d2-614c-4cf9-8d18-aff8aa2dc0eb
+    - 5429a063-fd90-51e0-a9f5-97a6546b6150
     - 5502caf5-4cf1-418f-bf50-164cfa316b0f
+    - 58749ffa-76c7-5603-9134-4ecb3838e132
+    - 74e27a8f-2ab9-57c3-bf26-af6c83af724e
+    - 7e14f5df-68ec-571d-b053-d413910e4091
+    - 7ea217ba-9ac4-5939-927d-34fcc19d4621
     - 844b598c-0171-4972-91c3-27aa21b45d52
     - 8fdc5f7a-ef8c-4193-a5c0-04577c3b134d
+    - 95e10365-8513-53a5-820d-af01c98be059
     - a8f48ce7-438c-4564-a70b-020abc96d5fe
     - ab60aae5-7860-4d1d-bb02-208e6631c78b
     - b44361f2-9021-4920-901a-b1a1f9143f97
+    - b448adce-7898-5047-85b7-d648a9c9d137
+    - bc0380d6-278e-5d72-9138-36e12ed6f75d
     - be2333d6-6716-4d13-947d-41f4198497a4
+    - d6ee1f9a-cb80-569a-a4bf-4f44765d9ba6
+    - dbfe47d7-8be5-548e-8a59-8a706db8f2c7
+    - e8892dca-72b1-5b7d-a7ce-aeb0739ccab3
     - f21cb7db-ee85-48a7-8f41-e4603238bede
   CL-002:
     question: What hybridoma cell lines are available?
@@ -213,10 +231,14 @@ ground_truth:
     - 3899a07c-6fb8-4fc2-997f-c2301d6082f7
     - 46cc2e4e-d9bf-4474-b4de-448e25fb0c66
     - c4e97f99-a857-4f2d-80f1-62de8a12d037
+  CL-010:
+    question: How many MPNST cell lines?
+    results: 31
   CR-002:
     question: Find human cell lines with the most diverse data types available on
       the portal.
     results:
+    - 202c110b-a5f1-49ab-acdc-e6e33a1c29bb
     - 5502caf5-4cf1-418f-bf50-164cfa316b0f
     - b44361f2-9021-4920-901a-b1a1f9143f97
     - be2333d6-6716-4d13-947d-41f4198497a4
@@ -304,8 +326,12 @@ ground_truth:
   MUT-002:
     question: Find NF1 floxed mice
     results:
+    - 060e787d-8615-57ba-b7ba-609e997862e8
+    - 1af77df9-a778-5c50-a54c-0bdb62389680
     - 27c1a639-9e98-4289-872d-f275d4e49be7
+    - b2933cc6-5277-59a0-ae69-f90ce28cbd06
     - ddf3618d-dda5-4c03-a4b4-b9263dba0a31
+    - ebfb68f4-2d81-53f4-9026-1dc3aef18617
   MUT-003:
     question: Which cell lines have the 'c.104del' sequence variation?
     results:
@@ -352,10 +378,11 @@ ground_truth:
   PI-001:
     question: What tools have been developed by Piotr Topilko
     results:
-    - 15c3bd82-9791-4a53-b6f7-4d23b882a285
+    - 1af77df9-a778-5c50-a54c-0bdb62389680
+    - c11416e9-1318-5ba4-b99b-9d615b4e2c00
   PI-002:
     question: How many tools have been funded by GFF?
-    results: 4
+    results: 6
   ST-001:
     question: Find studies focused on schwannoma
     results:
@@ -375,7 +402,6 @@ ground_truth:
     - syn61778589
     - syn61831970
     - syn62012031
-    - syn62809145
     - syn63992357
     - syn69071607
     - syn70366165
@@ -397,7 +423,9 @@ ground_truth:
     - syn4939910
     - syn51133929
     - syn53604892
+    - syn62031004
     - syn63944395
+    - syn68634225
   ST-003:
     question: Which studies have whole genome sequencing data from human female subjects?
     results:

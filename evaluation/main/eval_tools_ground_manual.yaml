@@ -21,42 +21,72 @@ ground_truth:
   AM-004:
     question: "Find mouse model with the earliest observed tumor development"
     results:
-      # Two mouse models tied for earliest tumor detection at 120 days (4 months)
-      - 215b4e43-8a99-4702-ab4b-eeeadeeb13a5  # Nf1flox/flox;PostnCre(+)
-      - eb4aff73-9da2-42b5-8f94-0a6084db75b0  # Nf14F/4F; DhhCre
+      # Single earliest at 90 days (3 months) -- see notes, re-derived for KG v0.4
+      - 9971e47e-976a-4631-8edd-5cae04304b01  # Nf1+/-GFAPCKO
 
     methodology: |
-      Review observations table for:
-      1. Mouse models only (filtered by backgroundStrain: C57BL/6, etc.)
-      2. observationType = "Tumor Incidence"
-      3. Actual tumor detection (not genetic manipulation timing or negative results)
-      4. Earliest observationTime
+      Review observations for:
+      1. Mouse models only (nf:species = "Mus musculus" on the nf:AnimalModel)
+      2. nf:PhenotypeObservation instances whose text describes an actual tumor
+         (search text for tumor/neurofibroma/sarcoma/glioma/mpnst; observationType
+         is no longer a literal string in KG v0.4 -- Observation subclass
+         (AssayObservation, PhenotypeObservation, ...) plus free text is the
+         only way to identify a tumor-relevant observation now)
+      3. Actual tumor detection (not genetic manipulation timing, drug-treatment
+         timing, survival/endpoint metrics, or negative results)
+      4. Earliest observationTime (normalize units: 1 month = 30 days)
 
-      Interpret observation text carefully, as most "Tumor Incidence" observations don't pertain.
-      For example, exclude:
-      - "at embryonic day" / "at E12.5" (genetic manipulation timing)
+      Interpret observation text carefully -- most tumor-mentioning observations
+      don't describe detection timing. For example, exclude:
+      - "at embryonic day" / "at E12.5" (genetic manipulation timing, not detection)
       - "prior to" / "before" (pre-tumor observations)
-      - "no evidence" / "no reduction" (negative results)
-      - "loss of Nf1 in" / "inactivation of" (describes genetic event *in* tissue, not tumor)
+      - "no evidence" / "did not develop" (negative results)
+      - text describing when a *treatment* started or was withdrawn (a
+        prevention/intervention timepoint, not a detection timepoint) --
+        e.g. "treatment ... starting at 1 month of age prevented initiation of ..."
+      - "median survival of N days" (a mortality endpoint, not first-observed
+        tumor timing -- treated as not dispositive; see notes)
 
     observations:
-      - resourceId: 215b4e43-8a99-4702-ab4b-eeeadeeb13a5
-        resourceName: "Nf1flox/flox;PostnCre(+)"
-        observationTime: 120.0
-        observationTimeUnits: "days"
-        observationType: "Tumor incidence"
-        observationText: "The Nf1flox/flox;PostnCre(+) mice develop plexiform neurofibromas in multiple peripheral nerves with 100% penetrance by 4 months of age."
+      - resourceId: 9971e47e-976a-4631-8edd-5cae04304b01
+        resourceName: "Nf1+/-GFAPCKO"
+        observationTime: 3.0
+        observationTimeUnits: "months"
+        observationSubmitterName: "James Goss"
+        observationText: "Optic glioma, focal expansion of prechiasmatic optic nerves and chiasm. Low proliferative indices. Lack of eosinophilic granular bodies, Rosenthal fibers or microcystic structures commonly seen in humans (therefore not juvenile pilocytic astrocytomas). Decrease in IPL-GCL and RNFL thickness by SD-OCT"
 
-      - resourceId: eb4aff73-9da2-42b5-8f94-0a6084db75b0
-        resourceName: "Nf14F/4F; DhhCre"
-        observationTime: 120.0
-        observationTimeUnits: "days"
-        observationType: "Tumor incidence"
-        observationText: "Neurofibromas were observed in 79.2% of Nf14F/4F; DhhCre mice, arising from the dorsal root ganglia and compressing the spinal cord, with 90.9% detected in the cervical or thoracic spine."
+    notes: |
+      RE-DERIVED for KG v0.4 (2026-08-28) -- the answer CHANGED, and not because
+      of the resourceId/schema migration itself. A large batch of new,
+      LLM-extracted observations was ingested (submitter "🤖 AI-extracted[
+      - IN BETA - please confirm accuracy in linked publication]"), which
+      surfaced a genuine earlier tumor-detection record that did not exist in
+      the v0.2-eval snapshot: Nf1+/-GFAPCKO, an optic glioma detected at 3
+      months (90 days) of age, submitted by a named human curator (James Goss),
+      not the AI-extraction pipeline.
 
-    notes: >
-      Advanced question bc the Observations text needs to be interpeted for actually relevant results. 
-      Models found after Observations data review have actual tumor detection at 120 days (4 months).
+      This supersedes the previous tied answer at 120 days (4 months):
+      - 215b4e43-8a99-4702-ab4b-eeeadeeb13a5 (Nf1flox/flox;PostnCre(+))
+      - eb4aff73-9da2-42b5-8f94-0a6084db75b0 (Nf14F/4F; DhhCre)
+      Both of those 120-day observations are still present, unchanged, and
+      still valid data -- they are simply no longer the earliest.
+
+      Judgment call worth flagging: fbf11ec4-1d12-4feb-a6fc-9faf6bc9c9db
+      (Nf1flox/-;hGFAP-Cre) has an AI-extracted observation reading "resulted
+      in tumor formation with a median survival of 91 days" (also earlier than
+      120). Treated as NOT a valid detection timepoint -- median survival is a
+      mortality endpoint that post-dates actual tumor onset by an unknown
+      margin, so it doesn't establish "earliest observed tumor development."
+      Even if this judgment is wrong, 91 > 90, so it would not change the
+      winner. Also excluded: four "3 months"/"90 days" observations reporting
+      explicitly NEGATIVE optic glioma findings ("no evidence of optic glioma
+      formation") on other Cx3cr1/NG2-Cre models, and two "12.5 days" entries
+      that describe embryonic Cre-recombination timing (~E12.5), not tumor
+      detection.
+
+      Because this depends on newly-ingested, partly AI-extracted observation
+      text rather than a stable structured field, it is worth spot-checking
+      again once the AI-extracted observations move out of beta.
 
   CL-003:
     question: "I need normal schwann cell lines"
@@ -78,21 +108,38 @@ ground_truth:
          hybridoma, hybrid, and spontaneously immortalized lines do not
 
     notes: |
-      Several lines are miscategorized with "No known genetic disorder" in source data.
-      Recommended corrections:
-      - 617cb183-3377-4473-8ad8-2f6472bce1fa (YST-1, cellLineId 4379c5e8-34d5-43f2-b0a8-2711c513eb40):
-        schwannoma tumor line; should be "Schwannomatosis"
-      - 234515dd-7c28-4172-83c7-59dddfa22acb (Schwann cell NF1 -/- iPN97.4 #24, cellLineId 859f3f11-7be4-41c1-97aa-05e86f0c8202):
-        NF1 knockout; should be "Neurofibromatosis type 1"
-      - faf29a50-3168-4ccd-a484-f2a78a026af3 (Schwann cell NF1 -/- with R681X mNf1 cDNA, cellLineId be5c41c4-e9ae-4330-a48b-7b81d26a0c91):
-        NF1 knockout + rescue; should be "Neurofibromatosis type 1"
-      - 3a3e5460-3d5b-45f9-995d-25bd49c06f34 (Schwann cell NF1 -/- with R816X mNf1 cDNA, cellLineId 766629ea-794c-4678-838d-4309d1e825e2):
-        NF1 knockout + rescue; should be "Neurofibromatosis type 1"
-      - 3beebac1-95b0-4834-9008-19f7d268fc5b (Schwann cell NF1 -/- with WT tagged mNf1 cDNA, cellLineId 36050621-0007-4b26-afec-08d43675afc4):
-        NF1 knockout + rescue; should be "Neurofibromatosis type 1"
+      RE-VERIFIED for KG v0.4 (2026-08-28): re-ran the methodology against
+      current data. Answer set UNCHANGED -- same 4 cell lines, no new
+      qualifying or disqualified candidates (checked against a fresh
+      name/synonym/description sweep for "schwann"/"hTERT SC", including a
+      newly-added entry "i28cNF" which correctly excludes on
+      geneticDisorder = NF1).
+
+      Of the 5 corrections previously recommended below, 4 have been fixed
+      upstream (geneticDisorder now correctly reads "Neurofibromatosis type 1"
+      for all four NF1-knockout/rescue lines). Still open:
+      - 617cb183-3377-4473-8ad8-2f6472bce1fa (YST-1): still shows
+        "No known genetic disorder" though its own description identifies it
+        as a schwannoma tumor line; should be "Schwannomatosis". Does not
+        affect the answer set here regardless, since it's independently
+        excluded on cellLineCategory = "Cancer cell line".
 
       Some Schwann cell lines use the abbreviation "SC" only in synonyms
       (e.g. "hTERT SC ipn02.3 2lambda"), requiring synonym search to discover.
+
+      Originally recommended corrections (for reference; ids below are the
+      current resourceId -- the parenthetical "cellLineId" values are the
+      pre-KG-v0.4 primary key, retained here only as a historical crosswalk):
+      - 617cb183-3377-4473-8ad8-2f6472bce1fa (YST-1, cellLineId 4379c5e8-34d5-43f2-b0a8-2711c513eb40):
+        schwannoma tumor line; should be "Schwannomatosis" -- NOT YET FIXED
+      - 234515dd-7c28-4172-83c7-59dddfa22acb (Schwann cell NF1 -/- iPN97.4 #24, cellLineId 859f3f11-7be4-41c1-97aa-05e86f0c8202):
+        NF1 knockout; should be "Neurofibromatosis type 1" -- fixed
+      - faf29a50-3168-4ccd-a484-f2a78a026af3 (Schwann cell NF1 -/- with R681X mNf1 cDNA, cellLineId be5c41c4-e9ae-4330-a48b-7b81d26a0c91):
+        NF1 knockout + rescue; should be "Neurofibromatosis type 1" -- fixed
+      - 3a3e5460-3d5b-45f9-995d-25bd49c06f34 (Schwann cell NF1 -/- with R816X mNf1 cDNA, cellLineId 766629ea-794c-4678-838d-4309d1e825e2):
+        NF1 knockout + rescue; should be "Neurofibromatosis type 1" -- fixed
+      - 3beebac1-95b0-4834-9008-19f7d268fc5b (Schwann cell NF1 -/- with WT tagged mNf1 cDNA, cellLineId 36050621-0007-4b26-afec-08d43675afc4):
+        NF1 knockout + rescue; should be "Neurofibromatosis type 1" -- fixed
 
   CR-004:
     question: "Does the SZ-NF1 cell line require MTA? Please answer exactly: 'Yes', 'No', 'Not explicitly documented but likely', or 'Not explicitly documented so unlikely'"
@@ -118,6 +165,10 @@ ground_truth:
         usage constraints and investigator-contact acquisition model, reads
         the ontology guidance, and correctly hedges with "Not explicitly
         documented but likely"
+
+      RE-VERIFIED for KG v0.4 (2026-08-28): SZ-NF1's usageRequirements and
+      howToAcquire are unchanged (still no explicit MTA mention, still
+      investigator-contact acquisition). Answer unchanged.
 
   PUB-001:
     question: "How many authors are on 'Validating Techniques for Measurement of Cutaneous Neurofibromas: Recommendations for Clinical Trials' (PMID: 34230197, DOI: 10.1212/WNL.0000000000012428)?"
@@ -150,6 +201,11 @@ ground_truth:
       so the count is unambiguous. Publications ingested from more than one
       portal listing can otherwise be duplicated, and the two records do not
       always agree.
+
+      RE-VERIFIED for KG v0.4 (2026-08-28): still exactly one node, still 15
+      nf:authors. Note nf:pmid is now an IRI
+      (<https://pubmed.ncbi.nlm.nih.gov/{pmid}>), not a literal -- match
+      accordingly. Answer unchanged.
 
       HISTORY: this question originally used the minipig paper
       (10.1038/s42003-018-0163-y, answer 22). It was moved after the main portal
@@ -237,6 +293,9 @@ ground_truth:
       - The remaining 14 authors (including all 3 without any authorOrcid link
         at all, per PUB-001) have no discoverable Synapse user id in the graph.
 
+      RE-VERIFIED for KG v0.4 (2026-08-28): same 8 profile ids resolve via the
+      one-hop nf:hasSynapseProfile route. Answer unchanged.
+
       WHY THE ANSWER IS PROFILE IDS, NOT NAMES: this question originally asked
       for author names and was unanswerable as posed, because a biolink:Person
       node carried only its type and an owl:sameAs to its ORCID. That is no
@@ -313,6 +372,9 @@ ground_truth:
 
       IF ORCID COVERAGE IS EXPANDED UPSTREAM, THIS ANSWER MUST BE RECOMPUTED.
 
+      RE-VERIFIED for KG v0.4 (2026-08-28): route (a) still finds 19 nodes,
+      still dedupe to the same 14 titles listed above. Answer unchanged.
+
   PUB-004:
     question: "Some publications are listed by both NF Research Tools Central and the main NF Data Portal. Which publications appear in both listings? Answer with the PubMed ID (PMID) of each one."
     results:
@@ -321,6 +383,7 @@ ground_truth:
       - "28469964"  # Comprehensive pharmacological profiling of neurofibromatosis...
       - "29055717"  # Development of 3D culture models of plexiform neurofibroma
       - "29893754"  # Pharmacological and genomic profiling of NF1 plexiform neurofibroma
+      - "29897904"  # (new cross-listing as of KG v0.4 -- see notes)
       - "30302402"  # Genetically engineered minipigs model...
       - "30348677"  # Spatiotemporal Loss of NF1 in Schwann Cell Lineage
       - "30936125"  # Targeted inhibition of the dual specificity phosphatases DUSP1/DUSP5
@@ -330,14 +393,25 @@ ground_truth:
       - "31545171"  # Optical dopamine monitoring with dLight1
       - "32074109"  # Validating indicators of CNS disorders in a swine model
       - "32459399"  # Early administration of imatinib mesylate
+      - "32471868"  # (new cross-listing as of KG v0.4 -- see notes)
       - "32561749"  # A clinically and genomically annotated nerve sheath tumor biospecimen
+      - "33032988"  # (new cross-listing as of KG v0.4 -- see notes)
+      - "33085177"  # (new cross-listing as of KG v0.4 -- see notes)
       - "33108355"  # Humanized neurofibroma model from iPSCs
       - "33203698"  # Activation of Receptor Tyrosine Kinases Mediates Acquired Resistance
+      - "33591953"  # (new cross-listing as of KG v0.4 -- see notes)
       - "34066061"  # Neurofibromin Deficiency and Extracellular Matrix Cooperate
+      - "34106871"  # (new cross-listing as of KG v0.4 -- see notes)
       - "34945792"  # Restoration of Normal NF1 Function with Antisense Morpholinos
       - "35172160"  # Modeling iPSC-derived human neurofibroma-like tumors in mice
       - "35433111"  # Targeted exon skipping of NF1 exon 17
       - "35741605"  # Integrated Drug Mining Reveals Actionable Strategies
+      - "36730269"  # (new cross-listing as of KG v0.4 -- see notes)
+      - "37246765"  # (new cross-listing as of KG v0.4 -- see notes)
+      - "38000020"  # (new cross-listing as of KG v0.4 -- see notes)
+      - "38744290"  # (new cross-listing as of KG v0.4 -- see notes)
+      - "39061138"  # (new cross-listing as of KG v0.4 -- see notes)
+      - "41223283"  # (new cross-listing as of KG v0.4 -- see notes)
 
     methodology: |
       Publications come from two portal listings, and each node records which one
@@ -348,10 +422,14 @@ ground_truth:
              prov:wasDerivedFrom ?collection ;
              nf:pmid ?pmid .
         GROUP BY ?pmid HAVING (COUNT(DISTINCT ?collection) > 1)
-      -> 22 PMIDs.
+      -> 34 PMIDs (was 22 at KG v0.2-eval; re-derived for KG v0.4, see notes).
 
-      The two collections are nf:ToolsCentralPublications (691 nodes, syn26486839)
-      and nf:MainPortalPublications (246 nodes, syn16857542); 937 nodes total.
+      nf:pmid is now an IRI (<https://pubmed.ncbi.nlm.nih.gov/{pmid}>), not a
+      plain literal -- match on the IRI, or extract the local name for the
+      answer format this question asks for.
+
+      The two collections are nf:ToolsCentralPublications (724 nodes, syn26486839)
+      and nf:MainPortalPublications (250 nodes, syn16857542); 974 nodes total.
 
     notes: |
       Tests whether an agent understands that biolink:Publication is populated
@@ -359,23 +437,28 @@ ground_truth:
       provenance link, and can group across it. See
       docs/publication-issues.md.
 
+      RE-DERIVED for KG v0.4 (2026-08-28): the answer grew from 22 to 34 PMIDs.
+      This is genuine "additions-direction" growth in both source listings
+      (937 -> 974 publication nodes total) between the v0.2-eval snapshot and
+      the current build, not a schema artifact -- all 22 original PMIDs are
+      still present and still cross-listed; 12 new PMIDs additionally overlap
+      now: 29897904, 32471868, 33032988, 33085177, 33591953, 34106871,
+      36730269, 37246765, 38000020, 38744290, 39061138, 41223283.
+
       The choice of matching key changes the answer, which is the main thing
       this question discriminates:
-      - 22 by nf:pmid (CORRECT -- best coverage, 906 distinct PMIDs)
-      - 19 by nf:doi (undercounts: only 807 distinct DOIs, because the main
-        portal doi column holds an article number or publisher PII for ~13% of
-        rows, so those nodes have no nf:doi to match on)
-      - 19 by nf:publicationTitle (undercounts similarly; also brittle to
-        punctuation and trailing periods)
-      An agent matching on DOI or title scores 19/22 recall -- a reasonable but
-      inferior answer, which is the intended partial credit.
+      - 34 by nf:pmid (CORRECT -- best coverage, 929 distinct PMIDs)
+      - by nf:doi or nf:publicationTitle undercounts, for the same reasons as
+        before (main portal's doi column sometimes holds an article number or
+        publisher PII instead of a real DOI; titles are brittle to punctuation)
+      An agent matching on DOI or title scores lower recall -- a reasonable but
+      inferior answer, which is the intended partial credit. Exact undercounts
+      were not re-verified this pass (see 19/19 at v0.2-eval for reference).
 
-      Do NOT count "any paper with more than one node" -- that gives 23. One
-      extra pair (PMID 37406085) is a same-collection duplicate: the main portal
-      lists it twice with DOIs differing only in case
-      (10.1158/1078-0432.CCR-22-2854 vs ...ccr-22-2854), producing two nodes
-      within nf:MainPortalPublications. That is an upstream data-entry issue,
-      not a cross-listing overlap.
+      Do NOT count "any paper with more than one node" -- that overcounts by
+      including same-collection duplicates (e.g. PMID 37406085 was one at
+      v0.2-eval, a main-portal DOI-case duplicate). Group by PMID and require
+      COUNT(DISTINCT collection) > 1, not COUNT(DISTINCT node) > 1.
 
   PUB-005:
     question: "I have Synapse profile 3334263. Among the co-authors on my papers who have an ORCID on record, how many are NOT Synapse users?"
@@ -432,6 +515,10 @@ ground_truth:
       Scoring caveat: "72" is not a substring of any of the plausible wrong
       answers above.
 
+      RE-VERIFIED for KG v0.4 (2026-08-28): 14 DOIs, 99 total co-author
+      ORCIDs, 72 without a Synapse profile -- identical to v0.2-eval. Answer
+      unchanged.
+
   PUB-006:
     question: "Across the publications in this knowledge graph, which researcher has the most distinct co-authors? Answer with their ORCID."
     results:
@@ -479,6 +566,9 @@ ground_truth:
         are partly missed
       - counting nf:authorOrcid edges or papers rather than DISTINCT co-authors
       - failing to exclude self, which adds 1 to every count uniformly
+
+      RE-VERIFIED for KG v0.4 (2026-08-28): same winner and same top-5 ranking
+      and margin (162/138/137/108/107). Answer unchanged.
 
   CR-001:
     question: "Which cell lines have shown sensitivity to HDAC inhibitors?"
@@ -531,3 +621,8 @@ ground_truth:
       The MPNST-642 observation mentions it was part of a 6-cell line MPNST screen,
       suggesting 5 additional MPNST cell lines may have been tested but aren't yet
       documented in observations (potential data gap).
+
+      RE-VERIFIED for KG v0.4 (2026-08-28): same 2 observations, identical
+      text, despite a large batch of new AI-extracted observations landing
+      elsewhere in the graph (see AM-004) -- none of them mention HDAC
+      inhibitors. Answer unchanged.

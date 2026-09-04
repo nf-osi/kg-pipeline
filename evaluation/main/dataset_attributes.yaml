@@ -59,9 +59,9 @@
 #   ✓ Can be explained clearly in <30 seconds
 
 metadata:
-  version: v1.3
-  data_sources_profile: evaluation
-  data_sources_version: KG v0.2-eval
+  version: v2.0
+  data_sources_profile: release
+  data_sources_version: KG v0.4
 
 components:
   - name: "Discovery via Mutation of Interest"
@@ -366,6 +366,20 @@ components:
         note: "Enables within-subject comparisons across tissues (e.g., dermal vs plexiform neurofibroma from same patient); requires grouping Cell Lines by Donor ID and finding those with multiple distinct tissues"
         demo_priority: high
         demo_rationale: "Enables high-value intra-donor comparison impossible via current facets"
+
+      - id: CL-010
+        question: "How many MPNST cell lines?"
+        user_story: "As a researcher, I want a count of available MPNST cell lines to gauge how well this tumor type is covered before planning a panel"
+        level: baseline
+        complexity: 0-hop
+        facet_answerable: yes
+        facet_note: "Resource Type = 'Cell Line' + manifestation = 'Malignant Peripheral Nerve Sheath Tumor' -> read off the result count"
+        text_search_answerable: no
+        text_search_note: "Searching 'MPNST' hits free text, not the structured property: 36 cell lines mention the acronym in resourceName/synonyms/description, 15 of which carry no MPNST manifestation, while 10 that do carry it never spell out the acronym"
+        user_frustration: low
+        note: "Trivial via facets, but a reliable agent trap. `manifestation` stores the full label 'Malignant Peripheral Nerve Sheath Tumor' and the string 'MPNST' appears nowhere in that column, so filtering manifestation on 'MPNST' returns 0 and substring-matching the acronym across labels/descriptions returns 36 -- neither is 31"
+        demo_priority: low
+        demo_rationale: "No advantage over existing facets; carried as a control that catches agents substituting substring matching for the structured manifestation property"
 
   - name: "Antibody Discovery"
     description: "Finding antibodies by target, species reactivity, and epitope specificity"

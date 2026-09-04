@@ -2,6 +2,96 @@
 
 All notable changes to the NF Research Tools Discovery evaluation dataset will be documented in this file.
 
+## [v2.0] - 2026-08-28
+
+Re-baseline for KG v0.4 (the upstream LinkML schema adoption, #87). This is the
+"re-baselining" work that v1.4 explicitly deferred — see its "Known gap" entry
+below. **Breaks comparability with all 52 previously recorded runs.**
+
+### Added
+- **CL-010: "How many MPNST cell lines?"** (baseline, 0-hop, count → 31).
+  Trivial for a user who reaches for the `manifestation` facet, and carried
+  precisely because it is trivial there: it is a control for agents that
+  substitute substring matching for the structured property. `manifestation`
+  stores the full label `Malignant Peripheral Nerve Sheath Tumor`, and the
+  acronym appears nowhere in that column, so the two natural shortcuts both
+  give the wrong number — filtering `manifestation` on `MPNST` returns 0, and
+  matching `MPNST` across `resourceName`/`synonyms`/`description` returns 36
+  (15 rows that mention the acronym without carrying the manifestation, while
+  missing 10 that carry it without spelling it out). Only PI-002 and CL-010
+  return a count rather than resourceIds
+- Regenerating `eval_tools_ground_auto.yaml` for this reproduced all 36 prior
+  answers byte-identically, so CL-010 and the question counts are the only
+  ground-truth changes
+
+### Changed
+- **`generate_ground_truth.py` ported to the v0.4 schema.** The central `resources`
+  table is gone upstream, so every tool-type table (`animal_models`, `cell_lines`,
+  `genetic_reagents`, `antibodies`, `mutation_model`) now carries a shared
+  `resourceId` directly instead of a `<type>Id`, and core Tool fields
+  (`resourceName`, `description`, `synonyms`, ...) are denormalized onto each of
+  them. Net effect: the old `ensure_resource_id`/`primary_to_res`/`name_to_res`
+  crosswalk machinery (built by joining against `resources.csv`) is gone —
+  IDs are already resourceIds at the source, so most queries got simpler, not
+  just renamed
+  - `mutation_model` collapsed `animalModelId`/`cellLineId` into one `resourceId`
+    column with no type marker; MUT-002/003/004/005/006 and CL-008 now
+    disambiguate animal-model vs. cell-line rows by checking `resourceId`
+    membership against `animal_models`/`cell_lines`, rather than by which of two
+    columns was populated
+  - `development_investigator.csv` / `development_funder.csv` no longer exist as
+    precomputed exports. PI-001, PI-002, and CR-001 now join `development.csv`
+    (which carries `resourceId` + `investigatorId` + `funderId` directly) against
+    `investigators.csv` / `funders.csv` themselves
+  - AM-001/002/003 and CL-001/002/004/007 dropped their `models_resources` /
+    `cells_donors_resources` merges — `manifestation`, `geneticDisorder`,
+    `resourceName`, `description`, `synonyms`, and (for cell lines) `race` are
+    already on the per-type table, donor-derived where applicable. `cells_donors`
+    (for `species`, still not denormalized onto `cell_lines`) is the one donor
+    join that's still needed
+  - Column renames throughout: `animalModelOfManifestation`/`cellLineManifestation`
+    → `manifestation`, `animalModelGeneticDisorder`/`cellLineGeneticDisorder` →
+    `geneticDisorder`, and the nine `<type>Id` primary keys → `resourceId`
+  - `DATA_DIR` now points at the top-level `data/csv` (the `release` profile,
+    KG v0.4) instead of `evaluation/data/csv` (the frozen `KG v0.2-eval` snapshot)
+
+- **Answer sets regenerated and diffed against v1.4.** 4 of 34 automated
+  questions changed, all growing (no removals except where an edge was
+  genuinely dropped upstream — see PI-001 below); the rest are byte-identical:
+  - **CL-001** (plexiform neurofibroma cell lines): 10 → 28
+  - **MUT-002** (NF1 floxed mice): 2 → 6
+  - **PI-001** (Piotr Topilko resources): 1 → 2, and it's not a strict add —
+    the v1.4 answer (`15c3bd82-...`, a cell line) is no longer linked to Topilko
+    in current `development.csv`; two different resources are now linked
+    instead (confirmed against `data/csv`, not a join bug)
+  - **PI-002** (Gilbert Family Foundation-funded resource count): 4 → 6
+  - This is exactly the "additions-direction staleness" v1.4 flagged as an open
+    gap (e.g. `cell_lines` grew from 637 to 665 rows between the v0.2-eval and
+    v0.4 pins) — recall for these 4 questions is not comparable to any prior run
+
+- **Manual ground truth (`eval_tools_ground_manual.yaml`) re-verified against
+  KG v0.4.** AM-004, CL-003, CR-001, CR-004, PUB-001–006 each re-run against
+  current data by hand. 8 of 10 unchanged; 2 real changes found:
+  - **AM-004** (earliest mouse tumor detection): answer changed from a tie at
+    120 days to a single new answer at 90 days (`9971e47e-...`,
+    "Nf1+/-GFAPCKO", optic glioma). Not a schema effect — a large batch of new
+    observations (many LLM-extracted, submitter tagged "🤖 AI-extracted...")
+    was ingested since v0.2-eval and surfaced a genuinely earlier, human-curated
+    (submitter "James Goss") detection record. The two previous 120-day
+    observations are still present and valid, just no longer earliest
+  - **PUB-004** (publications cross-listed in both portal listings): grew from
+    22 to 34 PMIDs — all 22 original PMIDs still cross-listed, plus 12 newly
+    overlapping. `nf:pmid` is also now an IRI, not a literal (query accordingly)
+  - **CL-003**: unchanged (same 4 cell lines). Side finding: 4 of the 5
+    "recommended corrections" noted in v1.x for miscategorized `geneticDisorder`
+    values have been fixed upstream since; the YST-1 schwannoma mislabeling has
+    not (doesn't affect the answer regardless, since YST-1 is independently
+    excluded on `cellLineCategory`)
+  - CR-001, CR-004, PUB-001, PUB-002, PUB-003, PUB-005, PUB-006: unchanged,
+    each re-run and confirmed identical
+
+- **Ground truth regenerated against baseline image `build-32`.**
+
 ## [v1.4] - 2026-08-27
 
 Minimal correctness pass for KG v0.4 (the upstream LinkML schema adoption, #87).

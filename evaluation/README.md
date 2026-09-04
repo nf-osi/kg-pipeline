@@ -148,7 +148,7 @@ This script processes the raw CSV data located in `../data/csv` to extract relev
 #### Identifier Standardization
 
 All ground truth IDs in the generated files should be standardized to use `resourceId` (instead of `cellLineID` or `geneticReagentId`, etc.). 
-There is only one question that returns a number (count) instead of uuid(s).
+Two questions return a number (count) instead of uuid(s): PI-002 and CL-010.
 
 ---
 
@@ -156,30 +156,30 @@ There is only one question that returns a number (count) instead of uuid(s).
 
 ### Data Versioning
 
-**Dataset Version**: v1.3
+**Dataset Version**: v2.0
 
-Built against **KG v0.2-eval**, `evaluation` profile in `data_sources.yaml`
+Built against **KG v0.4**, `release` profile in `data_sources.yaml`
 
 ---
 
 ### Dataset Statistics
 
-- **Total Questions**: 46
-  - Complete: 46
+- **Total Questions**: 47
+  - Complete: 47
   - Incomplete/WIP: 0
 
 #### By Complexity
-- **0-hop**: 15
+- **0-hop**: 16
 - **1-hop**: 17
 - **2-hop**: 12
 - **3-hop**: 2
 
 #### By Difficulty Level
 - **advanced**: 26
-- **baseline**: 20
+- **baseline**: 21
 
 #### By Persona
-- **Researcher**: 33
+- **Researcher**: 34
 - **Gene Therapy Developer**: 4
 - **Program Officer**: 3
 - **Bioinformatician**: 2
@@ -192,18 +192,18 @@ Built against **KG v0.2-eval**, `evaluation` profile in `data_sources.yaml`
 #### By Demo Priority
 - **high**: 22
 - **medium**: 16
-- **low**: 8
+- **low**: 9
 
 #### Answerability via Current Technologies
 
 | Technology | Yes | Partial | No |
 |------------|-----|---------|-----|
-| **Facet Filters** | 11 | 4 | 31 |
-| **Text Search** | 14 | 10 | 22 |
+| **Facet Filters** | 12 | 4 | 31 |
+| **Text Search** | 14 | 10 | 23 |
 
 #### Ground Truth Availability
 
-- **Automated** (generated from CSV data): 36
+- **Automated** (generated from CSV data): 37
 - **Manual** (curated, requires interpretation): 10
 
 ---
@@ -243,7 +243,7 @@ Built against **KG v0.2-eval**, `evaluation` profile in `data_sources.yaml`
 #### Cell Line Discovery
 *Finding cell lines by type, tissue, manifestation, growth characteristics, donor characteristics*
 
-**Questions: 9/9 complete**
+**Questions: 10/10 complete**
 
 | ID | Question | Level | Complexity | Facet | Text Search |
 |----|----------|-------|------------|-------|-------------|
@@ -256,6 +256,7 @@ Built against **KG v0.2-eval**, `evaluation` profile in `data_sources.yaml`
 | CL-007 | Find MPNST cell lines with population doubling times under 48 hours | advanced | 0-hop | No | No |
 | CL-008 | Find isogenic cell line pairs that differ only in NF1 status | advanced | 2-hop | No | No |
 | CL-009 | Find cell lines from different tissues of the same donor | advanced | 1-hop | No | No |
+| CL-010 | How many MPNST cell lines? | baseline | 0-hop | Yes | No |
 
 
 #### Antibody Discovery
