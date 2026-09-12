@@ -582,6 +582,51 @@ def create_variant_crosswalk_asset(study_id: str):
     return _crosswalk_asset
 
 
+def create_gene_asset(study_id: str):
+    @asset(
+        name="genes",
+        key_prefix=["portal", "rdf"],
+        compute_kind="python",
+        group_name="variants",
+        deps=[["variants", "raw", f"{study_id}_maf"]],
+    )
+    def _gene_asset(context: AssetExecutionContext) -> Path:
+        """Materialize biolink:Gene nodes, with HGNC as the symbol authority.
+
+        Output lands in data/rdf/ (core graph), not the variants subdirectory: gene
+        nodes stay whether or not the variant layer is published. Generation is gated
+        with the variant assets only because the MAF is where the gene annotation comes
+        from.
+        """
+        from scripts.materialize_genes import fetch_hgnc, materialize_genes, report
+
+        project_root = Path(__file__).parent.parent.parent
+        maf = project_root / "data" / "raw" / f"{study_id}_data_mutations.txt"
+        output_file = project_root / "data" / "rdf" / "genes.ttl"
+
+        hgnc_path = fetch_hgnc(project_root / "data" / "raw" / "hgnc_complete_set.txt")
+        index = materialize_genes(maf, output_file, hgnc_path)
+        context.log.info(report(index, output_file))
+
+        resolution = index.resolution
+        if resolution["unverified_maf_symbol"]:
+            context.log.warning(
+                f"{resolution['unverified_maf_symbol']} gene(s) kept an unverified MAF "
+                "symbol (no HGNC id, or HGNC's ensembl id disagreed)"
+            )
+        context.add_output_metadata({
+            "path": str(output_file.relative_to(project_root)),
+            "size_mb": round(output_file.stat().st_size / (1024 * 1024), 2),
+            "genes": len(index.genes),
+            "verified_against_hgnc": resolution["verified_by_hgnc"],
+            "symbols_corrected": resolution["symbol_corrected"],
+            "unverified_symbols": resolution["unverified_maf_symbol"],
+        })
+        return output_file
+
+    return _gene_asset
+
+
 def generate_variant_assets() -> List:
     """Variant layer assets, or nothing when KG_INCLUDE_VARIANTS is unset."""
     if os.environ.get("KG_INCLUDE_VARIANTS", "").lower() not in {"1", "true", "yes"}:
@@ -590,6 +635,7 @@ def generate_variant_assets() -> List:
     for study_id in VARIANT_STUDY_IDS:
         assets.append(create_variant_maf_asset(study_id))
         assets.append(create_variant_crosswalk_asset(study_id))
+        assets.append(create_gene_asset(study_id))
     return assets
 
 
