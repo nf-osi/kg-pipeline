@@ -435,6 +435,44 @@ def create_build_metadata_asset(rdf_asset_keys: list):
 
 
 # =============================================================================
+# Specimen / individual layer (core graph)
+# =============================================================================
+
+
+@asset(
+    name="specimens",
+    key_prefix=["portal", "rdf"],
+    compute_kind="python",
+    group_name="relationships",
+    deps=[["portal", "harmonized", "files"]],
+)
+def specimens_asset(context: AssetExecutionContext) -> Path:
+    """Promote specimenID/individualID literals on files into first-class nodes.
+
+    Derived from the harmonized files CSV rather than from files.ttl, because the CSV is
+    what the files RML itself consumes -- reading the RDF would make this depend on
+    RMLMapper having already run and on its output being current.
+    """
+    from scripts.materialize_specimens import materialize_specimens, report
+
+    project_root = Path(__file__).parent.parent.parent
+    files_csv = project_root / "data" / "csv" / "files_harmonized.csv"
+    output_file = project_root / "data" / "rdf" / "specimens.ttl"
+
+    index = materialize_specimens(files_csv, output_file)
+    context.log.info(report(index, output_file))
+
+    context.add_output_metadata({
+        "path": str(output_file.relative_to(project_root)),
+        "size_mb": round(output_file.stat().st_size / (1024 * 1024), 2),
+        "specimens": len(index.specimens),
+        "individuals": len(index.individuals),
+        "specimens_without_individual": len(index.orphan_specimens),
+    })
+    return output_file
+
+
+# =============================================================================
 # Generate all assets
 # =============================================================================
 
@@ -468,6 +506,7 @@ def generate_portal_assets() -> List:
     assets.append(shared_donor_links_asset)
     assets.append(nf1_mutation_sets_asset)
     assets.append(observation_links_asset)
+    assets.append(specimens_asset)
     assets.append(create_build_metadata_asset(rdf_asset_keys))
 
     return assets
