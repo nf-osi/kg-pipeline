@@ -879,8 +879,8 @@ nf:mutationId a owl:DatatypeProperty ;
 
 nf:affectedGeneSymbol a owl:DatatypeProperty ;
     rdfs:label "affectedGeneSymbol" ;
-    rdfs:comment "HGNC symbol of the gene affected by the mutation." ;
-    rdfs:domain nf:Mutation ;
+    rdfs:comment "HGNC symbol of the gene affected by the mutation or variant observation. Kept verbatim as the source reported it, even where the gene node's nf:geneSymbol was corrected against HGNC, so every record stays traceable to its source." ;
+    rdfs:domain [ a owl:Class ; owl:unionOf (nf:Mutation nf:VariantObservation) ] ;
     rdfs:range xsd:string .
 
 nf:affectedGeneName a owl:DatatypeProperty ;
@@ -1882,8 +1882,8 @@ nf:Individual a owl:Class ;
 
 nf:fromSpecimen a owl:ObjectProperty ;
     rdfs:label "fromSpecimen" ;
-    rdfs:comment "Links a file to the specimen it was derived from." ;
-    rdfs:domain nf:File ;
+    rdfs:comment "Links a file or variant observation to the specimen it was derived from." ;
+    rdfs:domain [ a owl:Class ; owl:unionOf (nf:File nf:VariantObservation) ] ;
     rdfs:range nf:Specimen .
 
 nf:hasFile a owl:ObjectProperty ;
@@ -1895,8 +1895,8 @@ nf:hasFile a owl:ObjectProperty ;
 
 nf:fromIndividual a owl:ObjectProperty ;
     rdfs:label "fromIndividual" ;
-    rdfs:comment "Links a specimen or file to the individual it came from. Asserted on files directly as well as via their specimen, because many files carry an individualID with no specimenID at all." ;
-    rdfs:domain [ a owl:Class ; owl:unionOf (nf:File nf:Specimen) ] ;
+    rdfs:comment "Links a specimen, file, or variant observation to the individual it came from. Asserted on files directly as well as via their specimen, because many files carry an individualID with no specimenID at all." ;
+    rdfs:domain [ a owl:Class ; owl:unionOf (nf:File nf:Specimen nf:VariantObservation) ] ;
     rdfs:range nf:Individual .
 
 nf:hasSpecimen a owl:ObjectProperty ;
@@ -1930,17 +1930,259 @@ nf:geneName a owl:DatatypeProperty ;
 nf:hgncId a owl:DatatypeProperty ;
     rdfs:label "hgncId" ;
     rdfs:comment "HGNC identifier of a gene, as a CURIE (e.g. HGNC:7765). Gene nodes also carry skos:exactMatch to the resolvable identifiers.org IRI, so HGNC-keyed data can join without a lookup table." ;
-    rdfs:domain biolink:Gene ;
+    rdfs:domain [ a owl:Class ; owl:unionOf (biolink:Gene nf:VariantObservation) ] ;
     rdfs:range xsd:string .
 
 nf:ensemblGeneId a owl:DatatypeProperty ;
     rdfs:label "ensemblGeneId" ;
     rdfs:comment "Ensembl gene identifier (e.g. ENSG00000196712). This is the key gene nodes are minted on, because it is the only source column that maps unambiguously to the others." ;
-    rdfs:domain biolink:Gene ;
+    rdfs:domain [ a owl:Class ; owl:unionOf (biolink:Gene nf:VariantObservation) ] ;
     rdfs:range xsd:string .
 
 nf:entrezGeneId a owl:DatatypeProperty ;
     rdfs:label "entrezGeneId" ;
     rdfs:comment "NCBI Entrez gene identifier." ;
-    rdfs:domain biolink:Gene ;
+    rdfs:domain [ a owl:Class ; owl:unionOf (biolink:Gene nf:VariantObservation) ] ;
     rdfs:range xsd:string .
+
+################################################################################
+# Classes - Somatic variant layer (cBioPortal)
+#
+# The variant node itself is biolink:SequenceVariant, used directly per
+# docs/biolink-alignment.md. Note nf:Variant is NOT reused: that class means "a
+# variant mentioned in publication text" (PubTator3) and carries no coordinates.
+################################################################################
+
+nf:VariantObservation a owl:Class ;
+    rdfs:label "Variant Observation" ;
+    rdfs:comment "The observation of one sequence variant in one sequenced sample: the context-full half of the two-layer split. Carries the sample, its allele-depth evidence, and the functional annotation of the transcript the caller picked. The context-free half (the allele itself) is the biolink:SequenceVariant it points at via nf:observesVariant, which is shared by every sample carrying the same allele." .
+
+################################################################################
+# Properties - Somatic variant layer
+################################################################################
+
+nf:hasVariantObservation a owl:ObjectProperty ;
+    owl:inverseOf nf:fromSpecimen ;
+    rdfs:label "hasVariantObservation" ;
+    rdfs:comment "Links a specimen to a variant observed in it." ;
+    rdfs:domain nf:Specimen ;
+    rdfs:range nf:VariantObservation .
+
+nf:observesVariant a owl:ObjectProperty ;
+    rdfs:label "observesVariant" ;
+    rdfs:comment "Links a variant observation to the context-free sequence variant it observes." ;
+    rdfs:domain nf:VariantObservation ;
+    rdfs:range biolink:SequenceVariant .
+
+nf:hasConsequence a owl:ObjectProperty ;
+    rdfs:label "hasConsequence" ;
+    rdfs:comment "Sequence Ontology molecular consequence of a variant observation, resolved from the MAF Consequence column (or Variant_Classification when that is empty) via mappings/sssom/variant_consequence.sssom.tsv. Repeatable: a single variant commonly carries several SO terms." ;
+    rdfs:domain nf:VariantObservation ;
+    rdfs:range owl:Class .
+
+nf:fromVariantDataset a owl:ObjectProperty ;
+    rdfs:label "fromVariantDataset" ;
+    rdfs:comment "Links a variant observation to the provenance node for the source dataset it was ingested from." ;
+    rdfs:domain nf:VariantObservation ;
+    rdfs:range void:Dataset .
+
+nf:vrsId a owl:DatatypeProperty ;
+    rdfs:label "vrsId" ;
+    rdfs:comment "GA4GH VRS 2.0 computed identifier (`ga4gh:VA.<digest>`) of a sequence variant. This is the cross-cohort join key: the same allele from any source collapses to the same value, and it is what makes future lookups against ClinVar, CIViC, or gnomAD possible. Absent on variants flagged nf:unnormalizedVariant." ;
+    rdfs:domain biolink:SequenceVariant ;
+    rdfs:range xsd:string .
+
+nf:refgetAccession a owl:DatatypeProperty ;
+    rdfs:label "refgetAccession" ;
+    rdfs:comment "GA4GH refget sequence accession (`SQ.<digest>`) of the reference sequence the variant is located on. Carries the assembly implicitly and exactly, which is what keeps a GRCh37 variant from silently colliding with a GRCh38 one." ;
+    rdfs:domain biolink:SequenceVariant ;
+    rdfs:range xsd:string .
+
+nf:variantStart a owl:DatatypeProperty ;
+    rdfs:label "variantStart" ;
+    rdfs:comment "Interbase (0-based, half-open) start of the variant on its reference sequence. Equals variantEnd for a pure insertion." ;
+    rdfs:domain biolink:SequenceVariant ;
+    rdfs:range xsd:integer .
+
+nf:variantEnd a owl:DatatypeProperty ;
+    rdfs:label "variantEnd" ;
+    rdfs:comment "Interbase (0-based, half-open) end of the variant on its reference sequence." ;
+    rdfs:domain biolink:SequenceVariant ;
+    rdfs:range xsd:integer .
+
+nf:variantState a owl:DatatypeProperty ;
+    rdfs:label "variantState" ;
+    rdfs:comment "Replacement sequence for the variant's reference interval. Empty string for a pure deletion." ;
+    rdfs:domain biolink:SequenceVariant ;
+    rdfs:range xsd:string .
+
+nf:unnormalizedVariant a owl:DatatypeProperty ;
+    rdfs:label "unnormalizedVariant" ;
+    rdfs:comment "True when a source row could not be given a GA4GH VRS identity (contig absent from the reference seqmap, assembly disagreeing with the source, or non-nucleotide alleles). Such variants are kept rather than dropped, keyed on assembly:chrom:pos:ref:alt, but they do NOT join across cohorts." ;
+    rdfs:domain biolink:SequenceVariant ;
+    rdfs:range xsd:boolean .
+
+nf:fullyJustified a owl:DatatypeProperty ;
+    rdfs:label "fullyJustified" ;
+    rdfs:comment "False when an indel's VRS identifier was computed without a reference sequence, so it was not bidirectionally justified and will NOT match vrs-python, ClinVar, or gnomAD. Absent (rather than true) on variants computed correctly, and never present on substitutions, which need no reference." ;
+    rdfs:domain biolink:SequenceVariant ;
+    rdfs:range xsd:boolean .
+
+nf:variantClassification a owl:DatatypeProperty ;
+    rdfs:label "variantClassification" ;
+    rdfs:comment "MAF Variant_Classification (e.g. Missense_Mutation). Kept as a literal alongside the SO terms on nf:hasConsequence because it is the vocabulary cBioPortal users filter by." ;
+    rdfs:domain nf:VariantObservation ;
+    rdfs:range xsd:string .
+
+nf:variantType a owl:DatatypeProperty ;
+    rdfs:label "variantType" ;
+    rdfs:comment "MAF Variant_Type: SNP, DEL, INS, DNP, TNP, or ONP." ;
+    rdfs:domain nf:VariantObservation ;
+    rdfs:range xsd:string .
+
+nf:variantImpact a owl:DatatypeProperty ;
+    rdfs:label "variantImpact" ;
+    rdfs:comment "VEP IMPACT rating of the variant observation: HIGH, MODERATE, LOW, or MODIFIER." ;
+    rdfs:domain nf:VariantObservation ;
+    rdfs:range xsd:string .
+
+nf:aminoacidChange a owl:DatatypeProperty ;
+    rdfs:label "aminoacidChange" ;
+    rdfs:comment "Short HGVS protein change (e.g. p.R1276*), the form users search by. Taken from MAF HGVSp_Short, falling back to HGVSp." ;
+    rdfs:domain nf:VariantObservation ;
+    rdfs:range xsd:string .
+
+nf:hgvsC a owl:DatatypeProperty ;
+    rdfs:label "hgvsC" ;
+    rdfs:comment "HGVS coding-sequence change, transcript-qualified." ;
+    rdfs:domain nf:VariantObservation ;
+    rdfs:range xsd:string .
+
+nf:hgvsP a owl:DatatypeProperty ;
+    rdfs:label "hgvsP" ;
+    rdfs:comment "HGVS protein change in three-letter form." ;
+    rdfs:domain nf:VariantObservation ;
+    rdfs:range xsd:string .
+
+nf:transcriptId a owl:DatatypeProperty ;
+    rdfs:label "transcriptId" ;
+    rdfs:comment "Ensembl transcript the annotation was computed against. All annotation on a variant observation is relative to this one picked transcript, not to the gene as a whole." ;
+    rdfs:domain nf:VariantObservation ;
+    rdfs:range xsd:string .
+
+nf:proteinPosition a owl:DatatypeProperty ;
+    rdfs:label "proteinPosition" ;
+    rdfs:comment "Residue position of the change within the protein." ;
+    rdfs:domain nf:VariantObservation ;
+    rdfs:range xsd:string .
+
+nf:exonNumber a owl:DatatypeProperty ;
+    rdfs:label "exonNumber" ;
+    rdfs:comment "Affected exon, as exon/total (e.g. 47/57)." ;
+    rdfs:domain nf:VariantObservation ;
+    rdfs:range xsd:string .
+
+
+
+
+nf:dbsnpId a owl:DatatypeProperty ;
+    rdfs:label "dbsnpId" ;
+    rdfs:comment "dbSNP rsID reported for the variant. Repeatable." ;
+    rdfs:domain nf:VariantObservation ;
+    rdfs:range xsd:string .
+
+nf:gnomadAlleleFrequency a owl:DatatypeProperty ;
+    rdfs:label "gnomadAlleleFrequency" ;
+    rdfs:comment "gnomAD genome allele frequency reported for the variant, used to judge whether a call is plausibly somatic." ;
+    rdfs:domain nf:VariantObservation ;
+    rdfs:range xsd:double .
+
+nf:tumorSampleBarcode a owl:DatatypeProperty ;
+    rdfs:label "tumorSampleBarcode" ;
+    rdfs:comment "Source Tumor_Sample_Barcode, retained verbatim so an observation can be traced back to its cBioPortal row even when it did not resolve to a portal specimen." ;
+    rdfs:domain nf:VariantObservation ;
+    rdfs:range xsd:string .
+
+nf:matchedNormalSampleBarcode a owl:DatatypeProperty ;
+    rdfs:label "matchedNormalSampleBarcode" ;
+    rdfs:comment "Source Matched_Norm_Sample_Barcode. The tumour/normal pairing is what makes the call somatic." ;
+    rdfs:domain nf:VariantObservation ;
+    rdfs:range xsd:string .
+
+nf:mutationStatus a owl:DatatypeProperty ;
+    rdfs:label "mutationStatus" ;
+    rdfs:comment "Somatic or Germline. NF-OSI MAFs leave MAF's own Mutation_Status blank, so ingest stamps Somatic from the cBioPortal MUTATION_EXTENDED profile, which is somatic by construction." ;
+    rdfs:domain nf:VariantObservation ;
+    rdfs:range xsd:string .
+
+nf:tumorDepth a owl:DatatypeProperty ;
+    rdfs:label "tumorDepth" ;
+    rdfs:comment "Total read depth at the locus in the tumour sample." ;
+    rdfs:domain nf:VariantObservation ;
+    rdfs:range xsd:integer .
+
+nf:tumorRefCount a owl:DatatypeProperty ;
+    rdfs:label "tumorRefCount" ;
+    rdfs:comment "Reads supporting the reference allele in the tumour sample." ;
+    rdfs:domain nf:VariantObservation ;
+    rdfs:range xsd:integer .
+
+nf:tumorAltCount a owl:DatatypeProperty ;
+    rdfs:label "tumorAltCount" ;
+    rdfs:comment "Reads supporting the variant allele in the tumour sample. Zero means no read supports the call in this sample, which is a reason to distrust it, not evidence of the variant." ;
+    rdfs:domain nf:VariantObservation ;
+    rdfs:range xsd:integer .
+
+nf:normalDepth a owl:DatatypeProperty ;
+    rdfs:label "normalDepth" ;
+    rdfs:comment "Total read depth at the locus in the matched normal sample." ;
+    rdfs:domain nf:VariantObservation ;
+    rdfs:range xsd:integer .
+
+nf:normalRefCount a owl:DatatypeProperty ;
+    rdfs:label "normalRefCount" ;
+    rdfs:comment "Reads supporting the reference allele in the matched normal sample." ;
+    rdfs:domain nf:VariantObservation ;
+    rdfs:range xsd:integer .
+
+nf:normalAltCount a owl:DatatypeProperty ;
+    rdfs:label "normalAltCount" ;
+    rdfs:comment "Reads supporting the variant allele in the matched normal sample. A non-zero count on a supposedly somatic call suggests germline contamination." ;
+    rdfs:domain nf:VariantObservation ;
+    rdfs:range xsd:integer .
+
+nf:variantAlleleFrequency a owl:DatatypeProperty ;
+    rdfs:label "variantAlleleFrequency" ;
+    rdfs:comment "Tumour variant allele frequency, derived as tumorAltCount / tumorDepth. Absent when the source provides no usable depth." ;
+    rdfs:domain nf:VariantObservation ;
+    rdfs:range xsd:double .
+
+nf:assemblyId a owl:DatatypeProperty ;
+    rdfs:label "assemblyId" ;
+    rdfs:comment "Reference assembly the source row was called against (e.g. GRCh38). On the observation rather than the variant, because the variant's own identity already pins the sequence via nf:refgetAccession." ;
+    rdfs:domain nf:VariantObservation ;
+    rdfs:range xsd:string .
+
+nf:referenceName a owl:DatatypeProperty ;
+    rdfs:label "referenceName" ;
+    rdfs:comment "Chromosome name in the form Beacon clients query by, with any chr prefix stripped." ;
+    rdfs:domain nf:VariantObservation ;
+    rdfs:range xsd:string .
+
+nf:sourceContig a owl:DatatypeProperty ;
+    rdfs:label "sourceContig" ;
+    rdfs:comment "Contig name exactly as written in the source file, kept for traceability when it differs from the reference's own naming." ;
+    rdfs:domain nf:VariantObservation ;
+    rdfs:range xsd:string .
+
+nf:sourcePos a owl:DatatypeProperty ;
+    rdfs:label "sourcePos" ;
+    rdfs:comment "1-based Start_Position exactly as written in the source file. Distinct from the variant's interbase nf:variantStart." ;
+    rdfs:domain nf:VariantObservation ;
+    rdfs:range xsd:integer .
+
+nf:affectsGene a owl:ObjectProperty ;
+    rdfs:label "affectsGene" ;
+    rdfs:comment "Gene a variant observation affects. On the observation rather than the variant because the association comes from the transcript the caller picked -- it is annotation, not identity, and the same allele annotated against another transcript could name another gene." ;
+    rdfs:domain nf:VariantObservation ;
+    rdfs:range biolink:Gene .

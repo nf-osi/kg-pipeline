@@ -517,15 +517,36 @@ portal_assets = generate_portal_assets()
 
 
 # =============================================================================
-# cBioPortal somatic variant source -- opt-in
+# Somatic variant layer (cBioPortal) -- opt-in
 #
-# Gated on KG_INCLUDE_VARIANTS so a default run does not reach out to the datahub LFS
-# store or rewrite the checked-in crosswalk. These assets produce no RDF: the MAF lands
-# in data/raw/ and the crosswalk in mappings/, both outside the graph.
+# Gated on KG_INCLUDE_VARIANTS so a default run cannot produce it (issue #95 asks for
+# the layer to be droppable in a later release). Two further gates sit downstream:
+# output goes to data/rdf/variants/, which the QLever index and the embedding edgelist
+# both miss because they glob data/rdf/*.ttl non-recursively, so publishing the layer
+# into an index is a separate explicit choice (see the Dockerfile's variants target).
 # =============================================================================
 
 
 VARIANT_STUDY_IDS = ["nst_nfosi_ntap"]
+
+
+class VariantIngestConfig(Config):
+    """Where the ingest tooling and reference data live.
+
+    `vrsify` is a Rust binary outside this repo (`~/sage/nf/vrsify`), so its path is
+    configuration rather than a Python dependency.
+    """
+
+    vrsify_bin: str = os.environ.get("VRSIFY_BIN", "vrsify")
+    #: Reference FASTA. Load-bearing: without it, indel VRS ids are not fully justified
+    #: and will not match vrs-python, ClinVar, or gnomAD.
+    reference_fasta: str = os.environ.get("VRSIFY_REFERENCE", "")
+    #: Seqmap TSV of refget SQ. accessions, from `vrsify seqmap --fasta <reference>`.
+    seqmap: str = os.environ.get("VRSIFY_SEQMAP", "")
+    #: Drop rows with fewer than this many tumour reads supporting the allele. 0 = off.
+    min_tumor_alt_count: int = 0
+    #: Fail the asset if fewer than this fraction of observations reach a specimen.
+    require_specimen_coverage: float = 0.85
 
 
 def create_variant_maf_asset(study_id: str):
@@ -627,6 +648,143 @@ def create_gene_asset(study_id: str):
     return _gene_asset
 
 
+def create_variant_ndjson_asset(study_id: str):
+    @asset(
+        name=f"{study_id}_vrs",
+        key_prefix=["variants", "vrs"],
+        compute_kind="vrsify",
+        group_name="variants",
+        deps=[["variants", "raw", f"{study_id}_maf"]],
+        metadata={"study_id": study_id},
+    )
+    def _ndjson_asset(context: AssetExecutionContext, config: VariantIngestConfig) -> Path:
+        """Run `vrsify maf` to mint GA4GH VRS ids for every row."""
+        import subprocess
+
+        project_root = Path(__file__).parent.parent.parent
+        if not config.seqmap:
+            raise RuntimeError(
+                "VRSIFY_SEQMAP is not set. Generate one with "
+                "`vrsify seqmap --fasta <GRCh38.fa> --assembly GRCh38 --out seqmap.tsv`."
+            )
+        out_dir = project_root / "data" / "variants"
+        out_dir.mkdir(parents=True, exist_ok=True)
+        alleles = out_dir / f"{study_id}_alleles.ndjson"
+        observations = out_dir / f"{study_id}_observations.ndjson"
+
+        cmd = [
+            config.vrsify_bin, "maf",
+            "--maf", str(project_root / "data" / "raw" / f"{study_id}_data_mutations.txt"),
+            "--seqmap", config.seqmap,
+            "--out-alleles", str(alleles),
+            "--out-observations", str(observations),
+            "--study-id", study_id,
+            "--source", f"cbioportal:{study_id}/data_mutations.txt",
+        ]
+        if config.reference_fasta:
+            cmd += ["--reference", config.reference_fasta]
+        else:
+            # Not fatal -- substitutions are exact either way -- but every indel id will
+            # be wrong for cross-source joins, so it must not pass silently.
+            context.log.warning(
+                "VRSIFY_REFERENCE is not set: indel VRS ids will NOT be fully justified "
+                "and will not match vrs-python/ClinVar/gnomAD."
+            )
+        if config.min_tumor_alt_count:
+            cmd += ["--min-tumor-alt-count", str(config.min_tumor_alt_count)]
+
+        context.log.info(f"Running {' '.join(cmd)}")
+        result = subprocess.run(cmd, capture_output=True, text=True, cwd=str(project_root))
+        # vrsify reports its run summary (row counts, unnormalized rows, un-justified
+        # indels) on stderr; it is the record of what the ingest actually did.
+        if result.stderr:
+            context.log.info(f"vrsify:\n{result.stderr}")
+        if result.returncode != 0:
+            raise RuntimeError(f"vrsify exited {result.returncode}: {result.stderr}")
+
+        report_dir = project_root / "reports"
+        report_dir.mkdir(parents=True, exist_ok=True)
+        (report_dir / f"{study_id}_vrsify.txt").write_text(result.stderr or "")
+
+        context.add_output_metadata({
+            "alleles_path": str(alleles.relative_to(project_root)),
+            "observations_path": str(observations.relative_to(project_root)),
+            "num_alleles": sum(1 for _ in open(alleles)),
+            "num_observations": sum(1 for _ in open(observations)),
+            "fully_justified": bool(config.reference_fasta),
+        })
+        return alleles
+
+    return _ndjson_asset
+
+
+def create_variant_rdf_asset(study_id: str):
+    @asset(
+        name=f"{study_id}_variants",
+        key_prefix=["variants", "rdf"],
+        compute_kind="python",
+        group_name="variants",
+        deps=[
+            ["variants", "vrs", f"{study_id}_vrs"],
+            ["variants", "mappings", f"{study_id}_crosswalk"],
+            ["portal", "rdf", "specimens"],
+            ["portal", "rdf", "genes"],
+        ],
+        metadata={"study_id": study_id},
+    )
+    def _rdf_asset(context: AssetExecutionContext, config: VariantIngestConfig) -> Path:
+        """Project the VRS NDJSON into RDF, joined to the core specimen layer."""
+        from scripts.variants_to_rdf import variants_to_rdf
+
+        project_root = Path(__file__).parent.parent.parent
+        output_file = project_root / "data" / "rdf" / "variants" / f"{study_id}.ttl"
+
+        builder = variants_to_rdf(
+            alleles=project_root / "data" / "variants" / f"{study_id}_alleles.ndjson",
+            observations=project_root / "data" / "variants" / f"{study_id}_observations.ndjson",
+            output_ttl=output_file,
+            study_id=study_id,
+            crosswalk_path=project_root / "mappings" / "cbioportal_sample_specimen.tsv",
+            consequence_lookup=project_root / "mappings" / "sssom" / "variant_consequence.sssom.tsv",
+            classification_lookup=project_root / "mappings" / "sssom" / "variant_classification.sssom.tsv",
+            source_url=f"cbioportal:{study_id}/data_mutations.txt",
+        )
+
+        counts = builder.counts
+        observations = counts["observations"] or 1
+        coverage = counts["observations_with_specimen"] / observations
+        context.log.info(
+            f"{counts['variants']} variants ({counts['variants_unnormalized']} unnormalized), "
+            f"{counts['observations']} observations, {coverage:.1%} reached a specimen"
+        )
+        if builder.unmapped_consequences:
+            context.log.warning(
+                "consequence terms with no SSSOM mapping: "
+                + ", ".join(f"{t} x{n}" for t, n in builder.unmapped_consequences.most_common())
+            )
+        if coverage < config.require_specimen_coverage:
+            raise RuntimeError(
+                f"specimen coverage {coverage:.1%} is below the required "
+                f"{config.require_specimen_coverage:.1%}; the sample crosswalk has "
+                "regressed (see mappings/cbioportal_sample_specimen.tsv)"
+            )
+
+        context.add_output_metadata({
+            "path": str(output_file.relative_to(project_root)),
+            "size_mb": round(output_file.stat().st_size / (1024 * 1024), 2),
+            "triples": len(builder.graph),
+            "variants": counts["variants"],
+            "variants_unnormalized": counts["variants_unnormalized"],
+            "variants_not_fully_justified": counts["variants_not_fully_justified"],
+            "observations": counts["observations"],
+            "observations_with_specimen": counts["observations_with_specimen"],
+            "specimen_coverage": round(coverage, 4),
+        })
+        return output_file
+
+    return _rdf_asset
+
+
 def generate_variant_assets() -> List:
     """Variant layer assets, or nothing when KG_INCLUDE_VARIANTS is unset."""
     if os.environ.get("KG_INCLUDE_VARIANTS", "").lower() not in {"1", "true", "yes"}:
@@ -635,7 +793,9 @@ def generate_variant_assets() -> List:
     for study_id in VARIANT_STUDY_IDS:
         assets.append(create_variant_maf_asset(study_id))
         assets.append(create_variant_crosswalk_asset(study_id))
+        assets.append(create_variant_ndjson_asset(study_id))
         assets.append(create_gene_asset(study_id))
+        assets.append(create_variant_rdf_asset(study_id))
     return assets
 
 
