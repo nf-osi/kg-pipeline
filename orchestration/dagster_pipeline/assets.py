@@ -1,5 +1,6 @@
 """Asset definitions for portal tables pipeline."""
 
+import os
 from pathlib import Path
 from typing import List
 
@@ -513,3 +514,83 @@ def generate_portal_assets() -> List:
 
 
 portal_assets = generate_portal_assets()
+
+
+# =============================================================================
+# cBioPortal somatic variant source -- opt-in
+#
+# Gated on KG_INCLUDE_VARIANTS so a default run does not reach out to the datahub LFS
+# store or rewrite the checked-in crosswalk. These assets produce no RDF: the MAF lands
+# in data/raw/ and the crosswalk in mappings/, both outside the graph.
+# =============================================================================
+
+
+VARIANT_STUDY_IDS = ["nst_nfosi_ntap"]
+
+
+def create_variant_maf_asset(study_id: str):
+    @asset(
+        name=f"{study_id}_maf",
+        key_prefix=["variants", "raw"],
+        compute_kind="python",
+        group_name="variants",
+        metadata={"study_id": study_id},
+    )
+    def _maf_asset(context: AssetExecutionContext) -> Path:
+        """Download the study's MAF from the datahub LFS store."""
+        from scripts.fetch_cbioportal_maf import fetch_maf
+
+        project_root = Path(__file__).parent.parent.parent
+        destination = project_root / "data" / "raw" / f"{study_id}_data_mutations.txt"
+        fetch_maf(study_id, destination)
+        context.add_output_metadata({
+            "path": str(destination.relative_to(project_root)),
+            "size_mb": round(destination.stat().st_size / (1024 * 1024), 2),
+        })
+        return destination
+
+    return _maf_asset
+
+
+def create_variant_crosswalk_asset(study_id: str):
+    @asset(
+        name=f"{study_id}_crosswalk",
+        key_prefix=["variants", "mappings"],
+        compute_kind="python",
+        group_name="variants",
+        deps=[["variants", "raw", f"{study_id}_maf"], ["portal", "harmonized", "files"]],
+        metadata={"study_id": study_id},
+    )
+    def _crosswalk_asset(context: AssetExecutionContext) -> Path:
+        """Refresh the sample -> specimen crosswalk, preserving hand-authored rows."""
+        from scripts.map_cbioportal_samples import main as map_main
+
+        project_root = Path(__file__).parent.parent.parent
+        maf = project_root / "data" / "raw" / f"{study_id}_data_mutations.txt"
+        output = project_root / "mappings" / "cbioportal_sample_specimen.tsv"
+        rc = map_main([
+            "--maf", str(maf),
+            "--study-id", study_id,
+            "--files", str(project_root / "data" / "csv" / "files_harmonized.csv"),
+            "--output", str(output),
+        ])
+        if rc != 0:
+            raise RuntimeError(f"crosswalk generation failed with code {rc}")
+        context.add_output_metadata({"path": str(output.relative_to(project_root))})
+        return output
+
+    return _crosswalk_asset
+
+
+def generate_variant_assets() -> List:
+    """Variant layer assets, or nothing when KG_INCLUDE_VARIANTS is unset."""
+    if os.environ.get("KG_INCLUDE_VARIANTS", "").lower() not in {"1", "true", "yes"}:
+        return []
+    assets = []
+    for study_id in VARIANT_STUDY_IDS:
+        assets.append(create_variant_maf_asset(study_id))
+        assets.append(create_variant_crosswalk_asset(study_id))
+    return assets
+
+
+variant_assets = generate_variant_assets()

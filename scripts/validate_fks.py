@@ -143,11 +143,74 @@ def check_constraint(
     )
 
 
+#: Where the cBioPortal sample crosswalk lives, relative to the repo root.
+CROSSWALK_PATH = Path("mappings/cbioportal_sample_specimen.tsv")
+
+
+def check_crosswalk(data_dir: Path, crosswalk_path: Path = CROSSWALK_PATH) -> FKResult | None:
+    """Check that every specimen the variant crosswalk names really exists.
+
+    Needs its own check rather than a TABLES-discovered constraint for two reasons:
+    the crosswalk is a checked-in mapping file, not a portal table, and portal
+    specimenID cells are pipe-delimited multi-values, which the generic FK loader does
+    not split.
+
+    This is aimed squarely at hand-authored rows. Rule-derived rows cannot be orphans
+    by construction -- scripts/map_cbioportal_samples.py only writes a specimen_id it
+    found in the files table -- but a `manual` row is typed by a human and can name a
+    specimen that does not exist, or one whose id later changes upstream. Coverage (how
+    many barcodes resolve at all) is deliberately NOT checked here; that lives on the
+    variant RDF asset, which fails the build below a threshold.
+    """
+    files_path = data_dir / "files_harmonized.csv"
+    if not crosswalk_path.exists() or not files_path.exists():
+        return None
+
+    constraint = FKConstraint(
+        source_table="cbioportal_sample_specimen",
+        source_column="specimen_id",
+        target_tables=["files_harmonized"],
+        target_column="specimenID",
+    )
+
+    # Same splitting/NA rules as scripts/materialize_specimens.py, which is what
+    # actually mints the nf:Specimen nodes these ids have to line up with.
+    na_values = {"na", "nan", "n/a", "none", "unknown"}
+    specimens: Set[str] = set()
+    with files_path.open(newline="", encoding="utf-8") as fh:
+        for row in csv.DictReader(fh):
+            for part in (row.get("specimenID") or "").split("|"):
+                part = part.strip()
+                if part and part.lower() not in na_values:
+                    specimens.add(part)
+
+    with crosswalk_path.open(newline="", encoding="utf-8") as fh:
+        rows = [line for line in fh if not line.startswith("#")]
+    values = [
+        (r.get("specimen_id") or "").strip()
+        for r in csv.DictReader(rows, delimiter="\t")
+    ]
+    values = [v for v in values if v]
+
+    orphans = sorted({v for v in values if v not in specimens})
+    return FKResult(
+        constraint=constraint,
+        populated=len(values),
+        orphaned=sum(1 for v in values if v not in specimens),
+        unique_orphans=len(orphans),
+        sample_values=orphans[:10],
+    )
+
+
 def validate_all(data_dir: Path) -> List[FKResult]:
     """Run all FK checks and return results."""
     constraints = discover_constraints()
     pk_cache: Dict[str, Set[str]] = {}
-    return [check_constraint(c, data_dir, pk_cache) for c in constraints]
+    results = [check_constraint(c, data_dir, pk_cache) for c in constraints]
+    crosswalk_result = check_crosswalk(data_dir)
+    if crosswalk_result is not None:
+        results.append(crosswalk_result)
+    return results
 
 
 def print_human(results: List[FKResult]) -> None:
