@@ -13,6 +13,7 @@ Usage:
     python scripts/rdf_to_edgelist.py
     python scripts/rdf_to_edgelist.py --rdf-dir data/rdf --output data/embeddings/kg.edgelist
     python scripts/rdf_to_edgelist.py --exclude rdf:type --unweighted
+    python scripts/rdf_to_edgelist.py --include-variants
 
 Examples:
     # Generate weighted edgelist (default)
@@ -20,6 +21,9 @@ Examples:
 
     # Skip rdf:type edges (class membership) to focus on domain relations
     python scripts/rdf_to_edgelist.py --exclude http://www.w3.org/1999/02/22-rdf-syntax-ns#type
+
+    # Fold in the somatic variant layer (off by default -- see --include-variants)
+    python scripts/rdf_to_edgelist.py --include-variants
 """
 
 from __future__ import annotations
@@ -42,10 +46,26 @@ logger = logging.getLogger(__name__)
 DEFAULT_RDF_DIR = Path("data/rdf")
 DEFAULT_OUTPUT = Path("data/embeddings/kg.edgelist")
 
+# The somatic variant layer (nf-osi/kg-pipeline#95) is written to a SUBdirectory of
+# data/rdf so that this glob, which is non-recursive, misses it. That is deliberate:
+# ~23k variant nodes and ~24k observation nodes would swamp a graph of ~8k specimens
+# and dominate every random walk, while adding no edges between portal entities. Pass
+# --include-variants to fold it in anyway (e.g. to test a variant-aware embedding).
+VARIANT_SUBDIR = "variants"
 
-def load_rdf(rdf_dir: Path) -> Store:
+
+def load_rdf(rdf_dir: Path, include_variants: bool = False) -> Store:
     store = Store()
     ttl_files = sorted(rdf_dir.glob("*.ttl"))
+    if include_variants:
+        variant_files = sorted((rdf_dir / VARIANT_SUBDIR).glob("*.ttl"))
+        if not variant_files:
+            logger.warning(
+                "--include-variants was passed but %s holds no .ttl files; "
+                "the variant layer is opt-in at ingest too (KG_INCLUDE_VARIANTS)",
+                rdf_dir / VARIANT_SUBDIR,
+            )
+        ttl_files += variant_files
     if not ttl_files:
         logger.error("No .ttl files found in %s", rdf_dir)
         sys.exit(1)
@@ -135,13 +155,19 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="Omit edge weights (default: include weights)",
     )
+    parser.add_argument(
+        "--include-variants",
+        action="store_true",
+        help=f"Also load {DEFAULT_RDF_DIR / VARIANT_SUBDIR}/*.ttl (the somatic variant "
+             "layer), which is excluded by default because it would dominate the walks",
+    )
     args = parser.parse_args(argv)
 
     if not args.rdf_dir.exists():
         logger.error("RDF directory not found: %s", args.rdf_dir)
         return 1
 
-    store = load_rdf(args.rdf_dir)
+    store = load_rdf(args.rdf_dir, include_variants=args.include_variants)
     edges = extract_edges(store, exclude=set(args.exclude))
     write_edgelist(edges, args.output, weighted=not args.unweighted)
     return 0

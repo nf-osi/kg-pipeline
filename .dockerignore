@@ -4,6 +4,12 @@
 # Include all final RDF files
 !data/rdf/*.ttl
 
+# Include the somatic variant layer. Needed for the runtime-variants target; the
+# default targets glob data/rdf/*.ttl, which is non-recursive, so merely having these
+# in the build context does not put them in the default index.
+!data/rdf/variants/
+!data/rdf/variants/*.ttl
+
 # Exclude RML intermediate files
 data/rdf/*.rml.ttl
 

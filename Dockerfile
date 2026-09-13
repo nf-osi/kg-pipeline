@@ -5,6 +5,10 @@
 #   schema/ontology.ttl  — OWL ontology
 #   schema/shapes.ttl    — SHACL shapes
 #
+# Optional somatic variant layer (nf-osi/kg-pipeline#95), in a SUBdirectory so the
+# data/rdf/*.ttl globs below miss it — publishing it is a separate, explicit choice:
+#   data/rdf/variants/*.ttl
+#
 # Optional text index files for the plus-text build:
 #   pubs/qlever_text/text_entities.ttl
 #   pubs/qlever_text/wordsfile.tsv
@@ -36,6 +40,18 @@ FROM indexer-base AS indexer-rdf
 RUN cat /input/schema/ontology.ttl /input/schema/shapes.ttl /input/rdf/*.ttl \
       | qlever-index -F ttl -f - -i /index/kg -p false
 
+# --- variant-layer build: core graph PLUS the somatic variant layer ---
+# The variant layer is a proof of concept and is meant to be droppable in a later
+# release, so it gets its own image target rather than being folded into the default
+# one. Build it explicitly:
+#     docker build --target runtime-variants -t kg:variants .
+# If data/rdf/variants/ is empty (the layer is opt-in at ingest too, via
+# KG_INCLUDE_VARIANTS) this target produces the same index as indexer-rdf.
+FROM indexer-base AS indexer-variants
+RUN cat /input/schema/ontology.ttl /input/schema/shapes.ttl /input/rdf/*.ttl \
+        $(ls /input/rdf/variants/*.ttl 2>/dev/null) \
+      | qlever-index -F ttl -f - -i /index/kg -p false
+
 # --- final image: just the server + pre-built index ---
 FROM adfreiburg/qlever AS runtime-base
 
@@ -63,6 +79,13 @@ CMD ["qlever-server", "-i", "/index/kg", "-p", "7002", "-t"]
 
 FROM runtime-base AS runtime-rdf
 COPY --from=indexer-rdf --chown=qlever:qlever /index /index
+HEALTHCHECK --interval=60s --timeout=10s --start-period=60s --retries=3 \
+  CMD curl -f http://localhost:7001/healthz || exit 1
+ENTRYPOINT ["/entrypoint.sh"]
+CMD ["qlever-server", "-i", "/index/kg", "-p", "7002"]
+
+FROM runtime-base AS runtime-variants
+COPY --from=indexer-variants --chown=qlever:qlever /index /index
 HEALTHCHECK --interval=60s --timeout=10s --start-period=60s --retries=3 \
   CMD curl -f http://localhost:7001/healthz || exit 1
 ENTRYPOINT ["/entrypoint.sh"]
