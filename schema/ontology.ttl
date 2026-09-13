@@ -547,8 +547,8 @@ nf:fileFormat a owl:DatatypeProperty ;
 
 nf:individualID a owl:DatatypeProperty ;
     rdfs:label "individualID" ;
-    rdfs:comment "Non-PII identifier for the individual (patient or animal) the data came from." ;
-    rdfs:domain nf:File ;
+    rdfs:comment "Non-PII identifier for the individual (patient or animal) the data came from. Asserted both on the file that carries it in the portal and on the nf:Individual node materialized from it." ;
+    rdfs:domain [ a owl:Class ; owl:unionOf (nf:File nf:Individual) ] ;
     rdfs:range xsd:string .
 
 nf:hasIndividualIdStatus a owl:ObjectProperty ;
@@ -635,8 +635,8 @@ nf:diagnosis a owl:DatatypeProperty ;
 
 nf:specimenID a owl:DatatypeProperty ;
     rdfs:label "specimenID" ;
-    rdfs:comment "Non-PII identifier for the source specimen." ;
-    rdfs:domain nf:File ;
+    rdfs:comment "Non-PII identifier for the source specimen. Asserted both on the file that carries it in the portal and on the nf:Specimen node materialized from it." ;
+    rdfs:domain [ a owl:Class ; owl:unionOf (nf:File nf:Specimen) ] ;
     rdfs:range xsd:string .
 
 nf:hasSpecimenIdStatus a owl:ObjectProperty ;
@@ -1856,3 +1856,91 @@ nf:Variant a owl:Class ;
     owl:equivalentClass obo:SO_0001564 ;
     rdfs:label "Variant" ;
     rdfs:comment "A genetic variant annotated in publication text." .
+
+################################################################################
+# Classes - Specimens and individuals
+#
+# The portal records specimenID/individualID as string literals on nf:File. These
+# classes promote them to nodes so per-specimen reasoning does not require a
+# string join at query time. Materialized by scripts/materialize_specimens.py.
+################################################################################
+
+nf:Specimen a owl:Class ;
+    rdfs:subClassOf biolink:MaterialSample ;
+    owl:equivalentClass obo:OBI_0100051 ;
+    rdfs:label "Specimen" ;
+    rdfs:comment "A biological specimen a portal file was derived from, identified by its non-PII specimenID. Materialized from the specimenID column of the portal files table, so it is faithful to the source rather than curated: a few portal specimenIDs are DICOM instance UIDs or free-text labels. Subclassed under biolink:MaterialSample (whose aliases include 'sample' and 'biospecimen') rather than equated with it, because BioLink maps that class to OBI:0000747 'material sample' while the NF sense is OBI:0100051 'specimen' -- the two are SIBLINGS under BFO material entity, not equivalents. Instances carry both rdf:type values so the alignment is queryable without a reasoner." .
+
+nf:Individual a owl:Class ;
+    rdfs:subClassOf biolink:IndividualOrganism ;
+    rdfs:label "Individual" ;
+    rdfs:comment "The individual (patient or animal) a specimen or file came from, identified by its non-PII individualID. Subclassed under biolink:IndividualOrganism, NOT biolink:Case: Case is defined as a human organism in a patient role, and a large share of NF portal individualIDs name mice or zebrafish, so Case would be false for them. DISTINCT from nf:Donor: nf:Donor is the UUID-keyed source donor of a cell line or animal model, and the two identifier spaces do not overlap at all. Instances carry both rdf:type values so the alignment is queryable without a reasoner." .
+
+################################################################################
+# Properties - Specimens and individuals
+################################################################################
+
+nf:fromSpecimen a owl:ObjectProperty ;
+    rdfs:label "fromSpecimen" ;
+    rdfs:comment "Links a file to the specimen it was derived from." ;
+    rdfs:domain nf:File ;
+    rdfs:range nf:Specimen .
+
+nf:hasFile a owl:ObjectProperty ;
+    owl:inverseOf nf:fromSpecimen ;
+    rdfs:label "hasFile" ;
+    rdfs:comment "Links a specimen to a file derived from it." ;
+    rdfs:domain nf:Specimen ;
+    rdfs:range nf:File .
+
+nf:fromIndividual a owl:ObjectProperty ;
+    rdfs:label "fromIndividual" ;
+    rdfs:comment "Links a specimen or file to the individual it came from. Asserted on files directly as well as via their specimen, because many files carry an individualID with no specimenID at all." ;
+    rdfs:domain [ a owl:Class ; owl:unionOf (nf:File nf:Specimen) ] ;
+    rdfs:range nf:Individual .
+
+nf:hasSpecimen a owl:ObjectProperty ;
+    owl:inverseOf nf:fromIndividual ;
+    rdfs:label "hasSpecimen" ;
+    rdfs:comment "Links an individual to a specimen taken from them." ;
+    rdfs:domain nf:Individual ;
+    rdfs:range nf:Specimen .
+
+################################################################################
+# Gene layer
+#
+# Gene nodes are typed biolink:Gene directly, NOT nf:Gene: that class means "a gene
+# entity annotated in publication text" (PubTator3) and carries no identifiers, so
+# overloading it would conflate a literature mention with an annotated locus.
+# Keyed on the Ensembl gene id; see docs/entity-layers.md.
+################################################################################
+
+nf:geneSymbol a owl:DatatypeProperty ;
+    rdfs:label "geneSymbol" ;
+    rdfs:comment "Approved HGNC symbol of a gene. Exactly one per gene node: a source symbol is the picked transcript's symbol, so an overlapping antisense or readthrough transcript can report a different gene's symbol against the same locus. Verbatim per-record symbols stay where they were asserted, on nf:affectedGeneSymbol." ;
+    rdfs:domain biolink:Gene ;
+    rdfs:range xsd:string .
+
+nf:geneName a owl:DatatypeProperty ;
+    rdfs:label "geneName" ;
+    rdfs:comment "HGNC approved full name of a gene. Asserted only when HGNC's own ensembl_gene_id agrees with the source's, so its presence means the gene's identity was independently cross-checked." ;
+    rdfs:domain biolink:Gene ;
+    rdfs:range xsd:string .
+
+nf:hgncId a owl:DatatypeProperty ;
+    rdfs:label "hgncId" ;
+    rdfs:comment "HGNC identifier of a gene, as a CURIE (e.g. HGNC:7765). Gene nodes also carry skos:exactMatch to the resolvable identifiers.org IRI, so HGNC-keyed data can join without a lookup table." ;
+    rdfs:domain biolink:Gene ;
+    rdfs:range xsd:string .
+
+nf:ensemblGeneId a owl:DatatypeProperty ;
+    rdfs:label "ensemblGeneId" ;
+    rdfs:comment "Ensembl gene identifier (e.g. ENSG00000196712). This is the key gene nodes are minted on, because it is the only source column that maps unambiguously to the others." ;
+    rdfs:domain biolink:Gene ;
+    rdfs:range xsd:string .
+
+nf:entrezGeneId a owl:DatatypeProperty ;
+    rdfs:label "entrezGeneId" ;
+    rdfs:comment "NCBI Entrez gene identifier." ;
+    rdfs:domain biolink:Gene ;
+    rdfs:range xsd:string .
