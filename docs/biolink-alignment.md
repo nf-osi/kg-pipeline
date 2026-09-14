@@ -12,26 +12,16 @@ Tracks how `schema/ontology.ttl` aligns NF-OSI entity classes to the [BioLink Mo
 
 That question decides subclass vs. replace, and it is the only question.
 
-**A portal table (or portal-derived column) backs the entity → keep an `nf:` class,
-`rdfs:subClassOf` the BioLink parent, and emit BOTH types.** The entity has NF-specific
-slots that come off that table, and those slots need an `rdfs:domain` we define; pointing
-a domain at a borrowed class asserts something about a vocabulary that is not ours.
-Emitting both types is what makes the subclassing usable — see the reasoning caveat
-below.
+**Backed by a portal table (or portal-derived column) → keep an `nf:` class,
+`rdfs:subClassOf` the BioLink parent, and emit BOTH types.** Its portal-derived slots need
+an `rdfs:domain` we define, and emitting both types is what makes the subclassing usable —
+see the reasoning caveat below.
 
-**Nothing in the portal backs it → use the BioLink class directly, with no `nf:` class.**
-These entities arrive from text mining or an external source, carry no portal slots, and
-so have nothing for an `nf:` class to hold.
+**Not backed by one → use the BioLink class directly, with no `nf:` class.** These
+entities come from text mining or an external source and carry no portal slots for an
+`nf:` class to hold.
 
-Today exactly one entity falls on the replace side: `nf:Chemical` →
-`biolink:ChemicalEntity`, whose instances come from PubTator3 annotation over publication
-abstracts. `biolink:Gene` and `biolink:SequenceVariant` are on that side too and never had
-an `nf:` class — both come from the cBioPortal MAF, not the portal. `biolink:Person` is
-the same case.
-
-`nf:Study`, `nf:Dataset` and `nf:Publication` were each replaced outright at first and
-have since been restored as subclasses: all three are backed by portal tables, so the
-removal stranded their `nf:` slots and silently broke the SHACL shapes that targeted them.
+The tables below record which side each class landed on.
 
 ## Replaced classes
 
@@ -42,6 +32,7 @@ No portal table backs these entities, so there are no NF-specific slots for an `
 | Removed | Replaced with | Notes |
 |---|---|---|
 | `nf:Chemical` | `biolink:ChemicalEntity` | No external mapping; BioLink already maps to CHEBI:24431 |
+| _(none — never defined)_ | `biolink:Person` | Used directly for people nodes. `nf:Person` is deliberately not defined: no portal table backs a person, the nodes are keyed on a Synapse profile or an ORCID, and `nf:Investigator` covers the one portal-table-backed flavour as a subclass. |
 | _(none — new)_ | `biolink:SequenceVariant` | Used directly for somatic variant nodes in the variant layer. `nf:Variant` was NOT reused: it means "a variant mentioned in publication text" (PubTator3) and carries no coordinates, so overloading it would conflate a literature mention with a called allele. See `docs/variant-layer.md`. |
 | _(none — new)_ | `biolink:Gene` | Used directly for the gene entity layer, keyed on Ensembl gene id. `nf:Gene` was NOT reused for the same reason: it means "a gene mentioned in publication text" and carries no identifiers. See `docs/entity-layers.md`. |
 
