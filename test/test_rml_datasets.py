@@ -34,6 +34,20 @@ class TestDatasetCore:
         datasets = list(datasets_graph.subjects(RDF.type, BIOLINK.Dataset))
         assert len(datasets) == 4, f"Expected 4 datasets, got {len(datasets)}"
 
+    def test_dataset_is_dual_typed(self, datasets_graph, namespaces):
+        """Datasets carry BOTH nf:Dataset and biolink:Dataset.
+
+        nf:Dataset is rdfs:subClassOf biolink:Dataset, but the index does no OWL
+        reasoning and SHACL target expansion only runs down to subclasses, so
+        shapes:DatasetShape (sh:targetClass nf:Dataset) and the nf: property
+        domains would bind nothing if only the BioLink parent were emitted.
+        """
+        nf_typed = set(datasets_graph.subjects(RDF.type, NF.Dataset))
+        biolink_typed = set(datasets_graph.subjects(RDF.type, BIOLINK.Dataset))
+        assert len(nf_typed) > 0, "no nf:Dataset instances emitted"
+        assert nf_typed == biolink_typed, \
+            f"dual typing is uneven: {nf_typed ^ biolink_typed}"
+
     def test_subject_is_iri(self, datasets_graph, namespaces):
         """Subjects should be IRIs"""
         datasets = list(datasets_graph.subjects(RDF.type, BIOLINK.Dataset))

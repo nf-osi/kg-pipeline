@@ -32,6 +32,20 @@ class TestStudyPublicationKeying:
         assert len(pubs) == 3, f"Expected 3 publications (1 row skipped), got {len(pubs)}"
         assert not any("Ghost" in str(o) for o in study_pub_graph.objects(None, RDFS.label))
 
+    def test_publications_are_dual_typed(self, study_pub_graph, namespaces):
+        """Publications carry BOTH nf:Publication and biolink:Publication.
+
+        nf:Publication is rdfs:subClassOf biolink:Publication, but the index does
+        no OWL reasoning and SHACL target expansion only runs down to subclasses,
+        so shapes:PublicationShape (sh:targetClass nf:Publication) and the nf:
+        property domains would bind nothing if only the parent were emitted.
+        """
+        nf_typed = set(study_pub_graph.subjects(RDF.type, namespaces["nf"].Publication))
+        biolink_typed = set(study_pub_graph.subjects(RDF.type, namespaces["biolink"].Publication))
+        assert len(nf_typed) > 0, "no nf:Publication instances emitted"
+        assert nf_typed == biolink_typed, \
+            f"dual typing is uneven: {nf_typed ^ biolink_typed}"
+
     def test_doi_keyed_subject(self, study_pub_graph, namespaces):
         pubs = {str(p) for p in study_pub_graph.subjects(RDF.type, namespaces["biolink"].Publication)}
         # rr:template percent-escapes the "/" inside the DOI
