@@ -8,15 +8,39 @@ Tracks how `schema/ontology.ttl` aligns NF-OSI entity classes to the [BioLink Mo
 @prefix biolink: <https://w3id.org/biolink/vocab/> .
 ```
 
+## The rule: does a portal table back this entity?
+
+That question decides subclass vs. replace, and it is the only question.
+
+**A portal table (or portal-derived column) backs the entity → keep an `nf:` class,
+`rdfs:subClassOf` the BioLink parent, and emit BOTH types.** The entity has NF-specific
+slots that come off that table, and those slots need an `rdfs:domain` we define; pointing
+a domain at a borrowed class asserts something about a vocabulary that is not ours.
+Emitting both types is what makes the subclassing usable — see the reasoning caveat
+below.
+
+**Nothing in the portal backs it → use the BioLink class directly, with no `nf:` class.**
+These entities arrive from text mining or an external source, carry no portal slots, and
+so have nothing for an `nf:` class to hold.
+
+Today exactly one entity falls on the replace side: `nf:Chemical` →
+`biolink:ChemicalEntity`, whose instances come from PubTator3 annotation over publication
+abstracts. `biolink:Gene` and `biolink:SequenceVariant` are on that side too and never had
+an `nf:` class — both come from the cBioPortal MAF, not the portal. `biolink:Person` is
+the same case.
+
+`nf:Study`, `nf:Dataset` and `nf:Publication` were each replaced outright at first and
+have since been restored as subclasses: all three are backed by portal tables, so the
+removal stranded their `nf:` slots and silently broke the SHACL shapes that targeted them.
+
 ## Replaced classes
 
-These `nf:` classes had no external ontology mappings worth preserving, so they were removed from the ontology and replaced directly with BioLink classes in RML mappings and SPARQL queries.
+No portal table backs these entities, so there are no NF-specific slots for an `nf:` class to carry. They are used directly as `rdf:type` in RML mappings and SPARQL queries, with no `nf:` class defined.
 
-`nf:Study` and `nf:Dataset` were originally in this table and have since been moved to the NF-specific subclass table below. Outright removal turned out to be the wrong call for them: both carry a large set of `nf:`-namespace slots that then had no domain we define, and `shapes:StudyShape` / `shapes:DatasetShape` silently validated nothing because their `sh:targetClass` pointed at a class that no longer existed. Queries written against `biolink:Study` / `biolink:Dataset` are unaffected — instances carry both types.
+`nf:Study`, `nf:Dataset` and `nf:Publication` were originally in this table and have since been moved to the NF-specific subclass table below — all three *are* backed by portal tables, so they were on the wrong side of the rule. Removing them stranded ~41 `nf:`-namespace slots on a domain we do not define, and made `shapes:StudyShape` / `shapes:DatasetShape` / `shapes:PublicationShape` target a class that no longer existed. Queries written against `biolink:Study` / `biolink:Dataset` / `biolink:Publication` are unaffected — instances carry both types.
 
 | Removed | Replaced with | Notes |
 |---|---|---|
-| `nf:Publication` | `biolink:Publication` | No external mapping |
 | `nf:Chemical` | `biolink:ChemicalEntity` | No external mapping; BioLink already maps to CHEBI:24431 |
 | _(none — new)_ | `biolink:SequenceVariant` | Used directly for somatic variant nodes in the variant layer. `nf:Variant` was NOT reused: it means "a variant mentioned in publication text" (PubTator3) and carries no coordinates, so overloading it would conflate a literature mention with a called allele. See `docs/variant-layer.md`. |
 | _(none — new)_ | `biolink:Gene` | Used directly for the gene entity layer, keyed on Ensembl gene id. `nf:Gene` was NOT reused for the same reason: it means "a gene mentioned in publication text" and carries no identifiers. See `docs/entity-layers.md`. |
@@ -46,6 +70,7 @@ These `nf:` classes are NF-specific specializations with no external mappings to
 | `nf:Individual` | `rdfs:subClassOf biolink:IndividualOrganism` | — |
 | `nf:Study` | `rdfs:subClassOf biolink:Study` | — |
 | `nf:Dataset` | `rdfs:subClassOf biolink:Dataset` | — |
+| `nf:Publication` | `rdfs:subClassOf biolink:Publication` | — |
 
 ## Borrowed classes are declared locally
 
@@ -60,7 +85,8 @@ fixed.
 
 `skos:scopeNote` rather than `rdfs:comment` is deliberate — see the convention note above
 that block. Where the borrowed class is only a parent (`biolink:Study`, `biolink:Dataset`,
-`biolink:MaterialSample`, `biolink:IndividualOrganism`), its scope note is a pointer and
+`biolink:Publication`, `biolink:MaterialSample`, `biolink:IndividualOrganism`), its scope
+note is a pointer and
 the substantive guidance lives in the `rdfs:comment` of the `nf:` subclass, which is ours
 to define.
 
@@ -72,9 +98,9 @@ means committing to a local declaration for every term in it that the graph inst
 
 `sh:targetClass C` binds instances of `C` *and its subclasses* — never its superclasses.
 So for a dual-typed pair the shape may target either class and bind the same nodes, but
-if only one of the two types is emitted the shape must target that one. `shapes:StudyShape`
-and `shapes:DatasetShape` target `nf:Study` / `nf:Dataset`, which works because the RML
-emits both types; before the subclasses were restored they targeted classes with no
+if only one of the two types is emitted the shape must target that one. `shapes:StudyShape`,
+`shapes:DatasetShape` and `shapes:PublicationShape` target the `nf:` class, which works
+because the RML emits both types; before the subclasses were restored they targeted classes with no
 declaration at all and silently validated zero nodes. A shape that binds nothing reports
 `conforms: True`, so this failure mode is invisible unless you count focus nodes.
 
@@ -102,8 +128,9 @@ emits just `nf:CellLine`. Where the emitter is ours to change, prefer typing ins
 with **both** the `nf:` class and the BioLink parent. `scripts/materialize_specimens.py`
 does this (`nf:Specimen` + `biolink:MaterialSample`, `nf:Individual` +
 `biolink:IndividualOrganism`) at a cost of 12,623 triples, and
-`mappings/rml/{studies,datasets}.rml.ttl` do it for `nf:Study` + `biolink:Study` and
-`nf:Dataset` + `biolink:Dataset` at a cost of 527. Retrofitting the remaining subclassed
+`mappings/rml/{studies,datasets,publications,study_publications}.rml.ttl` do it for
+`nf:Study`, `nf:Dataset` and `nf:Publication` and their BioLink parents at a cost of
+1,464. Retrofitting the remaining subclassed
 classes (`nf:CellLine`, `nf:Mutation`, `nf:Antibody`, ...) in the RML mappings is open
 work — for those, `?s a biolink:CellLine` still matches nothing.
 
@@ -111,7 +138,7 @@ work — for those, `?s a biolink:CellLine` still matches nothing.
 
 - `schema/ontology.ttl` — class definitions, borrowed-class declarations, property domains/ranges
 - `schema/shapes.ttl` — SHACL shape targets
-- `mappings/rml/{studies,datasets,publications}.rml.ttl` — `rr:constant` type declarations (studies and datasets emit both the `nf:` class and the BioLink parent)
+- `mappings/rml/{studies,datasets,publications,study_publications}.rml.ttl` — `rr:constant` type declarations (each emits both the `nf:` class and the BioLink parent)
 - `pubs/scripts/pubtator3_to_qlever.py` — text entity type for Chemical
 - `test/conftest.py` — added `BIOLINK` namespace
 - `test/test_rml_{studies,datasets}.py`, `test/test_rml_development.py` — SPARQL queries

@@ -246,6 +246,22 @@ class TestPublication:
         assert len(publications) > 0, "No publications found in graph"
         assert len(publications) >= 2, f"Expected at least 2 publications, got {len(publications)}"
 
+    def test_publications_are_dual_typed(self, publication_graph, namespaces):
+        """Publications carry BOTH nf:Publication and biolink:Publication.
+
+        nf:Publication is rdfs:subClassOf biolink:Publication, but the index does
+        no OWL reasoning and SHACL target expansion only runs down to subclasses,
+        so shapes:PublicationShape (sh:targetClass nf:Publication) and the nf:
+        property domains would bind nothing if only the parent were emitted.
+        """
+        NF = namespaces["nf"]
+        BIOLINK = namespaces["biolink"]
+        nf_typed = set(publication_graph.subjects(RDF.type, NF.Publication))
+        biolink_typed = set(publication_graph.subjects(RDF.type, BIOLINK.Publication))
+        assert len(nf_typed) > 0, "no nf:Publication instances emitted"
+        assert nf_typed == biolink_typed, \
+            f"dual typing is uneven: {nf_typed ^ biolink_typed}"
+
     def test_publications_carry_source_collection(self, publication_graph, namespaces):
         """Every publication should record the named source collection it came
         from, so it stays distinguishable once other portal publication

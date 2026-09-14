@@ -784,7 +784,7 @@ shapes:BiobankShape a sh:NodeShape ;
 ################################################################################
 
 shapes:PublicationShape a sh:NodeShape ;
-    sh:targetClass biolink:Publication ;
+    sh:targetClass nf:Publication ;
     rdfs:label "Publication shape" ;
     rdfs:comment "Expected properties for Publication instances." ;
     sh:property [

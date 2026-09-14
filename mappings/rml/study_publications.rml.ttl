@@ -47,6 +47,7 @@ map:StudyPublicationCore a rr:TriplesMap ;
     rdfs:label "Study Publication Core" ;
     rml:logicalSource map:StudyPublicationsSource ;
     rr:subjectMap [ rr:template "http://nf-osi.github.com/terms#publication/{publicationKey}" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [ rr:predicate rdf:type ; rr:objectMap [ rr:constant nf:Publication ; rr:termType rr:IRI ] ] ;
     rr:predicateObjectMap [ rr:predicate rdf:type ; rr:objectMap [ rr:constant biolink:Publication ; rr:termType rr:IRI ] ] ;
     rr:predicateObjectMap [ rr:predicate prov:wasDerivedFrom ; rr:objectMap [ rr:constant nf:MainPortalPublications ; rr:termType rr:IRI ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:publicationTitle ; rr:objectMap [ rml:reference "title" ; rr:datatype xsd:string ] ] ;

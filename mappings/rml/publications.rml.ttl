@@ -28,6 +28,7 @@ map:PublicationCore a rr:TriplesMap ;
     rdfs:label "Publication Core" ;
     rml:logicalSource map:PublicationsSource ;
     rr:subjectMap [ rr:template "http://nf-osi.github.com/terms#publication/{publicationId}" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [ rr:predicate rdf:type ; rr:objectMap [ rr:constant nf:Publication ; rr:termType rr:IRI ] ] ;
     rr:predicateObjectMap [ rr:predicate rdf:type ; rr:objectMap [ rr:constant biolink:Publication ; rr:termType rr:IRI ] ] ;
     # Named source collection this publication belongs to. The collection node
     # itself (label, comment, link to the Synapse table and its version) is

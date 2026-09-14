@@ -387,10 +387,18 @@ nf:Investigator a owl:Class ;
     rdfs:label "Investigator" ;
     rdfs:comment "A researcher involved in resource development." .
 
+nf:Publication a owl:Class ;
+    rdfs:subClassOf biolink:Publication ;
+    rdfs:label "Publication" ;
+    rdfs:comment "A publication on the NF-OSI portal. INSTANCES CAN BE DUPLICATED: publications are ingested from more than one portal listing, and each listing keys its records differently -- nf:ToolsCentralPublications by an internal publicationId, nf:MainPortalPublications by DOI with a \"pmid-<pmid>\" fallback for rows with no usable DOI. The listings overlap, so the same paper can appear as two distinct nodes with different IRIs, and their fields do not always agree. A raw COUNT of this class is therefore a count of RECORDS, not of distinct papers. Deduplicate on nf:pmid, falling back to nf:doi then nf:publicationTitle, before counting or listing. Each node carries prov:wasDerivedFrom naming the collection it came from; read that collection\'s rdfs:comment for its coverage and caveats. Subclassed under biolink:Publication rather than replaced by it, because the portal maintains publication tables of its own and the NF-specific slots asserted on publications (nf:pmid, nf:journal, nf:publicationTitle, ...) need a domain we define. Instances carry BOTH rdf:type values: the index does no OWL reasoning, and SHACL target expansion runs DOWN to subclasses only, so a shape or query on nf:Publication would match nothing if instances were typed biolink:Publication alone." .
+
 # Borrowed classes, annotated locally so their NF-OSI usage rules travel with
-# the graph rather than living only in this file's source. nf:Person and
-# nf:Publication are deliberately not defined; the Biolink terms are used
-# directly.
+# the graph rather than living only in this file's source. nf:Person is
+# deliberately not defined; the Biolink term is used directly, because no portal
+# table backs it -- see the subclass-vs-replace rule in
+# docs/biolink-alignment.md. Where a borrowed class is only the parent of an
+# nf: class, its scope note here is a pointer and the substantive guidance
+# lives on the subclass's rdfs:comment.
 #
 # CONVENTION -- terms we do NOT define carry their local guidance on
 # skos:scopeNote, never rdfs:comment. rdfs:comment is the defining vocabulary's
@@ -406,7 +414,7 @@ biolink:Person a owl:Class ;
 
 biolink:Publication a owl:Class ;
     rdfs:label "Publication" ;
-    skos:scopeNote "A publication on the NF-OSI portal. INSTANCES CAN BE DUPLICATED: publications are ingested from more than one portal listing, and each listing keys its records differently -- nf:ToolsCentralPublications by an internal publicationId, nf:MainPortalPublications by DOI with a \"pmid-<pmid>\" fallback for rows with no usable DOI. The listings overlap, so the same paper can appear as two distinct nodes with different IRIs, and their fields do not always agree. A raw COUNT of this class is therefore a count of RECORDS, not of distinct papers. Deduplicate on nf:pmid, falling back to nf:doi then nf:publicationTitle, before counting or listing. Each node carries prov:wasDerivedFrom naming the collection it came from; read that collection\'s rdfs:comment for its coverage and caveats." .
+    skos:scopeNote "Used here only as the BioLink parent of nf:Publication, whose instances carry both rdf:type values so the alignment is queryable without a reasoner. Every biolink:Publication in this graph is therefore also an nf:Publication -- read that class's rdfs:comment for the duplication caveat, which matters before any count." .
 
 biolink:Study a owl:Class ;
     rdfs:label "Study" ;
@@ -1700,71 +1708,71 @@ nf:doi a owl:ObjectProperty ;
 nf:citation a owl:DatatypeProperty ;
     rdfs:label "citation" ;
     rdfs:comment "Formatted citation string." ;
-    rdfs:domain biolink:Publication ;
+    rdfs:domain nf:Publication ;
     rdfs:range xsd:string .
 
 nf:publicationTitle a owl:DatatypeProperty ;
     rdfs:label "publicationTitle" ;
     rdfs:comment "Title of the publication." ;
-    rdfs:domain biolink:Publication ;
+    rdfs:domain nf:Publication ;
     rdfs:range xsd:string .
 
 nf:abstract a owl:DatatypeProperty ;
     rdfs:label "abstract" ;
     rdfs:comment "Abstract of the publication." ;
-    rdfs:domain biolink:Publication ;
+    rdfs:domain nf:Publication ;
     rdfs:range xsd:string .
 
 nf:publicationDate a owl:DatatypeProperty ;
     rdfs:label "publicationDate" ;
     rdfs:comment "Publication date." ;
-    rdfs:domain biolink:Publication ;
+    rdfs:domain nf:Publication ;
     rdfs:range xsd:string .
 
 nf:publicationDateUnix a owl:DatatypeProperty ;
     rdfs:label "publicationDateUnix" ;
     rdfs:comment "Publication date as Unix timestamp." ;
-    rdfs:domain biolink:Publication ;
+    rdfs:domain nf:Publication ;
     rdfs:range xsd:string .
 
 nf:journal a owl:DatatypeProperty ;
     rdfs:label "journal" ;
     rdfs:comment "Journal in which the publication appeared." ;
-    rdfs:domain biolink:Publication ;
+    rdfs:domain nf:Publication ;
     rdfs:range xsd:string .
 
 nf:pmid a owl:ObjectProperty ;
     rdfs:label "pmid" ;
     rdfs:comment "PubMed ID of the publication." ;
-    rdfs:domain biolink:Publication .
+    rdfs:domain nf:Publication .
 
 nf:authors a owl:DatatypeProperty ;
     rdfs:label "authors" ;
     rdfs:comment "Authors of the publication." ;
-    rdfs:domain biolink:Publication ;
+    rdfs:domain nf:Publication ;
     rdfs:range xsd:string .
 
 nf:inFullTextIndex a owl:DatatypeProperty ;
     rdfs:label "inFullTextIndex" ;
     rdfs:comment "Whether the publication is included in the project full-text index." ;
-    rdfs:domain biolink:Publication ;
+    rdfs:domain nf:Publication ;
     rdfs:range xsd:boolean .
 
 nf:hasPublication a owl:ObjectProperty ;
     rdfs:label "hasPublication" ;
     rdfs:comment "Links a resource-development context to the publication describing it: asserted from an nf:Development record and, as a shortcut, from the nf:Tool itself. This is a resource-development association, NOT authorship -- the linked investigator need not be an author of the paper. For authorship use the publication's DOI IRI and nf:authorOrcid." ;
-    rdfs:range biolink:Publication .
+    rdfs:range nf:Publication .
 
 nf:year a owl:DatatypeProperty ;
     rdfs:label "year" ;
     rdfs:comment "Publication year." ;
-    rdfs:domain biolink:Publication ;
+    rdfs:domain nf:Publication ;
     rdfs:range xsd:string .
 
 nf:publicationType a owl:DatatypeProperty ;
     rdfs:label "publicationType" ;
     rdfs:comment "Type of publication as recorded by the main portal listing (e.g. preprint, review)." ;
-    rdfs:domain biolink:Publication ;
+    rdfs:domain nf:Publication ;
     rdfs:range xsd:string .
 
 nf:hasSynapseProfile a owl:ObjectProperty ;
@@ -1779,7 +1787,7 @@ nf:onProject a owl:ObjectProperty ;
 nf:aboutStudy a owl:ObjectProperty ;
     rdfs:label "aboutStudy" ;
     rdfs:comment "Links a publication to a portal study whose data it reports. Asserted for main-portal (study-associated) publications; a publication can be about more than one study." ;
-    rdfs:domain biolink:Publication ;
+    rdfs:domain nf:Publication ;
     rdfs:range nf:Study .
 
 nf:authorOrcid a owl:ObjectProperty ;
@@ -1866,7 +1874,7 @@ nf:referencesPublication a owl:ObjectProperty ;
     rdfs:label "referencesPublication" ;
     rdfs:comment "Links an observation to a supporting publication." ;
     rdfs:domain nf:Observation ;
-    rdfs:range biolink:Publication .
+    rdfs:range nf:Publication .
 
 ################################################################################
 # Classes - Text entity annotations (from PubTator3 text index)
