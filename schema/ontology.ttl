@@ -27,7 +27,7 @@ nf:File a owl:Class ;
 nf:Study a owl:Class ;
     rdfs:subClassOf biolink:Study ;
     rdfs:label "Study" ;
-    rdfs:comment "A research study on the NF-OSI portal, keyed https://www.synapse.org/Synapse:{id}. The hub of the portal graph: files reach it via nf:parentStudy, and so do the curated datasets that have one. Subclassed under biolink:Study rather than replaced by it, so that the NF-specific slots asserted on studies (nf:studyStatus, nf:studyLeads, nf:institutions, ...) have a domain we define. Instances carry BOTH rdf:type values, which is what makes the subclassing usable: the index does no OWL reasoning, and SHACL target expansion runs DOWN to subclasses only, so a shape or query on nf:Study would match nothing if instances were typed biolink:Study alone." .
+    rdfs:comment "A research study on the NF-OSI portal, keyed https://www.synapse.org/Synapse:{id}. The hub of the portal graph: files and curated datasets both link to it via nf:parentStudy. Instances are also typed biolink:Study." .
 
 nf:Tool a owl:Class ;
     rdfs:label "Tool" ;
@@ -372,7 +372,7 @@ nf:Initiative a owl:Class ;
 nf:Dataset a owl:Class ;
     rdfs:subClassOf biolink:Dataset ;
     rdfs:label "Dataset" ;
-    rdfs:comment "A curated dataset on the NF-OSI portal -- a named, citable collection of files with its own metadata, keyed https://www.synapse.org/Synapse:{id}. Subclassed under biolink:Dataset rather than replaced by it, so that the NF-specific slots asserted on datasets (nf:datasetItemCount, nf:dataUseModifiers, nf:accessType, ...) have a domain we define. Instances carry BOTH rdf:type values, which is what makes the subclassing usable: the index does no OWL reasoning, and SHACL target expansion runs DOWN to subclasses only, so a shape or query on nf:Dataset would match nothing if instances were typed biolink:Dataset alone. This class is a PARTIAL view of portal data: curation is opt-in and most studies have no dataset at all, so counts over it are counts of curated datasets, NOT of the data holdings. Two further traps. (1) Dataset nodes are LEAVES -- nothing in the graph points at one, and there is no membership edge to the nf:File nodes they contain; the size and count of a dataset are recorded as literals (nf:datasetItemCount, nf:datasetSizeInBytes) and its only outgoing link is nf:parentStudy. To get from a dataset to files, go through that study. (2) Not to be confused with void:Dataset, which is the provenance class for source collections and shares no instances with this one. A few datasets have no title on record and so carry no rdfs:label; filter on the class, not on the presence of a label." .
+    rdfs:comment "A curated dataset on the NF-OSI portal -- a named, citable collection of files with its own metadata, keyed https://www.synapse.org/Synapse:{id}. Instances are also typed biolink:Dataset. COVERAGE IS PARTIAL: curation is opt-in and most studies have no dataset, so counts over this class count curated datasets, not portal holdings. Dataset nodes are also LEAVES: there is no edge to the nf:File nodes a dataset contains, only literal counts (nf:datasetItemCount, nf:datasetSizeInBytes) and nf:parentStudy, so reach files through the study. Distinct from void:Dataset, which is the provenance class for source collections." .
 
 nf:Development a owl:Class ;
     rdfs:label "Development" ;
@@ -390,15 +390,14 @@ nf:Investigator a owl:Class ;
 nf:Publication a owl:Class ;
     rdfs:subClassOf biolink:Publication ;
     rdfs:label "Publication" ;
-    rdfs:comment "A publication on the NF-OSI portal. INSTANCES CAN BE DUPLICATED: publications are ingested from more than one portal listing, and each listing keys its records differently -- nf:ToolsCentralPublications by an internal publicationId, nf:MainPortalPublications by DOI with a \"pmid-<pmid>\" fallback for rows with no usable DOI. The listings overlap, so the same paper can appear as two distinct nodes with different IRIs, and their fields do not always agree. A raw COUNT of this class is therefore a count of RECORDS, not of distinct papers. Deduplicate on nf:pmid, falling back to nf:doi then nf:publicationTitle, before counting or listing. Each node carries prov:wasDerivedFrom naming the collection it came from; read that collection\'s rdfs:comment for its coverage and caveats. Subclassed under biolink:Publication rather than replaced by it, because the portal maintains publication tables of its own and the NF-specific slots asserted on publications (nf:pmid, nf:journal, nf:publicationTitle, ...) need a domain we define. Instances carry BOTH rdf:type values: the index does no OWL reasoning, and SHACL target expansion runs DOWN to subclasses only, so a shape or query on nf:Publication would match nothing if instances were typed biolink:Publication alone." .
+    rdfs:comment "A publication on the NF-OSI portal. INSTANCES CAN BE DUPLICATED: publications are ingested from more than one portal listing, and each listing keys its records differently -- nf:ToolsCentralPublications by an internal publicationId, nf:MainPortalPublications by DOI with a \"pmid-<pmid>\" fallback for rows with no usable DOI. The listings overlap, so the same paper can appear as two distinct nodes with different IRIs, and their fields do not always agree. A raw COUNT of this class is therefore a count of RECORDS, not of distinct papers. Deduplicate on nf:pmid, falling back to nf:doi then nf:publicationTitle, before counting or listing. Each node carries prov:wasDerivedFrom naming the collection it came from; read that collection\'s rdfs:comment for its coverage and caveats. Instances are also typed biolink:Publication." .
 
 # Borrowed classes, annotated locally so their NF-OSI usage rules travel with
 # the graph rather than living only in this file's source. nf:Person is
-# deliberately not defined; the Biolink term is used directly, because no portal
-# table backs it -- see the subclass-vs-replace rule in
-# docs/biolink-alignment.md. Where a borrowed class is only the parent of an
-# nf: class, its scope note here is a pointer and the substantive guidance
-# lives on the subclass's rdfs:comment.
+# deliberately not defined -- no portal table backs it; see the
+# subclass-vs-replace rule in docs/biolink-alignment.md. Where a borrowed class
+# is only a parent, its scope note points at the nf: subclass that holds the
+# guidance.
 #
 # CONVENTION -- terms we do NOT define carry their local guidance on
 # skos:scopeNote, never rdfs:comment. rdfs:comment is the defining vocabulary's
@@ -414,35 +413,35 @@ biolink:Person a owl:Class ;
 
 biolink:Publication a owl:Class ;
     rdfs:label "Publication" ;
-    skos:scopeNote "Used here only as the BioLink parent of nf:Publication, whose instances carry both rdf:type values so the alignment is queryable without a reasoner. Every biolink:Publication in this graph is therefore also an nf:Publication -- read that class's rdfs:comment for the duplication caveat, which matters before any count." .
+    skos:scopeNote "BioLink parent of nf:Publication. Every instance in this graph is also an nf:Publication, where the usage guidance for these nodes lives." .
 
 biolink:Study a owl:Class ;
     rdfs:label "Study" ;
-    skos:scopeNote "Used here only as the BioLink parent of nf:Study, whose instances carry both rdf:type values so the alignment is queryable without a reasoner. Every biolink:Study in this graph is therefore also an nf:Study -- read that class's rdfs:comment for what the node actually is." .
+    skos:scopeNote "BioLink parent of nf:Study. Every instance in this graph is also an nf:Study, where the usage guidance for these nodes lives." .
 
 biolink:Dataset a owl:Class ;
     rdfs:label "Dataset" ;
-    skos:scopeNote "Used here only as the BioLink parent of nf:Dataset, whose instances carry both rdf:type values so the alignment is queryable without a reasoner. Every biolink:Dataset in this graph is therefore also an nf:Dataset -- read that class's rdfs:comment for the coverage caveats, which are substantial. Not to be confused with void:Dataset, the provenance class for source collections." .
+    skos:scopeNote "BioLink parent of nf:Dataset. Every instance in this graph is also an nf:Dataset, where the usage guidance for these nodes lives." .
 
 biolink:ChemicalEntity a owl:Class ;
     rdfs:label "Chemical Entity" ;
-    skos:scopeNote "A chemical entity annotated in publication text, keyed on its MeSH IRI (http://id.nlm.nih.gov/mesh/{id}). Replaces the former nf:Chemical (see docs/biolink-alignment.md). These come from text annotation over publication abstracts, so an instance means the chemical was MENTIONED in a paper -- not that it was administered, tested, or found active in NF." .
+    skos:scopeNote "A chemical entity mentioned in publication text, keyed on its MeSH IRI. An instance means the chemical was mentioned in a paper, not that it was administered, tested, or found active in NF." .
 
 biolink:Gene a owl:Class ;
     rdfs:label "Gene" ;
-    skos:scopeNote "A gene in the gene entity layer, keyed on its Ensembl gene id; see docs/entity-layers.md. DISTINCT from nf:Gene, which means \"a gene entity annotated in publication text\" (PubTator3) and carries no identifiers -- nf:Gene is declared rdfs:subClassOf this class, so a reasoner would fold the two together, but the raw graph keeps them apart and a literature mention is not an annotated locus." .
+    skos:scopeNote "A gene in the gene entity layer, keyed on its Ensembl gene id. Distinct from nf:Gene, which means a gene mentioned in publication text and carries no identifiers." .
 
 biolink:SequenceVariant a owl:Class ;
     rdfs:label "Sequence Variant" ;
-    skos:scopeNote "A called somatic allele in the variant layer: the context-free half of the two-layer split, shared by every sample carrying it; see docs/variant-layer.md. The per-sample evidence lives on nf:VariantObservation, which points here via nf:observesVariant, so counting instances of this class counts distinct alleles, NOT observations. DISTINCT from nf:Variant, which means \"a variant mentioned in publication text\" and carries no coordinates; nf:Variant is declared rdfs:subClassOf this class, but the two are not interchangeable." .
+    skos:scopeNote "A called somatic allele in the variant layer, shared by every sample carrying it. Per-sample evidence is on nf:VariantObservation, which points here via nf:observesVariant, so counting this class counts distinct alleles, not observations. Distinct from nf:Variant, which means a variant mentioned in publication text and carries no coordinates." .
 
 biolink:MaterialSample a owl:Class ;
     rdfs:label "Material Sample" ;
-    skos:scopeNote "Used here only as the BioLink parent of nf:Specimen, whose instances carry both rdf:type values so the alignment is queryable without a reasoner. Every biolink:MaterialSample in this graph is therefore also an nf:Specimen -- read that class's rdfs:comment for what the identifier actually is and why the two are subclassed rather than equated." .
+    skos:scopeNote "BioLink parent of nf:Specimen. Every instance in this graph is also an nf:Specimen, where the usage guidance for these nodes lives." .
 
 biolink:IndividualOrganism a owl:Class ;
     rdfs:label "Individual Organism" ;
-    skos:scopeNote "Used here only as the BioLink parent of nf:Individual, whose instances carry both rdf:type values so the alignment is queryable without a reasoner. Every biolink:IndividualOrganism in this graph is therefore also an nf:Individual, and a large share of them are mice or zebrafish rather than patients -- read that class's rdfs:comment before treating one as a human case." .
+    skos:scopeNote "BioLink parent of nf:Individual. Every instance in this graph is also an nf:Individual, where the usage guidance for these nodes lives." .
 
 nf:Data a owl:Class ;
     rdfs:label "Data" ;
