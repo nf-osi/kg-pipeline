@@ -24,7 +24,10 @@ nf:File a owl:Class ;
     rdfs:label "File" ;
     rdfs:comment "A file resource in the NF-OSI portal." .
 
-# nf:Study replaced by biolink:Study
+nf:Study a owl:Class ;
+    rdfs:subClassOf biolink:Study ;
+    rdfs:label "Study" ;
+    rdfs:comment "A research study on the NF-OSI portal, keyed https://www.synapse.org/Synapse:{id}. The hub of the portal graph: files reach it via nf:parentStudy, and so do the curated datasets that have one. Subclassed under biolink:Study rather than replaced by it, so that the NF-specific slots asserted on studies (nf:studyStatus, nf:studyLeads, nf:institutions, ...) have a domain we define. Instances carry BOTH rdf:type values, which is what makes the subclassing usable: the index does no OWL reasoning, and SHACL target expansion runs DOWN to subclasses only, so a shape or query on nf:Study would match nothing if instances were typed biolink:Study alone." .
 
 nf:Tool a owl:Class ;
     rdfs:label "Tool" ;
@@ -366,7 +369,10 @@ nf:Initiative a owl:Class ;
     rdfs:label "Initiative" ;
     rdfs:comment "A research funding initiative that supports studies, data generation, and tool development in the NF-OSI ecosystem." .
 
-# nf:Dataset replaced by biolink:Dataset
+nf:Dataset a owl:Class ;
+    rdfs:subClassOf biolink:Dataset ;
+    rdfs:label "Dataset" ;
+    rdfs:comment "A curated dataset on the NF-OSI portal -- a named, citable collection of files with its own metadata, keyed https://www.synapse.org/Synapse:{id}. Subclassed under biolink:Dataset rather than replaced by it, so that the NF-specific slots asserted on datasets (nf:datasetItemCount, nf:dataUseModifiers, nf:accessType, ...) have a domain we define. Instances carry BOTH rdf:type values, which is what makes the subclassing usable: the index does no OWL reasoning, and SHACL target expansion runs DOWN to subclasses only, so a shape or query on nf:Dataset would match nothing if instances were typed biolink:Dataset alone. This class is a PARTIAL view of portal data: curation is opt-in and most studies have no dataset at all, so counts over it are counts of curated datasets, NOT of the data holdings. Two further traps. (1) Dataset nodes are LEAVES -- nothing in the graph points at one, and there is no membership edge to the nf:File nodes they contain; the size and count of a dataset are recorded as literals (nf:datasetItemCount, nf:datasetSizeInBytes) and its only outgoing link is nf:parentStudy. To get from a dataset to files, go through that study. (2) Not to be confused with void:Dataset, which is the provenance class for source collections and shares no instances with this one. A few datasets have no title on record and so carry no rdfs:label; filter on the class, not on the presence of a label." .
 
 nf:Development a owl:Class ;
     rdfs:label "Development" ;
@@ -401,6 +407,34 @@ biolink:Person a owl:Class ;
 biolink:Publication a owl:Class ;
     rdfs:label "Publication" ;
     skos:scopeNote "A publication on the NF-OSI portal. INSTANCES CAN BE DUPLICATED: publications are ingested from more than one portal listing, and each listing keys its records differently -- nf:ToolsCentralPublications by an internal publicationId, nf:MainPortalPublications by DOI with a \"pmid-<pmid>\" fallback for rows with no usable DOI. The listings overlap, so the same paper can appear as two distinct nodes with different IRIs, and their fields do not always agree. A raw COUNT of this class is therefore a count of RECORDS, not of distinct papers. Deduplicate on nf:pmid, falling back to nf:doi then nf:publicationTitle, before counting or listing. Each node carries prov:wasDerivedFrom naming the collection it came from; read that collection\'s rdfs:comment for its coverage and caveats." .
+
+biolink:Study a owl:Class ;
+    rdfs:label "Study" ;
+    skos:scopeNote "Used here only as the BioLink parent of nf:Study, whose instances carry both rdf:type values so the alignment is queryable without a reasoner. Every biolink:Study in this graph is therefore also an nf:Study -- read that class's rdfs:comment for what the node actually is." .
+
+biolink:Dataset a owl:Class ;
+    rdfs:label "Dataset" ;
+    skos:scopeNote "Used here only as the BioLink parent of nf:Dataset, whose instances carry both rdf:type values so the alignment is queryable without a reasoner. Every biolink:Dataset in this graph is therefore also an nf:Dataset -- read that class's rdfs:comment for the coverage caveats, which are substantial. Not to be confused with void:Dataset, the provenance class for source collections." .
+
+biolink:ChemicalEntity a owl:Class ;
+    rdfs:label "Chemical Entity" ;
+    skos:scopeNote "A chemical entity annotated in publication text, keyed on its MeSH IRI (http://id.nlm.nih.gov/mesh/{id}). Replaces the former nf:Chemical (see docs/biolink-alignment.md). These come from text annotation over publication abstracts, so an instance means the chemical was MENTIONED in a paper -- not that it was administered, tested, or found active in NF." .
+
+biolink:Gene a owl:Class ;
+    rdfs:label "Gene" ;
+    skos:scopeNote "A gene in the gene entity layer, keyed on its Ensembl gene id; see docs/entity-layers.md. DISTINCT from nf:Gene, which means \"a gene entity annotated in publication text\" (PubTator3) and carries no identifiers -- nf:Gene is declared rdfs:subClassOf this class, so a reasoner would fold the two together, but the raw graph keeps them apart and a literature mention is not an annotated locus." .
+
+biolink:SequenceVariant a owl:Class ;
+    rdfs:label "Sequence Variant" ;
+    skos:scopeNote "A called somatic allele in the variant layer: the context-free half of the two-layer split, shared by every sample carrying it; see docs/variant-layer.md. The per-sample evidence lives on nf:VariantObservation, which points here via nf:observesVariant, so counting instances of this class counts distinct alleles, NOT observations. DISTINCT from nf:Variant, which means \"a variant mentioned in publication text\" and carries no coordinates; nf:Variant is declared rdfs:subClassOf this class, but the two are not interchangeable." .
+
+biolink:MaterialSample a owl:Class ;
+    rdfs:label "Material Sample" ;
+    skos:scopeNote "Used here only as the BioLink parent of nf:Specimen, whose instances carry both rdf:type values so the alignment is queryable without a reasoner. Every biolink:MaterialSample in this graph is therefore also an nf:Specimen -- read that class's rdfs:comment for what the identifier actually is and why the two are subclassed rather than equated." .
+
+biolink:IndividualOrganism a owl:Class ;
+    rdfs:label "Individual Organism" ;
+    skos:scopeNote "Used here only as the BioLink parent of nf:Individual, whose instances carry both rdf:type values so the alignment is queryable without a reasoner. Every biolink:IndividualOrganism in this graph is therefore also an nf:Individual, and a large share of them are mice or zebrafish rather than patients -- read that class's rdfs:comment before treating one as a human case." .
 
 nf:Data a owl:Class ;
     rdfs:label "Data" ;
@@ -509,8 +543,8 @@ nf:name a owl:DatatypeProperty ;
 nf:parentStudy a owl:ObjectProperty ;
     rdfs:label "parentStudy" ;
     rdfs:comment "The study a file or dataset belongs to." ;
-    rdfs:domain [ a owl:Class ; owl:unionOf (nf:File biolink:Dataset) ] ;
-    rdfs:range biolink:Study .
+    rdfs:domain [ a owl:Class ; owl:unionOf (nf:File nf:Dataset) ] ;
+    rdfs:range nf:Study .
 
 nf:assay a owl:DatatypeProperty ;
     rdfs:label "assay" ;
@@ -666,13 +700,13 @@ nf:initiative a owl:ObjectProperty ;
 nf:studyStatus a owl:DatatypeProperty ;
     rdfs:label "studyStatus" ;
     rdfs:comment "Current status of the study." ;
-    rdfs:domain biolink:Study ;
+    rdfs:domain nf:Study ;
     rdfs:range xsd:string .
 
 nf:dataStatus a owl:DatatypeProperty ;
     rdfs:label "dataStatus" ;
     rdfs:comment "Status of the study's data, e.g. 'Under Embargo'." ;
-    rdfs:domain biolink:Study ;
+    rdfs:domain nf:Study ;
     rdfs:range xsd:string .
 
 nf:accessRequirements a owl:DatatypeProperty ;
@@ -688,7 +722,7 @@ nf:acknowledgementStatements a owl:DatatypeProperty ;
 nf:studyFileviewId a owl:ObjectProperty ;
     rdfs:label "studyFileviewId" ;
     rdfs:comment "Synapse ID of the study file view." ;
-    rdfs:domain biolink:Study .
+    rdfs:domain nf:Study .
 
 nf:studyLeads a owl:DatatypeProperty ;
     rdfs:label "studyLeads" ;
@@ -713,8 +747,8 @@ nf:diseaseFocus a owl:DatatypeProperty ;
 nf:relatedStudies a owl:ObjectProperty ;
     rdfs:label "relatedStudies" ;
     rdfs:comment "Other studies related to this study." ;
-    rdfs:domain biolink:Study ;
-    rdfs:range biolink:Study .
+    rdfs:domain nf:Study ;
+    rdfs:range nf:Study .
 
 nf:grantDOI a owl:ObjectProperty ;
     rdfs:label "grantDOI" ;
@@ -1506,114 +1540,114 @@ nf:website a owl:ObjectProperty ;
 nf:creator a owl:DatatypeProperty ;
     rdfs:label "creator" ;
     rdfs:comment "Individual(s) who created the dataset." ;
-    rdfs:domain biolink:Dataset ;
+    rdfs:domain nf:Dataset ;
     rdfs:range xsd:string .
 
 nf:contributor a owl:DatatypeProperty ;
     rdfs:label "contributor" ;
     rdfs:comment "Individual(s) who contributed to the dataset." ;
-    rdfs:domain biolink:Dataset ;
+    rdfs:domain nf:Dataset ;
     rdfs:range xsd:string .
 
 nf:accessType a owl:DatatypeProperty ;
     rdfs:label "accessType" ;
     rdfs:comment "Access level for the dataset (e.g. Public Access, Controlled Access)." ;
-    rdfs:domain biolink:Dataset ;
+    rdfs:domain nf:Dataset ;
     rdfs:range xsd:string .
 
 nf:license a owl:ObjectProperty ;
     rdfs:label "license" ;
     rdfs:comment "License URL governing use of the dataset." ;
-    rdfs:domain biolink:Dataset .
+    rdfs:domain nf:Dataset .
 
 nf:conditionsOfAccess a owl:DatatypeProperty ;
     rdfs:label "conditionsOfAccess" ;
     rdfs:comment "Conditions or requirements for accessing the dataset." ;
-    rdfs:domain biolink:Dataset ;
+    rdfs:domain nf:Dataset ;
     rdfs:range xsd:string .
 
 nf:keywords a owl:DatatypeProperty ;
     rdfs:label "keywords" ;
     rdfs:comment "Keywords describing the dataset content." ;
-    rdfs:domain biolink:Dataset ;
+    rdfs:domain nf:Dataset ;
     rdfs:range xsd:string .
 
 nf:measurementTechnique a owl:DatatypeProperty ;
     rdfs:label "measurementTechnique" ;
     rdfs:comment "Measurement or assay technique used to generate the dataset." ;
-    rdfs:domain biolink:Dataset ;
+    rdfs:domain nf:Dataset ;
     rdfs:range xsd:string .
 
 nf:ageGroup a owl:DatatypeProperty ;
     rdfs:label "ageGroup" ;
     rdfs:comment "Age group(s) of the subjects in the dataset (e.g. pediatric, adult)." ;
-    rdfs:domain biolink:Dataset ;
+    rdfs:domain nf:Dataset ;
     rdfs:range xsd:string .
 
 nf:dataUseModifiers a owl:DatatypeProperty ;
     rdfs:label "dataUseModifiers" ;
     rdfs:comment "Data use conditions or modifiers applicable to the dataset (GA4GH DUO terms)." ;
-    rdfs:domain biolink:Dataset ;
+    rdfs:domain nf:Dataset ;
     rdfs:range xsd:string .
 
 nf:countryOfOrigin a owl:DatatypeProperty ;
     rdfs:label "countryOfOrigin" ;
     rdfs:comment "Country where the data was collected." ;
-    rdfs:domain biolink:Dataset ;
+    rdfs:domain nf:Dataset ;
     rdfs:range xsd:string .
 
 nf:datasetSizeInBytes a owl:DatatypeProperty ;
     rdfs:label "datasetSizeInBytes" ;
     rdfs:comment "Total size of the dataset in bytes." ;
-    rdfs:domain biolink:Dataset ;
+    rdfs:domain nf:Dataset ;
     rdfs:range xsd:long .
 
 nf:datasetItemCount a owl:DatatypeProperty ;
     rdfs:label "datasetItemCount" ;
     rdfs:comment "Number of items (files) in the dataset." ;
-    rdfs:domain biolink:Dataset ;
+    rdfs:domain nf:Dataset ;
     rdfs:range xsd:integer .
 
 nf:individualCount a owl:DatatypeProperty ;
     rdfs:label "individualCount" ;
     rdfs:comment "Number of individuals represented in the dataset." ;
-    rdfs:domain biolink:Dataset ;
+    rdfs:domain nf:Dataset ;
     rdfs:range xsd:integer .
 
 nf:specimenCount a owl:DatatypeProperty ;
     rdfs:label "specimenCount" ;
     rdfs:comment "Number of specimens represented in the dataset." ;
-    rdfs:domain biolink:Dataset ;
+    rdfs:domain nf:Dataset ;
     rdfs:range xsd:integer .
 
 nf:yearPublished a owl:DatatypeProperty ;
     rdfs:label "yearPublished" ;
     rdfs:comment "Year the dataset was published or released." ;
-    rdfs:domain biolink:Dataset ;
+    rdfs:domain nf:Dataset ;
     rdfs:range xsd:integer .
 
 nf:visualizeDataOn a owl:DatatypeProperty ;
     rdfs:label "visualizeDataOn" ;
     rdfs:comment "External platform(s) where the dataset can be visualized." ;
-    rdfs:domain biolink:Dataset ;
+    rdfs:domain nf:Dataset ;
     rdfs:range xsd:string .
 
 nf:alternateName a owl:DatatypeProperty ;
     rdfs:label "alternateName" ;
     rdfs:comment "Alternative name or title for the dataset." ;
-    rdfs:domain biolink:Dataset ;
+    rdfs:domain nf:Dataset ;
     rdfs:range xsd:string .
 
 nf:versionLabel a owl:DatatypeProperty ;
     rdfs:label "versionLabel" ;
     rdfs:comment "Human-readable label for the dataset version." ;
-    rdfs:domain biolink:Dataset ;
+    rdfs:domain nf:Dataset ;
     rdfs:range xsd:string .
 
 nf:externalRepositoryUri a owl:ObjectProperty ;
     rdfs:label "externalRepositoryUri" ;
     rdfs:comment "URI of an external repository where the dataset is also deposited." ;
-    rdfs:domain biolink:Dataset .
+    rdfs:domain nf:Dataset .
 
 ################################################################################
 # Properties - Development related
@@ -1629,7 +1663,7 @@ nf:resourceId a owl:DatatypeProperty ;
 nf:hasFunder a owl:ObjectProperty ;
     rdfs:label "hasFunder" ;
     rdfs:comment "Links to the funding organization." ;
-    rdfs:domain [ a owl:Class ; owl:unionOf (nf:File biolink:Study nf:Development) ] ;
+    rdfs:domain [ a owl:Class ; owl:unionOf (nf:File nf:Study nf:Development) ] ;
     rdfs:range nf:Funder .
 
 # Investigator
@@ -1746,7 +1780,7 @@ nf:aboutStudy a owl:ObjectProperty ;
     rdfs:label "aboutStudy" ;
     rdfs:comment "Links a publication to a portal study whose data it reports. Asserted for main-portal (study-associated) publications; a publication can be about more than one study." ;
     rdfs:domain biolink:Publication ;
-    rdfs:range biolink:Study .
+    rdfs:range nf:Study .
 
 nf:authorOrcid a owl:ObjectProperty ;
     rdfs:label "authorOrcid" ;
@@ -1849,7 +1883,7 @@ nf:DiseaseAnnotation a owl:Class ;
     rdfs:label "Disease Annotation" ;
     rdfs:comment "A disease entity annotated in publication text." .
 
-# nf:Chemical replaced by biolink:ChemicalEntity
+# nf:Chemical replaced by biolink:ChemicalEntity (declared under Borrowed classes above)
 
 nf:Variant a owl:Class ;
     rdfs:subClassOf biolink:SequenceVariant ;

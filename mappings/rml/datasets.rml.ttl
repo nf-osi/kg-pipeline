@@ -27,6 +27,7 @@ map:DatasetCore a rr:TriplesMap ;
     rdfs:label "Dataset Core" ;
     rml:logicalSource map:DatasetsSource ;
     rr:subjectMap [ rr:template "https://www.synapse.org/Synapse:{id}" ; rr:termType rr:IRI ] ;
+    rr:predicateObjectMap [ rr:predicate rdf:type ; rr:objectMap [ rr:constant nf:Dataset ; rr:termType rr:IRI ] ] ;
     rr:predicateObjectMap [ rr:predicate rdf:type ; rr:objectMap [ rr:constant biolink:Dataset ; rr:termType rr:IRI ] ] ;
     rr:predicateObjectMap [ rr:predicate nf:name ; rr:objectMap [ rml:reference "title" ; rr:datatype xsd:string ] ] ;
     rr:predicateObjectMap [ rr:predicate rdfs:label ; rr:objectMap [ rml:reference "title" ; rr:datatype xsd:string ] ] ;

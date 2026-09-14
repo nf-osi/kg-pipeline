@@ -31,6 +31,20 @@ class TestStudiesCore:
         studies = list(studies_graph.subjects(RDF.type, namespaces["biolink"].Study))
         assert len(studies) > 0
 
+    def test_study_is_dual_typed(self, studies_graph, namespaces):
+        """Studies carry BOTH nf:Study and biolink:Study.
+
+        nf:Study is rdfs:subClassOf biolink:Study, but the index does no OWL
+        reasoning and SHACL target expansion only runs down to subclasses, so
+        shapes:StudyShape (sh:targetClass nf:Study) and the nf: property domains
+        would bind nothing if only the BioLink parent were emitted.
+        """
+        nf_typed = set(studies_graph.subjects(RDF.type, namespaces["nf"].Study))
+        biolink_typed = set(studies_graph.subjects(RDF.type, namespaces["biolink"].Study))
+        assert len(nf_typed) > 0, "no nf:Study instances emitted"
+        assert nf_typed == biolink_typed, \
+            f"dual typing is uneven: {nf_typed ^ biolink_typed}"
+
     def test_study_id_is_iri(self, studies_graph, namespaces):
         """Study subjects should be Synapse URL IRIs"""
         studies = list(studies_graph.subjects(RDF.type, namespaces["biolink"].Study))
