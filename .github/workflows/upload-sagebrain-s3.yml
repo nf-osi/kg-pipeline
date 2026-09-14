@@ -3,8 +3,19 @@
 #   https://github.com/Sage-Bionetworks-IT/sagebrain-infra#2-upload-data-to-s3
 #
 # Data is stored under a portal-scoped, date-partitioned prefix:
-#   s3://<bucket>/{portal}/YYYY-MM-DD/schema/
-#   s3://<bucket>/{portal}/YYYY-MM-DD/data/rdf/
+#   s3://<bucket>/{portal}/YYYY-MM-DD/
+#       data/schema/*.ttl     <- load path: ontology + shapes
+#       data/rdf/*.ttl        <- load path: the graph itself
+#       data/_provenance.ttl  <- load path: copy of the manifest, queryable lineage
+#       manifest.ttl          <- trigger sentinel, uploaded LAST, outside the load path
+#
+# Nothing non-RDF is deposited at all right now. If that changes, put it under
+# an other/ subprefix rather than anywhere below data/.
+#
+# Everything Neptune should load must sit under data/ and be Turtle. The bulk
+# loader takes a literal S3 prefix -- no glob, no extension filter -- and parses
+# every object under it as Turtle, so with failOnError=TRUE a single stray
+# non-RDF object fails the entire snapshot load. See sagebrain-infra#42.
 #
 # Runs as a separate workflow so upload failures never block Synapse archiving.
 # Requires secret: SAGEBRAIN_ROLE_ARN (IAM role in sagebrain-prod for OIDC auth)
@@ -62,6 +73,9 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Generate build manifest
+        # Written twice: manifest.ttl is the sentinel Neptune watches for (and must
+        # stay outside the load path), while data/_provenance.ttl is an identical
+        # copy inside it so the prov:/void: triples still land in the graph.
         run: |
           DATE=$(date +%Y-%m-%d)
           TIMESTAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)
@@ -84,15 +98,25 @@ jobs:
               nf:buildTriggerEvent "${{ github.event.workflow_run.event }}" ;
               void:dataDump <s3://${{ env.NEPTUNE_BUCKET }}/${{ env.PORTAL }}/$DATE/> .
           EOF
+          mkdir -p data
+          cp manifest.ttl data/_provenance.ttl
 
       - name: Upload to S3
         # Uses sync --delete (not cp --recursive) so that if two builds run on the
         # same day, the second upload fully replaces the first, including files
         # removed/renamed since — cp alone would leave stale files behind.
         # Neptune loads the latest data for a given date.
+        #
+        # schema/ holds a README.md next to the two .ttl files, so its sync is
+        # filtered to Turtle — the README is not deposited.
+        # The kg-data artifact also unpacks data/raw/ and data/csv/ into the same
+        # local data/ — always sync explicit subpaths, never data/ wholesale,
+        # or the CSVs end up in the load path.
         run: |
           DATE=$(date +%Y-%m-%d)
           PREFIX=s3://${{ env.NEPTUNE_BUCKET }}/${{ env.PORTAL }}/$DATE
-          aws s3 sync schema/   $PREFIX/schema/   --delete
-          aws s3 sync data/rdf/ $PREFIX/data/rdf/ --delete
+          aws s3 sync schema/   $PREFIX/data/schema/ --delete --exclude "*" --include "*.ttl"
+          aws s3 sync data/rdf/ $PREFIX/data/rdf/    --delete
+          aws s3 cp data/_provenance.ttl $PREFIX/data/_provenance.ttl
+          # Sentinel last: writing manifest.ttl is what triggers the load.
           aws s3 cp manifest.ttl $PREFIX/manifest.ttl

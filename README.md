@@ -179,6 +179,22 @@ The archive requires `SYNAPSE_AUTH_TOKEN` to be set.
 
 After each successful build, RDF graph data (`schema/` and `data/rdf/`) is uploaded to the SageBrain Neptune S3 bucket under a date-partitioned prefix (`nf/YYYY-MM-DD/`). This requires the `SAGEBRAIN_ROLE_ARN` secret to be set for OIDC authentication.
 
+Neptune loads the `data/` subprefix, so the deposited layout separates what gets
+loaded from everything else:
+
+```
+nf/YYYY-MM-DD/
+    data/schema/*.ttl        # ontology.ttl + shapes.ttl
+    data/rdf/*.ttl           # the graph
+    data/_provenance.ttl     # copy of the manifest, so build lineage is queryable
+    manifest.ttl             # trigger sentinel, uploaded last
+```
+
+The bulk loader takes a literal S3 prefix — no glob or extension filter — and
+parses every object under it as Turtle, so one stray non-RDF file under `data/`
+fails the whole snapshot load. Nothing non-RDF is deposited (`schema/README.md`
+is filtered out); anything added later belongs under an `other/` subprefix.
+
 ### Build and Release
 
 Pre-built [QLever](https://github.com/ad-freiburg/qlever) images with indexed data
