@@ -795,7 +795,7 @@ shapes:PublicationShape a sh:NodeShape ;
     sh:property [
         sh:path nf:publicationTitle ;
         sh:datatype xsd:string ;
-        sh:maxCount 1 ;
+        rdfs:comment "Unbounded deliberately. Main-portal publication nodes are keyed on DOI (with a pmid fallback), so the rows of every study citing a paper collapse onto one subject. Where those rows disagree cosmetically -- a trailing period, \"Neuro Oncology\" vs \"Neuro-Oncology\" -- the node ends up with more than one value. The keying dedupes the subject, not the field values." ;
     ] ;
     sh:property [
         sh:path nf:abstract ;
@@ -820,7 +820,7 @@ shapes:PublicationShape a sh:NodeShape ;
     sh:property [
         sh:path nf:journal ;
         sh:datatype xsd:string ;
-        sh:maxCount 1 ;
+        rdfs:comment "Unbounded deliberately. Main-portal publication nodes are keyed on DOI (with a pmid fallback), so the rows of every study citing a paper collapse onto one subject. Where those rows disagree cosmetically -- a trailing period, \"Neuro Oncology\" vs \"Neuro-Oncology\" -- the node ends up with more than one value. The keying dedupes the subject, not the field values." ;
     ] ;
     sh:property [
         sh:path nf:doi ;
