@@ -1,0 +1,33 @@
+#curie_map:
+#  SO: http://purl.obolibrary.org/obo/SO_
+#  skos: http://www.w3.org/2004/02/skos/core#
+#  semapv: https://w3id.org/semapv/vocab/
+#mapping_set_id: https://w3id.org/synapse/nfosi/mapping/variantclassification
+#license: https://creativecommons.org/licenses/by/4.0/
+#comment: MAF `Variant_Classification` (MAF's own vocabulary) to SO IRIs. This is the
+#comment: FALLBACK for rows where `Consequence` is empty -- in nst_nfosi_ntap that is
+#comment: exactly 16 IGR rows -- and is also kept on the observation as a literal
+#comment: because it is the vocabulary cBioPortal users filter by.
+#comment: Unlike variant_consequence.sssom.tsv these are hand-assigned, and several are
+#comment: skos:broadMatch rather than exactMatch: MAF collapses distinctions SO keeps
+#comment: (Frame_Shift_Del and Frame_Shift_Ins both mean frameshift_variant; Splice_Site
+#comment: does not say donor vs acceptor; RNA covers any non-coding transcript).
+subject_id	subject_label	predicate_id	object_id	mapping_justification	notes
+	Missense_Mutation	skos:exactMatch	SO:0001583	semapv:ManualMappingCuration	missense_variant
+	Nonsense_Mutation	skos:exactMatch	SO:0001587	semapv:ManualMappingCuration	stop_gained
+	Nonstop_Mutation	skos:exactMatch	SO:0001578	semapv:ManualMappingCuration	stop_lost
+	Silent	skos:exactMatch	SO:0001819	semapv:ManualMappingCuration	synonymous_variant
+	Intron	skos:exactMatch	SO:0001627	semapv:ManualMappingCuration	intron_variant
+	5'UTR	skos:exactMatch	SO:0001623	semapv:ManualMappingCuration	5_prime_UTR_variant
+	3'UTR	skos:exactMatch	SO:0001624	semapv:ManualMappingCuration	3_prime_UTR_variant
+	5'Flank	skos:exactMatch	SO:0001631	semapv:ManualMappingCuration	upstream_gene_variant
+	3'Flank	skos:exactMatch	SO:0001632	semapv:ManualMappingCuration	downstream_gene_variant
+	IGR	skos:exactMatch	SO:0001628	semapv:ManualMappingCuration	intergenic_variant
+	Splice_Region	skos:exactMatch	SO:0001630	semapv:ManualMappingCuration	splice_region_variant
+	Translation_Start_Site	skos:exactMatch	SO:0002012	semapv:ManualMappingCuration	start_lost
+	In_Frame_Del	skos:exactMatch	SO:0001822	semapv:ManualMappingCuration	inframe_deletion
+	In_Frame_Ins	skos:exactMatch	SO:0001821	semapv:ManualMappingCuration	inframe_insertion
+	Splice_Site	skos:broadMatch	SO:0001629	semapv:ManualMappingCuration	splice_site_variant; MAF does not distinguish donor from acceptor
+	Frame_Shift_Del	skos:broadMatch	SO:0001589	semapv:ManualMappingCuration	frameshift_variant; the Del/Ins distinction is lost
+	Frame_Shift_Ins	skos:broadMatch	SO:0001589	semapv:ManualMappingCuration	frameshift_variant; the Del/Ins distinction is lost
+	RNA	skos:broadMatch	SO:0001619	semapv:ManualMappingCuration	non_coding_transcript_variant; MAF collapses all non-coding transcript effects

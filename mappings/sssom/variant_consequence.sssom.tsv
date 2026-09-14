@@ -1,0 +1,38 @@
+#curie_map:
+#  SO: http://purl.obolibrary.org/obo/SO_
+#  skos: http://www.w3.org/2004/02/skos/core#
+#  semapv: https://w3id.org/semapv/vocab/
+#mapping_set_id: https://w3id.org/synapse/nfosi/mapping/variantconsequence
+#license: https://creativecommons.org/licenses/by/4.0/
+#comment: MAF `Consequence` (VEP Sequence Ontology term names) to SO IRIs. Every row was
+#comment: resolved by EXACT label match against the SO release data-version 2026-08-07,
+#comment: not hand-assigned, hence semapv:LexicalMatching. MAF packs several terms into
+#comment: one comma-separated cell; variants_to_rdf.py splits and maps each one, so a
+#comment: variant can carry more than one consequence.
+subject_id	subject_label	predicate_id	object_id	mapping_justification	notes
+	missense_variant	skos:exactMatch	SO:0001583	semapv:LexicalMatching	
+	intron_variant	skos:exactMatch	SO:0001627	semapv:LexicalMatching	
+	synonymous_variant	skos:exactMatch	SO:0001819	semapv:LexicalMatching	
+	splice_region_variant	skos:exactMatch	SO:0001630	semapv:LexicalMatching	
+	splice_polypyrimidine_tract_variant	skos:exactMatch	SO:0002169	semapv:LexicalMatching	
+	stop_gained	skos:exactMatch	SO:0001587	semapv:LexicalMatching	
+	5_prime_UTR_variant	skos:exactMatch	SO:0001623	semapv:LexicalMatching	
+	3_prime_UTR_variant	skos:exactMatch	SO:0001624	semapv:LexicalMatching	
+	upstream_gene_variant	skos:exactMatch	SO:0001631	semapv:LexicalMatching	
+	downstream_gene_variant	skos:exactMatch	SO:0001632	semapv:LexicalMatching	
+	non_coding_transcript_exon_variant	skos:exactMatch	SO:0001792	semapv:LexicalMatching	
+	non_coding_transcript_variant	skos:exactMatch	SO:0001619	semapv:LexicalMatching	
+	splice_donor_region_variant	skos:exactMatch	SO:0002170	semapv:LexicalMatching	
+	splice_acceptor_variant	skos:exactMatch	SO:0001574	semapv:LexicalMatching	
+	frameshift_variant	skos:exactMatch	SO:0001589	semapv:LexicalMatching	
+	splice_donor_variant	skos:exactMatch	SO:0001575	semapv:LexicalMatching	
+	inframe_deletion	skos:exactMatch	SO:0001822	semapv:LexicalMatching	
+	NMD_transcript_variant	skos:exactMatch	SO:0001621	semapv:LexicalMatching	
+	splice_donor_5th_base_variant	skos:exactMatch	SO:0001787	semapv:LexicalMatching	
+	start_lost	skos:exactMatch	SO:0002012	semapv:LexicalMatching	
+	stop_lost	skos:exactMatch	SO:0001578	semapv:LexicalMatching	
+	intergenic_variant	skos:exactMatch	SO:0001628	semapv:LexicalMatching	
+	coding_sequence_variant	skos:exactMatch	SO:0001580	semapv:LexicalMatching	
+	stop_retained_variant	skos:exactMatch	SO:0001567	semapv:LexicalMatching	
+	inframe_insertion	skos:exactMatch	SO:0001821	semapv:LexicalMatching	
+	mature_miRNA_variant	skos:exactMatch	SO:0001620	semapv:LexicalMatching	

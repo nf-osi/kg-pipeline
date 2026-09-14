@@ -18,6 +18,7 @@ These `nf:` classes had no external ontology mappings worth preserving, so they 
 | `nf:Dataset` | `biolink:Dataset` | No external mapping |
 | `nf:Publication` | `biolink:Publication` | No external mapping |
 | `nf:Chemical` | `biolink:ChemicalEntity` | No external mapping; BioLink already maps to CHEBI:24431 |
+| _(none — new)_ | `biolink:SequenceVariant` | Used directly for somatic variant nodes in the variant layer. `nf:Variant` was NOT reused: it means "a variant mentioned in publication text" (PubTator3) and carries no coordinates, so overloading it would conflate a literature mention with a called allele. See `docs/variant-layer.md`. |
 | _(none — new)_ | `biolink:Gene` | Used directly for the gene entity layer, keyed on Ensembl gene id. `nf:Gene` was NOT reused for the same reason: it means "a gene mentioned in publication text" and carries no identifiers. See `docs/entity-layers.md`. |
 
 ## Subclassed under BioLink (with preserved mappings)
@@ -48,7 +49,7 @@ These `nf:` classes are NF-specific specializations with no external mappings to
 
 These remain in the `nf:` namespace only:
 
-`nf:File`, `nf:Tool`, `nf:GeneticReagent` (and all vector/reagent subtypes), `nf:AnimalModel` (and species subtypes), `nf:Donor`, `nf:MutationSet`, `nf:Biobank`, `nf:ClinicalAssessmentTool`, `nf:PatientDerivedModel`, `nf:OrganoidProtocol`, `nf:Initiative`, `nf:Development`, `nf:Funder`, `nf:Data`, `nf:Observation` (and subtypes), `nf:DiseaseAnnotation`, `nf:MaterialsTransferAgreement`
+`nf:File`, `nf:Tool`, `nf:GeneticReagent` (and all vector/reagent subtypes), `nf:AnimalModel` (and species subtypes), `nf:Donor`, `nf:MutationSet`, `nf:Biobank`, `nf:ClinicalAssessmentTool`, `nf:PatientDerivedModel`, `nf:OrganoidProtocol`, `nf:Initiative`, `nf:Development`, `nf:Funder`, `nf:Data`, `nf:Observation` (and subtypes), `nf:DiseaseAnnotation`, `nf:MaterialsTransferAgreement`, `nf:VariantObservation`
 
 `nf:Individual` is deliberately separate from `nf:Donor`: `nf:Donor` is the UUID-keyed
 source donor of a cell line or animal model, `nf:Individual` is the patient or animal an
