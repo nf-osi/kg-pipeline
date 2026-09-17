@@ -14,7 +14,9 @@ from rdflib.namespace import RDF, RDFS, SKOS, XSD
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from scripts.materialize_genes import gene_iri, hgnc_iri, load_hgnc, materialize_genes
+from scripts.materialize_genes import (
+    ensembl_iri, gene_node_iri, hgnc_iri, load_hgnc, materialize_genes,
+)
 
 NF = Namespace("http://nf-osi.github.com/terms#")
 BIOLINK = Namespace("https://w3id.org/biolink/vocab/")
@@ -54,22 +56,26 @@ NF1_HGNC = {"hgnc_id": "HGNC:7765", "symbol": "NF1", "name": "neurofibromin 1",
             "status": "Approved", "ensembl_gene_id": "ENSG00000196712"}
 
 
-def test_gene_node_is_biolink_and_keyed_on_ensembl(tmp_path):
+def test_gene_node_is_biolink_and_keyed_on_hgnc(tmp_path):
     graph, index = build(tmp_path, [NF1_MAF], [NF1_HGNC])
-    node = gene_iri("ENSG00000196712")
+    node = gene_node_iri("ENSG00000196712", "HGNC:7765")
 
     # biolink:Gene directly -- nf:Gene means a PubTator text mention.
     assert (node, RDF.type, BIOLINK.Gene) in graph
     assert (node, RDF.type, NF.Gene) not in graph
-    assert str(node) == "https://identifiers.org/ensembl:ENSG00000196712"
+    assert str(node) == "https://identifiers.org/hgnc:7765"
+    # The Ensembl IRI is an equivalence now, NOT the node.
+    assert (ensembl_iri("ENSG00000196712"), RDF.type, BIOLINK.Gene) not in graph
 
     assert (node, NF.geneSymbol, Literal("NF1", datatype=XSD.string)) in graph
     assert (node, NF.geneName, Literal("neurofibromin 1", datatype=XSD.string)) in graph
     assert (node, NF.hgncId, Literal("HGNC:7765", datatype=XSD.string)) in graph
     assert (node, NF.entrezGeneId, Literal("4763", datatype=XSD.string)) in graph
     assert (node, RDFS.label, Literal("NF1")) in graph
-    # The HGNC equivalence lets HGNC-keyed data join without a lookup table.
-    assert (node, SKOS.exactMatch, hgnc_iri("HGNC:7765")) in graph
+    # The Ensembl equivalence lets ENSG-keyed data join without a lookup table.
+    assert (node, SKOS.exactMatch, ensembl_iri("ENSG00000196712")) in graph
+    # ...and the node never claims to be equivalent to itself.
+    assert (node, SKOS.exactMatch, node) not in graph
     assert index.resolution["verified_by_hgnc"] == 1
 
 
@@ -84,9 +90,9 @@ def test_hgnc_corrects_a_symbol_borrowed_from_a_neighbouring_locus(tmp_path):
                   "status": "Approved", "ensembl_gene_id": "ENSG00000126860"}
     graph, index = build(tmp_path, [NF1_MAF, evi2a_maf], [NF1_HGNC, evi2a_hgnc])
 
-    assert (gene_iri("ENSG00000196712"), NF.geneSymbol,
+    assert (gene_node_iri("ENSG00000196712", "HGNC:7765"), NF.geneSymbol,
             Literal("NF1", datatype=XSD.string)) in graph
-    assert (gene_iri("ENSG00000126860"), NF.geneSymbol,
+    assert (gene_node_iri("ENSG00000126860", "HGNC:3499"), NF.geneSymbol,
             Literal("EVI2A", datatype=XSD.string)) in graph
     # ...and crucially, NF1 now labels exactly one gene.
     assert len(set(graph.subjects(NF.geneSymbol, Literal("NF1", datatype=XSD.string)))) == 1
@@ -99,7 +105,7 @@ def test_hgnc_is_rejected_when_its_ensembl_id_disagrees(tmp_path):
     # over the other and the MAF's stands -- counted as unverified.
     hgnc = dict(NF1_HGNC, ensembl_gene_id="ENSG00000999999")
     graph, index = build(tmp_path, [NF1_MAF], [hgnc])
-    node = gene_iri("ENSG00000196712")
+    node = gene_node_iri("ENSG00000196712", "HGNC:7765")
     assert (node, NF.geneSymbol, Literal("NF1", datatype=XSD.string)) in graph
     assert not list(graph.objects(node, NF.geneName))
     assert index.resolution["unverified_maf_symbol"] == 1
@@ -110,7 +116,7 @@ def test_withdrawn_hgnc_entries_are_ignored(tmp_path):
     # Adopting a withdrawn symbol would reintroduce the ambiguity HGNC exists to remove.
     hgnc = dict(NF1_HGNC, status="Entry Withdrawn", symbol="NF1-OLD")
     graph, index = build(tmp_path, [NF1_MAF], [hgnc])
-    node = gene_iri("ENSG00000196712")
+    node = gene_node_iri("ENSG00000196712", "HGNC:7765")
     assert (node, NF.geneSymbol, Literal("NF1", datatype=XSD.string)) in graph
     assert index.resolution["unverified_maf_symbol"] == 1
 
@@ -127,7 +133,7 @@ def test_dominant_maf_symbol_wins_without_hgnc(tmp_path):
          "Entrez_Gene_Id": "100271030"},
     ]
     graph, index = build(tmp_path, rows)
-    node = gene_iri("ENSG00000033867")
+    node = gene_node_iri("ENSG00000033867", "HGNC:11033")
     symbols = {str(o) for o in graph.objects(node, NF.geneSymbol)}
     assert symbols == {"SLC4A7"}, "a minority symbol must not label the dominant gene"
     # Entrez is restricted the same way, or the pseudogene's id lands on SLC4A7.
@@ -160,7 +166,7 @@ def test_gene_with_no_hgnc_id_still_gets_a_node(tmp_path):
     rows = [{"Hugo_Symbol": "LYRM4-AS1", "Gene": "ENSG00000012345",
              "HGNC_ID": "", "Entrez_Gene_Id": "0"}]
     graph, index = build(tmp_path, rows, [NF1_HGNC])
-    node = gene_iri("ENSG00000012345")
+    node = gene_node_iri("ENSG00000012345")   # no HGNC id -> Ensembl fallback
     assert (node, RDF.type, BIOLINK.Gene) in graph
     assert (node, NF.geneSymbol, Literal("LYRM4-AS1", datatype=XSD.string)) in graph
     assert not list(graph.objects(node, NF.hgncId))
@@ -191,3 +197,32 @@ def test_missing_required_column_is_a_hard_error(tmp_path):
         assert "Gene" in str(exc)
     else:
         raise AssertionError("a MAF with no Gene column must fail, not yield no genes")
+
+
+def test_several_mafs_fold_into_one_gene_layer(tmp_path):
+    """Two studies hitting the same locus must reach ONE node, not one node each."""
+    shared = NF1_MAF
+    other = {"Hugo_Symbol": "EVI2A", "Entrez_Gene_Id": "2123",
+             "Gene": "ENSG00000126860", "HGNC_ID": "HGNC:3499"}
+    evi2a_hgnc = {"hgnc_id": "HGNC:3499", "symbol": "EVI2A", "name": "EVI2A",
+                  "status": "Approved", "ensembl_gene_id": "ENSG00000126860"}
+
+    maf_a = write_maf(tmp_path / "a.txt", [shared])
+    maf_b = write_maf(tmp_path / "b.txt", [shared, other])
+    hgnc = write_hgnc(tmp_path / "h.txt", [NF1_HGNC, evi2a_hgnc])
+    out = tmp_path / "genes.ttl"
+    index = materialize_genes([maf_a, maf_b], out, hgnc)
+
+    graph = Graph()
+    graph.parse(out, format="turtle")
+    nodes = set(graph.subjects(RDF.type, BIOLINK.Gene))
+    # NF1 appears in both MAFs but is one node; 2 genes total, not 3.
+    assert len(nodes) == 2
+    assert gene_node_iri("ENSG00000196712", "HGNC:7765") in nodes
+    assert index.rows == 3, "rows from every MAF are counted"
+
+
+def test_a_single_maf_path_still_works(tmp_path):
+    """The Sequence overload must not break the one-MAF call the CLI made before."""
+    graph, index = build(tmp_path, [NF1_MAF], [NF1_HGNC])
+    assert (gene_node_iri("ENSG00000196712", "HGNC:7765"), RDF.type, BIOLINK.Gene) in graph

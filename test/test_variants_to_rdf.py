@@ -8,20 +8,29 @@ The invariants pinned here are the ones that make the layer worth having:
 * rows that cannot be resolved (no VRS identity, or a barcode with no portal specimen)
   are KEPT and counted rather than dropped;
 * the specimen join goes through the reviewed crosswalk, so a coverage regression is
-  visible instead of silently shrinking the layer.
+  visible instead of silently shrinking the layer;
+* a normalized allele is named by its VRS identifier itself, which is the only reason
+  another VRS-keyed source can join this graph by IRI.
+
+Most assertions here spell the allele IRI as `variant_iri(VRS_ID)`, which would follow
+any change to that function. `test_allele_iri_is_the_vrs_identifier` pins the literal
+IRI so the naming scheme cannot move unnoticed.
 """
 
 import json
 import sys
 from pathlib import Path
 
-from rdflib import Graph, Literal, Namespace
+from rdflib import Graph, Literal, Namespace, URIRef
 from rdflib.namespace import RDF, XSD
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
+from scripts.materialize_genes import ensembl_iri, gene_node_iri, hgnc_iri
 from scripts.materialize_specimens import individual_iri, specimen_iri
-from scripts.variants_to_rdf import so_iri, variant_iri, variants_to_rdf
+from scripts.variants_to_rdf import (
+    TripleSink, observation_iri, so_iri, variant_iri, variants_to_rdf,
+)
 
 NF = Namespace("http://nf-osi.github.com/terms#")
 BIOLINK = Namespace("https://w3id.org/biolink/vocab/")
@@ -225,6 +234,85 @@ def test_unnormalized_variant_is_kept_and_flagged(tmp_path):
     assert builder.counts["variants"] == 1
 
 
+def test_gene_link_is_two_iris_under_one_predicate(tmp_path):
+    """One predicate, two IRIs for the same gene: the Ensembl node and HGNC."""
+    graph, _ = build(tmp_path, [ALLELE], [observation("S1")],
+                     [("S1", "SPEC-1", "IND-1", "strip_last_segment")])
+    obs = next(iter(graph.subjects(RDF.type, NF.VariantObservation)))
+
+    assert set(graph.objects(obs, NF.affectedGene)) == {
+        ensembl_iri("ENSG00000130203"), hgnc_iri("HGNC:613"),
+    }
+    assert str(hgnc_iri("HGNC:613")) == "https://identifiers.org/hgnc:613"
+    # Both IRIs, no literals -- nf:hgncId is gone from observations, and the old
+    # nf:affectsGene predicate was collapsed into this one.
+    assert not [o for o in graph.objects(obs, NF.affectedGene) if isinstance(o, Literal)]
+    assert not list(graph.objects(obs, NF.hgncId))
+    assert not list(graph.objects(obs, NF.affectsGene))
+
+
+def test_gene_link_has_exactly_one_typed_gene(tmp_path):
+    """`a biolink:Gene` must select one of the two objects, or every count doubles."""
+    genes = Graph()
+    # The gene layer types the NODE, which is the HGNC IRI (materialize_genes).
+    genes.add((gene_node_iri("ENSG00000130203", "HGNC:613"), RDF.type, BIOLINK.Gene))
+    graph, _ = build(tmp_path, [ALLELE], [observation("S1")],
+                     [("S1", "SPEC-1", "IND-1", "strip_last_segment")])
+    obs = next(iter(graph.subjects(RDF.type, NF.VariantObservation)))
+
+    # The variant layer does not type the gene; the core gene layer does. Simulate the
+    # combined index the queries actually run against.
+    combined = graph + genes
+    typed = [g for g in combined.objects(obs, NF.affectedGene)
+             if (g, RDF.type, BIOLINK.Gene) in combined]
+    assert typed == [hgnc_iri("HGNC:613")], (
+        "exactly one object may be typed biolink:Gene -- the canned queries rely on it "
+        "to de-duplicate nf:affectedGene"
+    )
+
+
+def test_allele_iri_is_the_vrs_identifier(tmp_path):
+    """The node IRI is the `ga4gh:` identifier verbatim, not a local IRI beside it."""
+    graph, _ = build(tmp_path, [ALLELE], [observation("S1")],
+                     [("S1", "SPEC-1", "IND-1", "strip_last_segment")])
+
+    assert variant_iri(VRS_ID) == URIRef(VRS_ID)
+    assert (URIRef(VRS_ID), RDF.type, BIOLINK.SequenceVariant) in graph
+    # No local twin: the old scheme minted nf:variant/<digest> alongside.
+    assert (NF[f"variant/{VRS_ID.split(':', 1)[1]}"], RDF.type, BIOLINK.SequenceVariant) \
+        not in graph
+    # Kept as a literal too, for queries that select the id as a value.
+    assert (URIRef(VRS_ID), NF.vrsId, Literal(VRS_ID, datatype=XSD.string)) in graph
+
+
+def test_unnormalized_allele_is_not_given_a_ga4gh_iri(tmp_path):
+    """No VRS identity means no `ga4gh:` IRI -- the key is local to us."""
+    unnormalized = {
+        "type": "UnnormalizedVariant", "unnormalized": True,
+        "id": "nf:variant/GRCh37:9:1000:C:T", "assemblyId": "GRCh37",
+        "sourceContig": "9", "sourcePos": 1000, "reason": "assembly mismatch",
+    }
+    graph, _ = build(tmp_path, [ALLELE, unnormalized], [observation("S1")],
+                     [("S1", "SPEC-1", "IND-1", "strip_last_segment")])
+
+    node = variant_iri("nf:variant/GRCh37:9:1000:C:T")
+    assert str(node).startswith(str(NF))
+    assert (node, NF.unnormalizedVariant, Literal(True)) in graph
+    assert not [s for s in graph.subjects(NF.unnormalizedVariant, Literal(True))
+                if str(s).startswith("ga4gh:")]
+
+
+def test_observation_iri_survived_the_move_to_ga4gh_allele_iris(tmp_path):
+    """Observation IRIs embed the bare digest, so the allele rename did not churn them."""
+    graph, _ = build(tmp_path, [ALLELE], [observation("S1")],
+                     [("S1", "SPEC-1", "IND-1", "strip_last_segment")])
+
+    expected = NF[f"variantObservation/nf_test/S1/{VRS_ID.split(':', 1)[1]}"]
+    assert observation_iri("nf_test", "S1", variant_iri(VRS_ID)) == expected
+    assert (expected, RDF.type, NF.VariantObservation) in graph
+    assert "ga4gh" not in str(expected)
+
+
 def test_not_fully_justified_indel_is_flagged(tmp_path):
     allele = dict(ALLELE, fullyJustified=False)
     graph, builder = build(tmp_path, [allele], [observation("S1")],
@@ -270,3 +358,60 @@ def test_dataset_provenance_node_is_emitted(tmp_path):
     obs = next(iter(graph.subjects(RDF.type, NF.VariantObservation)))
     dataset = NF["variantDataset/nf_test"]
     assert (obs, NF.fromVariantDataset, dataset) in graph
+
+
+def test_streaming_output_matches_an_in_memory_graph(tmp_path):
+    """Batched serialization must not change the graph, only how it is written."""
+    alleles = [ALLELE, dict(ALLELE, id="ga4gh:VA.SECOND", fullyJustified=False)]
+    obs = [observation(f"S{i}") for i in range(1, 6)]
+    crosswalk = [(f"S{i}", f"SPEC-{i}", f"IND-{i}", "verbatim") for i in range(1, 6)]
+    streamed, builder = build(tmp_path, alleles, obs, crosswalk)
+
+    # Same builder, same inputs, but accumulated in a plain Graph as before.
+    reference = Graph()
+    replay = variants_to_rdf(
+        alleles=write_ndjson(tmp_path / "a2.ndjson", alleles),
+        observations=write_ndjson(tmp_path / "o2.ndjson", obs),
+        output_ttl=tmp_path / "out2.ttl",
+        study_id="nf_test",
+        crosswalk_path=write_crosswalk(tmp_path / "cw2.tsv", crosswalk),
+        consequence_lookup=CONSEQUENCE_LOOKUP,
+        classification_lookup=CLASSIFICATION_LOOKUP,
+    )
+    reference.parse(tmp_path / "out2.ttl", format="turtle")
+    assert set(streamed) == set(reference)
+    assert len(builder.graph) == len(replay.graph) == len(streamed)
+
+
+def test_a_tiny_batch_still_produces_one_valid_document(tmp_path):
+    """Force many flushes: every batch after the first must not re-declare prefixes,
+    and must not reference a prefix that was never declared."""
+    out = tmp_path / "tiny.ttl"
+    with TripleSink(out, batch=1) as sink:
+        sink.bind("nf", NF)
+        sink.bind("biolink", BIOLINK)
+        for i in range(25):
+            node = NF[f"variantObservation/nf_test/S{i}/VA.x"]
+            sink.add((node, RDF.type, NF.VariantObservation))
+            sink.add((node, NF.tumorSampleBarcode, Literal(f"S{i}", datatype=XSD.string)))
+        assert len(sink) == 50
+
+    text = out.read_text()
+    assert text.count("@prefix nf:") == 1, "a prefix must be declared once, not per batch"
+    parsed = Graph()
+    parsed.parse(out, format="turtle")   # raises on an undeclared prefix
+    assert len(parsed) == 50
+
+
+def test_sink_declares_a_late_prefix_rather_than_dropping_it(tmp_path):
+    """A namespace rdflib only invents in a later batch must still get a declaration."""
+    out = tmp_path / "late.ttl"
+    other = Namespace("https://example.org/late/")
+    with TripleSink(out, batch=1) as sink:
+        sink.bind("nf", NF)
+        sink.add((NF["a"], RDF.type, NF.Thing))
+        sink.add((NF["b"], NF.seeAlso, other["x"]))   # new namespace, second batch
+
+    parsed = Graph()
+    parsed.parse(out, format="turtle")
+    assert (NF["b"], NF.seeAlso, other["x"]) in parsed

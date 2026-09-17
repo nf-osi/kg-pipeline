@@ -169,9 +169,13 @@ SELECT ?symbol ?gene (COUNT(DISTINCT ?specimen) AS ?specimens) (COUNT(DISTINCT ?
 WHERE {
   # Grouped on the gene NODE, not the symbol string: the source's per-row symbol can be
   # borrowed from a neighbouring locus, so grouping by string splits a gene's count in
-  # two. nf:geneSymbol is the HGNC-verified label (see docs/entity-layers.md).
+  # two. nf:geneSymbol is the HGNC-verified label (see docs/variant-layer.md).
+  #
+  # `a biolink:Gene` is load-bearing, not decoration: nf:affectedGene carries both the
+  # Ensembl gene node and the gene's HGNC IRI, and only the former is typed, so without
+  # this line every observation would be counted twice.
   ?gene a biolink:Gene ; nf:geneSymbol ?symbol .
-  ?obs nf:affectsGene ?gene ;
+  ?obs nf:affectedGene ?gene ;
        nf:fromSpecimen ?specimen ;
        nf:observesVariant ?variant ;
        nf:hasConsequence ?so .
@@ -243,7 +247,9 @@ SELECT ?metric (COUNT(DISTINCT ?s) AS ?count) WHERE {
   } UNION {
     ?s a biolink:Gene . BIND("9_genes" AS ?metric)
   } UNION {
-    ?s a biolink:Gene . ?o nf:affectsGene ?s .
+    # `a biolink:Gene` also de-duplicates nf:affectedGene's HGNC object -- see
+    # variant-gene-summary above.
+    ?s a biolink:Gene . ?o nf:affectedGene ?s .
     BIND("A_genes_with_a_variant" AS ?metric)
   }
 } GROUP BY ?metric ORDER BY ?metric""",

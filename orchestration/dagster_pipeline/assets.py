@@ -527,14 +527,27 @@ portal_assets = generate_portal_assets()
 # =============================================================================
 
 
-VARIANT_STUDY_IDS = ["nst_nfosi_ntap"]
+VARIANT_STUDY_IDS = [
+    "nst_nfosi_ntap",
+    "schw_ctf_synodos_2025",
+    "nfib_ctf_biobank_2025",
+    "lgg_ctf_synodos_2025",
+]
+
+#: Per-study minimum tumour reads supporting the allele. 27.5% of
+#: `nfib_ctf_biobank_2025` rows have `t_alt_count = 0` -- no read supports the allele --
+#: and ingesting those would assert a specimen carries a variant with no evidence.
+#: The other studies are at or near zero such rows and need no filter.
+MIN_TUMOR_ALT_COUNT: dict[str, int] = {"nfib_ctf_biobank_2025": 1}
 
 
 class VariantIngestConfig(Config):
     """Where the ingest tooling and reference data live.
 
-    `vrsify` is a Rust binary outside this repo (`~/sage/nf/vrsify`), so its path is
-    configuration rather than a Python dependency.
+    `vrsify` is a Rust binary from a separate repo (https://github.com/nf-osi/vrsify),
+    installed with `cargo install --git https://github.com/nf-osi/vrsify --branch
+    develop`, so its path is configuration rather than a Python dependency. It defaults
+    to bare `vrsify`, i.e. whatever `cargo install` put on PATH.
     """
 
     vrsify_bin: str = os.environ.get("VRSIFY_BIN", "vrsify")
@@ -545,6 +558,10 @@ class VariantIngestConfig(Config):
     seqmap: str = os.environ.get("VRSIFY_SEQMAP", "")
     #: Drop rows with fewer than this many tumour reads supporting the allele. 0 = off.
     min_tumor_alt_count: int = 0
+    #: Namespace for rows vrsify cannot give a VRS id. It has no default upstream -- such
+    #: an id is local, so vrsify makes the caller name the namespace it is minted under
+    #: (or pass --strict) -- and `variants_to_rdf.py` strips exactly this prefix back off.
+    variant_id_prefix: str = os.environ.get("VRSIFY_VARIANT_ID_PREFIX", "nf:variant/")
     #: Fail the asset if fewer than this fraction of observations reach a specimen.
     require_specimen_coverage: float = 0.85
 
@@ -603,16 +620,20 @@ def create_variant_crosswalk_asset(study_id: str):
     return _crosswalk_asset
 
 
-def create_gene_asset(study_id: str):
+def create_gene_asset(study_ids: list[str]):
     @asset(
         name="genes",
         key_prefix=["portal", "rdf"],
         compute_kind="python",
         group_name="variants",
-        deps=[["variants", "raw", f"{study_id}_maf"]],
+        deps=[["variants", "raw", f"{s}_maf"] for s in study_ids],
     )
     def _gene_asset(context: AssetExecutionContext) -> Path:
         """Materialize biolink:Gene nodes, with HGNC as the symbol authority.
+
+        ONE asset over ALL studies' MAFs, not one per study: a gene is a gene, so two
+        studies hitting the same locus must reach the same node, and the output path is
+        a single data/rdf/genes.ttl either way.
 
         Output lands in data/rdf/ (core graph), not the variants subdirectory: gene
         nodes stay whether or not the variant layer is published. Generation is gated
@@ -622,11 +643,13 @@ def create_gene_asset(study_id: str):
         from scripts.materialize_genes import fetch_hgnc, materialize_genes, report
 
         project_root = Path(__file__).parent.parent.parent
-        maf = project_root / "data" / "raw" / f"{study_id}_data_mutations.txt"
+        mafs = [
+            project_root / "data" / "raw" / f"{s}_data_mutations.txt" for s in study_ids
+        ]
         output_file = project_root / "data" / "rdf" / "genes.ttl"
 
         hgnc_path = fetch_hgnc(project_root / "data" / "raw" / "hgnc_complete_set.txt")
-        index = materialize_genes(maf, output_file, hgnc_path)
+        index = materialize_genes(mafs, output_file, hgnc_path)
         context.log.info(report(index, output_file))
 
         resolution = index.resolution
@@ -680,6 +703,7 @@ def create_variant_ndjson_asset(study_id: str):
             "--out-observations", str(observations),
             "--study-id", study_id,
             "--source", f"cbioportal:{study_id}/data_mutations.txt",
+            "--variant-id-prefix", config.variant_id_prefix,
         ]
         if config.reference_fasta:
             cmd += ["--reference", config.reference_fasta]
@@ -690,8 +714,9 @@ def create_variant_ndjson_asset(study_id: str):
                 "VRSIFY_REFERENCE is not set: indel VRS ids will NOT be fully justified "
                 "and will not match vrs-python/ClinVar/gnomAD."
             )
-        if config.min_tumor_alt_count:
-            cmd += ["--min-tumor-alt-count", str(config.min_tumor_alt_count)]
+        min_alt = MIN_TUMOR_ALT_COUNT.get(study_id, config.min_tumor_alt_count)
+        if min_alt:
+            cmd += ["--min-tumor-alt-count", str(min_alt)]
 
         context.log.info(f"Running {' '.join(cmd)}")
         result = subprocess.run(cmd, capture_output=True, text=True, cwd=str(project_root))
@@ -748,6 +773,7 @@ def create_variant_rdf_asset(study_id: str):
             consequence_lookup=project_root / "mappings" / "sssom" / "variant_consequence.sssom.tsv",
             classification_lookup=project_root / "mappings" / "sssom" / "variant_classification.sssom.tsv",
             source_url=f"cbioportal:{study_id}/data_mutations.txt",
+            variant_id_prefix=config.variant_id_prefix,
         )
 
         counts = builder.counts
@@ -762,10 +788,11 @@ def create_variant_rdf_asset(study_id: str):
                 "consequence terms with no SSSOM mapping: "
                 + ", ".join(f"{t} x{n}" for t, n in builder.unmapped_consequences.most_common())
             )
-        if coverage < config.require_specimen_coverage:
+        floor = config.require_specimen_coverage
+        if coverage < floor:
             raise RuntimeError(
                 f"specimen coverage {coverage:.1%} is below the required "
-                f"{config.require_specimen_coverage:.1%}; the sample crosswalk has "
+                f"{floor:.1%}; the sample crosswalk has "
                 "regressed (see mappings/cbioportal_sample_specimen.tsv)"
             )
 
@@ -779,6 +806,7 @@ def create_variant_rdf_asset(study_id: str):
             "observations": counts["observations"],
             "observations_with_specimen": counts["observations_with_specimen"],
             "specimen_coverage": round(coverage, 4),
+            "specimen_coverage_floor": floor,
         })
         return output_file
 
@@ -794,8 +822,9 @@ def generate_variant_assets() -> List:
         assets.append(create_variant_maf_asset(study_id))
         assets.append(create_variant_crosswalk_asset(study_id))
         assets.append(create_variant_ndjson_asset(study_id))
-        assets.append(create_gene_asset(study_id))
         assets.append(create_variant_rdf_asset(study_id))
+    # Not per study -- one gene layer over every study's MAF.
+    assets.append(create_gene_asset(VARIANT_STUDY_IDS))
     return assets
 
 
