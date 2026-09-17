@@ -230,3 +230,20 @@ studies, resources, biobanks, funders, datasets, initiatives).
 
 Note the registry's display-name spelling need not match the `nf:authors` spelling on a
 publication, so these names are for display and disambiguation, not for joining.
+
+
+### Specimen / individual source-data traps
+
+Each has a test in `test/test_materialize_specimens.py`:
+
+- ids are **pipe-delimited multi-values** (`N10|N5`), which the files RML splits, so
+  this must too or a file is attributed to a specimen named `"N10|N5"`;
+- `na`, `nan`, `n/a`, `none`, `unknown` are placeholders, not ids;
+- **2,188 strings are used as both a specimen and an individual id**, so the two node
+  types need separate IRI stems;
+- 1,276 specimen ids need percent-encoding — `#` especially, since `nf:` is itself a
+  fragment namespace and an unescaped `#` truncates the IRI and merges nodes.
+
+Faithful to the source: some portal specimen ids are DICOM instance UIDs
+and some individual ids are experiment group labels (`cre- veh 52`). They become nodes
+because the portal calls them specimen ids.
