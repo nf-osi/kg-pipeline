@@ -7,7 +7,12 @@ dropped or guessed at.
 """
 
 import sys
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
+from threading import Barrier, BrokenBarrierError
+from types import SimpleNamespace
+
+import pytest
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
@@ -18,6 +23,8 @@ from scripts.map_cbioportal_samples import (
     strip_last_segment,
     write_crosswalk,
 )
+
+from scripts import map_cbioportal_samples as mapping
 
 STUDY = "nst_nfosi_ntap"
 SCHW = "schw_ctf_synodos_2025"
@@ -181,3 +188,62 @@ def test_regenerating_one_study_keeps_another_studys_rows(tmp_path):
     # The hand-authored row in particular must survive untouched.
     assert after[(STUDY, "JH-2-054-241HF")]["specimen_id"] == "HAND-FIXED"
     assert after[(STUDY, "JH-2-054-241HF")]["method"] == "manual"
+
+
+def test_concurrent_main_calls_preserve_both_updates_and_manual_rows(tmp_path, monkeypatch):
+    path = tmp_path / "crosswalk.tsv"
+    manual = {"study_id": STUDY, "tumor_sample_barcode": "manual",
+              "specimen_id": "curated", "individual_id": "I",
+              "method": "manual", "notes": "keep me"}
+    write_crosswalk(path, [manual])
+    monkeypatch.setattr(mapping, "read_maf_barcodes", lambda _: ["S", "manual"])
+    start = Barrier(2)
+
+    def index_files(_):
+        start.wait(timeout=5)
+        return SimpleNamespace(specimens={"S"}, specimen_individuals={"S": {"I"}})
+
+    monkeypatch.setattr(mapping, "index_files", index_files)
+    snapshots = Barrier(2)
+    original_build = mapping.build_rows
+
+    def build_after_snapshot(*args):
+        # Without the lock, both writers read the old file before either writes.
+        # With the lock, the first times out here and the second reads its update.
+        try:
+            snapshots.wait(timeout=0.5)
+        except BrokenBarrierError:
+            pass
+        return original_build(*args)
+
+    monkeypatch.setattr(mapping, "build_rows", build_after_snapshot)
+
+    def run(study):
+        return mapping.main(["--maf", "unused", "--files", "unused",
+                             "--study-id", study, "--output", str(path)])
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        assert list(pool.map(run, [STUDY, SCHW])) == [0, 0]
+
+    rows = load_existing(path)
+    assert rows[(STUDY, "S")]["specimen_id"] == "S"
+    assert rows[(SCHW, "S")]["specimen_id"] == "S"
+    assert rows[(STUDY, "manual")] == manual
+
+
+def test_failed_crosswalk_write_keeps_complete_previous_file(tmp_path):
+    path = tmp_path / "crosswalk.tsv"
+    write_crosswalk(path, [{"study_id": STUDY, "tumor_sample_barcode": "S",
+                          "specimen_id": "S", "method": "manual"}])
+    before = path.read_bytes()
+
+    def failing_rows():
+        yield {"study_id": SCHW, "tumor_sample_barcode": "new"}
+        assert path.read_bytes() == before, "readers must still see the old file"
+        raise RuntimeError("write interrupted")
+
+    with pytest.raises(RuntimeError, match="write interrupted"):
+        write_crosswalk(path, failing_rows())
+
+    assert path.read_bytes() == before
+    assert list(tmp_path.iterdir()) == [path]

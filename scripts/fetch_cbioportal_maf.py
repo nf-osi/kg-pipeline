@@ -52,10 +52,12 @@ from __future__ import annotations
 
 import argparse
 import base64
+import hashlib
 import json
 import os
 import re
 import sys
+import tempfile
 import urllib.error
 import urllib.request
 from dataclasses import dataclass
@@ -205,20 +207,41 @@ def resolve_lfs_download(source: StudySource, oid: str, size: int) -> str:
     return obj["actions"]["download"]["href"]
 
 
-def download(url: str, destination: Path, expected_size: int) -> None:
+def sha256_file(path: Path) -> str:
+    """Hash a MAF without loading the whole file into memory."""
+    digest = hashlib.sha256()
+    with open(path, "rb") as handle:
+        while chunk := handle.read(1 << 20):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def download(url: str, destination: Path, expected_size: int, expected_oid: str) -> None:
+    """Publish downloaded bytes only after verifying the pinned LFS identity."""
     destination.parent.mkdir(parents=True, exist_ok=True)
-    tmp = destination.with_suffix(destination.suffix + ".part")
-    written = 0
-    with _request(url) as resp, open(tmp, "wb") as out:
-        while chunk := resp.read(1 << 20):
-            out.write(chunk)
-            written += len(chunk)
-    if written != expected_size:
-        tmp.unlink(missing_ok=True)
-        raise SystemExit(
-            f"short read: got {written} bytes, pointer declared {expected_size}"
-        )
-    tmp.replace(destination)
+    with tempfile.NamedTemporaryFile(
+        dir=destination.parent, prefix=destination.name + ".", suffix=".part", delete=False
+    ) as out:
+        tmp = Path(out.name)
+        try:
+            written = 0
+            digest = hashlib.sha256()
+            with _request(url) as resp:
+                while chunk := resp.read(1 << 20):
+                    out.write(chunk)
+                    digest.update(chunk)
+                    written += len(chunk)
+            if written != expected_size:
+                raise SystemExit(
+                    f"short read: got {written} bytes, pointer declared {expected_size}"
+                )
+            if digest.hexdigest() != expected_oid:
+                raise SystemExit("SHA-256 mismatch: downloaded MAF does not match pinned LFS oid")
+            out.close()
+            tmp.chmod(destination.stat().st_mode & 0o777 if destination.exists() else 0o644)
+            tmp.replace(destination)
+        finally:
+            tmp.unlink(missing_ok=True)
 
 
 def maf_header(path: Path) -> list[str]:
@@ -256,8 +279,9 @@ def accept_candidate(path: Path, source: StudySource) -> str:
 def fetch_maf(study_id: str, destination: Path, force: bool = False) -> Path:
     """Download ``study_id``'s MAF to ``destination``, reusing a cached copy.
 
-    The fetched file must pass `accept_candidate`, so a source that has been rewritten
-    into a poorer form fails the run instead of quietly shrinking the graph.
+    Cached and downloaded bytes must match the pinned LFS SHA-256 digest. The file
+    must also pass `accept_candidate`, so a source that has been rewritten into a
+    poorer form fails the run instead of quietly shrinking the graph.
     """
     source = STUDIES.get(study_id)
     if source is None:
@@ -266,22 +290,27 @@ def fetch_maf(study_id: str, destination: Path, force: bool = False) -> Path:
             "Add a STUDIES entry to fetch a new one."
         )
 
-    # A cached copy is only cached if it is still acceptable; a file left by an older
-    # rule (or a half-fixed run) must not be reused just because it exists.
+    oid, size = read_lfs_pointer(source)
+    # Schema and row counts do not identify a revision: old annotations can pass
+    # both, even at the same byte size. Verify the bytes against the current pin.
     if destination.exists() and not force:
-        reason = accept_candidate(destination, source)
+        if destination.stat().st_size != size:
+            reason = f"has {destination.stat().st_size} bytes, expected {size}"
+        elif sha256_file(destination) != oid:
+            reason = "SHA-256 does not match pinned LFS oid"
+        else:
+            reason = accept_candidate(destination, source)
         if not reason:
             print(f"cached  {destination} ({destination.stat().st_size} bytes)")
             return destination
         print(f"re-fetching {destination}: cached copy {reason}")
 
-    oid, size = read_lfs_pointer(source)
     url = resolve_lfs_download(source, oid, size)
     print(
         f"fetching {source.repo}/{source.path}@{source.ref[:12]} "
         f"-> {destination} ({size} bytes, oid {oid[:12]}...)"
     )
-    download(url, destination, size)
+    download(url, destination, size, oid)
     reason = accept_candidate(destination, source)
     if reason:
         raise SystemExit(f"{study_id}: fetched MAF is unusable -- {reason}")

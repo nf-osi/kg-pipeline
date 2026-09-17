@@ -44,7 +44,9 @@ from __future__ import annotations
 
 import argparse
 import csv
+import fcntl
 import sys
+import tempfile
 from collections.abc import Callable
 from pathlib import Path
 
@@ -171,17 +173,27 @@ def build_rows(
 
 
 def write_crosswalk(path: Path, rows: list[dict]) -> None:
+    """Replace the TSV atomically so concurrent readers see a complete snapshot."""
     path.parent.mkdir(parents=True, exist_ok=True)
-    with open(path, "w", newline="") as handle:
-        handle.write(
-            "# cBioPortal Tumor_Sample_Barcode -> portal specimenID / individualID.\n"
-            "# Regenerate with scripts/map_cbioportal_samples.py. Rows whose `method` is\n"
-            "# not one of (" + ", ".join(sorted(DERIVED_METHODS)) + ") are treated as\n"
-            "# human-authored and preserved on rerun -- use method=manual for hand fixes.\n"
-        )
-        writer = csv.DictWriter(handle, fieldnames=CROSSWALK_COLUMNS, delimiter="\t")
-        writer.writeheader()
-        writer.writerows(rows)
+    with tempfile.NamedTemporaryFile(
+        mode="w", newline="", dir=path.parent, prefix=path.name + ".", delete=False
+    ) as handle:
+        tmp = Path(handle.name)
+        try:
+            handle.write(
+                "# cBioPortal Tumor_Sample_Barcode -> portal specimenID / individualID.\n"
+                "# Regenerate with scripts/map_cbioportal_samples.py. Rows whose `method` is\n"
+                "# not one of (" + ", ".join(sorted(DERIVED_METHODS)) + ") are treated as\n"
+                "# human-authored and preserved on rerun -- use method=manual for hand fixes.\n"
+            )
+            writer = csv.DictWriter(handle, fieldnames=CROSSWALK_COLUMNS, delimiter="\t")
+            writer.writeheader()
+            writer.writerows(rows)
+            handle.close()
+            tmp.chmod(path.stat().st_mode & 0o777 if path.exists() else 0o644)
+            tmp.replace(path)
+        finally:
+            tmp.unlink(missing_ok=True)
 
 
 def load_crosswalk(path: Path, study_id: str | None = None) -> dict[str, dict]:
@@ -216,25 +228,28 @@ def main(argv: list[str] | None = None) -> int:
 
     barcodes = read_maf_barcodes(args.maf)
     index = index_files(args.files)
-    existing = load_existing(args.output)
-    rows = build_rows(
-        args.study_id,
-        barcodes,
-        index.specimens,
-        index.specimen_individuals,
-        existing,
-    )
-    # One file holds every study, but a run only rebuilds the study it was given, so
-    # the other studies' rows have to be carried across or running study B would delete
-    # study A -- including the hand-authored rows this file promises to preserve.
-    carried = [
-        {c: row.get(c, "") for c in CROSSWALK_COLUMNS}
-        for (study, _), row in existing.items()
-        if study != args.study_id
-    ]
-    write_crosswalk(args.output, sorted(
-        carried + rows, key=lambda r: (r["study_id"], r["tumor_sample_barcode"])
-    ))
+    args.output.parent.mkdir(parents=True, exist_ok=True)
+    # Lock a stable sidecar, not the TSV inode that atomic replacement changes.
+    # Keep the sidecar after unlocking: deleting it would let writers lock different
+    # inodes. Hold the lock across the entire read/merge/write transaction.
+    with open(args.output.with_suffix(args.output.suffix + ".lock"), "a") as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        existing = load_existing(args.output)
+        rows = build_rows(
+            args.study_id,
+            barcodes,
+            index.specimens,
+            index.specimen_individuals,
+            existing,
+        )
+        carried = [
+            {c: row.get(c, "") for c in CROSSWALK_COLUMNS}
+            for (study, _), row in existing.items()
+            if study != args.study_id
+        ]
+        write_crosswalk(args.output, sorted(
+            carried + rows, key=lambda r: (r["study_id"], r["tumor_sample_barcode"])
+        ))
 
     resolved = [r for r in rows if r["specimen_id"]]
     with_individual = [r for r in resolved if r["individual_id"]]

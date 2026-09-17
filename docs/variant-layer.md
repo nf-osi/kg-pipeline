@@ -121,6 +121,9 @@ Why source pins:
 `fetch_cbioportal_maf.py` checks every fetched MAF for the columns the pipeline needs
 (`Gene`, `HGNC_ID`, `Hugo_Symbol`, `Tumor_Sample_Barcode`) and a per-study row floor, so
 a source that has been rewritten into a poorer form fails the run instead of losing data value.
+Cache reuse also requires matching the size and SHA-256 digest from the pinned LFS
+pointer, which is fetched on every run. Downloads are checked against that digest
+before replacing a cached file.
 
 ### Note 1 — specimen join is study-specific
 
@@ -162,6 +165,8 @@ The barcode→specimen rule belongs in a checked-in lookup (like the existing SS
 lookups) and unmatched counts belong in `validate_fks.py` as an asserted number. One crosswalk file holds
 every study; a run rebuilds only the specified study and carries the others across, so
 adding a study cannot delete another's rows (including hand-authored ones).
+Concurrent rebuilds hold a shared file lock across the read, merge and write, and
+replace the TSV atomically so readers always see a complete version.
 
 ### Note 2 — per-row data quality
 

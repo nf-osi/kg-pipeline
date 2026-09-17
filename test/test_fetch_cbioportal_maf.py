@@ -9,8 +9,14 @@ mutable, or if the acceptance check that catches such a rewrite is weakened.
 Nothing here touches the network.
 """
 
+import hashlib
+import io
 import sys
+from dataclasses import replace
 from pathlib import Path
+from unittest.mock import Mock
+
+import pytest
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
@@ -21,6 +27,8 @@ from scripts.fetch_cbioportal_maf import (
     count_rows,
     maf_header,
 )
+
+from scripts import fetch_cbioportal_maf as fetcher
 
 FULL_SHA = 40
 
@@ -77,3 +85,62 @@ def test_a_filtered_rerelease_is_rejected_on_row_count(tmp_path):
 def test_a_good_maf_is_accepted(tmp_path):
     maf = write_maf(tmp_path / "m.txt", sorted(REQUIRED_COLUMNS), rows=50_000)
     assert accept_candidate(maf, STUDIES["schw_ctf_synodos_2025"]) == ""
+
+
+@pytest.fixture
+def pinned_maf(tmp_path, monkeypatch):
+    source = replace(STUDIES["nst_nfosi_ntap"], min_rows=1)
+    monkeypatch.setitem(STUDIES, source.study_id, source)
+    path = write_maf(tmp_path / "m.txt", sorted(REQUIRED_COLUMNS))
+    content = path.read_bytes()
+    pointer = Mock(return_value=(hashlib.sha256(content).hexdigest(), len(content)))
+    url = Mock(return_value="https://example.org/maf")
+    request = Mock(side_effect=lambda _: io.BytesIO(content))
+    monkeypatch.setattr(fetcher, "read_lfs_pointer", pointer)
+    monkeypatch.setattr(fetcher, "resolve_lfs_download", url)
+    monkeypatch.setattr(fetcher, "_request", request)
+    return source, path, content, pointer, url, request
+
+
+def test_matching_cache_is_verified_without_downloading(pinned_maf):
+    source, path, content, pointer, url, request = pinned_maf
+    assert fetcher.fetch_maf(source.study_id, path) == path
+    pointer.assert_called_once_with(source)
+    url.assert_not_called()
+    request.assert_not_called()
+    assert path.read_bytes() == content
+
+
+def test_repin_replaces_acceptable_same_size_cache(pinned_maf, monkeypatch):
+    source, path, content, pointer, url, request = pinned_maf
+    # A changed annotation passes the column/row checks and has the same byte size.
+    path.write_bytes(content.replace(b"x", b"y"))
+    assert accept_candidate(path, source) == ""
+    repinned = replace(source, ref="a" * 40)
+    monkeypatch.setitem(STUDIES, source.study_id, repinned)
+
+    fetcher.fetch_maf(source.study_id, path)
+
+    pointer.assert_called_once_with(repinned)
+    request.assert_called_once()
+    assert path.read_bytes() == content
+
+
+def test_force_downloads_even_a_matching_cache(pinned_maf):
+    source, path, content, pointer, url, request = pinned_maf
+    fetcher.fetch_maf(source.study_id, path, force=True)
+    request.assert_called_once()
+    assert path.read_bytes() == content
+
+
+@pytest.mark.parametrize("corruption", ["same_size", "truncated"])
+def test_bad_download_preserves_previous_cache(pinned_maf, corruption):
+    source, path, content, pointer, url, request = pinned_maf
+    bad = content.replace(b"x", b"y") if corruption == "same_size" else content[:-1]
+    request.side_effect = lambda _: io.BytesIO(bad)
+
+    with pytest.raises(SystemExit, match="SHA-256|short read"):
+        fetcher.fetch_maf(source.study_id, path, force=True)
+
+    assert path.read_bytes() == content
+    assert list(path.parent.iterdir()) == [path]
