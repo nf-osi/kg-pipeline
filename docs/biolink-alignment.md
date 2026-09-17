@@ -34,7 +34,7 @@ No portal table backs these entities, so there are no NF-specific slots for an `
 | `nf:Chemical` | `biolink:ChemicalEntity` | No external mapping; BioLink already maps to CHEBI:24431 |
 | _(none — never defined)_ | `biolink:Person` | Used directly for people nodes. `nf:Person` is deliberately not defined: no portal table backs a person, the nodes are keyed on a Synapse profile or an ORCID, and `nf:Investigator` covers the one portal-table-backed flavour as a subclass. |
 | _(none — new)_ | `biolink:SequenceVariant` | Used directly for somatic variant nodes in the variant layer. `nf:Variant` was NOT reused: it means "a variant mentioned in publication text" (PubTator3) and carries no coordinates, so overloading it would conflate a literature mention with a called allele. See `docs/variant-layer.md`. |
-| _(none — new)_ | `biolink:Gene` | Used directly for the gene entity layer, keyed on Ensembl gene id. `nf:Gene` was NOT reused for the same reason: it means "a gene mentioned in publication text" and carries no identifiers. See `docs/entity-layers.md`. |
+| _(none — new)_ | `biolink:Gene` | Used directly for the gene entity layer, keyed on HGNC id (Ensembl as fallback). `nf:Gene` was NOT reused for the same reason: it means "a gene mentioned in publication text" and carries no identifiers. See `docs/variant-layer.md`. |
 
 ## Subclassed under BioLink (with preserved mappings)
 

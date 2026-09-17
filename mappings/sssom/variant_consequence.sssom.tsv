@@ -36,3 +36,5 @@ subject_id	subject_label	predicate_id	object_id	mapping_justification	notes
 	stop_retained_variant	skos:exactMatch	SO:0001567	semapv:LexicalMatching	
 	inframe_insertion	skos:exactMatch	SO:0001821	semapv:LexicalMatching	
 	mature_miRNA_variant	skos:exactMatch	SO:0001620	semapv:LexicalMatching	
+	regulatory_region_variant	skos:exactMatch	SO:0001566	semapv:LexicalMatching	
+	TF_binding_site_variant	skos:exactMatch	SO:0001782	semapv:LexicalMatching	

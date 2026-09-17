@@ -2,8 +2,16 @@
 
 Part of the variant layer PoC (nf-osi/kg-pipeline#95). See `docs/variant-layer.md`.
 
-cBioPortal `Tumor_Sample_Barcode` values do **not** match portal `specimenID`s. For
-`nst_nfosi_ntap` the barcode carries one extra trailing segment:
+cBioPortal `Tumor_Sample_Barcode` values may or may not match portal `specimenID`s, and
+which is true is a per-study fact, not a rule to hardcode. `BARCODE_RULES` is tried in
+order and the row records which one hit:
+
+| Study | Rule that matches | Coverage |
+|---|---|---|
+| `schw_ctf_synodos_2025` | `verbatim` | 40 / 40 |
+| `nst_nfosi_ntap` | `strip_last_segment` | 71 / 80 |
+
+For `nst_nfosi_ntap` the barcode carries one extra trailing segment:
 
     Tumor_Sample_Barcode  JH-2-001-8A1B1-A
     portal specimenID     JH-2-001-8A1B1
@@ -20,6 +28,8 @@ crosswalk to a reviewable TSV that the RDF step then reads verbatim. Consequence
 * the mapping is diffable, and a reviewer can see every barcode that did not resolve;
 * the 9 unresolved barcodes can be fixed by hand (set `method` to `manual`) without
   touching code, and reruns preserve those edits;
+* one file holds every study: a run rebuilds only the study it is given and carries the
+  other studies' rows across unchanged, so adding a study cannot delete another's;
 * a study whose ids cannot be derived at all -- `nfib_ctf_biobank_2025`, whose
   `Patient10_Tumor1` ids were renamed at submission and have no deterministic route back
   to portal specimens like `HM5230` -- can be added as a wholly manual file.
@@ -34,7 +44,10 @@ from __future__ import annotations
 
 import argparse
 import csv
+import fcntl
 import sys
+import tempfile
+from collections.abc import Callable
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -52,12 +65,27 @@ CROSSWALK_COLUMNS = [
 
 #: Methods this script derives. Anything else in an existing file (notably `manual`) is
 #: treated as human-authored and preserved verbatim on rerun.
-DERIVED_METHODS = frozenset({"strip_last_segment", "prefix_guess", "unmatched"})
+DERIVED_METHODS = frozenset(
+    {"verbatim", "strip_last_segment", "prefix_guess", "unmatched"}
+)
 
 
 def strip_last_segment(barcode: str) -> str:
     """`JH-2-001-8A1B1-A` -> `JH-2-001-8A1B1`."""
     return barcode.rsplit("-", 1)[0] if "-" in barcode else barcode
+
+
+#: Barcode -> specimenID rules, tried in order; the first candidate that is a portal
+#: specimenID wins and names itself in the row's `method`.
+#:
+#: `verbatim` is first because it is the only rule that cannot be wrong -- if the
+#: barcode already IS a specimenID there is nothing to derive. It matches 0 of 80 in
+#: `nst_nfosi_ntap` and 40 of 40 in `schw_ctf_synodos_2025`, so the two studies need no
+#: per-study branching: each simply falls to the rule that fits it.
+BARCODE_RULES: tuple[tuple[str, "Callable[[str], str]"], ...] = (
+    ("verbatim", lambda barcode: barcode),
+    ("strip_last_segment", strip_last_segment),
+)
 
 
 def individual_prefix_guess(barcode: str, segments: int = 3) -> str:
@@ -106,8 +134,12 @@ def build_rows(
             rows.append({c: kept.get(c, "") for c in CROSSWALK_COLUMNS})
             continue
 
-        candidate = strip_last_segment(barcode)
-        if candidate in specimens:
+        tried = []
+        for method, rule in BARCODE_RULES:
+            candidate = rule(barcode)
+            tried.append(candidate)
+            if candidate not in specimens:
+                continue
             individuals = sorted(specimen_individuals.get(candidate, set()))
             rows.append(
                 {
@@ -117,39 +149,51 @@ def build_rows(
                     # A specimen linked to several individuals is a source-data problem;
                     # leave it blank rather than pick one arbitrarily.
                     "individual_id": individuals[0] if len(individuals) == 1 else "",
-                    "method": "strip_last_segment",
+                    "method": method,
                     "notes": ""
                     if len(individuals) <= 1
                     else f"specimen links to {len(individuals)} individuals: {','.join(individuals)}",
                 }
             )
-            continue
-
-        rows.append(
-            {
-                "study_id": study_id,
-                "tumor_sample_barcode": barcode,
-                "specimen_id": "",
-                "individual_id": "",
-                "method": "unmatched",
-                "notes": f"'{candidate}' is not a portal specimenID; set method=manual to fix by hand",
-            }
-        )
+            break
+        else:
+            attempted = ", ".join(f"'{c}'" for c in dict.fromkeys(tried))
+            rows.append(
+                {
+                    "study_id": study_id,
+                    "tumor_sample_barcode": barcode,
+                    "specimen_id": "",
+                    "individual_id": "",
+                    "method": "unmatched",
+                    "notes": f"no portal specimenID among {attempted}; "
+                             "set method=manual to fix by hand",
+                }
+            )
     return rows
 
 
 def write_crosswalk(path: Path, rows: list[dict]) -> None:
+    """Replace the TSV atomically so concurrent readers see a complete snapshot."""
     path.parent.mkdir(parents=True, exist_ok=True)
-    with open(path, "w", newline="") as handle:
-        handle.write(
-            "# cBioPortal Tumor_Sample_Barcode -> portal specimenID / individualID.\n"
-            "# Regenerate with scripts/map_cbioportal_samples.py. Rows whose `method` is\n"
-            "# not one of (" + ", ".join(sorted(DERIVED_METHODS)) + ") are treated as\n"
-            "# human-authored and preserved on rerun -- use method=manual for hand fixes.\n"
-        )
-        writer = csv.DictWriter(handle, fieldnames=CROSSWALK_COLUMNS, delimiter="\t")
-        writer.writeheader()
-        writer.writerows(rows)
+    with tempfile.NamedTemporaryFile(
+        mode="w", newline="", dir=path.parent, prefix=path.name + ".", delete=False
+    ) as handle:
+        tmp = Path(handle.name)
+        try:
+            handle.write(
+                "# cBioPortal Tumor_Sample_Barcode -> portal specimenID / individualID.\n"
+                "# Regenerate with scripts/map_cbioportal_samples.py. Rows whose `method` is\n"
+                "# not one of (" + ", ".join(sorted(DERIVED_METHODS)) + ") are treated as\n"
+                "# human-authored and preserved on rerun -- use method=manual for hand fixes.\n"
+            )
+            writer = csv.DictWriter(handle, fieldnames=CROSSWALK_COLUMNS, delimiter="\t")
+            writer.writeheader()
+            writer.writerows(rows)
+            handle.close()
+            tmp.chmod(path.stat().st_mode & 0o777 if path.exists() else 0o644)
+            tmp.replace(path)
+        finally:
+            tmp.unlink(missing_ok=True)
 
 
 def load_crosswalk(path: Path, study_id: str | None = None) -> dict[str, dict]:
@@ -184,14 +228,28 @@ def main(argv: list[str] | None = None) -> int:
 
     barcodes = read_maf_barcodes(args.maf)
     index = index_files(args.files)
-    rows = build_rows(
-        args.study_id,
-        barcodes,
-        index.specimens,
-        index.specimen_individuals,
-        load_existing(args.output),
-    )
-    write_crosswalk(args.output, rows)
+    args.output.parent.mkdir(parents=True, exist_ok=True)
+    # Lock a stable sidecar, not the TSV inode that atomic replacement changes.
+    # Keep the sidecar after unlocking: deleting it would let writers lock different
+    # inodes. Hold the lock across the entire read/merge/write transaction.
+    with open(args.output.with_suffix(args.output.suffix + ".lock"), "a") as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        existing = load_existing(args.output)
+        rows = build_rows(
+            args.study_id,
+            barcodes,
+            index.specimens,
+            index.specimen_individuals,
+            existing,
+        )
+        carried = [
+            {c: row.get(c, "") for c in CROSSWALK_COLUMNS}
+            for (study, _), row in existing.items()
+            if study != args.study_id
+        ]
+        write_crosswalk(args.output, sorted(
+            carried + rows, key=lambda r: (r["study_id"], r["tumor_sample_barcode"])
+        ))
 
     resolved = [r for r in rows if r["specimen_id"]]
     with_individual = [r for r in resolved if r["individual_id"]]
@@ -204,6 +262,9 @@ def main(argv: list[str] | None = None) -> int:
     print(f"  with an individual     {len(with_individual)}")
     print(f"  hand-authored rows     {len(manual)}")
     print(f"  UNMATCHED              {len(unmatched)}")
+    if carried:
+        studies = sorted({r["study_id"] for r in carried})
+        print(f"  carried over           {len(carried)} rows ({', '.join(studies)})")
     for row in unmatched:
         print(f"    {row['tumor_sample_barcode']}")
     print(f"output                   {args.output}")

@@ -1,85 +1,184 @@
 # cBioPortal Tumor_Sample_Barcode -> portal specimenID / individualID.
 # Regenerate with scripts/map_cbioportal_samples.py. Rows whose `method` is
-# not one of (prefix_guess, strip_last_segment, unmatched) are treated as
+# not one of (prefix_guess, strip_last_segment, unmatched, verbatim) are treated as
 # human-authored and preserved on rerun -- use method=manual for hand fixes.
 study_id	tumor_sample_barcode	specimen_id	individual_id	method	notes
-nst_nfosi_ntap	JH-2-009-518B9-A	JH-2-009-518B9	JH-2-009	strip_last_segment	
-nst_nfosi_ntap	JH-2-093-518GA-A	JH-2-093-518GA	JH-2-093	strip_last_segment	
-nst_nfosi_ntap	JH-2-054-9255F-A			unmatched	'JH-2-054-9255F' is not a portal specimenID; set method=manual to fix by hand
+lgg_ctf_synodos_2025	SYN_NF_004	SYN_NF_004	SYN_NF_004	verbatim	
+lgg_ctf_synodos_2025	SYN_NF_007	SYN_NF_007	SYN_NF_007	verbatim	
+lgg_ctf_synodos_2025	SYN_NF_009	SYN_NF_009	SYN_NF_009	verbatim	
+lgg_ctf_synodos_2025	SYN_NF_010	SYN_NF_010	SYN_NF_010	verbatim	
+lgg_ctf_synodos_2025	SYN_NF_011	SYN_NF_011	SYN_NF_011	verbatim	
+lgg_ctf_synodos_2025	SYN_NF_012	SYN_NF_012	SYN_NF_012	verbatim	
+lgg_ctf_synodos_2025	SYN_NF_013	SYN_NF_013	SYN_NF_013	verbatim	
+lgg_ctf_synodos_2025	SYN_NF_014	SYN_NF_014	SYN_NF_014	verbatim	
+lgg_ctf_synodos_2025	SYN_NF_015	SYN_NF_015	SYN_NF_015	verbatim	
+lgg_ctf_synodos_2025	SYN_NF_017	SYN_NF_017	SYN_NF_017	verbatim	
+lgg_ctf_synodos_2025	SYN_NF_034	SYN_NF_034	SYN_NF_034	verbatim	
+lgg_ctf_synodos_2025	SYN_NF_036	SYN_NF_036	SYN_NF_036	verbatim	
+lgg_ctf_synodos_2025	SYN_NF_042	SYN_NF_042	SYN_NF_042	verbatim	
+lgg_ctf_synodos_2025	SYN_NF_043	SYN_NF_043	SYN_NF_043	verbatim	
+lgg_ctf_synodos_2025	SYN_NF_044	SYN_NF_044	SYN_NF_044	verbatim	
+lgg_ctf_synodos_2025	SYN_NF_055	SYN_NF_055	SYN_NF_055	verbatim	
+lgg_ctf_synodos_2025	SYN_NF_057	SYN_NF_057	SYN_NF_057	verbatim	
+lgg_ctf_synodos_2025	SYN_NF_058	SYN_NF_058	SYN_NF_058	verbatim	
+lgg_ctf_synodos_2025	SYN_NF_059	SYN_NF_059	SYN_NF_059	verbatim	
+lgg_ctf_synodos_2025	SYN_NF_060	SYN_NF_060	SYN_NF_060	verbatim	
+lgg_ctf_synodos_2025	SYN_NF_062	SYN_NF_062	SYN_NF_062	verbatim	
+nfib_ctf_biobank_2025	patient10tumor1	patient10tumor1	patient10	verbatim	
+nfib_ctf_biobank_2025	patient10tumor2	patient10tumor2	patient10	verbatim	
+nfib_ctf_biobank_2025	patient10tumor3	patient10tumor3	patient10	verbatim	
+nfib_ctf_biobank_2025	patient10tumor4	patient10tumor4	patient10	verbatim	
+nfib_ctf_biobank_2025	patient11tumor1	patient11tumor1	patient11	verbatim	
+nfib_ctf_biobank_2025	patient11tumor2	patient11tumor2	patient11	verbatim	
+nfib_ctf_biobank_2025	patient11tumor7	patient11tumor7	patient11	verbatim	
+nfib_ctf_biobank_2025	patient11tumor8	patient11tumor8	patient11	verbatim	
+nfib_ctf_biobank_2025	patient1tumor3	patient1tumor3	patient1	verbatim	
+nfib_ctf_biobank_2025	patient1tumor6	patient1tumor6	patient1	verbatim	
+nfib_ctf_biobank_2025	patient1tumor9	patient1tumor9	patient1	verbatim	
+nfib_ctf_biobank_2025	patient2tumor1	patient2tumor1	patient2	verbatim	
+nfib_ctf_biobank_2025	patient2tumor4	patient2tumor4	patient2	verbatim	
+nfib_ctf_biobank_2025	patient2tumor6	patient2tumor6	patient2	verbatim	
+nfib_ctf_biobank_2025	patient2tumor8	patient2tumor8	patient2	verbatim	
+nfib_ctf_biobank_2025	patient3tumor1	patient3tumor1	patient3	verbatim	
+nfib_ctf_biobank_2025	patient3tumor2	patient3tumor2	patient3	verbatim	
+nfib_ctf_biobank_2025	patient3tumor4	patient3tumor4	patient3	verbatim	
+nfib_ctf_biobank_2025	patient4tumor1	patient4tumor1	patient4	verbatim	
+nfib_ctf_biobank_2025	patient4tumor10	patient4tumor10	patient4	verbatim	
+nfib_ctf_biobank_2025	patient4tumor4	patient4tumor4	patient4	verbatim	
+nfib_ctf_biobank_2025	patient4tumor9	patient4tumor9	patient4	verbatim	
+nfib_ctf_biobank_2025	patient5tumor11	patient5tumor11	patient5	verbatim	
+nfib_ctf_biobank_2025	patient5tumor12	patient5tumor12	patient5	verbatim	
+nfib_ctf_biobank_2025	patient5tumor13	patient5tumor13	patient5	verbatim	
+nfib_ctf_biobank_2025	patient5tumor5	patient5tumor5	patient5	verbatim	
+nfib_ctf_biobank_2025	patient6tumor4	patient6tumor4	patient6	verbatim	
+nfib_ctf_biobank_2025	patient6tumor5	patient6tumor5	patient6	verbatim	
+nfib_ctf_biobank_2025	patient6tumor6	patient6tumor6	patient6	verbatim	
+nfib_ctf_biobank_2025	patient6tumor7	patient6tumor7	patient6	verbatim	
+nfib_ctf_biobank_2025	patient8tumor4	patient8tumor4	patient8	verbatim	
+nfib_ctf_biobank_2025	patient8tumor5	patient8tumor5	patient8	verbatim	
+nfib_ctf_biobank_2025	patient8tumor6	patient8tumor6	patient8	verbatim	
+nfib_ctf_biobank_2025	patient8tumor7	patient8tumor7	patient8	verbatim	
+nfib_ctf_biobank_2025	patient9tumor1	patient9tumor1	patient9	verbatim	
+nfib_ctf_biobank_2025	patient9tumor3	patient9tumor3	patient9	verbatim	
+nfib_ctf_biobank_2025	patient9tumor6	patient9tumor6	patient9	verbatim	
+nfib_ctf_biobank_2025	patient9tumor7	patient9tumor7	patient9	verbatim	
+nst_nfosi_ntap	JH-2-001-8A1B1-A	JH-2-001-8A1B1	JH-2-001	strip_last_segment	
+nst_nfosi_ntap	JH-2-002-354A1-A	JH-2-002-354A1	JH-2-002	strip_last_segment	
+nst_nfosi_ntap	JH-2-002-94FAA-A	JH-2-002-94FAA	JH-2-002	strip_last_segment	
+nst_nfosi_ntap	JH-2-002-FF824-A	JH-2-002-FF824	JH-2-002	strip_last_segment	
 nst_nfosi_ntap	JH-2-002-GAF53-A1011	JH-2-002-GAF53	JH-2-002	strip_last_segment	
+nst_nfosi_ntap	JH-2-002-GAF53-FB9H7	JH-2-002-GAF53	JH-2-002	strip_last_segment	
+nst_nfosi_ntap	JH-2-004-9D9D7-A	JH-2-004-9D9D7	JH-2-004	strip_last_segment	
 nst_nfosi_ntap	JH-2-006-D6BA4-A	JH-2-006-D6BA4	JH-2-006	strip_last_segment	
-nst_nfosi_ntap	JH-2-075-4F211-A	JH-2-075-4F211	JH-2-075	strip_last_segment	
-nst_nfosi_ntap	JH-2-055-1419H-9GG15	JH-2-055-1419H	JH-2-055	strip_last_segment	
-nst_nfosi_ntap	JH-2-057-37D5D-A	JH-2-057-37D5D	JH-2-057	strip_last_segment	
-nst_nfosi_ntap	JH-2-092-B4F11-A	JH-2-092-B4F11	JH-2-092	strip_last_segment	
-nst_nfosi_ntap	JH-2-082-B5148-A	JH-2-082-B5148	JH-2-082	strip_last_segment	
-nst_nfosi_ntap	JH-2-054-241HF-A			unmatched	'JH-2-054-241HF' is not a portal specimenID; set method=manual to fix by hand
+nst_nfosi_ntap	JH-2-009-2578C-A	JH-2-009-2578C	JH-2-009	strip_last_segment	
+nst_nfosi_ntap	JH-2-009-518B9-A	JH-2-009-518B9	JH-2-009	strip_last_segment	
+nst_nfosi_ntap	JH-2-010-H915D-A	JH-2-010-H915D	JH-2-010	strip_last_segment	
 nst_nfosi_ntap	JH-2-012-HE58H-A	JH-2-012-HE58H	JH-2-012	strip_last_segment	
 nst_nfosi_ntap	JH-2-013-7886G-A	JH-2-013-7886G	JH-2-013	strip_last_segment	
-nst_nfosi_ntap	JH-2-090-59DE8-A	JH-2-090-59DE8	JH-2-090	strip_last_segment	
-nst_nfosi_ntap	JH-2-095-4H3FE-A	JH-2-095-4H3FE	JH-2-095	strip_last_segment	
-nst_nfosi_ntap	JH-2-076-811H2-A	JH-2-076-811H2	JH-2-076	strip_last_segment	
-nst_nfosi_ntap	JH-2-060-19EC4-A			unmatched	'JH-2-060-19EC4' is not a portal specimenID; set method=manual to fix by hand
-nst_nfosi_ntap	JH-2-045-F7H3C-A	JH-2-045-F7H3C	JH-2-045	strip_last_segment	
-nst_nfosi_ntap	JH-2-055-FC9GH-A	JH-2-055-FC9GH	JH-2-055	strip_last_segment	
-nst_nfosi_ntap	JH-2-079-CB92G-A	JH-2-079-CB92G	JH-2-079	strip_last_segment	
-nst_nfosi_ntap	JH-2-009-2578C-A	JH-2-009-2578C	JH-2-009	strip_last_segment	
-nst_nfosi_ntap	JH-2-099-26HCE-A	JH-2-099-26HCE	JH-2-099	strip_last_segment	
-nst_nfosi_ntap	JH-2-103-H731E-A	JH-2-103-H731E	JH-2-103	strip_last_segment	
-nst_nfosi_ntap	JH-2-045-GH3AA-A	JH-2-045-GH3AA	JH-2-045	strip_last_segment	
-nst_nfosi_ntap	JH-2-068-A7488-A			unmatched	'JH-2-068-A7488' is not a portal specimenID; set method=manual to fix by hand
-nst_nfosi_ntap	JH-2-015-C436G-A	JH-2-015-C436G	JH-2-015	strip_last_segment	
-nst_nfosi_ntap	JH-2-100-19H33-A	JH-2-100-19H33	JH-2-100	strip_last_segment	
+nst_nfosi_ntap	JH-2-014-AH466-A	JH-2-014-AH466	JH-2-014	strip_last_segment	
+nst_nfosi_ntap	JH-2-015-55B8D-A	JH-2-015-55B8D	JH-2-015	strip_last_segment	
 nst_nfosi_ntap	JH-2-015-6AD96-A	JH-2-015-6AD96	JH-2-015	strip_last_segment	
-nst_nfosi_ntap	JH-2-044-83F15-A	JH-2-044-83F15	JH-2-044	strip_last_segment	
-nst_nfosi_ntap	JH-2-001-8A1B1-A	JH-2-001-8A1B1	JH-2-001	strip_last_segment	
-nst_nfosi_ntap	JH-2-104-51E2H-A	JH-2-104-51E2H	JH-2-104	strip_last_segment	
-nst_nfosi_ntap	JH-2-002-FF824-A	JH-2-002-FF824	JH-2-002	strip_last_segment	
-nst_nfosi_ntap	JH-2-016-6H516-A	JH-2-016-6H516	JH-2-016	strip_last_segment	
-nst_nfosi_ntap	JH-2-002-94FAA-A	JH-2-002-94FAA	JH-2-002	strip_last_segment	
-nst_nfosi_ntap	JH-2-026-9FD64-A	JH-2-026-9FD64	JH-2-026	strip_last_segment	
-nst_nfosi_ntap	JH-2-016-4H597-A	JH-2-016-4H597	JH-2-016	strip_last_segment	
-nst_nfosi_ntap	JH-2-068-A733G-A			unmatched	'JH-2-068-A733G' is not a portal specimenID; set method=manual to fix by hand
-nst_nfosi_ntap	JH-2-093-214AE-A	JH-2-093-214AE	JH-2-093	strip_last_segment	
-nst_nfosi_ntap	JH-2-068-FH52C-A			unmatched	'JH-2-068-FH52C' is not a portal specimenID; set method=manual to fix by hand
-nst_nfosi_ntap	JH-2-090-19D3F-A	JH-2-090-19D3F	JH-2-090	strip_last_segment	
-nst_nfosi_ntap	JH-2-096-5E593-A	JH-2-096-5E593	JH-2-096	strip_last_segment	
-nst_nfosi_ntap	JH-2-089-H8EBA-A	JH-2-089-H8EBA	JH-2-089	strip_last_segment	
-nst_nfosi_ntap	JH-2-086-5EA11-A	JH-2-086-5EA11	JH-2-086	strip_last_segment	
-nst_nfosi_ntap	JH-2-082-G8357-A	JH-2-082-G8357	JH-2-082	strip_last_segment	
-nst_nfosi_ntap	JH-2-010-H915D-A	JH-2-010-H915D	JH-2-010	strip_last_segment	
-nst_nfosi_ntap	JH-2-023-9DA42-A	JH-2-023-9DA42	JH-2-023	strip_last_segment	
-nst_nfosi_ntap	JH-2-023-91HBD-A	JH-2-023-91HBD	JH-2-023	strip_last_segment	
-nst_nfosi_ntap	JH-2-085-F2983-A	JH-2-085-F2983	JH-2-085	strip_last_segment	
-nst_nfosi_ntap	JH-2-077-88G11-A	JH-2-077-88G11	JH-2-077	strip_last_segment	
-nst_nfosi_ntap	JH-2-074-HE12C-A	JH-2-074-HE12C	JH-2-074	strip_last_segment	
-nst_nfosi_ntap	JH-2-017-9FH8F-A	JH-2-017-9FH8F	JH-2-017	strip_last_segment	
+nst_nfosi_ntap	JH-2-015-C436G-A	JH-2-015-C436G	JH-2-015	strip_last_segment	
 nst_nfosi_ntap	JH-2-015-G41AC-A	JH-2-015-G41AC	JH-2-015	strip_last_segment	
-nst_nfosi_ntap	JH-2-023-876HC-A	JH-2-023-876HC	JH-2-023	strip_last_segment	
-nst_nfosi_ntap	JH-2-113-7857D-A	JH-2-113-7857D	JH-2-113	strip_last_segment	
-nst_nfosi_ntap	JH-2-072-3DD4G-A	JH-2-072-3DD4G	JH-2-072	strip_last_segment	
-nst_nfosi_ntap	JH-2-004-9D9D7-A	JH-2-004-9D9D7	JH-2-004	strip_last_segment	
-nst_nfosi_ntap	JH-2-094-151G9-A	JH-2-094-151G9	JH-2-094	strip_last_segment	
-nst_nfosi_ntap	JH-2-076-41G1H-A	JH-2-076-41G1H	JH-2-076	strip_last_segment	
-nst_nfosi_ntap	JH-2-023-89E1F-A	JH-2-023-89E1F	JH-2-023	strip_last_segment	
+nst_nfosi_ntap	JH-2-016-4H597-A	JH-2-016-4H597	JH-2-016	strip_last_segment	
+nst_nfosi_ntap	JH-2-016-6H516-A	JH-2-016-6H516	JH-2-016	strip_last_segment	
+nst_nfosi_ntap	JH-2-017-9FH8F-A	JH-2-017-9FH8F	JH-2-017	strip_last_segment	
 nst_nfosi_ntap	JH-2-019-DB5EH-A	JH-2-019-DB5EH	JH-2-019	strip_last_segment	
+nst_nfosi_ntap	JH-2-021-6GFE7-A	JH-2-021-6GFE7	JH-2-021	strip_last_segment	
+nst_nfosi_ntap	JH-2-023-1G2BC-A	JH-2-023-1G2BC	JH-2-023	strip_last_segment	
+nst_nfosi_ntap	JH-2-023-876HC-A	JH-2-023-876HC	JH-2-023	strip_last_segment	
+nst_nfosi_ntap	JH-2-023-89E1F-A	JH-2-023-89E1F	JH-2-023	strip_last_segment	
+nst_nfosi_ntap	JH-2-023-91HBD-A	JH-2-023-91HBD	JH-2-023	strip_last_segment	
+nst_nfosi_ntap	JH-2-023-9DA42-A	JH-2-023-9DA42	JH-2-023	strip_last_segment	
+nst_nfosi_ntap	JH-2-026-9FD64-A	JH-2-026-9FD64	JH-2-026	strip_last_segment	
+nst_nfosi_ntap	JH-2-029-7AE7F-A	JH-2-029-7AE7F	JH-2-029	strip_last_segment	
 nst_nfosi_ntap	JH-2-031-9GEA9-A	JH-2-031-9GEA9	JH-2-031	strip_last_segment	
 nst_nfosi_ntap	JH-2-032-AE88A-A	JH-2-032-AE88A	JH-2-032	strip_last_segment	
-nst_nfosi_ntap	JH-2-021-6GFE7-A	JH-2-021-6GFE7	JH-2-021	strip_last_segment	
-nst_nfosi_ntap	JH-2-029-7AE7F-A	JH-2-029-7AE7F	JH-2-029	strip_last_segment	
-nst_nfosi_ntap	JH-2-015-55B8D-A	JH-2-015-55B8D	JH-2-015	strip_last_segment	
-nst_nfosi_ntap	JH-2-014-AH466-A	JH-2-014-AH466	JH-2-014	strip_last_segment	
-nst_nfosi_ntap	JH-2-002-GAF53-FB9H7	JH-2-002-GAF53	JH-2-002	strip_last_segment	
-nst_nfosi_ntap	JH-2-092-B52E5-A	JH-2-092-B52E5	JH-2-092	strip_last_segment	
-nst_nfosi_ntap	JH-2-002-354A1-A	JH-2-002-354A1	JH-2-002	strip_last_segment	
-nst_nfosi_ntap	JH-2-075-3HE68-A	JH-2-075-3HE68	JH-2-075	strip_last_segment	
-nst_nfosi_ntap	JH-2-094-5HA24-A	JH-2-094-5HA24	JH-2-094	strip_last_segment	
-nst_nfosi_ntap	JH-2-111-G645D-A	JH-2-111-G645D	JH-2-111	strip_last_segment	
-nst_nfosi_ntap	JH-2-091-CAA8H-A	JH-2-091-CAA8H	JH-2-091	strip_last_segment	
+nst_nfosi_ntap	JH-2-044-83F15-A	JH-2-044-83F15	JH-2-044	strip_last_segment	
+nst_nfosi_ntap	JH-2-045-F7H3C-A	JH-2-045-F7H3C	JH-2-045	strip_last_segment	
+nst_nfosi_ntap	JH-2-045-GH3AA-A	JH-2-045-GH3AA	JH-2-045	strip_last_segment	
+nst_nfosi_ntap	JH-2-054-241HF-A			unmatched	no portal specimenID among 'JH-2-054-241HF-A', 'JH-2-054-241HF'; set method=manual to fix by hand
+nst_nfosi_ntap	JH-2-054-9255F-A			unmatched	no portal specimenID among 'JH-2-054-9255F-A', 'JH-2-054-9255F'; set method=manual to fix by hand
+nst_nfosi_ntap	JH-2-055-1419H-9GG15	JH-2-055-1419H	JH-2-055	strip_last_segment	
 nst_nfosi_ntap	JH-2-055-E1381-A	JH-2-055-E1381	JH-2-055	strip_last_segment	
-nst_nfosi_ntap	JH-2-102-3B72A-A			unmatched	'JH-2-102-3B72A' is not a portal specimenID; set method=manual to fix by hand
-nst_nfosi_ntap	JH-2-023-1G2BC-A	JH-2-023-1G2BC	JH-2-023	strip_last_segment	
-nst_nfosi_ntap	JH-2-068-2BHHG-A	JH-2-068-2BHHG	JH-2-068	strip_last_segment	
-nst_nfosi_ntap	JH-2-060-4CE8D-A			unmatched	'JH-2-060-4CE8D' is not a portal specimenID; set method=manual to fix by hand
-nst_nfosi_ntap	JH-2-079-9D31F-A			unmatched	'JH-2-079-9D31F' is not a portal specimenID; set method=manual to fix by hand
+nst_nfosi_ntap	JH-2-055-FC9GH-A	JH-2-055-FC9GH	JH-2-055	strip_last_segment	
+nst_nfosi_ntap	JH-2-057-37D5D-A	JH-2-057-37D5D	JH-2-057	strip_last_segment	
+nst_nfosi_ntap	JH-2-060-19EC4-A			unmatched	no portal specimenID among 'JH-2-060-19EC4-A', 'JH-2-060-19EC4'; set method=manual to fix by hand
+nst_nfosi_ntap	JH-2-060-4CE8D-A			unmatched	no portal specimenID among 'JH-2-060-4CE8D-A', 'JH-2-060-4CE8D'; set method=manual to fix by hand
 nst_nfosi_ntap	JH-2-061-1H66H-A	JH-2-061-1H66H	JH-2-061	strip_last_segment	
+nst_nfosi_ntap	JH-2-068-2BHHG-A	JH-2-068-2BHHG	JH-2-068	strip_last_segment	
+nst_nfosi_ntap	JH-2-068-A733G-A			unmatched	no portal specimenID among 'JH-2-068-A733G-A', 'JH-2-068-A733G'; set method=manual to fix by hand
+nst_nfosi_ntap	JH-2-068-A7488-A			unmatched	no portal specimenID among 'JH-2-068-A7488-A', 'JH-2-068-A7488'; set method=manual to fix by hand
+nst_nfosi_ntap	JH-2-068-FH52C-A			unmatched	no portal specimenID among 'JH-2-068-FH52C-A', 'JH-2-068-FH52C'; set method=manual to fix by hand
+nst_nfosi_ntap	JH-2-072-3DD4G-A	JH-2-072-3DD4G	JH-2-072	strip_last_segment	
+nst_nfosi_ntap	JH-2-074-HE12C-A	JH-2-074-HE12C	JH-2-074	strip_last_segment	
+nst_nfosi_ntap	JH-2-075-3HE68-A	JH-2-075-3HE68	JH-2-075	strip_last_segment	
+nst_nfosi_ntap	JH-2-075-4F211-A	JH-2-075-4F211	JH-2-075	strip_last_segment	
+nst_nfosi_ntap	JH-2-076-41G1H-A	JH-2-076-41G1H	JH-2-076	strip_last_segment	
+nst_nfosi_ntap	JH-2-076-811H2-A	JH-2-076-811H2	JH-2-076	strip_last_segment	
+nst_nfosi_ntap	JH-2-077-88G11-A	JH-2-077-88G11	JH-2-077	strip_last_segment	
+nst_nfosi_ntap	JH-2-079-9D31F-A			unmatched	no portal specimenID among 'JH-2-079-9D31F-A', 'JH-2-079-9D31F'; set method=manual to fix by hand
+nst_nfosi_ntap	JH-2-079-CB92G-A	JH-2-079-CB92G	JH-2-079	strip_last_segment	
+nst_nfosi_ntap	JH-2-082-B5148-A	JH-2-082-B5148	JH-2-082	strip_last_segment	
+nst_nfosi_ntap	JH-2-082-G8357-A	JH-2-082-G8357	JH-2-082	strip_last_segment	
+nst_nfosi_ntap	JH-2-085-F2983-A	JH-2-085-F2983	JH-2-085	strip_last_segment	
+nst_nfosi_ntap	JH-2-086-5EA11-A	JH-2-086-5EA11	JH-2-086	strip_last_segment	
+nst_nfosi_ntap	JH-2-089-H8EBA-A	JH-2-089-H8EBA	JH-2-089	strip_last_segment	
+nst_nfosi_ntap	JH-2-090-19D3F-A	JH-2-090-19D3F	JH-2-090	strip_last_segment	
+nst_nfosi_ntap	JH-2-090-59DE8-A	JH-2-090-59DE8	JH-2-090	strip_last_segment	
+nst_nfosi_ntap	JH-2-091-CAA8H-A	JH-2-091-CAA8H	JH-2-091	strip_last_segment	
+nst_nfosi_ntap	JH-2-092-B4F11-A	JH-2-092-B4F11	JH-2-092	strip_last_segment	
+nst_nfosi_ntap	JH-2-092-B52E5-A	JH-2-092-B52E5	JH-2-092	strip_last_segment	
+nst_nfosi_ntap	JH-2-093-214AE-A	JH-2-093-214AE	JH-2-093	strip_last_segment	
+nst_nfosi_ntap	JH-2-093-518GA-A	JH-2-093-518GA	JH-2-093	strip_last_segment	
+nst_nfosi_ntap	JH-2-094-151G9-A	JH-2-094-151G9	JH-2-094	strip_last_segment	
+nst_nfosi_ntap	JH-2-094-5HA24-A	JH-2-094-5HA24	JH-2-094	strip_last_segment	
+nst_nfosi_ntap	JH-2-095-4H3FE-A	JH-2-095-4H3FE	JH-2-095	strip_last_segment	
+nst_nfosi_ntap	JH-2-096-5E593-A	JH-2-096-5E593	JH-2-096	strip_last_segment	
+nst_nfosi_ntap	JH-2-099-26HCE-A	JH-2-099-26HCE	JH-2-099	strip_last_segment	
+nst_nfosi_ntap	JH-2-100-19H33-A	JH-2-100-19H33	JH-2-100	strip_last_segment	
+nst_nfosi_ntap	JH-2-102-3B72A-A			unmatched	no portal specimenID among 'JH-2-102-3B72A-A', 'JH-2-102-3B72A'; set method=manual to fix by hand
+nst_nfosi_ntap	JH-2-103-H731E-A	JH-2-103-H731E	JH-2-103	strip_last_segment	
+nst_nfosi_ntap	JH-2-104-51E2H-A	JH-2-104-51E2H	JH-2-104	strip_last_segment	
+nst_nfosi_ntap	JH-2-111-G645D-A	JH-2-111-G645D	JH-2-111	strip_last_segment	
+nst_nfosi_ntap	JH-2-113-7857D-A	JH-2-113-7857D	JH-2-113	strip_last_segment	
+schw_ctf_synodos_2025	swn_patient_10_tumor_108	swn_patient_10_tumor_108	swn_patient_10	verbatim	
+schw_ctf_synodos_2025	swn_patient_10_tumor_109	swn_patient_10_tumor_109	swn_patient_10	verbatim	
+schw_ctf_synodos_2025	swn_patient_10_tumor_110	swn_patient_10_tumor_110	swn_patient_10	verbatim	
+schw_ctf_synodos_2025	swn_patient_10_tumor_111	swn_patient_10_tumor_111	swn_patient_10	verbatim	
+schw_ctf_synodos_2025	swn_patient_10_tumor_112	swn_patient_10_tumor_112	swn_patient_10	verbatim	
+schw_ctf_synodos_2025	swn_patient_11_tumor_25	swn_patient_11_tumor_25	swn_patient_11	verbatim	
+schw_ctf_synodos_2025	swn_patient_11_tumor_26	swn_patient_11_tumor_26	swn_patient_11	verbatim	
+schw_ctf_synodos_2025	swn_patient_1_tumor_10	swn_patient_1_tumor_10	swn_patient_1	verbatim	
+schw_ctf_synodos_2025	swn_patient_1_tumor_11	swn_patient_1_tumor_11	swn_patient_1	verbatim	
+schw_ctf_synodos_2025	swn_patient_1_tumor_8	swn_patient_1_tumor_8	swn_patient_1	verbatim	
+schw_ctf_synodos_2025	swn_patient_1_tumor_9	swn_patient_1_tumor_9	swn_patient_1	verbatim	
+schw_ctf_synodos_2025	swn_patient_21_tumor_53	swn_patient_21_tumor_53	swn_patient_21	verbatim	
+schw_ctf_synodos_2025	swn_patient_23_tumor_46	swn_patient_23_tumor_46	swn_patient_23	verbatim	
+schw_ctf_synodos_2025	swn_patient_23_tumor_47	swn_patient_23_tumor_47	swn_patient_23	verbatim	
+schw_ctf_synodos_2025	swn_patient_25_tumor_56	swn_patient_25_tumor_56	swn_patient_25	verbatim	
+schw_ctf_synodos_2025	swn_patient_27_tumor_87	swn_patient_27_tumor_87	swn_patient_27	verbatim	
+schw_ctf_synodos_2025	swn_patient_27_tumor_88	swn_patient_27_tumor_88	swn_patient_27	verbatim	
+schw_ctf_synodos_2025	swn_patient_28_tumor_62	swn_patient_28_tumor_62	swn_patient_28	verbatim	
+schw_ctf_synodos_2025	swn_patient_28_tumor_63	swn_patient_28_tumor_63	swn_patient_28	verbatim	
+schw_ctf_synodos_2025	swn_patient_28_tumor_64	swn_patient_28_tumor_64	swn_patient_28	verbatim	
+schw_ctf_synodos_2025	swn_patient_28_tumor_65	swn_patient_28_tumor_65	swn_patient_28	verbatim	
+schw_ctf_synodos_2025	swn_patient_2_tumor_12	swn_patient_2_tumor_12	swn_patient_2	verbatim	
+schw_ctf_synodos_2025	swn_patient_2_tumor_13	swn_patient_2_tumor_13	swn_patient_2	verbatim	
+schw_ctf_synodos_2025	swn_patient_31_tumor_70	swn_patient_31_tumor_70	swn_patient_31	verbatim	
+schw_ctf_synodos_2025	swn_patient_32_tumor_74	swn_patient_32_tumor_74	swn_patient_32	verbatim	
+schw_ctf_synodos_2025	swn_patient_32_tumor_75	swn_patient_32_tumor_75	swn_patient_32	verbatim	
+schw_ctf_synodos_2025	swn_patient_33_tumor_94	swn_patient_33_tumor_94	swn_patient_33	verbatim	
+schw_ctf_synodos_2025	swn_patient_38_tumor_89	swn_patient_38_tumor_89	swn_patient_38	verbatim	
+schw_ctf_synodos_2025	swn_patient_38_tumor_90	swn_patient_38_tumor_90	swn_patient_38	verbatim	
+schw_ctf_synodos_2025	swn_patient_39_tumor_6	swn_patient_39_tumor_6	swn_patient_39	verbatim	
+schw_ctf_synodos_2025	swn_patient_39_tumor_95	swn_patient_39_tumor_95	swn_patient_39	verbatim	
+schw_ctf_synodos_2025	swn_patient_4_tumor_28	swn_patient_4_tumor_28	swn_patient_4	verbatim	
+schw_ctf_synodos_2025	swn_patient_54_tumor_135	swn_patient_54_tumor_135	swn_patient_54	verbatim	
+schw_ctf_synodos_2025	swn_patient_59_tumor_136	swn_patient_59_tumor_136	swn_patient_59	verbatim	
+schw_ctf_synodos_2025	swn_patient_63_tumor_123	swn_patient_63_tumor_123	swn_patient_63	verbatim	
+schw_ctf_synodos_2025	swn_patient_64_tumor_121	swn_patient_64_tumor_121	swn_patient_64	verbatim	
+schw_ctf_synodos_2025	swn_patient_64_tumor_125	swn_patient_64_tumor_125	swn_patient_64	verbatim	
+schw_ctf_synodos_2025	swn_patient_6_tumor_15	swn_patient_6_tumor_15	swn_patient_6	verbatim	
+schw_ctf_synodos_2025	swn_patient_7_tumor_16	swn_patient_7_tumor_16	swn_patient_7	verbatim	
+schw_ctf_synodos_2025	swn_patient_8_tumor_21	swn_patient_8_tumor_21	swn_patient_8	verbatim	

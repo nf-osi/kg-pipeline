@@ -1,54 +1,114 @@
 # Variant layer (cBioPortal somatic variants) — PoC notes
 
 Working notes for [#95](https://github.com/nf-osi/kg-pipeline/issues/95): add a somatic
-variant observation layer from two public NF cBioPortal studies, joined back to the
+variant observation layer from the public NF cBioPortal studies, joined back to the
 specimens and individuals already in the graph.
 
-**Status.** Built and running end to end on `nst_nfosi_ntap`: 23,181 variant nodes and
-23,741 observations, 90.2% of which reach a portal specimen. Scoped to that one study
-(see Finding 1), with all consequences retained rather than filtered.
+**Status.** Built and running end to end on four studies, with all consequences
+retained rather than filtered:
 
-Two prerequisites were missing and were built first, as **core graph** entity layers
-(permanent) — see [`entity-layers.md`](entity-layers.md):
+| Study | Rows | Observations | Reach a portal specimen | Barcode rule |
+|---|---|---|---|---|
+| `nst_nfosi_ntap` | 23,741 | 23,741 | 90.2% | `strip_last_segment` |
+| `schw_ctf_synodos_2025` | 41,874 | 41,874 | **100%** | `verbatim` |
+| `lgg_ctf_synodos_2025` | 61,890 | 61,890 | **100%** | `verbatim` |
+| `nfib_ctf_biobank_2025` | 680,335 | 493,060 | **100%** (crosswalk) | `verbatim` |
 
-* `nf:Specimen` / `nf:Individual`, because `specimenID`/`individualID` existed only as
-  string literals on `nf:File`, leaving the issue's model nothing to attach to;
-* `biolink:Gene`, so `nf:affectsGene` is a real edge rather than a literal.
+`nfib` drops 187,275 rows to `--min-tumor-alt-count 1` (27.5% of its rows have no
+tumour read supporting the allele); nothing else is filtered.
 
-One issue premise still does not hold: there is **no named-graph mechanism** — every
-`data/rdf/*.ttl` is `cat`-ed into one default graph at index time — so reversibility is
+Depending on the graph infra, there may be **no named-graph mechanism** — every
+`data/rdf/*.ttl` is `cat`-ed into one default graph at index time, reversibility is
 delivered by three independent opt-in gates instead (see "Feature gates" below).
 
-## Source data — what is actually retrievable
+## Linked core entities (specimen, individual, gene)
 
-| Study | cBioPortal `referenceGenome` | Samples | Mutation rows | `data_mutations.txt` |
+| Layer | Class | Key | Count | Built by |
 |---|---|---|---|---|
-| `nst_nfosi_ntap` | hg38 | 80 sequenced (134 total) | 23,741 | 27 MB, retrievable |
-| `nfib_ctf_biobank_2025` | hg38 | 38 | 64,338 | 497 MB, **not** retrievable (see below) |
+| Specimen | `nf:Specimen` + `biolink:MaterialSample` | portal `specimenID` | 8,117 | `scripts/materialize_specimens.py` |
+| Individual | `nf:Individual` + `biolink:IndividualOrganism` | portal `individualID` | 4,506 | same |
+| Gene | `biolink:Gene` | HGNC id, Ensembl as fallback | 39,160 | `scripts/materialize_genes.py` |
+
+```turtle
+nf:specimen/JH-2-111-G645D  a nf:Specimen, biolink:MaterialSample ;
+    nf:specimenID "JH-2-111-G645D" ; nf:hasFile <syn26470374> ;
+    nf:fromIndividual nf:individual/JH-2-111 .
+nf:individual/JH-2-111  a nf:Individual, biolink:IndividualOrganism ;
+    nf:individualID "JH-2-111" ; nf:hasSpecimen nf:specimen/JH-2-111-G645D .
+
+<https://identifiers.org/hgnc:7765>  a biolink:Gene ;
+    rdfs:label "NF1" ; nf:geneSymbol "NF1" ; nf:geneName "neurofibromin 1" ;
+    nf:hgncId "HGNC:7765" ; nf:ensemblGeneId "ENSG00000196712" ;
+    nf:entrezGeneId "4763" ;
+    skos:exactMatch <https://identifiers.org/ensembl:ENSG00000196712> .
+```
+
+### Gene nodes are created as part of this layer and uses HGNC
+
+Gene nodes are named by their HGNC IRI. With HGNC the stable authority, HGNC-keyed
+sources join by IRI; the Ensembl id stays as `nf:ensemblGeneId` and `skos:exactMatch`. 
+Genes with no HGNC id fall back to Ensembl IRI rather than being dropped.
+
+The layer is built from **all** studies' MAFs folded into one index, not one graph per
+study. Over the four MAFs that is **39,160 nodes — 30,252 HGNC-keyed and 8,908 Ensembl-keyed**.
+The fallback share jumped from 0.2% (exome-only) to 23% when the whole-genome studies
+landed, because WGS reaches non-coding loci HGNC has never named. That is the fallback
+doing its job: dropping those would lose a quarter of the gene layer to keep the keying
+tidy.
+
+Symbols (`Hugo_Symbol`) should never be used for key or a join. `Hugo_Symbol` is the 
+*picked transcript's* symbol, so an overlapping antisense or readthrough transcript 
+reports a neighbouring gene's symbol — `HGNC:11033` appears as both `SLC4A7` and `UBA52P4`. 
+Symbols therefore come from HGNC, accepted only when HGNC's own `ensembl_gene_id` agrees with the MAF's. 
+That cross-check has corrected symbols and cut symbols labelling two different genes. 
+Without it `NF1` labelled both NF1 and EVI2A (which sits inside the NF1
+locus), splitting "how many samples are altered in NF1" across two nodes. 
+`--no-hgnc` skips the lookup for offline runs and warns.
+
+**Not folded in:** `data/csv/mutations.csv`'s 22 gene symbols. 
+These are model-organism orthologs (`Nf1`, `Trp53` mouse; `nf1a` zebrafish) or transgenes (`Cre`).
+
+#### Effect on the default build
+
+The gene layer's *generation* is gated with the variant assets (`KG_INCLUDE_VARIANTS`)
+only because the MAF is where the annotation comes from; its output is core either way,
+so if the variant study were dropped `genes.ttl` would stay and simply stop growing.
+Sourcing genes from HGNC directly would decouple the two, at the cost of ~45,000 nodes
+of which only ~11,200 are referenced.
+
+## Source data
+
+| Study | Samples | Mutation rows | Source (all hg38) |
+|---|---|---|---|
+| `nst_nfosi_ntap` | 80 sequenced (134 total) | 23,741 | 27 MB, upstream @ `86690e1e` |
+| `schw_ctf_synodos_2025` | 40 | 41,874 | 47 MB, upstream @ `1cc0ead2` |
+| `lgg_ctf_synodos_2025` | 21 | 61,890 | 36 MB, upstream @ `d84cab37` |
+| `nfib_ctf_biobank_2025` | 38 | 680,335 | 496 MB, upstream @ `3ffe91da` |
 
 Both are `MUTATION_EXTENDED` / `MAF` profiles, i.e. somatic by construction — neither
 carries a per-row `Mutation_Status`.
 
-Three possible sources, in descending order of column coverage:
+Why source pins:
 
-1. **`nf-osi/datahub` fork** (`public/nst_nfosi_ntap/data_mutations.txt`, git LFS).
-   The richest form: 113 columns including `Consequence` (VEP Sequence Ontology terms),
-   `HGVSc`/`HGVSp`/`HGVSp_Short`, `Transcript_ID`, `Gene` (Ensembl), `HGNC_ID`,
-   `dbSNP_RS`, gnomAD AFs, `IMPACT`, `FILTER`. This fork is pinned at 2025-02 while
-   cBioPortal's own import is 2026-01, so it is stale but complete. Fetch without
-   cloning via the LFS batch API:
+1. **`cBioPortal/datahub` at a pinned commit** — In general, use the original contribution commit 
+   or carefully curated commit, because cBioPortal can do unexpected reprocessing of studies *in place*; 
+   for example, they renamed sample ids from `patient10tumor1` to `Patient10_Tumor1` 
+   (creating issues for linkage back to portal files), and with `schw_ctf_synodos_2025` 
+   reprocessed using genome-nexus / `isoform: mskcc`, which removed 57 columns including the required `HGNC_ID`. 
+   Studies at the indicated commits have full 113/114 columns: `Consequence` (VEP SO terms), 
+   `HGVSc`/`HGVSp`/`HGVSp_Short`, `Transcript_ID`, `Gene` (Ensembl), `HGNC_ID`, `dbSNP_RS`, gnomAD AFs, `IMPACT`, `FILTER`. 
 
    ```sh
-   OID=$(gh api repos/nf-osi/datahub/contents/public/nst_nfosi_ntap/data_mutations.txt \
-           --jq '.content' | base64 -d | sed -n 's/.*sha256://p')
-   # POST {"operation":"download","objects":[{"oid":"'$OID'","size":27602051}]} to
-   # https://github.com/nf-osi/datahub.git/info/lfs/objects/batch, then curl the href.
+   # data_mutations.txt at a pinned commit is an LFS pointer; fetch the bytes with:
+   curl -s https://raw.githubusercontent.com/cBioPortal/datahub/<sha>/public/<study>/data_mutations.txt
+   # -> read oid/size, POST to .../datahub.git/info/lfs/objects/batch, curl the href.
    ```
 
-2. **Upstream `cBioPortal/datahub`** has both studies, but its LFS objects return
-   `404 Object does not exist on the server` — so `nfib_ctf_biobank_2025`'s MAF is **not
-   obtainable this way**. Needs another route (Synapse copy, the NF-OSI cBioPortal
-   staging pipeline, or asking cBioPortal).
+2. **Don't use `datahub.assets.cbioportal.org/<study>.tar.gz`.** An unversioned
+   "latest": no commit, no digest, contents change. Not hypothetical — the
+   tarball and git copies of `schw_ctf_synodos_2025` already differ on 98 `Hugo_Symbol`
+   values (`DDX58`/`RIGI`, `KIAA0100`/`BLTP2`, …), and the `nst_nfosi_ntap` tarball is a
+   gnomAD-filtered re-release: 955 rows over 19 samples against the original 23,741 over 80.
 
 3. **cBioPortal REST API** — `POST /api/molecular-profiles/{profile}/mutations/fetch?projection=DETAILED`
    with `{"sampleListId": "{study}_all"}`. Always current and needs no LFS, but returns
@@ -58,10 +118,17 @@ Three possible sources, in descending order of column coverage:
    fallback and as a cross-check on the MAF, but it costs the SO-term mapping the issue
    proposes.
 
-### Finding 1 — the specimen join is study-specific and incomplete
+`fetch_cbioportal_maf.py` checks every fetched MAF for the columns the pipeline needs
+(`Gene`, `HGNC_ID`, `Hugo_Symbol`, `Tumor_Sample_Barcode`) and a per-study row floor, so
+a source that has been rewritten into a poorer form fails the run instead of losing data value.
+Cache reuse also requires matching the size and SHA-256 digest from the pinned LFS
+pointer, which is fetched on every run. Downloads are checked against that digest
+before replacing a cached file.
 
-This is the load-bearing assumption of the whole PoC ("joined back to the specimens and
-individuals already present"), and neither study's barcodes join directly.
+### Note 1 — specimen join is study-specific
+
+Three of the four studies join verbatim at 100%; only
+`nst_nfosi_ntap` needs a derivation rule, and only it has residual gaps.
 
 **`nst_nfosi_ntap`** — `Tumor_Sample_Barcode` looks like `JH-2-001-8A1B1-A`.
 
@@ -80,73 +147,65 @@ three barcodes end in something other than `-A` (`…-GAF53-A1011`, `…-GAF53-F
 specimens sit mostly under `syn4939902` (71), with a few in `syn21984813` (4) and
 `syn11638893` (1).
 
-**`nfib_ctf_biobank_2025`** — sample ids are `Patient10_Tumor1`, patient ids
-`Patient_10`.
+**The three CTF/Synodos studies** — their barcodes **are** the portal `specimenID`,
+verbatim, at full coverage:
 
-| Join attempt | Coverage |
-|---|---|
-| `sampleId` → `specimenID` | **0 / 38** |
-| `patientId` → `individualID` | **8 / 10** patients (`Patient_3`, `Patient_11` absent) |
+| Study | Barcode looks like | → specimenID | → individualID | Files | Project |
+|---|---|---|---|---|---|
+| `schw_ctf_synodos_2025` | `swn_patient_10_tumor_108` | **40 / 40** | 40 / 40 (22 individuals) | 474 | `syn9727752` |
+| `nfib_ctf_biobank_2025` | `patient10tumor1` | **38 / 38** | 38 / 38 (10 individuals) | 487 | `syn4984604` |
+| `lgg_ctf_synodos_2025` | `SYN_NF_004` | **21 / 21** | 21 / 21 (21 individuals) | 110 | `syn5698493` |
 
-The KG's specimens for those same individuals are named `HM4959`, `HM5085`, `HM5230`, …
-— cBioPortal's sample ids were renamed during submission, and **there is no
-deterministic mapping** from `Patient10_Tumor1` back to `HM5230`. Consequences:
+When no normalization rule, `BARCODE_RULES` tries `verbatim` before
+`strip_last_segment` and each study falls to the rule that fits it. All three reach the
+files the issue's drill-down needs, across WGS, WES, methylation array, RNA-seq, SNP
+array and MudPIT.
 
-- specimen-level questions ("which specimens carry this variant?") are answerable for
-  `nst_nfosi_ntap` only;
-- `nfib_ctf_biobank_2025` can only be attached at the individual level, which also
-  breaks the "and which datasets/files correspond to those specimens" drill-down;
-- either obtain a sample→specimen crosswalk for the cNF study, or scope the PoC to
-  `nst_nfosi_ntap` and say so.
+The barcode→specimen rule belongs in a checked-in lookup (like the existing SSSOM
+lookups) and unmatched counts belong in `validate_fks.py` as an asserted number. One crosswalk file holds
+every study; a run rebuilds only the specified study and carries the others across, so
+adding a study cannot delete another's rows (including hand-authored ones).
+Concurrent rebuilds hold a shared file lock across the read, merge and write, and
+replace the TSV atomically so readers always see a complete version.
 
-Whichever is chosen, the barcode→specimen rule belongs in a checked-in lookup (like the
-existing SSSOM lookups) rather than a regex in a script, and the unmatched counts belong
-in `validate_fks.py` as an asserted number — not a silent drop.
+### Note 2 — per-row data quality
 
-### Finding 2 — per-row data quality
-
-- **Mixed assemblies inside one study.** `nfib_ctf_biobank_2025` has **29 `GRCh37` rows**
-  among 64,309 `GRCh38` ones (samples `Patient1_Tumor9`, `Patient3_Tumor2`,
-  `Patient8_Tumor5`), even though the study declares hg38. Hashing those against GRCh38
-  refget accessions would mint wrong VRS ids silently. The tool refuses to.
-- **28% of `nfib_ctf_biobank_2025` rows have `t_alt_count = 0`** (17,848 / 64,338) — no
-  read in the tumor supports the allele. Ingesting them asserts a specimen carries a
-  variant it has no support for. Use `--min-tumor-alt-count 1` for that study.
+- **Assemblies.** Currently every one of the four pinned MAFs is 100% `GRCh38`.
+- **27.5% of `nfib_ctf_biobank_2025` rows have `t_alt_count = 0`** (187,275 / 680,335) —
+  no read in the tumor supports the allele. Ingesting them asserts a specimen carries a
+  variant it has no support for, so that study runs with `--min-tumor-alt-count 1`
+  (`MIN_TUMOR_ALT_COUNT` in `assets.py`), dropping them to 493,060 observations. The
+  other three studies have at most 8 such rows and need no filter.
 - `nst_nfosi_ntap`'s MAF has `t_depth`/`t_ref_count`/`t_alt_count` columns that are
-  **entirely empty**, so no VAF is derivable for study 1 from the MAF (the API's
+  **entirely empty**, so no VAF is derivable for that study from the MAF (the API's
   `tumorAltCount`/`tumorRefCount` are populated — another reason to cross-check).
-- `nst_nfosi_ntap` is unfiltered by consequence (5,659 `Intron`, 3,897 `Silent` rows);
-  `nfib_ctf_biobank_2025` is coding-only. Decide whether the layer holds everything or
-  only impactful consequences: 23,741 rows / 23,181 distinct alleles unfiltered vs
+  `schw_ctf_synodos_2025`, `lgg_ctf_synodos_2025` and `nfib_ctf_biobank_2025` populate
+  all three on every row, so VAF is real there.
+- **`schw_ctf_synodos_2025` is the cleanest of the three**: 100% `GRCh38`, 
+  **0** rows with `t_alt_count = 0`, `Consequence` and `IMPACT` on every row.
+  Its `Mutation_Status` is blank throughout, so it relies on `vrsify --mutation-status
+  Somatic` (the default, and correct for a `MUTATION_EXTENDED` profile). 83 rows carry
+  neither an Ensembl nor an HGNC gene id and 128 carry Ensembl only; the latter fall back to
+  Ensembl-keyed gene nodes and are reported as `gene via Ensembl only`.
+- **Whole-genome studies reach where genes are not.** 32% of `lgg_ctf_synodos_2025`
+  observations (19,946 / 61,890) resolve to no gene at all, compared to 25 / 23,741 for the
+  exome-based `nst_nfosi_ntap`.
+- `nst_nfosi_ntap` is unfiltered by consequence (5,659 `Intron`, 3,897 `Silent` rows), while 
+  an earlier reprocessed `nfib_ctf_biobank_2025` was coding-only. 
+  Decide whether the layer holds everything or only impactful consequences: 
+  23,741 rows / 23,181 distinct alleles unfiltered vs
   12,614 rows / 12,362 alleles coding-only — **1.9×**, not the order of magnitude a
   glance at the `Intron` count suggests.
 
 ## Ingest tooling — `vrsify maf`
 
-The VRS identity engine in `vrsify` (`digest`/`vrs`/`normalize`/`refget`) is
-format-agnostic; only the front end is format-specific. So the tool was **extended**
-with a `maf` subcommand (M7) rather than replaced — see `docs/vrsify-handoff.md` in that
-repo for the full brief.
+`vrsify` is a separate tool, published at
+[nf-osi/vrsify](https://github.com/nf-osi/vrsify). Install it from the `develop` branch
+rather than from a working copy, so every run of this pipeline uses the same build:
 
-`vrsify` lives at `~/sage/nf/vrsify`, outside this repo. It was called `vcf2vrs` until
-the MAF front end landed; the name changed because the input is no longer just VCF.
-
-The contract that matters here: **the same variant gets the same `ga4gh:VA.` id through
-either front end.** Integration tests gate it — a MAF SNP row for rs7412 reproduces the
-GA4GH `vrs@2.0` golden id `ga4gh:VA.0AePZIWZUNsUlQTamyLrjm2HWUw2opLt`, and a deletion and
-an insertion expressed in MAF's trimmed `-` form and in VCF's anchored form collapse to
-one id. Without that, a variant from cBioPortal would not join to one from a VCF, to
-ClinVar, or to gnomAD, and the issue's "future joins are lookups" claim is empty.
-
-MAF is in fact a *better* input than VCF here: it already stores indels trimmed with `-`
-placeholders, so projecting into VRS's interbase coordinates needs no anchor-base
-reference lookup — the step a MAF→VCF conversion needs a FASTA for:
-
-| MAF row | VRS interbase | state |
-|---|---|---|
-| SNP `Start=100 End=102 ACG→TTT` | `[99, 102)` | `"TTT"` |
-| DEL `Start=100 End=102 ACG→-` | `[99, 102)` | `""` |
-| INS `Start=100 End=101 -→TT` | `[100, 100)` | `"TT"` |
+```sh
+cargo install --git https://github.com/nf-osi/vrsify --branch develop
+```
 
 Run:
 
@@ -157,16 +216,17 @@ vrsify seqmap --fasta GRCh38.fa --assembly GRCh38 --out seqmap.tsv
 vrsify maf \
   --maf data_mutations.txt \
   --seqmap seqmap.tsv \
-  --reference GRCh38.fa \          # required: see below
+  --reference GRCh38.fa \               # required: see below
   --out-alleles alleles.ndjson \
   --out-observations obs.ndjson \
   --study-id nst_nfosi_ntap \
+  --variant-id-prefix "nf:variant/" \   # required: see below
   --source "cbioportal:nst_nfosi_ntap/data_mutations.txt"
 ```
 
 Behaviour the pipeline depends on:
 
-- **`--reference` is not optional for us.** Substitutions are byte-exact without it, but
+- **`--reference` is not optional.** Substitutions are byte-exact without it, but
   indels only converge with vrs-python/ClinVar/the VCF path after fully-justified
   normalization. Without it, indel alleles come out tagged `"fullyJustified": false` and
   the count is printed as a warning. `nst_nfosi_ntap` has 941 indels (786 DEL, 155 INS),
@@ -178,6 +238,13 @@ Behaviour the pipeline depends on:
   alleles stream as `{"type": "UnnormalizedVariant", "unnormalized": true, "id":
   "nf:variant/{assembly}:{chrom}:{pos}:{ref}:{alt}", "reason": …}`, deduplicated on that
   key and counted — the fallback the issue asks for. `--strict` makes them fatal.
+- **`--variant-id-prefix` is ours to supply.** A `ga4gh:VA.` id is a digest and means the
+  same thing everywhere; the id of a row that *cannot* be normalized is only a key over
+  the source coordinates, meaningful only inside the namespace that minted it. `vrsify`
+  refuses to guess one, so it has no default and the run fails up front without either
+  `--variant-id-prefix` or `--strict`. We pass `nf:variant/` — the prefix is
+  concatenated verbatim, so the trailing separator is part of the value, and it is the
+  namespace `variants_to_rdf.py` strips back off when it mints the IRI.
 - Observations carry no zygosity (MAF has no `GT`). They carry the tumor/normal barcode
   pair, allele depths + derived VAF, `studyId`, and `Consequence` as a **list** of SO
   terms, so each term can go through SSSOM independently.
@@ -204,7 +271,7 @@ GA4GH's canonical accession for GRCh38 chr19.
            |                                         |
            |                    mappings/cbioportal_sample_specimen.tsv
            |                                         |
-     vrsify maf  --reference GRCh38.fa               |
+  vrsify maf --reference GRCh38.fa                  |
            |                                         |
    data/variants/<study>_{alleles,observations}.ndjson
            |                                         |
@@ -217,38 +284,69 @@ GA4GH's canonical accession for GRCh38 chr19.
 Every step is a Dagster asset (`orchestration/dagster_pipeline/assets.py`). To run it:
 
 ```sh
-# One-time: a reference FASTA and its refget accessions. Load-bearing for indels.
+# One-time: install the ingest tool, then build a reference FASTA's refget accessions.
+# The seqmap is load-bearing for indels.
+cargo install --git https://github.com/nf-osi/vrsify --branch develop
 vrsify seqmap --fasta hg38.fa --assembly GRCh38 --out seqmap.tsv
-export VRSIFY_BIN=~/sage/nf/vrsify/target/release/vrsify
 export VRSIFY_REFERENCE=/path/to/hg38.fa VRSIFY_SEQMAP=/path/to/seqmap.tsv
+# VRSIFY_BIN only if `vrsify` is not on PATH (default: `vrsify`).
 
 export KG_INCLUDE_VARIANTS=1        # gate 1: generate the layer at all
 dagster asset materialize --select 'variants/*' -m orchestration.dagster_pipeline
 ```
 
-Or step by step, which is what the assets shell out to:
+The studies built are `VARIANT_STUDY_IDS` in `assets.py`; the gene layer is one asset
+over **all** of their MAFs, not one per study.
+
+Or step by step, which is what the assets shell out to (substitute any study id):
 
 ```sh
 python scripts/fetch_cbioportal_maf.py --study nst_nfosi_ntap
 python scripts/materialize_specimens.py
 python scripts/map_cbioportal_samples.py \
     --maf data/raw/nst_nfosi_ntap_data_mutations.txt --study-id nst_nfosi_ntap
-$VRSIFY_BIN maf --maf data/raw/nst_nfosi_ntap_data_mutations.txt \
+vrsify maf --maf data/raw/nst_nfosi_ntap_data_mutations.txt \
     --seqmap "$VRSIFY_SEQMAP" --reference "$VRSIFY_REFERENCE" \
     --out-alleles data/variants/nst_nfosi_ntap_alleles.ndjson \
     --out-observations data/variants/nst_nfosi_ntap_observations.ndjson \
-    --study-id nst_nfosi_ntap
+    --study-id nst_nfosi_ntap --variant-id-prefix "nf:variant/"
 python scripts/variants_to_rdf.py \
     --alleles data/variants/nst_nfosi_ntap_alleles.ndjson \
     --observations data/variants/nst_nfosi_ntap_observations.ndjson \
     --study-id nst_nfosi_ntap
 ```
 
-Measured on the real study, ~36 s total excluding the reference download: MAF fetch 4 s,
-specimens 5 s, `vrsify maf` over 23,741 rows against the full 3.1 GB hg38 7 s, RDF
+Measured on `nst_nfosi_ntap`, ~36 s total excluding the reference download: MAF fetch
+4 s, specimens 5 s, `vrsify maf` over 23,741 rows against the full 3.1 GB hg38 7 s, RDF
 projection 23 s.
 
-## The model as built
+**`nfib_ctf_biobank_2025` is a different size of problem, and it set the memory
+budget.** `vrsify` handles its 680,335 rows in about 4 s, but `variants_to_rdf.py`
+originally built one rdflib `Graph` and serialized at the end — 493,060 observations →
+17,587,310 triples took **~19 GB resident**, which is not a CI-sized job.
+
+It now streams: triples go into a 50k-triple buffer that is serialized and appended,
+so memory is a function of the batch, not the study. rdflib still does the serializing,
+one batch at a time, so escaping and prefixed names are unchanged rather than
+reimplemented by hand.
+
+| | in-memory `Graph` | batched sink |
+|---|---|---|
+| `nst_nfosi_ntap` (856k triples) | 988 MB, 21.6 s, 46,330,768 B | **142 MB**, 20.6 s, 46,338,394 B |
+| `nfib_ctf_biobank_2025` (17.6M triples) | ~19 GB, ~490 s | **150 MB**, 424 s, 945 MB |
+
+Peak memory is now flat across a 20× difference in study size. Output is still prefixed,
+subject-grouped Turtle — the file grew 0.02% on `nst_nfosi_ntap`, and its triple set is
+identical to what the in-memory path produced (asserted in
+`test_streaming_output_matches_an_in_memory_graph`). Plain N-Triples would have been
+simpler but ~4× larger.
+
+The catch batching introduces is the prefix table: a batch's `@prefix` header is written
+only the first time each prefix appears, and a namespace rdflib invents in a later batch
+is declared when it appears, which Turtle permits mid-document. Stripping headers
+blindly would emit a file referencing an undeclared prefix; two tests cover it.
+
+## The model
 
 Abridged from the real output for the NF1 nonsense variant `p.R1276*`:
 
@@ -266,13 +364,15 @@ nf:specimen/JH-2-111-G645D
 
 nf:variantObservation/nst_nfosi_ntap/JH-2-111-G645D-A/VA.rDRjZ2kX3o3hvEAykAwbNXMw4dkisxiw
     a nf:VariantObservation ;
-    nf:observesVariant nf:variant/VA.rDRjZ2kX3o3hvEAykAwbNXMw4dkisxiw ;
+    nf:observesVariant ga4gh:VA.rDRjZ2kX3o3hvEAykAwbNXMw4dkisxiw ;
     nf:fromSpecimen   nf:specimen/JH-2-111-G645D ;
     nf:fromIndividual nf:individual/JH-2-111 ;
     nf:fromVariantDataset nf:variantDataset/nst_nfosi_ntap ;
     nf:hasConsequence obo:SO_0001587 ;              # stop_gained, via SSSOM
     nf:variantClassification "Nonsense_Mutation" ; nf:variantImpact "HIGH" ;
-    nf:affectedGeneSymbol "NF1" ; nf:hgncId "HGNC:7765" ;
+    nf:affectedGeneSymbol "NF1" ;
+    nf:affectedGene <https://identifiers.org/hgnc:7765> ,          # the gene node
+                    <https://identifiers.org/ensembl:ENSG00000196712> ;
     nf:ensemblGeneId "ENSG00000196712" ; nf:entrezGeneId "4763" ;
     nf:transcriptId "ENST00000356175" ; nf:exonNumber "28/57" ;
     nf:aminoacidChange "p.R1276*" ; nf:hgvsP "p.Arg1276Ter" ;
@@ -282,7 +382,7 @@ nf:variantObservation/nst_nfosi_ntap/JH-2-111-G645D-A/VA.rDRjZ2kX3o3hvEAykAwbNXM
     nf:normalDepth 127 ; nf:normalRefCount 125 ; nf:normalAltCount 0 ;
     nf:assemblyId "GRCh38" ; nf:sourceContig "17" ; nf:sourcePos 31235728 .
 
-nf:variant/VA.rDRjZ2kX3o3hvEAykAwbNXMw4dkisxiw
+ga4gh:VA.rDRjZ2kX3o3hvEAykAwbNXMw4dkisxiw
     a biolink:SequenceVariant ;
     nf:vrsId "ga4gh:VA.rDRjZ2kX3o3hvEAykAwbNXMw4dkisxiw" ;
     nf:refgetAccession "SQ.upqChCoU-Gtd_61IidCsln-r8cxUTFeP" ;   # GRCh38 chr17
@@ -291,23 +391,8 @@ nf:variant/VA.rDRjZ2kX3o3hvEAykAwbNXMw4dkisxiw
 
 No `nf:tumorAltCount` or `nf:variantAlleleFrequency` above, and that is the source, not
 a bug: `nst_nfosi_ntap`'s MAF ships `t_depth`/`t_ref_count`/`t_alt_count` columns that
-are entirely empty (Finding 2), so only the *normal* depths survive. The REST API does
+are entirely empty, so only the *normal* depths survive. The REST API does
 populate the tumour counts, which is one reason to cross-check against it.
-
-Three decisions:
-
-* **`biolink:SequenceVariant`, not `nf:Variant`.** `nf:Variant` already means "a variant
-  mentioned in publication text" (PubTator3) and has no coordinates. Using the Biolink
-  class directly follows `docs/biolink-alignment.md`'s "replaced classes" convention.
-* **The variant node carries nothing sample-specific** — no barcode, gene, consequence
-  or depth. That is what lets one allele shared by several samples stay one node, and it
-  is asserted in `test/test_variants_to_rdf.py`. A resolvable `ga4gh:` IRI namespace does
-  not exist, so the node lives under `nf:variant/` and keeps the canonical CURIE in
-  `nf:vrsId` rather than minting an IRI that 404s.
-* **`nf:affectsGene` is on the observation, not the variant.** The gene association
-  comes from the transcript the caller picked, so it is annotation, not identity: the
-  same allele annotated against another transcript could name another gene. 23,716 of
-  23,741 observations reach a gene node; the 25 that do not had no Ensembl gene id.
 
 ## Feature gates
 
@@ -330,7 +415,7 @@ no edges between portal entities.
 `test/test_variants_to_rdf.py` covers the invariants that make the layer worth having
 (the two-layer split, multi-term consequences, the keep-don't-drop paths);
 `test/test_materialize_specimens.py` and `test/test_materialize_genes.py` cover the
-entity layers' source-data traps ([`entity-layers.md`](entity-layers.md)).
+entity layers' source-data traps (see "Core entity layers" above).
 
 Beyond unit tests, the four use cases from the issue are canned queries in
 `scripts/query_sparql.py`, so they are exercised rather than asserted:
@@ -361,25 +446,12 @@ the ranking is essentially gene length.
 
 `validate_fks.py` gained a check that every specimen named in the crosswalk exists,
 aimed at hand-authored rows; and the variant RDF asset fails the build if specimen
-coverage drops below 85% (currently 90.2%).
+coverage drops below 85% (currently 90.2% for `nst_nfosi_ntap`, 100% for
+`schw_ctf_synodos_2025`).
 
 ## Still open
 
-1. **Pathway layer.** Gene nodes now exist, but nothing links them to Reactome, so the
-   issue's "which pathways are recurrently hit" use case is still unanswerable. This is
-   now one hop away rather than two: a Reactome layer attaching to
-   `https://identifiers.org/ensembl:*` would complete it.
-2. **`nfib_ctf_biobank_2025`.** Needs a `Patient10_Tumor1` → `HM5230` crosswalk before
-   it can join at specimen level. The crosswalk file is already the right shape to
-   receive it: add rows with `method=manual` and they are preserved on regeneration.
-3. **The 9 unresolved barcodes** (2,320 observations, 9.8%). They are in the graph but
-   unattached. `JH-2-054`, `JH-2-060`, `JH-2-068`, `JH-2-079`, `JH-2-102` look like
-   specimens the portal simply does not have; worth a curation check rather than a code
-   fix.
-4. **Class-name drift in `vrsify`.** Its VCF front end still emits
-   `"type": "VariantCall"` while the MAF front end emits `"VariantObservation"`. Only
-   the MAF path is used here, but the two should be unified before anything consumes the
-   VCF path.
-5. **Stale source.** The `nf-osi/datahub` fork is pinned at 2025-02 while cBioPortal's
-   own import is 2026-01. Worth diffing against the REST API before the PoC is shown to
-   users.
+- **The 9 unresolved barcodes** in `nst_nfosi_ntap` (2,320 observations, 9.8%). They
+   are in the graph but unattached. `JH-2-054`, `JH-2-060`, `JH-2-068`, `JH-2-079`,
+   `JH-2-102` look like specimens the portal simply does not have; worth a curation
+   check rather than a code fix. The other three studies have no equivalent gap.

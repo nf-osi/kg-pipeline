@@ -1,15 +1,31 @@
 """Materialize biolink:Gene nodes from a cBioPortal MAF's gene annotation columns.
 
 Core graph, not part of the reversible variant layer -- gene nodes stay whether or not
-the variant layer is published. See `docs/entity-layers.md`.
+the variant layer is published. See "Core entity layers" in `docs/variant-layer.md`.
 
 `biolink:Gene` is used directly, NOT `nf:Gene`: that class already means "a gene entity
 annotated in publication text" (PubTator3) and carries no identifiers.
 
-## Ensembl is the key, because the symbol is not
+## HGNC is the key, with Ensembl as the fallback
 
-MAF gene columns disagree with each other, and only one pairing is clean. Measured on
-`nst_nfosi_ntap` (23,741 rows):
+Gene nodes are named by their HGNC IRI (`https://identifiers.org/hgnc:7765`). HGNC is
+the stable authority for human gene identity, so an HGNC-keyed source -- ClinVar, the
+variant layer's observations, anything downstream -- joins to a gene node by IRI rather
+than through a lookup. A gene with no HGNC id falls back to its Ensembl IRI so it still
+gets a node; 22 of 11,233 do, mostly unnamed `ENST…`-symbol entries.
+
+The Ensembl id is kept on `nf:ensemblGeneId` and as `skos:exactMatch`, so nothing that
+resolved a gene by ENSG before has to change how it finds one.
+
+**What this costs, measured rather than assumed.** ENSG->HGNC is clean (0 of 11,211
+ambiguous), but HGNC->ENSG has exactly one collision: `HGNC:23222` is both
+`ENSG00000182957` and `ENSG00000228741`. Both are `SPATA13` -- one gene duplicated in
+Ensembl -- so keying on HGNC merges them into one node, which is a correction, not a
+loss. Symbol-level ambiguity (`HGNC:11033` appearing as both `SLC4A7` and `UBA52P4`) is
+a separate problem, handled by the HGNC-authority step below, and is unaffected by which
+identifier names the node.
+
+MAF gene columns disagree with each other. Measured on `nst_nfosi_ntap` (23,741 rows):
 
 | Mapping | Ambiguous keys |
 |---|---|
@@ -21,10 +37,9 @@ MAF gene columns disagree with each other, and only one pairing is clean. Measur
 
 `Hugo_Symbol` is the *picked transcript's* symbol, not the gene's: an antisense or
 readthrough transcript (`ACBD3-AS1`, `FBXO38-DT`) carries the overlapping gene's ENSG
-and HGNC id. So keying on HGNC would merge genuinely unrelated genes -- `HGNC:11033`
+and HGNC id. That is why the symbol is never the key and never the join -- `HGNC:11033`
 appears as both `SLC4A7` and `UBA52P4`, `HGNC:15464` as both `SPINK5` and `FBXO38-DT`.
-Keying on ENSG avoids that, and makes `nf:hgncId` safe to assert because that direction
-has no conflicts.
+Both identifier columns are safe to assert; the symbol is not.
 
 ## HGNC is the symbol authority, not the MAF
 
@@ -59,6 +74,7 @@ import argparse
 import csv
 import sys
 from collections import Counter, defaultdict
+from collections.abc import Sequence
 from pathlib import Path
 
 import urllib.request
@@ -85,13 +101,29 @@ DEFAULT_HGNC_PATH = Path("data/raw/hgnc_complete_set.txt")
 csv.field_size_limit(min(sys.maxsize, 2**31 - 1))
 
 
-def gene_iri(ensembl_gene_id: str) -> URIRef:
+def ensembl_iri(ensembl_gene_id: str) -> URIRef:
+    """`ENSG00000196712` -> the identifiers.org IRI.
+
+    This is the gene's Ensembl identity, not necessarily its node: see
+    `gene_node_iri`. Kept as an equivalence so ENSG-keyed data still joins.
+    """
     return URIRef(ENSEMBL_IRI.format(ensembl_gene_id))
 
 
 def hgnc_iri(hgnc_id: str) -> URIRef:
     """`HGNC:7765` -> the identifiers.org IRI. The numeric part is the identifier."""
     return URIRef(HGNC_IRI.format(hgnc_id.split(":", 1)[-1]))
+
+
+def gene_node_iri(ensembl_gene_id: str, hgnc_id: str | None = None) -> URIRef:
+    """The IRI a gene node is named by: its HGNC IRI, or Ensembl when it has no HGNC id.
+
+    One function so the gene layer and anything linking into it cannot disagree about
+    which of a gene's two identifiers is the node. The fallback is not a corner case to
+    tidy away later -- 22 of 11,233 genes have no HGNC id, and dropping them to keep the
+    keying uniform would lose real nodes for a cosmetic gain.
+    """
+    return hgnc_iri(hgnc_id) if hgnc_id else ensembl_iri(ensembl_gene_id)
 
 
 def fetch_hgnc(destination: Path = DEFAULT_HGNC_PATH) -> Path:
@@ -228,8 +260,9 @@ class GeneIndex:
                 self.resolution["unverified_maf_symbol"] += 1
 
 
-def index_maf(maf: Path) -> GeneIndex:
-    index = GeneIndex()
+def index_maf(maf: Path, index: GeneIndex | None = None) -> GeneIndex:
+    """Fold one MAF's gene columns into ``index`` (a new one if not supplied)."""
+    index = GeneIndex() if index is None else index
     with open(maf, newline="") as handle:
         rows = (line for line in handle if not line.startswith("#"))
         reader = csv.DictReader(rows, delimiter="\t")
@@ -257,7 +290,8 @@ def build_graph(
     hgnc = hgnc or {}
 
     for ensembl in sorted(index.genes):
-        node = gene_iri(ensembl)
+        hgnc_ids = sorted(index.hgnc[ensembl])
+        node = gene_node_iri(ensembl, hgnc_ids[0] if hgnc_ids else None)
         graph.add((node, RDF.type, BIOLINK.Gene))
         graph.add((node, NF.ensemblGeneId, Literal(ensembl, datatype=XSD.string)))
 
@@ -268,10 +302,14 @@ def build_graph(
         if name:
             graph.add((node, NF.geneName, Literal(name, datatype=XSD.string)))
 
-        for hgnc_id in sorted(index.hgnc[ensembl]):
+        for hgnc_id in hgnc_ids:
             graph.add((node, NF.hgncId, Literal(hgnc_id, datatype=XSD.string)))
-            # An equivalence, not a label: lets HGNC-keyed data join without a lookup.
-            graph.add((node, SKOS.exactMatch, hgnc_iri(hgnc_id)))
+        # Equivalences, not labels: every identifier IRI for this gene EXCEPT the one
+        # that is already the node, so ENSG-keyed data joins without a lookup and the
+        # node never skos:exactMatch-es itself.
+        for equivalent in (ensembl_iri(ensembl), *(hgnc_iri(h) for h in hgnc_ids)):
+            if equivalent != node:
+                graph.add((node, SKOS.exactMatch, equivalent))
         for entrez in sorted(index.entrez_for(ensembl)):
             graph.add((node, NF.entrezGeneId, Literal(entrez, datatype=XSD.string)))
 
@@ -279,14 +317,21 @@ def build_graph(
 
 
 def materialize_genes(
-    maf: Path, output_ttl: Path, hgnc_path: Path | None = None
+    maf: Path | Sequence[Path], output_ttl: Path, hgnc_path: Path | None = None
 ) -> GeneIndex:
-    """Build gene nodes from ``maf``, using ``hgnc_path`` as the symbol authority.
+    """Build gene nodes from one or more MAFs, with ``hgnc_path`` as symbol authority.
+
+    Several MAFs fold into ONE index rather than one graph per study, because a gene is
+    a gene: two studies hitting the same locus must reach the same node, and symbol
+    dominance is better judged over all the evidence than per study.
 
     ``hgnc_path=None`` falls back to the dominant MAF symbol, which leaves ~53 symbols
     labelling the wrong gene -- runnable offline, but not what should be published.
     """
-    index = index_maf(maf)
+    mafs = [maf] if isinstance(maf, (str, Path)) else list(maf)
+    index = GeneIndex()
+    for one in mafs:
+        index_maf(Path(one), index)
     hgnc = load_hgnc(hgnc_path) if hgnc_path else {}
     index.tally_resolution(hgnc, lookup_supplied=hgnc_path is not None)
     graph = build_graph(index, hgnc)
@@ -326,7 +371,8 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
     )
-    parser.add_argument("--maf", type=Path, required=True, help="cBioPortal MAF")
+    parser.add_argument("--maf", type=Path, required=True, nargs="+",
+                        help="cBioPortal MAF(s); several fold into one gene layer")
     parser.add_argument(
         "--output",
         type=Path,

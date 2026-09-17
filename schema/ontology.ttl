@@ -429,11 +429,11 @@ biolink:ChemicalEntity a owl:Class ;
 
 biolink:Gene a owl:Class ;
     rdfs:label "Gene" ;
-    skos:scopeNote "A gene in the gene entity layer, keyed on its Ensembl gene id. Distinct from nf:Gene, which means a gene mentioned in publication text and carries no identifiers." .
+    skos:scopeNote "A gene in the gene entity layer, named by its HGNC IRI (https://identifiers.org/hgnc:7765); a gene with no HGNC id falls back to its Ensembl IRI, which 22 of 11,233 do. Either way the other identifier is carried as skos:exactMatch, so a source keyed on either authority joins without a lookup. Distinct from nf:Gene, which means a gene mentioned in publication text and carries no identifiers." .
 
 biolink:SequenceVariant a owl:Class ;
     rdfs:label "Sequence Variant" ;
-    skos:scopeNote "A called somatic allele in the variant layer, shared by every sample carrying it. Per-sample evidence is on nf:VariantObservation, which points here via nf:observesVariant, so counting this class counts distinct alleles, not observations. Distinct from nf:Variant, which means a variant mentioned in publication text and carries no coordinates." .
+    skos:scopeNote "A called somatic allele in the variant layer, shared by every sample carrying it. Named by its GA4GH VRS computed identifier as an IRI (ga4gh:VA.<digest>), so the same allele from any source is the same node; alleles that could not be normalized have no VRS identity and are named under nf:variant/ with nf:unnormalizedVariant true. Per-sample evidence is on nf:VariantObservation, which points here via nf:observesVariant, so counting this class counts distinct alleles, not observations. Distinct from nf:Variant, which means a variant mentioned in publication text and carries no coordinates." .
 
 biolink:MaterialSample a owl:Class ;
     rdfs:label "Material Sample" ;
@@ -1953,7 +1953,7 @@ nf:hasSpecimen a owl:ObjectProperty ;
 # Gene nodes are typed biolink:Gene directly, NOT nf:Gene: that class means "a gene
 # entity annotated in publication text" (PubTator3) and carries no identifiers, so
 # overloading it would conflate a literature mention with an annotated locus.
-# Keyed on the Ensembl gene id; see docs/entity-layers.md.
+# Keyed on the HGNC id, Ensembl as fallback; see docs/variant-layer.md.
 ################################################################################
 
 nf:geneSymbol a owl:DatatypeProperty ;
@@ -1970,13 +1970,13 @@ nf:geneName a owl:DatatypeProperty ;
 
 nf:hgncId a owl:DatatypeProperty ;
     rdfs:label "hgncId" ;
-    rdfs:comment "HGNC identifier of a gene, as a CURIE (e.g. HGNC:7765). Gene nodes also carry skos:exactMatch to the resolvable identifiers.org IRI, so HGNC-keyed data can join without a lookup table." ;
-    rdfs:domain [ a owl:Class ; owl:unionOf (biolink:Gene nf:VariantObservation) ] ;
+    rdfs:comment "HGNC identifier of a gene, as a CURIE (e.g. HGNC:7765). Gene nodes also carry skos:exactMatch to the resolvable identifiers.org IRI, so HGNC-keyed data can join without a lookup table. Variant observations do not use this: they carry the same identifier as an IRI on nf:affectedGene instead." ;
+    rdfs:domain biolink:Gene ;
     rdfs:range xsd:string .
 
 nf:ensemblGeneId a owl:DatatypeProperty ;
     rdfs:label "ensemblGeneId" ;
-    rdfs:comment "Ensembl gene identifier (e.g. ENSG00000196712). This is the key gene nodes are minted on, because it is the only source column that maps unambiguously to the others." ;
+    rdfs:comment "Ensembl gene identifier (e.g. ENSG00000196712), as a literal. Gene nodes are named by HGNC and carry the Ensembl IRI as skos:exactMatch; a gene with no HGNC id is named by this identifier instead. ENSG->HGNC is the unambiguous direction (0 of 11,211 ambiguous), which is what makes both safe to assert." ;
     rdfs:domain [ a owl:Class ; owl:unionOf (biolink:Gene nf:VariantObservation) ] ;
     rdfs:range xsd:string .
 
@@ -2029,7 +2029,7 @@ nf:fromVariantDataset a owl:ObjectProperty ;
 
 nf:vrsId a owl:DatatypeProperty ;
     rdfs:label "vrsId" ;
-    rdfs:comment "GA4GH VRS 2.0 computed identifier (`ga4gh:VA.<digest>`) of a sequence variant. This is the cross-cohort join key: the same allele from any source collapses to the same value, and it is what makes future lookups against ClinVar, CIViC, or gnomAD possible. Absent on variants flagged nf:unnormalizedVariant." ;
+    rdfs:comment "GA4GH VRS 2.0 computed identifier (`ga4gh:VA.<digest>`) of a sequence variant, as a literal. This is the cross-cohort join key: the same allele from any source collapses to the same value, and it is what makes future lookups against ClinVar, CIViC, or gnomAD possible. It is also the variant node's own IRI, so joining by IRI needs no property path; this literal is for selecting the identifier as a value. Absent on variants flagged nf:unnormalizedVariant, which have no VRS identity and are named under nf:variant/ instead." ;
     rdfs:domain biolink:SequenceVariant ;
     rdfs:range xsd:string .
 
@@ -2222,8 +2222,8 @@ nf:sourcePos a owl:DatatypeProperty ;
     rdfs:domain nf:VariantObservation ;
     rdfs:range xsd:integer .
 
-nf:affectsGene a owl:ObjectProperty ;
-    rdfs:label "affectsGene" ;
-    rdfs:comment "Gene a variant observation affects. On the observation rather than the variant because the association comes from the transcript the caller picked -- it is annotation, not identity, and the same allele annotated against another transcript could name another gene." ;
+nf:affectedGene a owl:ObjectProperty ;
+    rdfs:label "affectedGene" ;
+    rdfs:comment "Gene a variant observation affects. On the observation rather than the variant because the association comes from the transcript the caller picked -- it is annotation, not identity, and the same allele annotated against another transcript could name another gene. Carries TWO objects per observation, both IRIs denoting the same gene from two authorities: the gene NODE, which is its HGNC IRI (https://identifiers.org/hgnc:7765, replacing the former nf:hgncId literal so HGNC-keyed sources can join by IRI), and the Ensembl IRI. The two are reconcilable inside the graph: the node carries the Ensembl IRI as skos:exactMatch. A gene with no HGNC id is Ensembl-keyed, and then the Ensembl object is the node. Exactly one object is typed biolink:Gene, so a query that counts or traverses genes must constrain the gene side with `a biolink:Gene` -- without it a bare ?obs nf:affectedGene ?gene matches twice per observation." ;
     rdfs:domain nf:VariantObservation ;
     rdfs:range biolink:Gene .

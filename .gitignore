@@ -15,6 +15,9 @@ logs/
 # Ignore harmonization reports
 reports/
 
+# Stable lock for concurrent cBioPortal crosswalk rebuilds
+mappings/cbioportal_sample_specimen.tsv.lock
+
 # Ignore local RMLMapper binary
 tools/rmlmapper-8.1.0.jar
 
