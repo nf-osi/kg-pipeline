@@ -507,6 +507,122 @@ WHERE {
 GROUP BY ?reason ?gene ?curatedProtein ?curatedCdna ?vrsId
 ORDER BY ?reason ?gene ?curatedProtein ?curatedCdna""",
     },
+    # --- Ported from the `demos` branch (commit c5b91510), where variant-layer-demo.md
+    # verified them against a live index. That branch predates this file's rewrite, so
+    # the specs are copied verbatim rather than the branch being merged. Keep as a block.
+    "variant-driver-by-cohort": {
+        "help": "Driver-gene sanity check: altered specimens over linked specimens, per variant dataset, for the NF driver panel. The denominator is computed before the consequence filter, and OPTIONAL keeps the zero rows -- a gene with no qualifying call is the interesting case",
+        "query": """\
+SELECT ?dataset ?symbol ?linkedSpecimens (COUNT(DISTINCT ?specimen) AS ?altered)
+WHERE {
+  {
+    SELECT ?dataset (COUNT(DISTINCT ?s) AS ?linkedSpecimens)
+    WHERE { ?o a nf:VariantObservation ; nf:fromVariantDataset ?dataset ; nf:fromSpecimen ?s }
+    GROUP BY ?dataset
+  }
+  VALUES ?symbol { "NF1" "NF2" "SUZ12" "EED" "TP53" "CDKN2A" }
+  # `a biolink:Gene` de-duplicates nf:affectedGene's Ensembl equivalence IRI.
+  ?gene a biolink:Gene ; nf:geneSymbol ?symbol .
+  OPTIONAL {
+    ?obs nf:fromVariantDataset ?dataset ; nf:affectedGene ?gene ;
+         nf:fromSpecimen ?specimen ; nf:hasConsequence ?so .
+    VALUES ?so {
+      obo:SO_0001583 obo:SO_0001587 obo:SO_0001578 obo:SO_0001589
+      obo:SO_0001822 obo:SO_0001821 obo:SO_0002012
+      obo:SO_0001574 obo:SO_0001575
+    }
+  }
+}
+GROUP BY ?dataset ?symbol ?linkedSpecimens ORDER BY ?symbol ?dataset""",
+    },
+    "variant-allele-spellings": {
+        "help": "Alleles the source spells more than one way: one VRS id whose observations carry different protein-change strings because different rows picked different transcripts. Grouping a recurrence analysis by nf:aminoacidChange splits exactly these",
+        "query": """\
+SELECT ?vrs (COUNT(DISTINCT ?change) AS ?spellings)
+       (COUNT(DISTINCT ?specimen) AS ?specimens)
+       (COUNT(DISTINCT ?dataset) AS ?datasets)
+       (GROUP_CONCAT(DISTINCT ?change; separator=" | ") AS ?proteinChanges)
+       (GROUP_CONCAT(DISTINCT ?tx; separator=" | ") AS ?transcripts)
+       (GROUP_CONCAT(DISTINCT ?symbol; separator=", ") AS ?genes)
+WHERE {
+  ?obs nf:observesVariant ?variant ; nf:aminoacidChange ?change ;
+       nf:fromVariantDataset ?dataset .
+  ?variant nf:vrsId ?vrs .
+  OPTIONAL { ?obs nf:transcriptId ?tx }
+  OPTIONAL { ?obs nf:fromSpecimen ?specimen }
+  OPTIONAL { ?obs nf:affectedGene ?g . ?g a biolink:Gene ; nf:geneSymbol ?symbol }
+}
+GROUP BY ?vrs
+HAVING (COUNT(DISTINCT ?change) > 1)
+ORDER BY DESC(?specimens) LIMIT 50""",
+    },
+    "variant-assay-breadth": {
+        "help": "What data exists on the specimens selected by genotype: assays and file counts for specimens with a truncating or canonical-splice call in a gene. Params: gene",
+        "binds": {"gene": "NF1"},
+        "query": """\
+SELECT ?assay (COUNT(DISTINCT ?specimen) AS ?specimens) (COUNT(DISTINCT ?file) AS ?files)
+WHERE {{
+  # The genotype selection is a DISTINCT subselect on purpose: inlining it lets the
+  # specimen->file fan-out multiply the variant observations, which is enough to exceed
+  # the server's memory limit on the full layer.
+  {{
+    SELECT DISTINCT ?specimen WHERE {{
+      ?gene a biolink:Gene ; nf:geneSymbol "{gene}" .
+      ?obs nf:affectedGene ?gene ; nf:fromSpecimen ?specimen ; nf:hasConsequence ?so .
+      VALUES ?so {{ obo:SO_0001587 obo:SO_0001589 obo:SO_0001574 obo:SO_0001575 }}
+    }}
+  }}
+  # Files of the SAME specimen, not another specimen from the same individual.
+  ?specimen nf:hasFile ?file .
+  ?file nf:assay ?assay .
+}}
+GROUP BY ?assay ORDER BY DESC(?specimens) DESC(?files)""",
+    },
+    "variant-genotype-crosscheck": {
+        "help": "Audit the portal's curated nf:nf1Genotype annotation against the calls: specimens by curated genotype, split on whether the layer has a truncating/splice NF1 call. A specimen with no such call is NOT wild type -- this layer carries small variants only, so deletion and LOH are invisible to it",
+        "query": """\
+SELECT ?curated ?hasTruncatingNF1 (COUNT(DISTINCT ?spec) AS ?specimens)
+WHERE {
+  {
+    SELECT DISTINCT ?spec ?curated WHERE {
+      ?spec nf:hasFile ?f .
+      ?f nf:nf1Genotype ?curated .
+      FILTER EXISTS { ?spec nf:hasVariantObservation ?any }
+    }
+  }
+  # BIND(EXISTS{...}) rather than OPTIONAL: the OPTIONAL form cross-products the
+  # annotation against every observation of the specimen and blows the memory limit.
+  BIND(EXISTS {
+    ?spec nf:hasVariantObservation ?o .
+    ?o nf:affectedGene ?g ; nf:hasConsequence ?so .
+    ?g a biolink:Gene ; nf:geneSymbol "NF1" .
+    FILTER(?so IN (obo:SO_0001587, obo:SO_0001589, obo:SO_0001574, obo:SO_0001575))
+  } AS ?hasTruncatingNF1)
+}
+GROUP BY ?curated ?hasTruncatingNF1 ORDER BY ?curated ?hasTruncatingNF1""",
+    },
+    "variant-progression": {
+        "help": "Driver-panel alleles shared by more than one specimen from the same individual, with the tumour types of those specimens. A shared allele is a starting point for a progression comparison, not proof the lesions are independent or that the allele is germline",
+        "query": """\
+SELECT ?individual ?vrs ?symbol ?change (COUNT(DISTINCT ?specimen) AS ?specimens)
+       (GROUP_CONCAT(DISTINCT ?tumorType; separator=" | ") AS ?tumorTypes)
+WHERE {
+  VALUES ?symbol { "NF1" "NF2" "SUZ12" "EED" "TP53" "CDKN2A" }
+  ?gene a biolink:Gene ; nf:geneSymbol ?symbol .
+  ?obs nf:affectedGene ?gene ; nf:observesVariant ?variant ; nf:fromSpecimen ?specimen ;
+       nf:fromIndividual ?individual ; nf:hasConsequence ?so .
+  VALUES ?so {
+    obo:SO_0001583 obo:SO_0001587 obo:SO_0001578 obo:SO_0001589
+    obo:SO_0001822 obo:SO_0001821 obo:SO_0002012
+  }
+  ?variant nf:vrsId ?vrs .
+  OPTIONAL { ?obs nf:aminoacidChange ?change }
+  OPTIONAL { ?specimen nf:hasFile ?f . ?f nf:tumorType ?tumorType }
+}
+GROUP BY ?individual ?vrs ?symbol ?change
+HAVING (COUNT(DISTINCT ?specimen) > 1)
+ORDER BY DESC(?specimens) ?individual ?symbol LIMIT 50""",
+    },
 }
 
 
