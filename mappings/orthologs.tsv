@@ -1,0 +1,43 @@
+# Model-organism gene -> human gene, for the genes NF-OSI curates mutations on.
+# Regenerate with scripts/fetch_orthologs.py; verify with --check.
+#
+# source: Alliance of Genome Resources combined orthology (https://fms.alliancegenome.org/download/ORTHOLOGY-ALLIANCE_COMBINED.tsv.gz)
+# release: 9.0.0   file generated (UTC): 2026-04-05
+# orthology filter: Stringent
+# sha256: 977ad252878d25a6cf486a9054448feff0e308e83e2fe5d6e8b6ec31c45491d4
+#
+# status=ortholog   a model-organism gene mapped to its human gene; the only rows that
+#                   become nf:hasOrtholog triples (scripts/materialize_orthologs.py)
+# status=human      the curated symbol is already human; no crosswalk needed, listed so
+#                   the audit of mutations.csv's symbol vocabulary is complete
+# status=excluded   a construct or promoter, not a modelled locus; see `notes`
+# status=unresolved a non-human symbol the Alliance release does not cover; a real gap,
+#                   left visible rather than dropped
+#
+# support = AlgorithmsMatch / OutOfAlgorithms from the Alliance file. CDKN2A->Cdkn2a is
+# 1/10: the mouse Cdkn2a/Cdkn2b locus does not correspond cleanly to the human one, and
+# that is a fact about the biology, not a defect in the row. Kept visible on purpose.
+status	curated_symbol	model_gene_id	model_gene_symbol	model_species	human_gene_id	human_symbol	human_iri	support	is_best_score	is_best_rev_score	notes
+human	ARAF				HGNC:646	ARAF	https://identifiers.org/hgnc:646				1 mutation row(s) in mutations.csv
+human	BRCA2				HGNC:1101	BRCA2	https://identifiers.org/hgnc:1101				1 mutation row(s) in mutations.csv
+excluded	CAG-cre/Esr1*										CAG-CreER transgene (CAG promoter + Cre-ERT2 fusion); 1 mutation row(s) in mutations.csv
+human	CDKN2A				HGNC:1787	CDKN2A	https://identifiers.org/hgnc:1787				1 mutation row(s) in mutations.csv
+ortholog	Cdkn2a	MGI:104738	Cdkn2a	Mus musculus	HGNC:1787	CDKN2A	https://identifiers.org/hgnc:1787	1/10	No	Yes	1 mutation row(s) in mutations.csv
+human	COL3A1				HGNC:2201	COL3A1	https://identifiers.org/hgnc:2201				1 mutation row(s) in mutations.csv
+excluded	Cre										Cre recombinase; a transgene, not a locus; 1 mutation row(s) in mutations.csv
+excluded	Dhh										Dhh-Cre knock-in; the Dhh locus carries the driver, it is not the modelled gene; 1 mutation row(s) in mutations.csv
+excluded	GFAP										human GFAP promoter driving Cre; the allele is the driver, not GFAP loss; 1 mutation row(s) in mutations.csv
+human	KDM6A				HGNC:12637	KDM6A	https://identifiers.org/hgnc:12637				1 mutation row(s) in mutations.csv
+human	MTOR				HGNC:3942	MTOR	https://identifiers.org/hgnc:3942				1 mutation row(s) in mutations.csv
+human	NF1				HGNC:7765	NF1	https://identifiers.org/hgnc:7765				77 mutation row(s) in mutations.csv
+ortholog	Nf1	MGI:97306	Nf1	Mus musculus	HGNC:7765	NF1	https://identifiers.org/hgnc:7765	10/10	Yes	Yes	13 mutation row(s) in mutations.csv
+ortholog	nf1a	ZFIN:ZDB-GENE-030131-4907	nf1a	Danio rerio	HGNC:7765	NF1	https://identifiers.org/hgnc:7765	5/10	Yes	Yes	1 mutation row(s) in mutations.csv
+ortholog	nf1b	ZFIN:ZDB-GENE-091111-4	nf1b	Danio rerio	HGNC:7765	NF1	https://identifiers.org/hgnc:7765	1/10	No	Yes	1 mutation row(s) in mutations.csv
+human	PIK3CA				HGNC:8975	PIK3CA	https://identifiers.org/hgnc:8975				1 mutation row(s) in mutations.csv
+ortholog	Ptpn11	MGI:99511	Ptpn11	Mus musculus	HGNC:9644	PTPN11	https://identifiers.org/hgnc:9644	10/10	Yes	Yes	1 mutation row(s) in mutations.csv
+ortholog	Suz12	MGI:1261758	Suz12	Mus musculus	HGNC:17101	SUZ12	https://identifiers.org/hgnc:17101	10/10	Yes	Yes	1 mutation row(s) in mutations.csv
+excluded	SynI										rat synapsin I promoter driving Cre; driver, not SYN1 loss; 1 mutation row(s) in mutations.csv
+human	TP53				HGNC:11998	TP53	https://identifiers.org/hgnc:11998				7 mutation row(s) in mutations.csv
+ortholog	Trp53	MGI:98834	Trp53	Mus musculus	HGNC:11998	TP53	https://identifiers.org/hgnc:11998	9/10	Yes	Yes	2 mutation row(s) in mutations.csv
+human	TSC1				HGNC:12362	TSC1	https://identifiers.org/hgnc:12362				1 mutation row(s) in mutations.csv
+excluded											zebrafish dlx5a/dlx6a:cre transgene, curated with no gene symbol; 1 mutation row(s) in mutations.csv
