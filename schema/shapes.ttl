@@ -288,6 +288,14 @@ shapes:MutationShape a sh:NodeShape ;
         sh:maxCount 1 ;
     ] ;
     sh:property [
+        # One digest per mutation: a mutation is one allele, and two digests on one
+        # node would mean the curated expression resolved two ways -- a defect, not a
+        # multi-valued fact.
+        sh:path nf:mutationVrsId ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
         sh:path nf:alleleType ;
         sh:datatype xsd:string ;
     ] ;
@@ -1601,4 +1609,31 @@ shapes:ToolShape a sh:NodeShape ;
         sh:path nf:hasObservation ;
         sh:nodeKind sh:IRI ;
         sh:class nf:Observation ;
+    ] .
+
+################################################################################
+# Model organism gene (ortholog layer)
+################################################################################
+
+shapes:ModelOrganismGeneShape a sh:NodeShape ;
+    sh:targetClass nf:ModelOrganismGene ;
+    rdfs:label "Model organism gene shape" ;
+    rdfs:comment "Expected properties for the non-human end of an ortholog edge." ;
+    sh:property [
+        sh:path nf:geneSymbol ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path nf:species ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        # A model-organism gene is in this graph only because it is an ortholog of
+        # something, so the edge is required, and one model gene can be the ortholog
+        # of more than one human gene.
+        sh:path nf:orthologOf ;
+        sh:nodeKind sh:IRI ;
+        sh:minCount 1 ;
     ] .
