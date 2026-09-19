@@ -160,7 +160,7 @@ profiles:
         concrete_type: TableEntity
         note: Portal datasets with rich metadata (data type, species, assay, disease
           focus, access type, etc.); links to studies
-        source_version: 16
+        source_version: 17
       study_publications:
         synapse_id: syn16857542
         concrete_type: TableEntity
