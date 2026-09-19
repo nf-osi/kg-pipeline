@@ -33,14 +33,15 @@ diffable mapping rather than a regex buried in a script.
 | `cbioportal_sample_specimen.tsv` | cBioPortal `Tumor_Sample_Barcode` → portal `specimenID`/`individualID` | `scripts/map_cbioportal_samples.py` |
 | `orthologs.tsv` | model-organism gene (MGI/ZFIN/RGD) → human gene (HGNC IRI) | `scripts/fetch_orthologs.py` |
 | `model_mutation_vrs.tsv` | curated `humanClinVarMutation` → GRCh38 coordinates → `ga4gh:VA.*` | `scripts/mint_model_mutation_vrs.py` |
+| `compound_chembl.tsv` | free-text `compoundName` / `experimentalCondition` → ChEMBL molecule | `scripts/map_compound_chembl.py` |
 
 Rows whose `method` is not one of the derived values (`strip_last_segment`,
 `prefix_guess`, `unmatched`) are treated as human-authored and preserved on
 regeneration — set `method=manual` to fix a barcode by hand. `scripts/validate_fks.py`
 checks that every specimen named here actually exists.
 
-The last two are the two bridges between the curated model-system layer and the somatic
-variant layer. Both are checked in rather than fetched at build time, because both need the network and neither
+`orthologs.tsv` and `model_mutation_vrs.tsv` are the two bridges between the curated
+model-system layer and the somatic variant layer. Both are checked in rather than fetched at build time, because both need the network and neither
 changes on a build cadence. `orthologs.tsv` is ~20 rows keyed to the genes in
 `mutations.csv`, and `model_mutation_vrs.tsv` is 46. They are turned into triples
 offline by `scripts/materialize_orthologs.py` and
@@ -49,6 +50,45 @@ offline by `scripts/materialize_orthologs.py` and
 `orthologs.tsv` includes a `status` column to make exclusions explicit. 
 Cre driver lines curated under promoter symbols such as `Dhh`, `GFAP`, and `SynI` are marked `status=excluded` with a reason. 
 The source is SHA-256 pinned in `fetch_orthologs.py`, and `check_source_versions.py --check-external` reports source drift without modifying the pin.
+
+`compound_chembl.tsv` is the crosswalk for the portal's two free-text compound fields,
+built for [demo 2](../docs/demos/demo-2-jh-2-002-genotype-to-data.md) and intended to be
+pushed back upstream as file annotations. It covers every file carrying one of the two
+fields, but rows whose strings appear on demo 2's files are marked `in_demo=yes` and
+**sort to the top**, because those are the ones being annotated first and read line by
+line; the portal-wide tail below them is resolved by the same rules but not yet reviewed.
+
+It resolves against a ChEMBL label index exported from the
+[sagebrain-tap](https://github.com/Sage-Bionetworks/sagebrain-tap) Open Targets ingest —
+`python -m opentargets.export_label_index` — staged at `data/reference/chembl_labels.tsv`.
+The index release and its SHA-256 are recorded in the file header, because a crosswalk is
+only reproducible against the label set that produced it.
+
+Three behaviours worth knowing, each of which exists because the alternative produces a
+confident wrong answer:
+
+- **Ambiguity is refused.** A label can name several molecules, and the wrong pick is a
+  different drug rather than a near miss: taking the first candidate resolves `Olaparib`
+  to PARPI, `Doxorubicin` to DAUNORUBICIN HYDROCHLORIDE and `Sirolimus` to EVEROLIMUS.
+  Candidates are ranked by match kind, and a remaining tie is written with
+  `method=ambiguous`, no ChEMBL id, and the candidates in `notes` for a curator.
+- **The `|` delimiter is split only when that helps.** It is the portal's multi-value
+  separator, but it has also replaced the commas inside systematic names —
+  `11H-Benzo[a]carbazole-1|4-dione|7|11-dimethyl-` was one compound. The split is
+  attempted and kept only if something resolves; otherwise the value stays whole and is
+  classed `shredded_name`, a corrupted value rather than an unknown compound.
+- **`combination_key` makes order variants visible.** `Ribociclib;Trametinib`,
+  `Trametinib;Ribociclib` and `tno155 plus ribociclib` are the same experiments written
+  three ways; rows sharing a key are the same arm.
+
+`value_class` separates what upstream actually needs to fix: `compound`, `combination`,
+`arm_list`, `control`, `not_a_compound` (durations sitting in a compound field),
+`shredded_name` and `unresolved`. Unresolved strings are kept with an empty `chembl_id`,
+the same keep-don't-drop rule the variant layer uses — a string that does not resolve is
+a curation finding, not noise to hide.
+
+`--files-out` writes the per-file expansion used to push annotations upstream. That sheet
+is derived and not checked in; the mapping is the reviewable artifact.
 
 ## RML (`rml/`)
 
