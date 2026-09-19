@@ -13,9 +13,12 @@ import pytest
 sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 
 from prepare_portal_tables import (
+    TABLES,
     apply_derived_columns,
     format_doi,
     format_orcid,
+    format_string,
+    format_string_list,
     format_synapse_id,
 )
 
@@ -261,3 +264,51 @@ class TestFormatDoi:
 
 
 # Run with: pytest test/test_prepare_portal_tables.py -v
+
+
+class TestCompoundFieldsAreNotSplit:
+    """`compoundName` and `experimentalCondition` are carried verbatim.
+
+    `string_list` normalises commas to pipes before splitting, and in these two
+    fields a comma means two different things: it separates compounds, and it
+    occurs inside single values. Splitting corrupted the second kind and nothing
+    at this layer can tell them apart, so the value is kept whole and the
+    compound crosswalk resolves it where a split can be checked before it is
+    believed.
+    """
+
+    def _column(self, target):
+        for column in TABLES["files"]["columns"]:
+            if column["target"] == target:
+                return column
+        raise AssertionError(f"no {target!r} column in the files table spec")
+
+    @pytest.mark.parametrize("target", ["compoundName", "experimentalCondition"])
+    def test_declared_as_a_plain_string(self, target):
+        assert self._column(target)["transform"] == "string"
+
+    @pytest.mark.parametrize("value", [
+        "11H-Benzo[a]carbazole-1,4-dione, 7,11-dimethyl-",   # IUPAC locants
+        "Acridine, 9-phenoxy-",                              # inverted CAS name
+        "1S,9R-HYDRASTINE",                                  # stereodescriptors
+        "Maternal & Postnatal High-Fat, High-Sucrose Diet",  # prose
+        "DEOXYSAPPANONE B 7,3'-DIMETHYL ETHER ACETATE",
+    ])
+    def test_a_comma_inside_one_value_survives(self, value):
+        assert format_string(value) == value
+
+    @pytest.mark.parametrize("value", ["Dasatinib,Simvastatin", "CUDC-907,Panobinostat"])
+    def test_a_genuine_list_is_also_left_whole(self, value):
+        """Not a regression. Splitting these here would be right, but the same rule
+        would shred the names above, so the ambiguity is passed on intact rather
+        than resolved by guessing."""
+        assert format_string(value) == value
+
+    def test_string_list_would_still_have_shredded_it(self):
+        """Pins the behaviour being avoided, so the reason for the change survives
+        even if someone reverts the declaration without reading the comment."""
+        assert format_string_list("11H-Benzo[a]carbazole-1,4-dione, 7,11-dimethyl-") == (
+            "11H-Benzo[a]carbazole-1|4-dione|7|11-dimethyl-")
+
+    def test_empty_value_stays_empty(self):
+        assert format_string("") == ""

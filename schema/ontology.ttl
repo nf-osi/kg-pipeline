@@ -650,7 +650,7 @@ nf:reportMilestone a owl:DatatypeProperty ;
 
 nf:compoundName a owl:DatatypeProperty ;
     rdfs:label "compoundName" ;
-    rdfs:comment "Name of the compound used in the experiment." ;
+    rdfs:comment "Free text attempting to capture the compound name(s) used in the experiment. A single value may name more than one compound, and some values are doses, plate codes or other text that is not a compound name at all. Treat it as a string to be resolved, not as a compound identifier." ;
     rdfs:range xsd:string .
 
 nf:experimentalCondition a owl:DatatypeProperty ;
