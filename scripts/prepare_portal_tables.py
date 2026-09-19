@@ -516,12 +516,26 @@ TABLES: Dict[str, Dict[str, Any]] = {
                 "type": "text",
                 "transform": "number",
             },
-            {"target": "compoundName", "source": "compoundName", "type": "text+", "transform": "string_list"},
+            # Carried verbatim, NOT split. `string_list` normalises commas to pipes
+            # before splitting, and a comma means two different things in these two
+            # fields: it separates compounds (`Dasatinib,Simvastatin`) and it occurs
+            # inside single values -- IUPAC locants (`2,6-dimethoxyquinone`), inverted
+            # CAS names (`Acridine, 9-phenoxy-`), and ordinary prose
+            # (`Maternal & Postnatal High-Fat, High-Sucrose Diet`). Splitting turned
+            # `11H-Benzo[a]carbazole-1,4-dione, 7,11-dimethyl-` into four nonsense
+            # values, and no rule here can tell the two cases apart.
+            #
+            # Measured on the current export: of the comma-bearing values, splitting
+            # is correct for 18 of 78 distinct compoundName values and 10 of 48
+            # distinct experimentalCondition values. So the value is kept whole and
+            # resolving it is the compound crosswalk's job, where an attempted split
+            # can be checked against ChEMBL before it is believed.
+            {"target": "compoundName", "source": "compoundName", "type": "text+", "transform": "string"},
             {
                 "target": "experimentalCondition",
                 "source": "experimentalCondition",
                 "type": "text+",
-                "transform": "string_list",
+                "transform": "string",
             },
             {"target": "modelSystemName", "source": "modelSystemName", "type": "text+", "transform": "string_list"},
             # Synapse user who created / last modified the file. These resolve to
