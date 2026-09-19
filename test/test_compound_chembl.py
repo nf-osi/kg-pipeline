@@ -40,6 +40,10 @@ LABEL_ROWS = [
     # Two molecules whose PREFERRED names are the same string: genuinely ambiguous.
     ("XL-184", "xl-184", "preferred_name", "OT", "CHEMBL2105717", "CABOZANTINIB", "Small molecule", "yes"),
     ("XL-184", "xl-184", "preferred_name", "OT", "CHEMBL2103868", "CABOZANTINIB S-MALATE", "Small molecule", "yes"),
+    # Present so a fragment of a longer name CAN match -- without these the
+    # partial-split tests would pass for the wrong reason.
+    ("ACRIDINE", "acridine", "preferred_name", "OT", "CHEMBL15380", "ACRIDINE", "Small molecule", "no"),
+    ("SALINOMYCIN", "salinomycin", "preferred_name", "OT", "CHEMBL508208", "SALINOMYCIN", "Small molecule", "no"),
 ]
 
 
@@ -143,6 +147,13 @@ class TestShreddedNames:
     def test_a_real_list_is_not_flagged(self, raw):
         assert not looks_shredded(raw)
 
+    def test_a_comma_spelled_systematic_name_is_not_shredded(self, index):
+        """Detection is pipe-only on purpose. Once the ingest stopped comma-splitting,
+        the same string spelled with commas is simply the correct value, and flagging
+        it would report a fixed problem as still broken."""
+        assert not looks_shredded("11H-Benzo[a]carbazole-1,4-dione, 7,11-dimethyl-")
+        assert looks_shredded("11H-Benzo[a]carbazole-1|4-dione|7|11-dimethyl-")
+
     def test_shredded_value_is_classified_as_corrupted_not_unknown(self, index):
         raw = "11H-Benzo[a]carbazole-1|4-dione|7|11-dimethyl-"
         value_class, note = classify(raw, [resolved(raw, index)], arms=1)
@@ -151,6 +162,32 @@ class TestShreddedNames:
 
 
 class TestArmSplitting:
+    def test_comma_is_an_arm_separator(self, index):
+        """What the portal records after the ingest stopped comma-splitting."""
+        rows = build_rows({("trametinib,ribociclib", "compoundName"): 3}, {}, index)
+        assert {r["chembl_id"] for r in rows} == {"CHEMBL2103875", "CHEMBL3545110"}
+        assert {r["arm"] for r in rows} == {"1", "2"}
+
+    def test_both_vintages_of_the_export_give_the_same_answer(self, index):
+        """A pre-fix export spells the same list with pipes. Reading either without
+        a flag is why both characters are arm separators."""
+        def ids(raw):
+            return {r["chembl_id"] for r in build_rows({(raw, "compoundName"): 1}, {}, index)}
+        assert ids("trametinib,ribociclib") == ids("trametinib|ribociclib")
+
+    def test_a_partly_resolving_split_is_refused(self, index):
+        """`Acridine, 9-phenoxy-` is ONE compound. Accepting a split because some arm
+        resolves returns ACRIDINE -- a real molecule, and the wrong one. This is the
+        case that makes the rule all-arms rather than any-arm."""
+        rows = build_rows({("Acridine, 9-phenoxy-", "compoundName"): 1}, {}, index)
+        assert len(rows) == 1, "must stay whole"
+        assert rows[0]["component"] == "Acridine, 9-phenoxy-"
+        assert rows[0]["chembl_id"] == "", "must not resolve to the fragment's match"
+
+    def test_a_salt_is_not_two_compounds(self, index):
+        rows = build_rows({("SALINOMYCIN, SODIUM", "compoundName"): 1}, {}, index)
+        assert len(rows) == 1 and rows[0]["chembl_id"] == ""
+
     def test_pipe_split_is_kept_when_it_resolves(self, index):
         rows = build_rows({("trametinib|ribociclib", "compoundName"): 3},
                           {("trametinib|ribociclib", "compoundName"): 3}, index)

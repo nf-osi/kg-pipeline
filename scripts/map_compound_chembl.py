@@ -26,21 +26,26 @@ scope if a narrower pass is wanted.
 
 ## Resolution rules, in order
 
-1. **Split the multi-value delimiter `|` into arms -- but only if the split resolves.**
-   `|` is the portal's general list separator (1,358 `individualID`s and 600
-   `specimenID`s use it), and in the compound fields it does separate real arms:
-   `100 nM CUDC-907|100 nM Panobinostat` is two compounds.
+1. **Split a list into arms -- but only if EVERY arm resolves.**
+   Two characters separate arms in these fields. A comma is what the portal records
+   (`Dasatinib,Simvastatin`), and `|` is what exports built before the ingest stopped
+   comma-splitting contain (`CUDC-907|Panobinostat`). Both are handled, so this script
+   reads either vintage of `files.csv` without a flag.
 
-   It has also **shredded systematic names whose commas became pipes**:
+   The comma is also a character *inside* chemical names, so the split is attempted and
+   kept only if every arm fully resolves. "Any arm resolves" is not enough and the
+   difference is not academic: `Acridine, 9-phenoxy-` is one compound, and the lax rule
+   happily returns ACRIDINE -- a real molecule, and the wrong one. `SALINOMYCIN, SODIUM`
+   fails the same way. Requiring all arms costs a couple of recoverable values
+   (`10|20uM Ataluren` loses its dose range) and those stay visible as unresolved,
+   which is the trade this file makes everywhere.
+
+   A pre-fix export can also contain **systematic names whose commas became pipes**:
    `11H-Benzo[a]carbazole-1|4-dione|7|11-dimethyl-` was
-   `11H-Benzo[a]carbazole-1,4-dione, 7,11-dimethyl-`. Splitting those produces
-   fragments that are not compounds at all -- the survey counted about 120 of them.
-
-   Since no pattern separates the two cases reliably, the split is *attempted* and kept
-   only if at least one part resolves. Otherwise the raw string is left whole and
-   unresolved, and if its brackets are unbalanced or a part is bare digits it is
-   classified `shredded_name`: a corrupted value, not an unknown compound, and a
-   different upstream fix.
+   `11H-Benzo[a]carbazole-1,4-dione, 7,11-dimethyl-`. Those are classified
+   `shredded_name` -- a corrupted value, not an unknown compound. That detection is
+   deliberately pipe-only and transitional: the same string spelled with commas is
+   correct, and the class should disappear once every export post-dates the ingest fix.
 2. **Split combinations** within an arm on `;`, ` + ` and ` plus `. Each component becomes
    its own row, so a two-drug arm is two annotations rather than one unparseable string.
    ` + ` needs the spaces: `(+)-Camptothecin` must not split.
@@ -112,9 +117,15 @@ KIND_RANK = {"preferred_name": 0, "synonym": 1, "trade_name": 2}
 #: `(+)-Camptothecin` and `(S)-(+)-...` are not torn apart.
 COMBINATION_SPLIT = re.compile(r";|\s\+\s|\bplus\b", re.IGNORECASE)
 
-#: The portal's general multi-value delimiter. Only split on it when that helps -- see
-#: rule 1 and `split_arms`.
-ARM_DELIMITER = "|"
+#: Arm separators. The comma is the portal's own; `|` appears in exports built before
+#: the ingest stopped comma-splitting these fields, where it stands for a comma. Both
+#: are accepted so this script reads either vintage -- see rule 1.
+ARM_SPLIT = re.compile(r"[|,]")
+
+#: Pipe only. A pre-fix export encodes a name's internal commas as pipes, so an
+#: unbalanced part is evidence of corruption; the same string spelled with commas is
+#: simply the correct value. See `looks_shredded`.
+SHREDDED_DELIMITER = "|"
 
 #: A leading concentration, e.g. `100 nM CUDC-907` or `0.0125% DMSO`.
 LEADING_DOSE = re.compile(
@@ -266,9 +277,9 @@ def looks_shredded(raw: str) -> bool:
 
     A genuine list of compound names has neither.
     """
-    if ARM_DELIMITER not in raw:
+    if SHREDDED_DELIMITER not in raw:
         return False
-    for part in raw.split(ARM_DELIMITER):
+    for part in raw.split(SHREDDED_DELIMITER):
         stripped = part.strip()
         if stripped.isdigit():
             return True
@@ -445,13 +456,13 @@ def build_rows(counts: dict, demo_counts: dict, index: LabelIndex) -> list[dict]
         counts.items(),
         key=lambda kv: (0 if demo_counts.get(kv[0]) else 1, -kv[1], kv[0][0], kv[0][1]))
     for (raw, field_name), file_count in ordering:
-        # Attempt the `|` split, keep it only if it resolves something -- rule 1.
-        split_arms = [a.strip() for a in raw.split(ARM_DELIMITER) if a.strip()]
+        # Attempt the arm split, keep it only if EVERY arm fully resolves -- rule 1.
+        split_arms = [a.strip() for a in ARM_SPLIT.split(raw) if a.strip()]
         arms: list[list[Resolution]] = []
         if len(split_arms) > 1:
             attempt = [[resolve_component(c, index) for c in split_components(arm)]
                        for arm in split_arms]
-            if any(r.hit for arm in attempt for r in arm):
+            if all(all(r.hit for r in arm) for arm in attempt):
                 arms = attempt
         if not arms:
             arms = [[resolve_component(c, index) for c in split_components(raw)]]

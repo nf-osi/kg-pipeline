@@ -72,11 +72,17 @@ confident wrong answer:
   to PARPI, `Doxorubicin` to DAUNORUBICIN HYDROCHLORIDE and `Sirolimus` to EVEROLIMUS.
   Candidates are ranked by match kind, and a remaining tie is written with
   `method=ambiguous`, no ChEMBL id, and the candidates in `notes` for a curator.
-- **The `|` delimiter is split only when that helps.** It is the portal's multi-value
-  separator, but it has also replaced the commas inside systematic names —
-  `11H-Benzo[a]carbazole-1|4-dione|7|11-dimethyl-` was one compound. The split is
-  attempted and kept only if something resolves; otherwise the value stays whole and is
-  classed `shredded_name`, a corrupted value rather than an unknown compound.
+- **An arm split is kept only if EVERY arm resolves.** Arms are separated by a comma
+  (what the portal records) or by `|` (what exports predating the ingest fix contain),
+  and both are read without a flag. The comma is also a character inside chemical names,
+  so a partial match is not good enough: `Acridine, 9-phenoxy-` is one compound, and
+  accepting the split because one arm resolves returns ACRIDINE — a real molecule and
+  the wrong one. `SALINOMYCIN, SODIUM` fails identically. Requiring every arm costs a
+  couple of recoverable values, which stay visible as unresolved.
+- **`shredded_name` is transitional and pipe-only.** A pre-fix export encodes a name's
+  internal commas as pipes, so `11H-Benzo[a]carbazole-1|4-dione|7|11-dimethyl-` is
+  corruption rather than an unknown compound. The same string spelled with commas is
+  correct, so the class should empty out once every export post-dates the ingest fix.
 - **`combination_key` makes order variants visible.** `Ribociclib;Trametinib`,
   `Trametinib;Ribociclib` and `tno155 plus ribociclib` are the same experiments written
   three ways; rows sharing a key are the same arm.
