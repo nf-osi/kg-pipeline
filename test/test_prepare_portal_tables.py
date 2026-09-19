@@ -291,7 +291,7 @@ class TestCompoundFieldsAreNotSplit:
         "11H-Benzo[a]carbazole-1,4-dione, 7,11-dimethyl-",   # IUPAC locants
         "Acridine, 9-phenoxy-",                              # inverted CAS name
         "1S,9R-HYDRASTINE",                                  # stereodescriptors
-        "Maternal & Postnatal High-Fat, High-Sucrose Diet",  # prose, 109 files
+        "Maternal & Postnatal High-Fat, High-Sucrose Diet",  # prose
         "DEOXYSAPPANONE B 7,3'-DIMETHYL ETHER ACETATE",
     ])
     def test_a_comma_inside_one_value_survives(self, value):

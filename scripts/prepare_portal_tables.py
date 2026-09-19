@@ -517,19 +517,19 @@ TABLES: Dict[str, Dict[str, Any]] = {
                 "transform": "number",
             },
             # Carried verbatim, NOT split. `string_list` normalises commas to pipes
-            # before splitting, and a comma means two different things in these two
-            # fields: it separates compounds (`Dasatinib,Simvastatin`) and it occurs
-            # inside single values -- IUPAC locants (`2,6-dimethoxyquinone`), inverted
-            # CAS names (`Acridine, 9-phenoxy-`), and ordinary prose
-            # (`Maternal & Postnatal High-Fat, High-Sucrose Diet`). Splitting turned
-            # `11H-Benzo[a]carbazole-1,4-dione, 7,11-dimethyl-` into four nonsense
-            # values, and no rule here can tell the two cases apart.
+            # before splitting, and in these two fields a comma means two different
+            # things:
             #
-            # Measured on the current export: of the comma-bearing values, splitting
-            # is correct for 18 of 78 distinct compoundName values and 10 of 48
-            # distinct experimentalCondition values. So the value is kept whole and
-            # resolving it is the compound crosswalk's job, where an attempted split
-            # can be checked against ChEMBL before it is believed.
+            #   separator        Dasatinib,Simvastatin
+            #   part of a value  2,6-dimethoxyquinone                 IUPAC locants
+            #                    Acridine, 9-phenoxy-                 inverted CAS name
+            #                    ...High-Fat, High-Sucrose Diet       prose
+            #
+            # Splitting turns `11H-Benzo[a]carbazole-1,4-dione, 7,11-dimethyl-` into
+            # four nonsense values, and no rule here can tell the two cases apart. So
+            # the value is kept whole and resolving it is the compound crosswalk's
+            # job, where an attempted split can be checked against ChEMBL before it
+            # is believed. A merged list stays recoverable; a shredded name does not.
             {"target": "compoundName", "source": "compoundName", "type": "text+", "transform": "string"},
             {
                 "target": "experimentalCondition",

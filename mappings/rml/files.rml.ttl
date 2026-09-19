@@ -870,8 +870,8 @@ map:FileCompoundName a rr:TriplesMap ;
     # previous grel:string_split on "\\|" existed only because the ingest
     # joined these values with pipes; it no longer does, so the value is one
     # literal. Its grel:controls_if null-guard is gone too -- RMLMapper skips
-    # an empty reference on its own, and the guard was emitting 7 literal
-    # "None" values into the graph.
+    # an empty reference on its own, and the guard was emitting literal "None"
+    # values into the graph.
     rr:predicateObjectMap [ rr:predicate nf:compoundName ; rr:objectMap [ rml:reference "compoundName" ; rr:datatype xsd:string ] ] .
 
 map:FileExperimentalCondition a rr:TriplesMap ;
@@ -882,8 +882,8 @@ map:FileExperimentalCondition a rr:TriplesMap ;
     # previous grel:string_split on "\\|" existed only because the ingest
     # joined these values with pipes; it no longer does, so the value is one
     # literal. Its grel:controls_if null-guard is gone too -- RMLMapper skips
-    # an empty reference on its own, and the guard was emitting 7 literal
-    # "None" values into the graph.
+    # an empty reference on its own, and the guard was emitting literal "None"
+    # values into the graph.
     rr:predicateObjectMap [ rr:predicate nf:experimentalCondition ; rr:objectMap [ rml:reference "experimentalCondition" ; rr:datatype xsd:string ] ] .
 
 map:FileModelSystemName a rr:TriplesMap ;
