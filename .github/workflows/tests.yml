@@ -1,0 +1,58 @@
+# Run the pytest suite on pull requests and on pushes to develop.
+#
+# This exists because #112 merged with three failing tests in test_rml_files.py.
+# Nothing caught it: the only PR-triggered workflows were path-filtered to the
+# ontology and the evaluation site, so no workflow had ever run pytest.
+#
+# Unfiltered by path on purpose. The regression was in an RML mapping test and the
+# change that broke it was in a Python transform -- a path filter drawn around
+# either one would have missed it.
+name: Tests
+
+on:
+  pull_request:
+  push:
+    branches:
+      - develop
+
+env:
+  RMLMAPPER_VERSION: "8.1.0"
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      # The RML mapping tests shell out to RMLMapper, which is a Java jar.
+      # 21, not 17: rmlmapper 8.1.0 ships class file version 65.0, which a Java 17
+      # runtime refuses to load (it reads up to 61.0).
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r test/requirements-test.txt
+          # Imported by the scripts under test rather than by the tests themselves,
+          # so they are not in requirements-test.txt. fastmcp and inspect_ai are
+          # deliberately absent: only scripts/mcp_sparql.py and scripts/extract_runs.py
+          # need them and no test imports either.
+          pip install pandas numpy pyoxigraph synapseclient pyyaml python-dotenv httpx
+
+      - name: Download RMLMapper
+        run: |
+          curl -sL --fail -o "tools/rmlmapper-${RMLMAPPER_VERSION}.jar" \
+            "https://github.com/RMLio/rmlmapper-java/releases/download/v${RMLMAPPER_VERSION}/rmlmapper-${RMLMAPPER_VERSION}-r380-all.jar"
+
+      # No Synapse login and no data/ directory: every test either builds its own
+      # fixtures or points the RML mappings at the CSVs in test/.
+      - name: Run tests
+        run: pytest test/ -p no:cacheprovider
