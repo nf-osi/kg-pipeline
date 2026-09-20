@@ -38,6 +38,7 @@ DEFAULT_OUTPUT = Path("data/csv/files_harmonized.csv")
 DEFAULT_LOOKUP = Path("mappings/sssom/data_lookup.sssom.tsv")
 DEFAULT_NF1_LOOKUP = Path("mappings/sssom/nf1_genotype_lookup.sssom.tsv")
 DEFAULT_NF2_LOOKUP = Path("mappings/sssom/nf2_genotype_lookup.sssom.tsv")
+DEFAULT_TUMOR_TYPE_LOOKUP = Path("mappings/sssom/tumor_type_lookup.sssom.tsv")
 
 NF_NS = "http://nf-osi.github.com/terms#"
 
@@ -146,6 +147,12 @@ def main(argv: list[str] | None = None) -> int:
         help=f"SSSOM lookup TSV for NF2 genotype (default: {DEFAULT_NF2_LOOKUP})",
     )
     parser.add_argument(
+        "--tumor-type-lookup",
+        type=Path,
+        default=DEFAULT_TUMOR_TYPE_LOOKUP,
+        help=f"SSSOM lookup TSV for tumorType (default: {DEFAULT_TUMOR_TYPE_LOOKUP})",
+    )
+    parser.add_argument(
         "--check-only",
         action="store_true",
         help="Report match stats without writing output",
@@ -172,6 +179,11 @@ def main(argv: list[str] | None = None) -> int:
 
     nf1_lookup = build_label_to_iri(args.nf1_lookup) if args.nf1_lookup.exists() else {}
     nf2_lookup = build_label_to_iri(args.nf2_lookup) if args.nf2_lookup.exists() else {}
+    tumor_type_lookup = (
+        build_label_to_iri(args.tumor_type_lookup)
+        if args.tumor_type_lookup.exists()
+        else {}
+    )
     print(f"Loaded {len(nf1_lookup)} NF1 genotype entries, {len(nf2_lookup)} NF2 genotype entries", flush=True)
 
     rows = []
@@ -180,6 +192,7 @@ def main(argv: list[str] | None = None) -> int:
     empty_count = 0
     dt_class_counts: Counter[str] = Counter()
     dt_unmapped: Counter[str] = Counter()
+    tt_unmapped: Counter[str] = Counter()
     nf1_counts: Counter[str] = Counter()
     nf1_unmapped: Counter[str] = Counter()
     nf2_counts: Counter[str] = Counter()
@@ -222,6 +235,23 @@ def main(argv: list[str] | None = None) -> int:
             else:
                 dt_class_counts["(unclassified)"] += 1
             row["dataTypeIRI"] = data_type_iri
+
+            # Resolve tumorType to a disease term.
+            #
+            # Additive: nf:tumorType keeps the curated string, and the IRI goes on a
+            # separate predicate. Unlike dataType -- where the label is replaced by
+            # its IRI -- most of the distinct tumorType values have no exact term,
+            # and several that do not are the clinically interesting ones (ANNUBP,
+            # atypical neurofibroma). Replacing the string would delete the tumour
+            # type from those files entirely.
+            tumor_type = row.get("tumorType", "").strip()
+            tumor_type_iri = classify_datatype(tumor_type, tumor_type_lookup)
+            if tumor_type:
+                for part in tumor_type.split("|"):
+                    part = part.strip()
+                    if part and part.lower() not in tumor_type_lookup:
+                        tt_unmapped[part] += 1
+            row["tumorTypeIRI"] = tumor_type_iri
 
             # Classify NF1 genotype
             nf1_raw = row.get("nf1Genotype", "").strip()
@@ -276,6 +306,11 @@ def main(argv: list[str] | None = None) -> int:
     print(f"\nNF1 genotype classification ({total} file rows):")
     for cls, count in nf1_counts.most_common():
         print(f"  {cls:60s}: {count}")
+    if tt_unmapped:
+        print(f"\nUnmapped tumorType values ({len(tt_unmapped)} unique):")
+        for term, count in tt_unmapped.most_common():
+            print(f"  {count:>7}  {term}")
+
     if nf1_unmapped:
         print(f"\nUnmapped NF1 genotype values ({len(nf1_unmapped)} unique):")
         for term, count in nf1_unmapped.most_common():
@@ -292,7 +327,9 @@ def main(argv: list[str] | None = None) -> int:
     if args.check_only:
         return 0
 
-    out_fieldnames = list(fieldnames) + ["modelSystemId", "dataTypeIRI", "nf1GenotypeIRI", "nf2GenotypeIRI"]
+    out_fieldnames = list(fieldnames) + [
+        "modelSystemId", "dataTypeIRI", "tumorTypeIRI", "nf1GenotypeIRI", "nf2GenotypeIRI",
+    ]
     args.output.parent.mkdir(parents=True, exist_ok=True)
     with open(args.output, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=out_fieldnames, quoting=csv.QUOTE_MINIMAL)

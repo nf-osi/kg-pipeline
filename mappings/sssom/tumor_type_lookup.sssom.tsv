@@ -1,0 +1,80 @@
+#curie_map:
+#  obo: http://purl.obolibrary.org/obo/
+#  EFO: http://www.ebi.ac.uk/efo/
+#  skos: http://www.w3.org/2004/02/skos/core#
+#  semapv: https://w3id.org/semapv/vocab/
+#  sssom: https://w3id.org/sssom/
+#mapping_set_id: https://w3id.org/synapse/nfosi/mapping/tumortype
+#license: https://creativecommons.org/licenses/by/4.0/
+#comment: Portal `tumorType` free text to EFO / MONDO disease IRIs. Authored for demo 2,
+#comment: whose indication hop needs `Malignant Peripheral Nerve Sheath Tumor` and
+#comment: `Plexiform Neurofibroma` to reach a disease term. This is NOT the systematic
+#comment: tumour-type mapping the phenotype-ontology work calls for -- it is its seed.
+#comment:
+#comment: Every mapped row was resolved by EXACT label match, case-folded, against the
+#comment: disease terms of Open Targets Platform release 26.06 (which carries EFO, MONDO,
+#comment: Orphanet, HP and NCIT), on the term name or an exactSynonym. Rows were not
+#comment: hand-assigned, hence semapv:LexicalMatching. Matching against the terms the
+#comment: indication data actually uses is deliberate: a mapping to a term that source
+#comment: does not carry would satisfy a reviewer and still join to nothing.
+#comment:
+#comment: Values with NO exact match keep object_id sssom:NoTermFound and a note giving
+#comment: the reason, rather than being dropped. Several are a base term plus a qualifier
+#comment: (`Recurrent MPNST`, `Atypical MPNST`) where mapping to the base term would
+#comment: silently discard the qualifier; several name a syndrome rather than a tumour.
+#comment: `Cutaneous Neurofibroma` is the largest unmapped value and the first one worth a
+#comment: curator's decision; its note names the candidate.
+#comment:
+#comment: Case variants map to the same term (`schwannoma` / `Schwannoma`), which is one
+#comment: of the things this file is for.
+#comment:
+#comment: Rows are ordered by how many files carry the value, mapped rows first, so review
+#comment: effort and file order agree.
+subject_id	subject_label	predicate_id	object_id	mapping_justification	notes
+	Malignant Peripheral Nerve Sheath Tumor	skos:exactMatch	obo:MONDO_0017827	semapv:LexicalMatching	exact match on 'malignant peripheral nerve sheath tumor'
+	Plexiform Neurofibroma	skos:exactMatch	EFO:EFO_0000658	semapv:LexicalMatching	exact match on 'plexiform neurofibroma'
+	schwannoma	skos:exactMatch	obo:MONDO_0002546	semapv:LexicalMatching	exact match on 'schwannoma'
+	Neurofibroma	skos:exactMatch	obo:MONDO_0016755	semapv:LexicalMatching	exact match on 'neurofibroma'
+	Schwannoma	skos:exactMatch	obo:MONDO_0002546	semapv:LexicalMatching	exact match on 'schwannoma'
+	meningioma	skos:exactMatch	obo:MONDO_0016642	semapv:LexicalMatching	exact match on 'meningioma'
+	Vestibular Schwannoma	skos:exactMatch	obo:MONDO_0001569	semapv:LexicalMatching	exact match on 'acoustic neuroma'. two candidates share this label: HP_0009588 (a phenotype) and MONDO_0001569 (a disease). A tumourType names a disease, so the disease-kind term is taken; the choice is a kind preference, not a clinical judgement
+	Juvenile Myelomonocytic Leukemia	skos:exactMatch	obo:MONDO_0011908	semapv:LexicalMatching	exact match on 'juvenile myelomonocytic leukemia'
+	Optic Pathway Glioma	skos:exactMatch	obo:MONDO_0016167	semapv:LexicalMatching	exact match on 'optic pathway glioma'
+	Glioma	skos:exactMatch	obo:MONDO_0021042	semapv:LexicalMatching	exact match on 'glioma'
+	Sarcoma	skos:exactMatch	obo:MONDO_0005089	semapv:LexicalMatching	exact match on 'sarcoma'
+	Pilocytic Astrocytoma	skos:exactMatch	obo:MONDO_0016691	semapv:LexicalMatching	exact match on 'pilocytic astrocytoma'
+	Glioblastoma	skos:exactMatch	obo:MONDO_0018177	semapv:LexicalMatching	exact match on 'glioblastoma'
+	Diffuse Astrocytoma	skos:exactMatch	obo:MONDO_0016686	semapv:LexicalMatching	exact match on 'diffuse astrocytoma'
+	Melanoma	skos:exactMatch	obo:MONDO_0005105	semapv:LexicalMatching	exact match on 'melanoma'
+	Pilomyxoid Astrocytoma	skos:exactMatch	obo:MONDO_0016692	semapv:LexicalMatching	exact match on 'pilomyxoid astrocytoma'
+	Synovial Sarcoma	skos:exactMatch	obo:MONDO_0010434	semapv:LexicalMatching	exact match on 'synovial sarcoma'
+	teratoma	skos:exactMatch	obo:MONDO_0002601	semapv:LexicalMatching	exact match on 'teratoma'
+	Glioblastoma Multiforme	skos:exactMatch	obo:MONDO_0018177	semapv:LexicalMatching	exact match on 'glioblastoma'
+	Fibromatosis	skos:exactMatch	obo:MONDO_0005031	semapv:LexicalMatching	exact match on 'fibromatosis'
+	Pleomorphic Xanthoastrocytoma	skos:exactMatch	obo:MONDO_0016690	semapv:LexicalMatching	exact match on 'pleomorphic xanthoastrocytoma'
+	Anaplastic Astrocytoma	skos:exactMatch	obo:MONDO_0016684	semapv:LexicalMatching	exact match on 'anaplastic astrocytoma'
+	MPNST	skos:exactMatch	obo:MONDO_0017827	semapv:LexicalMatching	exact match on 'malignant peripheral nerve sheath tumor'
+	NF2	skos:exactMatch	obo:MONDO_0007039	semapv:LexicalMatching	exact match on 'NF2-related schwannomatosis'
+	Colorectal Carcinoma	skos:exactMatch	obo:MONDO_0024331	semapv:LexicalMatching	exact match on 'colorectal carcinoma'
+	NF1	skos:exactMatch	obo:MONDO_0018975	semapv:LexicalMatching	exact match on 'neurofibromatosis type 1'
+	Colorectal Adenocarcinoma	skos:exactMatch	obo:MONDO_0005008	semapv:LexicalMatching	exact match on 'colorectal adenocarcinoma'
+	Cutaneous Neurofibroma	skos:exactMatch	sssom:NoTermFound	semapv:ManualMappingCuration	EFO_0000397 'dermal neurofibroma' is the likely target and is the largest unmapped value here, but 'cutaneous neurofibroma' is not an exact synonym of it in the checked release, so asserting the match is a curation decision rather than a lexical one
+	Unknown	skos:exactMatch	sssom:NoTermFound	semapv:ManualMappingCuration	not a disease term; the annotation records that the tumour type was not stated
+	Not Applicable	skos:exactMatch	sssom:NoTermFound	semapv:ManualMappingCuration	not a disease term; the file is not about a tumour
+	Atypical Neurofibroma	skos:exactMatch	sssom:NoTermFound	semapv:ManualMappingCuration	no exact match; relates to MONDO_0016755 'neurofibroma' but 'atypical' is a distinct histological category (see also ANNUBP)
+	Low-Grade Glioma NOS	skos:exactMatch	sssom:NoTermFound	semapv:ManualMappingCuration	'NOS' marks an unspecified subtype; MONDO_0021042 'glioma' loses the grade
+	High-Grade Glioma NOS	skos:exactMatch	sssom:NoTermFound	semapv:ManualMappingCuration	'NOS' marks an unspecified subtype; MONDO_0021042 'glioma' loses the grade
+	Recurrent MPNST	skos:exactMatch	sssom:NoTermFound	semapv:ManualMappingCuration	MONDO_0017827 plus a recurrence qualifier; mapping it to the base term would silently drop the qualifier
+	Diffuse Infiltrating Neurofibroma	skos:exactMatch	sssom:NoTermFound	semapv:ManualMappingCuration	no exact match; a subtype of MONDO_0016755 'neurofibroma' rather than a synonym of it
+	NF1-Associated Tumor	skos:exactMatch	sssom:NoTermFound	semapv:ManualMappingCuration	names the syndrome, not the tumour. MONDO_0018975 is the syndrome; what the tumour is remains unstated
+	ANNUBP	skos:exactMatch	sssom:NoTermFound	semapv:ManualMappingCuration	atypical neurofibromatous neoplasm of uncertain biologic potential; a recognised entity between neurofibroma and MPNST, with no exact term in the checked release
+	tumor	skos:exactMatch	sssom:NoTermFound	semapv:ManualMappingCuration	placeholder, not a considered term. Lexically an exact synonym of MONDO_0005070 'neoplasm', but asserting that would let a query count these files as disease-annotated when they carry no disease information
+	Hybrid PNST	skos:exactMatch	sssom:NoTermFound	semapv:ManualMappingCuration	hybrid peripheral nerve sheath tumour; no exact term in the checked release
+	Nodular Neurofibroma	skos:exactMatch	sssom:NoTermFound	semapv:ManualMappingCuration	no exact match; a subtype of MONDO_0016755 'neurofibroma' rather than a synonym of it
+	NF2-Associated Tumor	skos:exactMatch	sssom:NoTermFound	semapv:ManualMappingCuration	names the syndrome, not the tumour; see NF1-Associated Tumor
+	Atypical MPNST	skos:exactMatch	sssom:NoTermFound	semapv:ManualMappingCuration	MONDO_0017827 plus a histological qualifier; mapping it to the base term would silently drop the qualifier
+	Tumor	skos:exactMatch	sssom:NoTermFound	semapv:ManualMappingCuration	placeholder, not a considered term; see the lower-case spelling
+	Atypical Pilocytic Astrocytoma	skos:exactMatch	sssom:NoTermFound	semapv:ManualMappingCuration	MONDO_0016691 plus a histological qualifier; same reasoning as Atypical MPNST
+	recurrent tumor	skos:exactMatch	sssom:NoTermFound	semapv:ManualMappingCuration	placeholder plus a recurrence qualifier; no disease term is recoverable
+	Hemorrhagic Neoplasm	skos:exactMatch	sssom:NoTermFound	semapv:ManualMappingCuration	no exact match in the checked release; describes a tumour's state rather than naming a tumour type, so the disease term is unstated
+	Necrotic Neoplasm	skos:exactMatch	sssom:NoTermFound	semapv:ManualMappingCuration	no exact match in the checked release; describes a tumour's state rather than naming a tumour type, so the disease term is unstated

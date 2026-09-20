@@ -755,6 +755,39 @@ map:FileNf1Genotype a rr:TriplesMap ;
         ]
     ] .
 
+map:FileTumorTypeTerm a rr:TriplesMap ;
+    rdfs:label "File TumorType Term" ;
+    rml:logicalSource map:PortalFilesSource ;
+    rr:subjectMap [ rr:template "https://www.synapse.org/Synapse:{id}" ; rr:termType rr:IRI ] ;
+    # Additive, unlike nf:dataType: nf:tumorType keeps the curated string and the
+    # resolved EFO/MONDO term goes here. Most distinct tumorType values have no exact
+    # term, and several that do not are the clinically interesting ones, so replacing
+    # the label would delete the tumour type from those files. Split on "\|" because a
+    # file can carry more than one tumour type.
+    rr:predicateObjectMap [
+        rr:predicate nf:tumorTypeTerm ;
+        rr:objectMap [
+            a fnml:FunctionTermMap ;
+            rr:termType rr:IRI ;
+            fnml:functionValue [
+                a fno:Execution ;
+                rml:logicalSource map:PortalFilesSource ;
+                rr:predicateObjectMap [
+                    rr:predicate fno:executes ;
+                    rr:objectMap [ rr:constant grel:string_split ; rr:termType rr:IRI ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:valueParameter ;
+                    rr:objectMap [ rml:reference "tumorTypeIRI" ; rr:termType rr:Literal ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:p_string_sep ;
+                    rr:objectMap [ rr:constant "\\|" ; rr:termType rr:Literal ]
+                ]
+            ]
+        ]
+    ] .
+
 map:FileNf2Genotype a rr:TriplesMap ;
     rdfs:label "File NF2 Genotype" ;
     rml:logicalSource map:PortalFilesSource ;

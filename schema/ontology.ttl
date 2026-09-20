@@ -688,8 +688,13 @@ nf:hasSpecimenIdStatus a owl:ObjectProperty ;
 
 nf:tumorType a owl:DatatypeProperty ;
     rdfs:label "tumorType" ;
-    rdfs:comment "Tumor type of the source biospecimen." ;
+    rdfs:comment "Tumor type of the source biospecimen, as curated free text. Kept alongside nf:tumorTypeTerm rather than replaced by it, because most distinct values have no exact ontology term and several of those are clinically meaningful categories." ;
     rdfs:range xsd:string .
+
+nf:tumorTypeTerm a owl:ObjectProperty ;
+    rdfs:label "tumorTypeTerm" ;
+    rdfs:comment "The EFO or MONDO disease term a curated tumorType label resolves to, via mappings/sssom/tumor_type_lookup.sssom.tsv. Present only where the label matched a term exactly; its absence means the label had no exact match, NOT that the file has no tumour type. Read it together with nf:tumorType." ;
+    rdfs:range owl:Thing .
 
 ################################################################################
 # Properties - Study related

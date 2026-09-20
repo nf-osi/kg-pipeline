@@ -114,6 +114,10 @@ shapes:FileShape a sh:NodeShape ;
         sh:datatype xsd:string ;
     ] ;
     sh:property [
+        sh:path nf:tumorTypeTerm ;
+        sh:nodeKind sh:IRI ;
+    ] ;
+    sh:property [
         sh:path nf:compoundName ;
         sh:datatype xsd:string ;
     ] ;

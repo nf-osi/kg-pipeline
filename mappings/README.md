@@ -15,6 +15,23 @@ Two types of mappings convert portal data into RDF, running at different pipelin
 | `cell_line_category_lookup.sssom.tsv` | `cellLineCategory` | CellLine subclass IRIs |
 | `variant_consequence.sssom.tsv` | MAF `Consequence` | Sequence Ontology IRIs |
 | `variant_classification.sssom.tsv` | MAF `Variant_Classification` | Sequence Ontology IRIs (fallback) |
+| `tumor_type_lookup.sssom.tsv` | `tumorType` | EFO / MONDO disease IRIs |
+
+`tumor_type_lookup.sssom.tsv` is **additive**, unlike the others: `nf:tumorType` keeps the
+curated string and the resolved term goes on `nf:tumorTypeTerm`. Most of the distinct
+`tumorType` values have no exact ontology term, and several that do not are the
+clinically meaningful categories (`ANNUBP`, `Atypical Neurofibroma`, `Recurrent MPNST`),
+so replacing the label the way `dataType` does would delete the tumour type from those
+files. Values with no term keep `object_id = sssom:NoTermFound` and a note giving the
+reason, so what the file refuses to assert is as visible as what it does — the same rule
+`orthologs.tsv` follows with `status=excluded`.
+
+Mapped rows were resolved by exact, case-folded label match against the EFO/MONDO terms
+carried by a pinned Open Targets release, not hand-assigned, hence
+`semapv:LexicalMatching`. Matching against the terms the indication data actually uses is
+deliberate: a mapping to a term that source does not carry would satisfy a reviewer and
+still join to nothing. It was authored for demo 2 and is the seed of the systematic
+tumour-type mapping, not that mapping itself.
 
 The two variant lookups are read by `scripts/variants_to_rdf.py`, not by an RML
 mapping — the somatic variant layer comes from NDJSON, not a portal CSV, so it skips

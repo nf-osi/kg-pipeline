@@ -532,3 +532,60 @@ class TestFilesEmptyFields:
 
 # Run with: pytest test/test_rml_files.py -v
 
+
+class TestTumorTypeTerm:
+    """nf:tumorTypeTerm carries the resolved EFO/MONDO term for a tumorType label.
+
+    Additive by design: nf:tumorType keeps the curated string. Most distinct
+    tumorType values in the portal have no exact ontology term, and several of
+    those are clinically meaningful categories (ANNUBP, atypical neurofibroma),
+    so replacing the label -- the way nf:dataType replaces its own -- would delete
+    the tumour type from those files entirely.
+    """
+
+    MONDO = "http://purl.obolibrary.org/obo/MONDO_"
+
+    def test_term_is_an_iri_not_a_literal(self, files_graph, namespaces):
+        terms = list(files_graph.objects(None, namespaces["nf"].tumorTypeTerm))
+        assert terms, "expected at least one nf:tumorTypeTerm"
+        for term in terms:
+            assert isinstance(term, URIRef), f"{term!r} should be an IRI"
+
+    def test_multi_value_label_yields_one_term_each(self, files_graph, namespaces):
+        """`Neurofibroma|Schwannoma` is two tumour types, so two terms."""
+        NF = namespaces["nf"]
+        subject = next(
+            s for s, o in files_graph.subject_objects(NF.tumorType)
+            if str(o) == "Neurofibroma"
+        )
+        terms = {str(t) for t in files_graph.objects(subject, NF.tumorTypeTerm)}
+        assert terms == {self.MONDO + "0016755", self.MONDO + "0002546"}
+
+    def test_label_survives_alongside_the_term(self, files_graph, namespaces):
+        """The string is not replaced -- both predicates are present."""
+        NF = namespaces["nf"]
+        subject = next(
+            s for s, o in files_graph.subject_objects(NF.tumorType)
+            if str(o) == "Neurofibroma"
+        )
+        labels = {str(o) for o in files_graph.objects(subject, NF.tumorType)}
+        assert {"Neurofibroma", "Schwannoma"} <= labels
+
+    def test_unmapped_label_keeps_its_string_and_gets_no_term(self, files_graph, namespaces):
+        """The case that makes this additive rather than a replacement: a label with
+        no exact ontology term must still say what the tumour was."""
+        NF = namespaces["nf"]
+        subjects = [
+            s for s, o in files_graph.subject_objects(NF.tumorType)
+            if str(o) == "Schwannoma"
+            and not list(files_graph.objects(s, NF.tumorTypeTerm))
+        ]
+        assert subjects, "expected a file whose tumorType resolved to no term"
+        for subject in subjects:
+            assert str(next(files_graph.objects(subject, NF.tumorType))) == "Schwannoma"
+
+    def test_no_sssom_sentinel_reaches_the_graph(self, files_graph, namespaces):
+        """`sssom:NoTermFound` marks a non-match in the mapping file. Expanding it
+        would assert a disease term that does not exist."""
+        for term in files_graph.objects(None, namespaces["nf"].tumorTypeTerm):
+            assert "NoTermFound" not in str(term)
