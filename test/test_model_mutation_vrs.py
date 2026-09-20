@@ -9,6 +9,7 @@ from rdflib import Graph, Namespace, URIRef
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from scripts.materialize_model_mutation_vrs import build_graph
+from scripts import mint_model_mutation_vrs as resolver
 from scripts.mint_model_mutation_vrs import (
     normalize_hgvs,
     parse_expression,
@@ -156,3 +157,60 @@ def test_mutation_iri_matches_the_rml_subject_template():
     assert str(subject) == (
         "http://nf-osi.github.com/terms#mutation/c9b33ec8-8862-4b18-b0ea-37ab8284ef53"
     )
+
+
+@pytest.mark.parametrize(
+    "searched,name,aliases,vs_spdi,evidence",
+    [
+        # A newer transcript alone cannot confirm the original intronic expression.
+        ("NM_000546.6:c.96+1G>A", "NM_000546.6(TP53):c.96+1G>A", [], None,
+         "clinvar_unconfirmed"),
+        # A prefix of a longer expression is not an exact HGVS match.
+        ("NM_000546.5:c.96+1G>A", "NM_000546.5(TP53):c.96+1G>AT", [], None,
+         "clinvar_unconfirmed"),
+        ("NM_000546.5:c.96+1G>A", "other", ["NM_000546.5:c.96+1G>AT"], None,
+         "clinvar_unconfirmed"),
+        # Gene/protein annotations do not change the transcript HGVS identity.
+        ("NM_000546.5:c.96+1G>A", "NM_000546.5(TP53):c.96+1G>A (p.?)", [], None,
+         "clinvar_only"),
+        # A bumped search is safe if an alias still confirms the original version.
+        ("NM_000546.6:c.96+1G>A", "NM_000546.6(TP53):c.96+1G>A",
+         ["NM_000546.5:c.96+1G>A"], None, "clinvar_only"),
+        # Independent projection of the original version also confirms identity.
+        ("NM_000546.6:c.96+1G>A", "NM_000546.6(TP53):c.96+1G>A", [],
+         "NC_000017.11:100:C:T", "both_agree"),
+        ("NM_000546.6:c.96+1G>A", "NM_000546.6(TP53):c.96+1G>A", [],
+         "NC_000017.11:200:C:T", "disagree"),
+    ],
+)
+def test_resolution_requires_original_expression_or_coordinate_agreement(
+    monkeypatch, searched, name, aliases, vs_spdi, evidence
+):
+    curated_hgvs = "NM_000546.5:c.96+1G>A"
+
+    def project(hgvs, throttle):
+        assert hgvs == curated_hgvs
+        return vs_spdi
+
+    def lookup(hgvs, throttle):
+        assert hgvs == curated_hgvs
+        return {"searched": searched, "name": name, "aliases": aliases,
+                "spdi": "NC_000017.11:100:C:T", "vcv": "VCV_TEST",
+                "chromosome": "17", "start": "101"}
+
+    monkeypatch.setattr(resolver, "variation_services_spdi", project)
+    monkeypatch.setattr(resolver, "clinvar_record", lookup)
+    (resolved,) = resolver.resolve_all(
+        [{"mutationId": "m1", "affectedGeneSymbol": "TP53",
+          "humanClinVarMutation": "NM_000546.5(TP53):c.96+1G>A"}],
+        FakeReference("chr17", 100, "C"), resolver.Throttle(0),
+    )
+    assert resolved["evidence"] == evidence
+    if evidence in {"both_agree", "clinvar_only"}:
+        assert resolved["genomic_spdi"] == "NC_000017.11:100:C:T"
+        assert resolved["reference_bases"] == "C"
+        assert resolved["alternate_bases"] == "T"
+    else:
+        assert resolved["genomic_spdi"] == ""
+        assert resolved["reference_bases"] == ""
+        assert resolved["vrs_id"] == ""

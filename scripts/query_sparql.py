@@ -266,9 +266,9 @@ SELECT ?metric (COUNT(DISTINCT ?s) AS ?count) WHERE {
     #   tier 2  protein string      the curated HGVS protein change equals the call's,
     #                               with the gene constrained on BOTH sides (pitfall 2)
     #
-    # Tier 2 is a fallback, not a weaker version of tier 1: the 63 curated mutations
-    # with only a bare cDNA string have no transcript to project from, so they can
-    # never reach tier 1 (see scripts/mint_model_mutation_vrs.py).
+    # Tier 2 compares protein strings for pairs without an identity match. It can
+    # connect different nucleotide alleles and also supports mutations whose bare
+    # cDNA curation cannot reach tier 1 (see scripts/mint_model_mutation_vrs.py).
     "variant-model-match": {
         "help": "Patient alleles that a curated model system carries, on both join tiers (1 = VRS allele identity, 2 = gene-constrained protein string). Params: gene",
         "binds": {"gene": "NF1"},
@@ -292,11 +292,10 @@ WHERE {{
     ?mutation nf:affectedGeneSymbol "{gene}" ; nf:proteinVariation ?tier2Change .
     ?obs nf:hgvsP ?tier2Change ; nf:affectedGene ?gene ; nf:observesVariant ?variant .
     ?variant nf:vrsId ?vrsId .
-    # A mutation that already matched on tier 1 is not also reported on tier 2.
+    # Deduplicate this mutation/allele pair only. A different patient allele can
+    # share its protein string and must still be reported as a tier-2 match.
     FILTER NOT EXISTS {{
-      ?mutation nf:mutationVrsId ?tier1Id .
-      ?tier1Variant nf:vrsId ?tier1Id .
-      ?tier1Obs nf:observesVariant ?tier1Variant .
+      ?mutation nf:mutationVrsId ?vrsId .
     }}
     BIND("2 protein string" AS ?tier)
   }}
@@ -364,21 +363,28 @@ WHERE {{
                         obo:SO_0001822 obo:SO_0001821 obo:SO_0002012 }}
         }} GROUP BY ?gene
       }}
-      # Tier 1: no curated mutation attached to a model carries this exact allele.
-      FILTER NOT EXISTS {{
-        ?m1 a nf:Mutation ; nf:mutationVrsId ?vrsId .
-        {{ ?r1 nf:hasMutation ?m1 }} UNION {{ ?r1 nf:hasNf1MutationSet/nf:hasMutation ?m1 }}
-      }}
-      # Tier 2: nor this protein change in this gene. Human symbol only -- the
-      # ortholog hop belongs to the gene-level question, where a mechanism-level
-      # match is the claim being made; here the claim is allele-level.
-      FILTER NOT EXISTS {{
-        ?m2 a nf:Mutation ; nf:affectedGeneSymbol ?symbol ; nf:proteinVariation ?hgvsP .
-        {{ ?r2 nf:hasMutation ?m2 }} UNION {{ ?r2 nf:hasNf1MutationSet/nf:hasMutation ?m2 }}
-      }}
     }}
     GROUP BY ?vrsId
     HAVING (COUNT(DISTINCT ?specimen) >= {minSpecimens})
+  }}
+  # Coverage is an allele-level decision, made after counting all observations.
+  # Tier 1: no curated mutation attached to a model carries this exact allele.
+  FILTER NOT EXISTS {{
+    ?m1 a nf:Mutation ; nf:mutationVrsId ?vrsId .
+    {{ ?r1 nf:hasMutation ?m1 }} UNION {{ ?r1 nf:hasNf1MutationSet/nf:hasMutation ?m1 }}
+  }}
+  # Tier 2: no observation of this allele matches a curated protein change in
+  # the same human gene. Fresh variables check every annotation: correlating on
+  # the counted observation's protein string would leave other transcripts of
+  # an already-covered allele in the gap list.
+  FILTER NOT EXISTS {{
+    ?coveredVariant nf:vrsId ?vrsId .
+    ?coveredObs nf:observesVariant ?coveredVariant ; nf:affectedGene ?coveredGene ;
+                nf:hgvsP ?coveredChange .
+    ?coveredGene a biolink:Gene ; nf:geneSymbol ?coveredSymbol .
+    ?m2 a nf:Mutation ; nf:affectedGeneSymbol ?coveredSymbol ;
+        nf:proteinVariation ?coveredChange .
+    {{ ?r2 nf:hasMutation ?m2 }} UNION {{ ?r2 nf:hasNf1MutationSet/nf:hasMutation ?m2 }}
   }}
   # Tumour types come from the file layer and fan out; ?vrsId is already bound to a
   # short list by the subquery above, so this stays a bound lookup rather than a

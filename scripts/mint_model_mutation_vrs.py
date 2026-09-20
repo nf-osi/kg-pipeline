@@ -264,8 +264,8 @@ def normalize_hgvs(value: str) -> str:
 #: How many RefSeq transcript versions above the curated one to try. ClinVar indexes
 #: HGVS against the CURRENT version of a transcript only, so a mutation curated as
 #: `NM_000546.5:c.405C>G` finds nothing once NCBI moves TP53 to `.6`. Walking forward
-#: cannot manufacture a false match: whatever it finds still has to produce the same
-#: genomic SPDI as the version the curator actually wrote.
+#: is only a search strategy: a hit must still agree with the original version's
+#: genomic SPDI or explicitly name the original expression in its name/aliases.
 VERSION_LOOKAHEAD = 3
 
 
@@ -399,9 +399,13 @@ def resolve_all(rows: list[dict[str, str]], reference: Reference,
             found.update(genomic_spdi=vs_spdi, evidence="variation_services_only",
                          notes="no single ClinVar record for this expression")
         elif cv_spdi:
-            wanted = normalize_hgvs(record["searched"])
-            named = (wanted in normalize_hgvs(record["name"])
-                     or any(wanted in normalize_hgvs(a) for a in record["aliases"]))
+            # The search may have advanced the transcript version. Without an
+            # independent projection, only the ORIGINAL expression can confirm
+            # identity. Equality also rejects a longer, different HGVS allele
+            # that happens to start with the curated expression.
+            wanted = normalize_hgvs(hgvs_c)
+            named = (wanted == normalize_hgvs(record["name"])
+                     or any(wanted == normalize_hgvs(a) for a in record["aliases"]))
             if named:
                 found.update(genomic_spdi=cv_spdi, evidence="clinvar_only",
                              notes="Variation Services cannot project this position "

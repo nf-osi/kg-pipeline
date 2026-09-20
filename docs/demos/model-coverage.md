@@ -70,9 +70,14 @@ Every query here labels the tier a row came from, because they do not mean the s
 | Tier | Join | What it asserts |
 |---|---|---|
 | **1 — allele identity** | `nf:mutationVrsId` == `nf:vrsId` | the curated mutation *is* the patient's allele. Nothing is compared but the digest |
-| **2 — protein string** | `nf:proteinVariation` == `nf:hgvsP`, gene constrained on both sides | the two spell the same protein change. Same locus, probably the same allele |
+| **2 — protein string** | `nf:proteinVariation` == `nf:hgvsP`, gene constrained on both sides | the two spell the same protein change in the same gene; nucleotide alleles can differ |
 
-Tier 2 is not a weaker tier 1; it is the tier for mutations that can never reach tier 1.
+Tier 2 supplies protein-string matches for mutation–patient-allele pairs without an
+identity match. A tier-1 match suppresses tier 2 only for that same pair: another patient
+allele sharing the protein string still appears at tier 2. The gap list excludes an
+entire VRS allele if any of its gene/protein annotations matches a model, so another
+transcript annotation cannot put a covered allele back on the gap list.
+
 Of 118 curated mutations, 45 carry a ClinVar expression with a transcript accession and so
 have coordinates. The other 73 carry a bare cDNA string (`c.910C>T`) or free text
 (`Ex16-35del`, *"De novo Alu repeat insertion in intron between exons 5 and 6"*) — with no
@@ -372,3 +377,7 @@ reports drift without editing the pin.
     counterpart of pitfall 3. ADPRHL1's single allele reports as 18 + 7 specimens when
     grouped by string and 25 when grouped by digest, which moves it four places up the
     ranking and changes which flag fires.
+13. **A newer transcript search hit is not confirmation of the curated expression.**
+    When Variation Services cannot project the original expression, ClinVar's name or
+    an alias must match that original normalized expression exactly. A newer transcript
+    version alone, or a longer expression with the same prefix, cannot establish identity.
