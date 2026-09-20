@@ -30,10 +30,12 @@ jobs:
           cache: pip
 
       # The RML mapping tests shell out to RMLMapper, which is a Java jar.
+      # 21, not 17: rmlmapper 8.1.0 ships class file version 65.0, which a Java 17
+      # runtime refuses to load (it reads up to 61.0).
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: "17"
+          java-version: "21"
 
       - name: Install dependencies
         run: |
