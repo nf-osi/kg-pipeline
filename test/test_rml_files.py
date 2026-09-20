@@ -177,8 +177,12 @@ class TestFilesMultiValue:
         assert "NTAP" in funders
         assert "NFRI" in funders
 
-    def test_compound_name_split(self, files_graph, namespaces):
-        """compoundName should split on pipe delimiter"""
+    def test_compound_name_is_carried_verbatim(self, files_graph, namespaces):
+        """compoundName is NOT split. A comma is both a separator and a character
+        inside chemical names (`2,6-dimethoxyquinone`, `Acridine, 9-phenoxy-`), so the
+        ingest carries the value whole and mappings/compound_chembl.tsv resolves it,
+        where an attempted split can be checked against ChEMBL before it is believed.
+        """
         NF = namespaces["nf"]
         query = """
         SELECT ?c WHERE {
@@ -186,11 +190,11 @@ class TestFilesMultiValue:
         }
         """
         compounds = [str(r.c) for r in files_graph.query(query, initNs={"nf": NF})]
-        assert "DrugA" in compounds
-        assert "DrugB" in compounds
+        assert compounds == ["DrugA,DrugB"]
 
-    def test_experimental_condition_split(self, files_graph, namespaces):
-        """experimentalCondition should split on pipe delimiter"""
+    def test_experimental_condition_is_carried_verbatim(self, files_graph, namespaces):
+        """Same reasoning as compoundName: the field mixes compounds with prose
+        (`Maternal & Postnatal High-Fat, High-Sucrose Diet`)."""
         NF = namespaces["nf"]
         query = """
         SELECT ?ec WHERE {
@@ -198,8 +202,7 @@ class TestFilesMultiValue:
         }
         """
         conditions = [str(r.ec) for r in files_graph.query(query, initNs={"nf": NF})]
-        assert "ConditionX" in conditions
-        assert "ConditionY" in conditions
+        assert conditions == ["ConditionX,ConditionY"]
 
     def test_model_system_name_split(self, files_graph, namespaces):
         """modelSystemName should split on pipe delimiter"""
@@ -258,8 +261,16 @@ class TestFilesPlaceholderValues:
         diagnoses = [str(r.diagnosis) for r in files_graph.query(query, initNs={"nf": NF})]
         assert diagnoses == ["Unknown"]
 
-    def test_compound_name_none_normalized_casing(self, files_graph, namespaces):
-        """compoundName 'none' should normalize casing to 'None'"""
+    def test_compound_name_placeholder_is_not_rewritten(self, files_graph, namespaces):
+        """compoundName 'none' is emitted as recorded.
+
+        The mapping used to pass this through a grel:controls_if guard that rewrote
+        it to 'None' -- and that same guard put literal "None" values on files whose
+        compoundName was simply empty. The value is now carried verbatim, and whether
+        'none' means a vehicle control or a missing annotation is a curation question,
+        visible as a value_class in mappings/compound_chembl.tsv rather than papered
+        over by a casing rule here.
+        """
         NF = namespaces["nf"]
         query = """
         SELECT ?c WHERE {
@@ -267,7 +278,7 @@ class TestFilesPlaceholderValues:
         }
         """
         compounds = [str(r.c) for r in files_graph.query(query, initNs={"nf": NF})]
-        assert compounds == ["None"]
+        assert compounds == ["none"]
 
     def test_individual_id_placeholder_becomes_status_class(self, files_graph, namespaces):
         """individualID 'unknown' should not produce nf:individualID; instead
@@ -520,3 +531,4 @@ class TestFilesEmptyFields:
 
 
 # Run with: pytest test/test_rml_files.py -v
+
