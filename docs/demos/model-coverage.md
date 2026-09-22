@@ -13,28 +13,19 @@ Built to the plan in [demo-1-model-coverage.md](demo-1-model-coverage.md). Every
 below is the result of a real run against the index described under Build context, not an
 illustration.
 
-## What changed to make it answerable
-
-Three things, all of which §B5 named as blockers.
+## What makes it answerable
 
 | | Before | After |
 |---|---|---|
-| Cell-line names | 0 of 636 cell lines carried `nf:name`; §B5's answer was a UUID | 664 of 664 |
 | Curated mutations with an allele identity | none — the join was a protein string | 45 of 118 carry `nf:mutationVrsId` |
 | Animal models reaching a human gene | 4 of 130, and 2 of those 4 are Cre drivers | 31 of 130 |
 
-1. **Core rebuild.** The local snapshot predated `75eafb62` (2026-08-31), which both
-   added `nf:name` and re-keyed every tool-type resource from `nf:cellLine/{id}` onto a
-   shared `nf:resource/{resourceId}`. Rebuilding only `cell_lines.ttl` would have
-   orphaned it from `mutation_model.ttl`, `nf1_mutation_sets.ttl`, `observation_links.ttl`
-   and `files.ttl`, all of which still pointed at the old IRIs — so the whole core was
-   rebuilt from the 2026-09-02 CSVs, `files.ttl` included.
-2. **[`mappings/orthologs.tsv`](../../mappings/orthologs.tsv)** — 7 ortholog pairs over
+- **[`mappings/orthologs.tsv`](../../mappings/orthologs.tsv)** — 7 ortholog pairs over
    the genes in `mutations.csv`, from a digest-pinned Alliance of Genome Resources
    release. This is what lets a mouse `Nf1` model meet a human `NF1` gene node.
-3. **[`mappings/model_mutation_vrs.tsv`](../../mappings/model_mutation_vrs.tsv)** — VRS
-   digests for the 45 curated mutations that carry a ClinVar expression, minted with the
-   same `vrsify` and the same GRCh38 reference as the patient alleles. This is what turns
+- **[`mappings/model_mutation_vrs.tsv`](../../mappings/model_mutation_vrs.tsv)** — VRS
+   digests for the 45 curated mutations that carry a ClinVar expression, minted with the same
+   `vrsify` and GRCh38 reference as the patient alleles. This is what turns
    the model↔patient join from a string comparison into an identity.
 
 ## Build context
@@ -49,9 +40,6 @@ Three things, all of which §B5 named as blockers.
 | Ortholog source | Alliance of Genome Resources 9.0.0, Stringent filter, file generated 2026-04-05 UTC, `sha256:977ad252…` |
 | Coordinate sources | NCBI Variation Services + ClinVar E-utilities, accessed 2026-09-18 |
 | Model mutation VRS | `vrsify 0.1.0`, GRCh38 (`hg38.fa` + `seqmap.tsv`), minted 2026-09-18 |
-
-The previous index (`:7002`, 26,124,204 triples) is the one §B5 was measured on. The
-774k-triple difference is the core rebuild plus 87 triples of new bridge.
 
 ```sh
 Q="python scripts/query_sparql.py --endpoint http://localhost:7004 --format tsv"
@@ -98,10 +86,9 @@ about this data, not a property of the design. Tier 2 stays because those 10 are
 curation pass away from mattering, and because 63 mutations reachable by neither tier is
 the number that should drive the next curation ask.
 
-## 2. §B5 reproduced, and one model it could not see
+## 2. Models seen in current version of demo
 
-`--canned variant-model-match --bind gene=NF1`. All 5 of §B5's protein changes and all 11
-of its cell lines survive digest-level identity — and the names are names now.
+`--canned variant-model-match --bind gene=NF1`.
 
 | Tier | Patient change | Curated protein | Curated ClinVar expression | Model | Kind | Specimens |
 |---|---|---|---|---|---|---|
@@ -113,10 +100,7 @@ of its cell lines survive digest-level identity — and the names are names now.
 | 1 | `p.Arg1968Ter` | `p.Arg1968Ter` | `NM_001042492.3(NF1):c.5902C>T` | RG-315 | cell line | 1 |
 | **1** | **`p.Arg1968Ter`** | — | **`NM_000267.3(NF1):c.5839C>T (p.Arg1947Ter)`** | **Nf1pArg1947mp1** | **animal model** (*Sus scrofa*) | **1** |
 
-**5 alleles, 11 cell lines, 1 animal model, 6 patient specimens.** §B5 measured 5 / 11 / 6
-on the protein string alone; the pig is what identity adds.
-
-The last row is new, and it is the clearest single argument for the allele-identity tier.
+**5 alleles, 11 cell lines, 1 animal model, 6 patient specimens.**
 
 `Nf1pArg1947mp1` is an Ossabaw minipig — *"[From GFF:] Minipig model containing a recurrent
 nonsense mutation p.Arg1947\*(R1947\*)"* — commercially available, with a linked
@@ -124,7 +108,7 @@ publication. It carries the **same allele** as a cutaneous neurofibroma from
 `patient9tumor1` in the `nfib_ctf_biobank_2025` cohort: `ga4gh:VA.XdnQRoJrH9WSI8nL-PwhTedWxDF9K0s3`,
 a `stop_gained` (`obo:SO_0001587`).
 
-The protein-string join could not find it, for two independent reasons:
+A protein-string join would not find it, for two independent reasons:
 
 - The curated record has **no `nf:proteinVariation` at all** — only the ClinVar
   expression. There is no string for tier 2 to compare.
@@ -165,8 +149,7 @@ specimens with no model on either tier. 54 rows; the top 12:
 | UNC80 | `p.Asp749Val` | 6 | 2 | — | 1.15 | — | cNF, diffuse astrocytoma |
 | BICDL1 | `p.Ala42del` | 5 | 1 | 6.6e-6 | 0.57 | — | schwannoma |
 
-**Read the flag column before reading the ranking.** The top two rows are what
-[§A3](variant-layer-demo.md#a3-ranking-genes-without-being-fooled-by-gene-length) predicts:
+**Read the flag column before reading the ranking.** The top two rows are a known artifact:
 `gene alleles/specimen` far below 1 means a handful of alleles shared by many samples,
 which is the signature of germline leakage or a mapping artifact, not of a recurrent
 somatic driver. ADPRHL1 has 5 alleles across 28 specimens; KRTAP1-3 is a keratin-associated
@@ -174,7 +157,7 @@ protein in a repeat family. Both are flagged and both stay on the list — the p
 for flags rather than silent filtering, and a demo that quietly drops rows is not auditable.
 
 The one row on this list with the driver signature is **NF1 `p.Arg1534Ter`** — 0.95 alleles
-per specimen, 6 specimens, 3 of 4 cohorts, 5 tumour types, gnomAD AF 6.6e-6, no model
+per specimen, 6 specimens, 3 of 4 cohorts, 5 tumour types, gnomAD AF 6.6e-6, and no model
 system in the registry. That is the work order. (And it is one allele: `p.Arg1534Ter` and
 `p.Arg1513Ter` are the same call spelled against two transcripts, which is why the query
 groups on `nf:vrsId`. Grouped on the protein string it would appear twice, lower down.)
