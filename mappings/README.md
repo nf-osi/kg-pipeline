@@ -40,18 +40,15 @@ regeneration — set `method=manual` to fix a barcode by hand. `scripts/validate
 checks that every specimen named here actually exists.
 
 The last two are the two bridges between the curated model-system layer and the somatic
-variant layer, built for [demo 1](../docs/demos/demo-1-model-coverage.md). Both are
-checked in rather than fetched at build time, because both need the network and neither
-changes on a build cadence — `orthologs.tsv` is ~20 rows keyed to the genes in
+variant layer. Both are checked in rather than fetched at build time, because both need the network and neither
+changes on a build cadence. `orthologs.tsv` is ~20 rows keyed to the genes in
 `mutations.csv`, and `model_mutation_vrs.tsv` is 46. They are turned into triples
 offline by `scripts/materialize_orthologs.py` and
 `scripts/materialize_model_mutation_vrs.py`.
 
-`orthologs.tsv` carries a `status` column so what it *refuses* to assert is as visible
-as what it does: a Cre driver line curated under the promoter's symbol (`Dhh`, `GFAP`,
-`SynI`) gets `status=excluded` with a reason, not silence. Its source is pinned by
-SHA-256 in `fetch_orthologs.py`; `python scripts/check_source_versions.py
---check-external` re-hashes it and reports drift without editing the pin.
+`orthologs.tsv` includes a `status` column to make exclusions explicit. 
+Cre driver lines curated under promoter symbols such as `Dhh`, `GFAP`, and `SynI` are marked `status=excluded` with a reason. 
+The source is SHA-256 pinned in `fetch_orthologs.py`, and `check_source_versions.py --check-external` reports source drift without modifying the pin.
 
 ## RML (`rml/`)
 
