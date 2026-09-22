@@ -12,6 +12,11 @@ on:
         description: "Custom image tag (optional, defaults to build-<run_number>)"
         required: false
         type: string
+      deposit:
+        description: "Deposit this build's RDF snapshot to Sage Brain S3 (pauses for review)"
+        required: false
+        type: boolean
+        default: false
 
 env:
   REGISTRY: ghcr.io
@@ -167,3 +172,20 @@ jobs:
           push: true
           tags: ${{ steps.meta-text.outputs.tags }}
           labels: ${{ steps.meta-text.outputs.labels }}
+
+  # Build and publish in one go. Off unless the run was dispatched with
+  # `deposit: true` — a tag build is published by dispatching "Deposit to Sage
+  # Brain" with its run ID, so every deposit is a deliberate, reviewed act.
+  # The called job parks on the `sagebrain-prod` environment for a reviewer
+  # before it fetches anything; declining leaves S3 untouched.
+  deposit:
+    needs: build
+    if: inputs.deposit
+    uses: ./.github/workflows/deposit-sagebrain.yml
+    # build_run_id is omitted on purpose: a called workflow shares this run's ID,
+    # so the snapshot it deposits is the kg-data artifact `build` just uploaded.
+    secrets: inherit
+    permissions:
+      contents: read
+      actions: read
+      id-token: write
