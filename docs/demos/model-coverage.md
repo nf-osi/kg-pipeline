@@ -1,17 +1,12 @@
-# Demo 1 — Patient alleles vs. model systems: covered, and not covered
+# Patient alleles vs. model systems representation and gaps
 
-The inversion of [variant-layer-demo.md §B5](variant-layer-demo.md#b5-from-a-patients-allele-to-a-model-system-that-carries-it).
-§B5 asks "is any patient allele already modelled?" and answers with 5 protein changes and
-11 cell lines. This asks the question a funder asks:
+"Is any patient allele already modelled?" can be answered, leading to one result with 5 protein changes and
+11 cell lines. This demo addresses another question a funder might ask:
 
 > **Which recurrent patient alleles in these cohorts have no model system — ranked by how
 > many specimens carry them?**
 
-and its mirror, which curated models carry mutations no patient here has.
-
-Built to the plan in [demo-1-model-coverage.md](demo-1-model-coverage.md). Every number
-below is the result of a real run against the index described under Build context, not an
-illustration.
+and its mirror, which curated models carry mutations no patient has.
 
 ## What makes it answerable
 
@@ -51,42 +46,40 @@ $Q --canned model-without-patient-allele
 
 ---
 
-## 1. The two tiers, and what the second one is for
+## 1. Two matching tiers
 
-Every query here labels the tier a row came from, because they do not mean the same thing.
+Every result records how the patient and model variants were matched because the two matching strategies support different claims.
 
 | Tier | Join | What it asserts |
 |---|---|---|
 | **1 — allele identity** | `nf:mutationVrsId` == `nf:vrsId` | the curated mutation *is* the patient's allele. Nothing is compared but the digest |
 | **2 — protein string** | `nf:proteinVariation` == `nf:hgvsP`, gene constrained on both sides | the two spell the same protein change in the same gene; nucleotide alleles can differ |
 
-Tier 2 supplies protein-string matches for mutation–patient-allele pairs without an
-identity match. A tier-1 match suppresses tier 2 only for that same pair: another patient
-allele sharing the protein string still appears at tier 2. The gap list excludes an
-entire VRS allele if any of its gene/protein annotations matches a model, so another
-transcript annotation cannot put a covered allele back on the gap list.
+Tier 2 supplies matches only where an allele-identity match is unavailable for the same model-mutation/patient-allele pair. 
+A Tier 1 match suppresses the corresponding Tier 2 result for that pair, but another patient allele producing the same protein change can still appear as Tier 2.
 
-Of 118 curated mutations, 45 carry a ClinVar expression with a transcript accession and so
-have coordinates. The other 73 carry a bare cDNA string (`c.910C>T`) or free text
-(`Ex16-35del`, *"De novo Alu repeat insertion in intron between exons 5 and 6"*) — with no
-transcript there is nothing to project, and [new-layers.md §1](new-layers.md) puts
-VariantValidator/VEP projection out of scope.
+The gap analysis operates at the VRS allele level: if any gene/protein annotation for an allele matches a model, that allele is considered represented. 
+This prevents alternate transcript annotations from causing the same biological allele to appear both matched and unmatched.
 
-How the two tiers divide the 118:
+Of 118 curated mutations, 45 contain a ClinVar expression with enough transcript information to resolve genomic coordinates. 
+The remaining 73 contain only bare cDNA expressions such as c.910C>T or free-text descriptions such as Ex16-35del. 
+Without a transcript accession, those records cannot be projected reliably to genomic coordinates and therefore cannot currently receive VRS identity.
+
+The 118 mutations divide as follows:
 
 | | has a protein string | no protein string |
 |---|---|---|
 | **has a VRS digest** | 40 — both tiers | 5 — tier 1 only |
 | **no VRS digest** | **10 — tier 2 only** | 63 — reachable by neither |
 
-**Measured on this index, tier 2 adds nothing tier 1 does not already find.** Of 65,163
-protein-altering patient alleles, 5 are modelled at tier 1 and **0 more at tier 2 only** —
-none of the 10 tier-2-only mutations matches a call in these cohorts. That is a result
-about this data, not a property of the design. Tier 2 stays because those 10 are one
-curation pass away from mattering, and because 63 mutations reachable by neither tier is
-the number that should drive the next curation ask.
+**With the current data, tier 2 does not add any additional patient matches.** Of 65,163
+protein-altering patient alleles, 5 are modelled at tier 1 and 
+**0 additional alleles are represented only through Tier 2**. 
 
-## 2. Models seen in current version of demo
+The 10 Tier-2-only mutations remain potentially useful if future cohorts contain matching protein changes. 
+More importantly, the 63 mutations reachable by neither tier identify a clear model-curation gap.
+
+## 2. Patient alleles represented in the current model registry
 
 `--canned variant-model-match --bind gene=NF1`.
 
@@ -110,12 +103,11 @@ a `stop_gained` (`obo:SO_0001587`).
 
 A protein-string join would not find it, for two independent reasons:
 
-- The curated record has **no `nf:proteinVariation` at all** — only the ClinVar
+- The curated record has **no `nf:proteinVariation` at all**, only the ClinVar
   expression. There is no string for tier 2 to compare.
 - Even if there were, it would be `p.Arg1947Ter` (NM_000267.3 numbering) against the
-  patient's `p.Arg1968Ter` (NM_001042492.3). Different strings, one allele. This is
-  [pitfall 3](variant-layer-demo.md#pitfalls-these-queries-encode) with a model system on
-  the other end of it.
+  patient's `p.Arg1968Ter` (NM_001042492.3). The strings differ because of transcript choice;
+  the VRS identity shows that they represent the same allele.
 
 Minting VRS for the curated mutations collapses five such pairs:
 
@@ -127,12 +119,17 @@ Minting VRS for the curated mutations collapses five such pairs:
 | `ga4gh:VA.pjTOXfH_cUb4dtkw…` | `NF1 c.2041C>T` | `Nf1 c.2041C>T` (mouse casing) |
 | `ga4gh:VA.QRPxJFmsOsOhfJOR…` | `NF1 c.2542G>C` | `Nf1 c.2542G>C` |
 
-40 distinct curated expressions, **37 distinct alleles**.
+The 40 distinct curated ClinVar expressions therefore resolve to 37 distinct alleles.
 
-## 3. The gap list
+## 3. Patient alleles not represented in the model registry
 
-`--canned variant-model-gap --bind minSpecimens=4`. Protein-altering alleles in ≥4
-specimens with no model on either tier. 54 rows; the top 12:
+Running:
+
+`$Q --canned variant-model-gap --bind minSpecimens=4`
+
+returns protein-altering alleles observed in at least 4 specimens that have no matching model under either tier.
+
+There are 54 such alleles. The top 12 by specimen count are:
 
 | Gene | Protein change(s) | Specimens | Cohorts | gnomAD AF | Gene alleles/specimen | Flag | Tumour types |
 |---|---|---|---|---|---|---|---|
@@ -149,21 +146,22 @@ specimens with no model on either tier. 54 rows; the top 12:
 | UNC80 | `p.Asp749Val` | 6 | 2 | — | 1.15 | — | cNF, diffuse astrocytoma |
 | BICDL1 | `p.Ala42del` | 5 | 1 | 6.6e-6 | 0.57 | — | schwannoma |
 
-**Read the flag column before reading the ranking.** The top two rows are a known artifact:
-`gene alleles/specimen` far below 1 means a handful of alleles shared by many samples,
-which is the signature of germline leakage or a mapping artifact, not of a recurrent
-somatic driver. ADPRHL1 has 5 alleles across 28 specimens; KRTAP1-3 is a keratin-associated
-protein in a repeat family. Both are flagged and both stay on the list — the plan asked
-for flags rather than silent filtering, and a demo that quietly drops rows is not auditable.
+**Read the flag column before reading the ranking.** 
+
+A high specimen count does not by itself identify a biologically meaningful recurrent event. 
+The top two rows are a known artifact: `gene alleles/specimen` far below 1 means a handful of alleles shared by many samples, 
+which is the signature of germline leakage or a mapping artifact, not of a recurrent somatic driver. 
+ADPRHL1 has 5 alleles across 28 specimens; KRTAP1-3 is a keratin-associated protein in a repeat family. 
+These rows remain visible rather than being silently filtered so that the ranking stays auditable.
 
 The one row on this list with the driver signature is **NF1 `p.Arg1534Ter`** — 0.95 alleles
 per specimen, 6 specimens, 3 of 4 cohorts, 5 tumour types, gnomAD AF 6.6e-6, and no model
-system in the registry. That is the work order. (And it is one allele: `p.Arg1534Ter` and
-`p.Arg1513Ter` are the same call spelled against two transcripts, which is why the query
-groups on `nf:vrsId`. Grouped on the protein string it would appear twice, lower down.)
+system in the registry. 
 
-Restricted to NF1, the complete list of unmodelled recurrent alleles is short enough to act
-on:
+p.Arg1534Ter and p.Arg1513Ter are two transcript-level protein descriptions of the same VRS allele. 
+Grouping by nf:vrsId correctly treats them as one event.
+
+Restricted to NF1, the recurrent registry gaps are short enough to inspect directly:
 
 | NF1 allele | Specimens | Cohorts | Tumour types |
 |---|---|---|---|
@@ -172,13 +170,24 @@ on:
 | `p.Arg2450Ter` | 2 | 1 | cNF |
 | `p.Gln1703Ter` | 2 | 1 | pNF |
 
-How much of the list is threshold: 563 alleles in ≥2 specimens, 144 in ≥3, 54 in ≥4, 21 in
-≥5. At ≥4, 13 of 54 carry a flag.
+The size of the gap list is sensitive to the recurrence threshold:
+- 563 alleles in ≥2 specimens
+- 144 in ≥3
+- 54 in ≥4
+- 21 in ≥5
 
-## 4. Gene-level coverage, with the animal models finally in it
+But consider that at ≥4, 13 of 54 rows carry an artifact or frequency flag.
 
-`--canned variant-model-gap-genes`. Before the ortholog crosswalk, **4 of 130 animal models
-reached any human gene**, and two of those four were Gfap-Cre drivers. Now 31 do.
+## 4. Gene-level model representation
+
+Allele-level matching is appropriate for asking whether a specific patient variant has a corresponding model. 
+Animal models also support a broader question: is the altered human gene represented by any curated model of that gene or its ortholog?
+
+The ortholog layer makes this comparison possible.
+
+Before adding it, only 4 of 130 animal models connected to a human gene, and 2 of those 4 were Cre driver lines. With the crosswalk, 31 of 130 do.
+
+Among genes observed in the patient cohorts, the model registry currently contains:
 
 | Gene | Specimens | Alleles | Cohorts | Cell lines | Animal models | Route | Model species |
 |---|---|---|---|---|---|---|---|
@@ -195,8 +204,9 @@ reached any human gene**, and two of those four were Gfap-Cre drivers. Now 31 do
 | TSC1 | 4 | 5 | 2 | 1 | 0 | direct | — |
 | **PTPN11** | 3 | 4 | 2 | 0 | **1** | **ortholog only** | mouse |
 
-Those twelve are the whole of it. Every other observed gene has zero models, including the
-top of the cohort ranking:
+These are the only observed genes with a model connection in the current registry.
+
+Several highly observed genes have no corresponding curated model:
 
 | Gene | Specimens | Alleles | Cohorts | Models |
 |---|---|---|---|---|
@@ -207,13 +217,15 @@ top of the cohort ranking:
 | LRTM3 | 26 | 50 | 3 | **0** |
 | OBSCN | 25 | 52 | 4 | **0** |
 
-TTN, MUC16, OBSCN and LRTM3 are the long-gene passenger signature §A3 describes — no model
-is needed and none should be built. **NF2 is not.** 28 specimens, 28 alleles, 1.00 alleles
-per specimen across 3 cohorts: the same driver signature as NF1, and not one cell line or
-animal model in the registry carries an NF2 mutation. For a portfolio that funds
-NF2-related schwannomatosis, that is the single most consequential row in this document.
+TTN, MUC16, OBSCN, and LRTM3 show patterns consistent with long-gene/passenger effects — no model
+is needed and none should be built. 
 
-Three caveats belong on the slide with this table:
+But **NF2** is different in this dataset: 28 specimens contain 28 NF2 alleles across 3 cohorts, 
+for exactly 1.00 allele per specimen, yet the current registry contains no cell line or animal model linked to an NF2 mutation.
+
+That makes NF2 a prominent registry representation gap for follow-up, especially in a portfolio that includes NF2-related schwannomatosis.
+
+### Important qualifications
 
 - **A gene-level match is not an allele match.** A mouse `Nf1` knockout covers an NF1
   patient at the mechanism level. The `route` column says which rows depend on that
@@ -223,30 +235,35 @@ Three caveats belong on the slide with this table:
   promoter driving Cre, not a broken gene. The query flags this from
   `nf:alleleType = Recombinase`, and `mappings/orthologs.tsv` lists `GFAP`, `SynI` and
   `Dhh` as `status=excluded` with the reason, so their absence from the ortholog graph is
-  a decision on the record. The `GFAP` row survives only because `GFAP` is also a real
+  clear. The `GFAP` row survives only because `GFAP` is also a real
   human symbol and reaches the gene by the direct route, where no ortholog row exists to
   exclude it. **This is a curation problem, not a query problem**: a driver line should
   not be curated as a mutation in the promoter's gene.
 - **CDKN2A does not appear**, despite having 5 cell lines and 1 mouse model. It scores
   0 of 169 specimens because this layer carries small variants only and CDKN2A is lost by
-  deletion. Absence from this table is not absence of alteration — see
-  [demo 3](demo-3-copy-number.md).
+  deletion. Absence from this table is not absence of alteration.
 
-## 5. The mirror: models carrying alleles no patient here has
+## 5. The mirror analysis: model alleles not observed in these cohorts
 
-`--canned model-without-patient-allele`. Of the 111 curated mutations attached to a model,
-**8 match a patient allele and 103 do not** — split into two findings that should not be
-read as one:
+Running:
+
+`$Q --canned model-without-patient-allele`
+
+examines the comparison from the model side.
+
+Of 111 curated mutations attached to a model: 8 match a patient allele, 103 do not.
+
+The 103 unmatched mutations fall into two importantly different categories:
 
 | Reason | Mutations | Models affected | What it means |
 |---|---|---|---|
 | 1 — allele minted, never observed | 33 | 100 | a real statement about these four cohorts |
 | 2 — no VRS identity mintable | 70 | 142 | a statement about the curation, not about patients |
 
-(The two model counts overlap: a line carrying both an `Nf1` allele and a Cre transgene is
+(The two model counts can overlap: a line carrying both an `Nf1` allele and a Cre transgene is
 in both rows.)
 
-Examples of the first kind, which is the kind that can be quoted:
+Examples from the first category are:
 
 | Gene | Curated | Allele | Models |
 |---|---|---|---|
@@ -257,45 +274,20 @@ Examples of the first kind, which is the kind that can be quoted:
 | NF1 | `c.6641+1G>T` | `ga4gh:VA.Snm0jh43GQWHRQUL…` | 4 (icNF98.4c/d, cNF98.4c/d) |
 | PIK3CA | `c.1624G>A` (`p.Glu542Lys`) | `ga4gh:VA.EQ5CsXtT8KcVEtOU…` | 2 (NCC-MPNST3 pair) |
 
-The `p.Arg681*` row is the honest reading of the whole exercise: twelve model systems carry
+The `p.Arg681*` example is useful for interpreting this analysis correctly: twelve model systems carry
 an allele that none of 169 sequenced specimens here does. That is **not** evidence the
-models are wrong — R681X is a well-known recurrent NF1 allele and these cohorts are four
-convenience samples, not a population. It is evidence that *this registry's model portfolio
-and this registry's sequenced patients were assembled independently*, which is exactly the
-thing the graph is now able to say.
+models are irrelevant — R681X is a well-known recurrent NF1 allele. 
+It indicates that the model portfolio and the sequenced patient cohorts represent 
+different subsets of NF variation. The graph now makes that difference measurable.
 
 The second group is mostly HEK293/Schwann-cell engineering lines whose curated
 `nf:sequenceVariation` records the editing scar (`c.101del`, `c.102del`, `c.103del`,
-`c.103_104delins122`, each on 14 or 4 lines) rather than a patient-comparable allele. Those
-should never appear in a coverage claim in either direction, and the `reason` column keeps
-them from doing so.
+`c.103_104delins122`, each on 14 or 4 lines) rather than a patient-comparable allele.
+Without sufficient transcript and genomic context, these mutations cannot currently be compared to patient alleles by identity.
 
-## 6. Two curation defects the crosswalk surfaced
+The `reason` field keeps these curation limitations separate from genuine "allele not observed" results.
 
-Neither was looked for.
-
-1. **`NF1 c.2542G>T` vs `c.2542G>C`.** Mutation `7658c873…` records
-   `humanClinVarMutation: NM_000267.3(NF1):c.2542G>C (p.Gly848Arg)` and
-   `sequenceVariation: c.2542G>T`. Codon 848 is `GGG`; `G>C` gives `CGG` (Arg, as
-   curated), `G>T` gives `TGG` (Trp). The cDNA column contradicts the other two columns
-   on the same row, and ClinVar has no `NM_000267.3:c.2542G>T` record at all. Minting
-   from the ClinVar expression is what made the two columns comparable.
-2. **`NM_000546.5(TP53):c.405C>G` is pinned to a retired transcript version.** ClinVar
-   indexes HGVS against the *current* RefSeq version only, so the curated string finds
-   nothing; NCBI now files it under `NM_000546.6`. The minting script walks the version
-   forward and records the substitution in the row's `notes`, and the digest is still only
-   accepted because the two independent resolvers agree on the coordinates.
-
-A third, found while pinning down which table version the first two are against:
-`mutationDetailsId` is not unique in `syn26486835` v11 — 120 rows, 118 distinct ids. Of the
-two duplicated pairs, one is a plain duplicated row already filed upstream; the other holds
-the same allele written against two NF1 transcripts, and is the one worth reporting.
-
-All three are written up as submittable issue text, with the source-version provenance
-worked out, in [curation-issues-from-demo-1.md](curation-issues-from-demo-1.md). The first
-two are visible in `mappings/model_mutation_vrs.tsv`.
-
-## What this cannot answer
+### Important qualifications
 
 - **Recurrence here is not population recurrence.** Four cohorts, four assay designs, four
   calling pipelines. "Unmodelled in this registry, observed in these cohorts" is the
@@ -305,28 +297,20 @@ two are visible in `mappings/model_mutation_vrs.tsv`.
   that exists but is not in the registry, or is in the registry with its mutation
   uncurated, reads as a gap. 73 of 118 curated mutations have no mintable identity, so the
   tier-1 gap list is an upper bound on the gap.
-- **Small variants only.** No CNV, no structural variants, no fusions; CDKN2A's absence
-  above is the visible consequence.
 - **Absence of a call is not wild type.** A specimen with no call in a gene may be
   uncovered or filtered.
 - **The artifact flags are heuristics.** `alleles/specimen` has no background model and no
   gene-length term, and gnomAD AF is present on only a minority of calls, so an unflagged
   row is not certified somatic.
 - **`nf:orthologOf` says nothing about the allele.** The ortholog layer is 7 pairs over 5
-  human genes, and covers only the genes in `mutations.csv` — by design
-  ([out of scope](demo-1-model-coverage.md#out-of-scope)), not by omission.
+  human genes, and covers only the genes in `mutations.csv` by design, not by omission.
 
 ## Reproducing this
 
 ```sh
-# 1. Rebuild the core. The whole core, not just cell_lines: 75eafb62 re-keyed the
-#    resource IRIs, so a partial rebuild orphans the mutation and observation links.
-#    This run reused the 2026-09-02 CSVs rather than re-fetching from Synapse: every
-#    mapping was re-run with RMLMapper directly (files.rml.ttl chunked at 100k rows via
-#    RMLMapperResource.run_chunked), then the three derived materializers.
-dagster asset materialize --select 'portal/*' -m orchestration.dagster_pipeline
+# 1. Rebuild the whole core
 
-# 2. The two bridges. Both need the network and neither is a pipeline asset; both write
+# 2. Build the two crosswalks. Both need network access; both write
 #    a reviewed TSV into mappings/ that the pipeline then serializes.
 python scripts/fetch_orthologs.py                 # -> mappings/orthologs.tsv
 python scripts/mint_model_mutation_vrs.py         # -> mappings/model_mutation_vrs.tsv
@@ -344,23 +328,3 @@ docker run -d --name kg-variants-demo1 -p 7004:7001 kg:variants-demo1
 `check_source_versions.py --check-external` re-hashes the pinned Alliance release and
 reports drift without editing the pin.
 
-## New pitfalls, for the list in variant-layer-demo.md
-
-10. **QLever's `GROUP_CONCAT` returns the empty string for the whole group if any member
-    is unbound.** Concatenating `nf:species` over a gene's models blanked the column for
-    every gene that has both cell lines (no species) and animal models (species) — not
-    just the cell-line rows, the entire cell. `COALESCE(?species, "unstated")` fixes it.
-    Same failure family as [pitfall 4](variant-layer-demo.md#pitfalls-these-queries-encode)
-    (`GROUP_CONCAT` over an IRI), and just as silent.
-11. **A canned-query parameter that lands outside a string literal cannot be made safe by
-    escaping quotes.** `HAVING(… >= {minSpecimens})` interpolates into SPARQL, not into a
-    literal, so `query_sparql.py` validates numeric binds as integers instead. See
-    `numeric_binds` in `CANNED_QUERIES`.
-12. **Group the gap list on `nf:vrsId`, not on the protein string** — the allele-level
-    counterpart of pitfall 3. ADPRHL1's single allele reports as 18 + 7 specimens when
-    grouped by string and 25 when grouped by digest, which moves it four places up the
-    ranking and changes which flag fires.
-13. **A newer transcript search hit is not confirmation of the curated expression.**
-    When Variation Services cannot project the original expression, ClinVar's name or
-    an alias must match that original normalized expression exactly. A newer transcript
-    version alone, or a longer expression with the same prefix, cannot establish identity.
