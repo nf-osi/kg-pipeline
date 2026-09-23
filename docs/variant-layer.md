@@ -292,7 +292,7 @@ export VRSIFY_REFERENCE=/path/to/hg38.fa VRSIFY_SEQMAP=/path/to/seqmap.tsv
 # VRSIFY_BIN only if `vrsify` is not on PATH (default: `vrsify`).
 
 export KG_INCLUDE_VARIANTS=1        # gate 1: generate the layer at all
-dagster asset materialize --select 'variants/*' -m orchestration.dagster_pipeline
+dagster asset materialize --select 'group:variants' -m orchestration.dagster_pipeline
 ```
 
 The studies built are `VARIANT_STUDY_IDS` in `assets.py`; the gene layer is one asset
@@ -404,6 +404,13 @@ machinery in this pipeline, so that is delivered as three independent opt-ins:
 | `KG_INCLUDE_VARIANTS=1` | off | Registers the variant Dagster assets. Unset, the layer cannot be generated at all. |
 | output path `data/rdf/variants/` | — | Both the QLever index and `rdf_to_edgelist.py` glob `data/rdf/*.ttl`, which is non-recursive, so a generated layer still stays out of the published index and the embeddings. |
 | `docker build --target runtime-variants` | `runtime-rdf` | The only way the layer reaches a served index. |
+
+In CI the same three gates are one dispatch input: **Build image** takes
+`variants: true`, which installs `vrsify` at a pinned revision, fetches the digest-pinned
+GRCh38 reference, materializes `variants/*`, and pushes the `runtime-variants` target to
+`ghcr.io/nf-osi/kg-qlever-variants`. With the input off, none of those steps run and the
+core image is unchanged. The published `kg-qlever` and `kg-qlever-plus-text` images never
+carry the layer, whatever the input.
 
 Plus `rdf_to_edgelist.py --include-variants` to fold it into an embedding deliberately.
 Keeping it out by default is not only about reversibility: 23k variant and 24k

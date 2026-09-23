@@ -12,6 +12,11 @@ on:
         description: "Custom image tag (optional, defaults to build-<run_number>)"
         required: false
         type: string
+      variants:
+        description: "Also build the somatic variant layer and push kg-qlever-variants"
+        required: false
+        type: boolean
+        default: false
       deposit:
         description: "Deposit this build's RDF snapshot to Sage Brain S3 (pauses for review)"
         required: false
@@ -22,9 +27,21 @@ env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository_owner }}/kg-qlever
   IMAGE_NAME_TEXT: ${{ github.repository_owner }}/kg-qlever-plus-text
+  IMAGE_NAME_VARIANTS: ${{ github.repository_owner }}/kg-qlever-variants
   ECR_REPOSITORY: kg-qlever
   ECR_REPOSITORY_TEXT: kg-qlever-plus-text
   RMLMAPPER_VERSION: "8.1.0"
+  # UCSC GRCh38, pinned by digest. `vrsify --reference` is load-bearing: without the
+  # exact same reference, indel alleles normalize differently and their ga4gh:VA. ids
+  # stop matching ClinVar, gnomAD and the curated model mutations. The file has not
+  # changed since 2014-01-16, so a digest mismatch means the source moved, not that
+  # the reference was updated.
+  REFERENCE_FASTA_URL: https://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/hg38.fa.gz
+  REFERENCE_FASTA_MD5: 1c9dcaddfa41027f17cd8f7a82c7293b
+  # Pinned to a revision, not to `develop`. vrsify's normalization is what mints the
+  # ga4gh:VA. ids, so a moving branch would change allele identities between builds
+  # with nothing in the graph recording that it happened. This is vrsify 0.1.0.
+  VRSIFY_REV: cc6e6275941d833b9dc750cdea65e4693bb46791
   AWS_REGION: us-east-1
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
@@ -67,6 +84,71 @@ jobs:
 
       - name: Validate RDF outputs
         run: ./scripts/validate_rdf.sh
+
+      # --- somatic variant layer (opt-in) ------------------------------------------
+      # Off unless dispatched with `variants: true`. The layer is a droppable proof of
+      # concept (docs/variant-layer.md, issue #95), so it stays out of the default
+      # build entirely: with the flag off none of these steps run and the core graph is
+      # what it always was. With it on, the layer lands in data/rdf/variants/, which
+      # the default image targets still miss because they glob data/rdf/*.ttl
+      # non-recursively -- only the runtime-variants target below picks it up.
+      - name: Install vrsify
+        if: inputs.variants
+        run: cargo install --locked --git https://github.com/nf-osi/vrsify --rev "$VRSIFY_REV"
+
+      - name: Fetch the GRCh38 reference and derive its seqmap
+        if: inputs.variants
+        run: |
+          curl -sL -o hg38.fa.gz "$REFERENCE_FASTA_URL"
+          echo "${REFERENCE_FASTA_MD5}  hg38.fa.gz" | md5sum -c -
+          gunzip hg38.fa.gz
+          vrsify seqmap --fasta hg38.fa --assembly GRCh38 --out seqmap.tsv
+
+      - name: Materialize the variant layer
+        if: inputs.variants
+        env:
+          KG_INCLUDE_VARIANTS: "1"
+          VRSIFY_REFERENCE: ${{ github.workspace }}/hg38.fa
+          VRSIFY_SEQMAP: ${{ github.workspace }}/seqmap.tsv
+        # `group:variants`, not `variants/*`: the gene layer is registered behind the
+        # same gate but keyed portal/rdf/genes, because gene nodes are core output even
+        # if the variant study is dropped (docs/variant-layer.md, "Effect on the default
+        # build"). A key-prefix selector would silently skip it and the gene-level
+        # coverage query would return nothing. Every variant asset factory sets
+        # group_name="variants", so the group selector cannot drift.
+        run: dagster asset materialize -m dagster_pipeline --select 'group:variants'
+
+      # validate_rdf.sh covers the portal tables only. Study list is imported rather
+      # than restated so this cannot drift from VARIANT_STUDY_IDS.
+      - name: Validate the variant layer
+        if: inputs.variants
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          from dagster_pipeline.assets import VARIANT_STUDY_IDS
+
+          fail = 0
+          for study in VARIANT_STUDY_IDS:
+              f = Path("data/rdf/variants") / f"{study}.ttl"
+              if f.is_file() and f.stat().st_size:
+                  print(f"  ok: {f} ({f.stat().st_size} bytes)")
+              else:
+                  print(f"::error::Missing or empty: {f}")
+                  fail += 1
+          if fail:
+              raise SystemExit(f"::error::{fail} variant RDF files failed validation")
+          print(f"All {len(VARIANT_STUDY_IDS)} variant RDF outputs validated")
+          PY
+
+      # 3.1 GB of reference and ~740 MB of NDJSON intermediates. Neither is an artifact
+      # nor a build input (.dockerignore keeps both out of the context), and the
+      # variants index needs the room on a runner that has ~21 GB to spend.
+      - name: Reclaim disk
+        if: inputs.variants
+        run: |
+          rm -f hg38.fa seqmap.tsv
+          rm -rf data/variants
+          df -h /
 
       - name: Upload artifacts (RDF data)
         uses: actions/upload-artifact@v7
@@ -172,6 +254,33 @@ jobs:
           push: true
           tags: ${{ steps.meta-text.outputs.tags }}
           labels: ${{ steps.meta-text.outputs.labels }}
+
+      # Build variant-layer image. Its own image name rather than a tag on kg-qlever:
+      # the layer is opt-in at every other gate, so `latest` on the main image has to
+      # stay the core graph. GHCR only -- there is no kg-qlever-variants ECR
+      # repository, and pushing to an ECR repository that does not exist fails the
+      # build. Add ECR_REPOSITORY_VARIANTS here once one is provisioned.
+      - name: Extract metadata (variants)
+        if: inputs.variants
+        id: meta-variants
+        uses: docker/metadata-action@v6
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_VARIANTS }}
+          tags: |
+            type=raw,value=latest
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=raw,value=${{ inputs.tag || format('build-{0}', github.run_number) }},enable=${{ github.event_name == 'workflow_dispatch' }}
+
+      - name: Build and push (variants)
+        if: inputs.variants
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          target: runtime-variants
+          push: true
+          tags: ${{ steps.meta-variants.outputs.tags }}
+          labels: ${{ steps.meta-variants.outputs.labels }}
 
   # Build and publish in one go. Off unless the run was dispatched with
   # `deposit: true` — a tag build is published by dispatching "Deposit to Sage

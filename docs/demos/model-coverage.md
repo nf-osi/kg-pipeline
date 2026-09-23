@@ -307,6 +307,11 @@ The `reason` field keeps these curation limitations separate from genuine "allel
 
 ## Reproducing this
 
+The published `ghcr.io/nf-osi/kg-qlever` images are the `runtime-rdf` target and carry no
+patient variant layer, so none of the queries above return anything against them. Dispatch
+**Build image** with `variants: true` for an image that does
+(`ghcr.io/nf-osi/kg-qlever-variants`), or rebuild locally:
+
 ```sh
 # 1. Rebuild the whole core
 
@@ -319,7 +324,7 @@ python scripts/materialize_model_mutation_vrs.py  # -> data/rdf/model_mutation_v
 
 # 3. Index and serve.
 export KG_INCLUDE_VARIANTS=1
-dagster asset materialize --select 'variants/*' -m orchestration.dagster_pipeline
+dagster asset materialize --select 'group:variants' -m orchestration.dagster_pipeline
 docker build --target runtime-variants -t kg:variants-demo1 .
 docker run -d --name kg-variants-demo1 -p 7004:7001 kg:variants-demo1
 ```
