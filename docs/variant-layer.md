@@ -88,6 +88,12 @@ of which only ~11,200 are referenced.
 Both are `MUTATION_EXTENDED` / `MAF` profiles, i.e. somatic by construction — neither
 carries a per-row `Mutation_Status`.
 
+> **Currently unfetchable (2026-09-23).** `cBioPortal/datahub` has exhausted its Git LFS
+> budget, so the batch endpoint returns `403 This repository exceeded its LFS budget` for
+> all four objects. This is upstream's quota, not auth or rate limiting, and no token
+> works around it. The pins still resolve — only the bytes are blocked. See
+> [build-capacity.md](build-capacity.md) for the mirror proposed to fix this.
+
 Why source pins:
 
 1. **`cBioPortal/datahub` at a pinned commit** — In general, use the original contribution commit 

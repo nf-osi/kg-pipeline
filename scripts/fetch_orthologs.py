@@ -60,6 +60,9 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from source_mirror import fetch_pinned  # noqa: E402
+
 #: Alliance combined orthology, `Stringent` filter. Moving pointer at the URL; the
 #: digest is the actual pin. Bump both together, and record the release in HEADER.
 ORTHOLOGY_URL = (
@@ -142,20 +145,25 @@ def fetch_orthology(cache: Path = ORTHOLOGY_CACHE) -> Path:
     """Download the pinned Alliance release unless a cached copy matches the digest."""
     if cache.exists() and sha256_file(cache) == ORTHOLOGY_SHA256:
         return cache
-    cache.parent.mkdir(parents=True, exist_ok=True)
-    tmp = cache.with_suffix(cache.suffix + ".part")
-    with urllib.request.urlopen(ORTHOLOGY_URL, timeout=300) as resp, tmp.open("wb") as out:
-        while chunk := resp.read(1 << 20):
-            out.write(chunk)
-    got = sha256_file(tmp)
-    if got != ORTHOLOGY_SHA256:
-        tmp.unlink()
-        raise SystemExit(
-            f"{ORTHOLOGY_URL} digest {got} != pinned {ORTHOLOGY_SHA256}.\n"
-            "The Alliance published a new release behind the same URL. Re-pin "
-            "ORTHOLOGY_SHA256/_RELEASE/_GENERATED after reviewing the diff."
+    # Mirror first, upstream second; both verified against ORTHOLOGY_SHA256. The URL is
+    # a moving pointer -- the Alliance publishes each release behind it -- so a digest
+    # mismatch from *upstream* means a new release to review, while one from the mirror
+    # would mean the mirror is wrong. fetch_pinned raises on either, and the message
+    # names the URL that served the bytes.
+    try:
+        fetch_pinned(
+            ORTHOLOGY_SHA256,
+            cache,
+            lambda: ORTHOLOGY_URL,
+            label=f"Alliance orthology {ORTHOLOGY_RELEASE}",
         )
-    tmp.replace(cache)
+    except SystemExit as exc:
+        if "SHA-256 mismatch" in str(exc) and ORTHOLOGY_URL in str(exc):
+            raise SystemExit(
+                f"{exc}\nThe Alliance published a new release behind the same URL. "
+                "Re-pin ORTHOLOGY_SHA256/_RELEASE/_GENERATED after reviewing the diff."
+            ) from exc
+        raise
     return cache
 
 

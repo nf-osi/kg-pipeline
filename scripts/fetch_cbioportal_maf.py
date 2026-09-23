@@ -63,6 +63,9 @@ import urllib.request
 from dataclasses import dataclass
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from source_mirror import fetch_pinned  # noqa: E402
+
 GITHUB_API = "https://api.github.com"
 USER_AGENT = "nf-osi-kg-pipeline/fetch_cbioportal_maf"
 
@@ -186,15 +189,31 @@ def resolve_lfs_download(source: StudySource, oid: str, size: int) -> str:
         }
     ).encode()
     url = f"https://github.com/{source.repo}.git/info/lfs/objects/batch"
-    with _request(
-        url,
-        data=payload,
-        headers={
-            "Accept": "application/vnd.git-lfs+json",
-            "Content-Type": "application/vnd.git-lfs+json",
-        },
-    ) as resp:
-        batch = json.load(resp)
+    try:
+        with _request(
+            url,
+            data=payload,
+            headers={
+                "Accept": "application/vnd.git-lfs+json",
+                "Content-Type": "application/vnd.git-lfs+json",
+            },
+        ) as resp:
+            batch = json.load(resp)
+    except urllib.error.HTTPError as exc:
+        # The batch endpoint reports some failures in band (an `error` on the object,
+        # handled below) and others as an HTTP status. The status kind matters most:
+        # `403 This repository exceeded its LFS budget` is upstream's quota, not our
+        # auth and not a rate limit, and no token works around it. Left uncaught it
+        # arrives as a 60-line urllib traceback inside a Dagster stack trace.
+        try:
+            detail = json.loads(exc.read()).get("message", "").rstrip(". ")
+        except Exception:
+            detail = ""
+        raise SystemExit(
+            f"LFS batch endpoint for {source.repo} returned HTTP {exc.code}"
+            + (f": {detail}" if detail else "")
+            + ". The pin is still valid -- only the bytes are unavailable from upstream."
+        ) from exc
     obj = batch["objects"][0]
     if "error" in obj:
         # This is exactly how upstream cBioPortal/datahub fails. Say so, rather than
@@ -305,12 +324,19 @@ def fetch_maf(study_id: str, destination: Path, force: bool = False) -> Path:
             return destination
         print(f"re-fetching {destination}: cached copy {reason}")
 
-    url = resolve_lfs_download(source, oid, size)
     print(
         f"fetching {source.repo}/{source.path}@{source.ref[:12]} "
         f"-> {destination} ({size} bytes, oid {oid[:12]}...)"
     )
-    download(url, destination, size, oid)
+    # Mirror first. The oid still comes from upstream's contents API above, so the pin
+    # is upstream's either way -- only the bytes may be ours. See scripts/source_mirror.py.
+    fetch_pinned(
+        oid,
+        destination,
+        lambda: resolve_lfs_download(source, oid, size),
+        size=size,
+        label=f"{study_id} MAF",
+    )
     reason = accept_candidate(destination, source)
     if reason:
         raise SystemExit(f"{study_id}: fetched MAF is unusable -- {reason}")
