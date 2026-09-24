@@ -6,8 +6,9 @@ The prompt was "set up our own build runner on AWS for higher capacity". The mea
 below say that is the right instinct for one of the three reasons usually given for it,
 and the wrong tool for the other two.
 
-**Recommendation in one line:** take the free disk fix now, mirror the source data to S3
-next, and revisit a runner only if a measured build still doesn't fit.
+**Recommendation in one line:** mirror the source data (done — that was the real
+problem), and do *not* move runners; a completed build has since measured 85 GB free
+where this doc originally assumed 21 GB.
 
 ## What we measured
 
@@ -42,16 +43,41 @@ consequences that shape every option below:
 
 | | vCPU | RAM | Disk |
 |---|---|---|---|
-| `ubuntu-latest`, public repo | 4 | 16 GB | 14 GB documented, **~21 GB actually free** |
+| `ubuntu-latest`, public repo | 4 | 16 GB | 14 GB documented, **145 GB volume / 85 GB free, measured** |
 | CodeBuild Linux Medium | 4 | 8 GiB | 128 GB |
 | CodeBuild Linux Large | 8 | 16 GiB | 128 GB |
 | CodeBuild Linux XLarge | 36 | 72 GiB | 256 GB |
 
-## Driver 1 — the disk ceiling
+## Driver 1 — the disk ceiling — **measured, and it does not exist**
 
-Real, but **not yet demonstrated**: the run above died before reaching the disk-hungry
-part, so the projection below is arithmetic, not observation. Measured footprints from a
-local variants build:
+> **Corrected 2026-09-24 by run [`35937975360`](https://github.com/nf-osi/kg-pipeline/actions/runs/35937975360)**, the first
+> variants build to complete. Everything in this section below the measurement was
+> written from the documented runner spec and is wrong. It is kept rather than deleted
+> because the reasoning it contains is the reasoning that *would* apply on a 21 GB
+> runner, and because the gap between the documented spec and the real one is the
+> finding.
+>
+> | point in the job | total | used | free |
+> |---|---|---|---|
+> | before `free-disk-space` | 145 GB | 60 GB | **85 GB** |
+> | after `free-disk-space` (saved 22 GB) | 145 GB | 38 GB | 108 GB |
+> | peak, just before `Reclaim disk` | 145 GB | 43 GB | **102 GB** |
+> | after `Reclaim disk` | 145 GB | 39 GB | 106 GB |
+>
+> `ubuntu-latest` is a **145 GB volume with 85 GB free**, not the 14 GB the GitHub docs
+> state or the ~21 GB widely reported. The entire variant build — reference, MAFs,
+> NDJSON, 1.18 GB of Turtle and three QLever indexes — peaked at about **5 GB above
+> baseline**. It would have fitted with roughly 80 GB to spare and no cleanup at all.
+>
+> So `free-disk-space` is unnecessary here: it spent 1.1 min freeing 22 GB that were
+> never needed. `Reclaim disk` is still worth keeping, not for headroom but because its
+> `df` is the only thing that would catch this premise going stale in the other
+> direction.
+>
+> The lesson generalises past this repo: the documented runner spec was off by an order
+> of magnitude, and one `df` settled what a page of arithmetic could not.
+
+The projection that prompted all of the above, from a local variants build:
 
 | | Size | Freed before the index build? |
 |---|---|---|
@@ -62,16 +88,12 @@ local variants build:
 | Core `data/rdf/`, `data/csv/`, `data/raw/` | ~1 GB | no |
 | Three QLever indexes in one job (`runtime-rdf`, `runtime-text`, `runtime-variants`) | ~930 MB each plus sort intermediates | n/a |
 
-Against ~21 GB this is tight but probably survivable *with* the `Reclaim disk` step, and
-would very likely not fit without it. The cheap mitigation is
-[`jlumbroso/free-disk-space`](https://github.com/jlumbroso/free-disk-space), which
-reclaims ~31 GB in ~3 min by deleting preinstalled .NET/Android/Haskell toolchains we
-never use — taking the runner to ~50 GB for free. That is a one-step change and it should
-be tried before any infrastructure exists.
+Against ~21 GB that would have been tight. Against the 85 GB the runner actually has, it
+is not close to a constraint.
 
-Note also that the job builds **three separate indexes**. Splitting `build-image` into
-parallel jobs per target would cut peak disk roughly threefold and shorten wall-clock,
-independent of what hardware it runs on.
+The job does still build **three separate indexes** in one job. Splitting `build-image`
+into parallel jobs per target would shorten wall-clock — the case for it is now purely
+time, not disk.
 
 ## Driver 2 — control and reproducibility
 
@@ -136,8 +158,8 @@ The honest read: this driver justifies *knowing what we'd do*, not doing it yet.
 
 | Option | Disk | RAM ceiling | Cost | Effort |
 |---|---|---|---|---|
-| Stay hosted, add `free-disk-space` | ~50 GB | 16 GB | $0 | ~10 min |
-| Stay hosted, split targets into parallel jobs | ~21 GB each | 16 GB | $0 | ~half a day |
+| **Stay hosted, change nothing** | **85 GB free, measured** | 16 GB | $0 | none |
+| Stay hosted, split targets into parallel jobs | 85 GB each | 16 GB | $0 | ~half a day |
 | **AWS CodeBuild managed runners** | 128 GB | 16 GiB (Large) / 72 GiB (XLarge) | ~$0.60/build at Large ≈ $12/mo | ~half a day |
 | Self-managed ephemeral EC2 (ARC, `terraform-aws-github-runner`) | anything | anything | ~$0.20/build + idle + ops | days, ongoing |
 | Third-party managed (RunsOn, Depot, Blacksmith) | anything | anything | varies | ~hours, new vendor |
@@ -177,12 +199,12 @@ Staged deliberately so each step is independently useful and the expensive one i
 2. **Surface upstream failures legibly.** Catch `HTTPError` in `resolve_lfs_download` and
    raise the LFS budget/quota message directly, matching the handling already there for
    in-band LFS errors.
-3. **Take the free headroom.** Add `free-disk-space` to `build-image`, gated on
-   `inputs.variants` so normal builds don't pay the ~3 min. Keep the `df -h /` in
-   `Reclaim disk` and record the real number — this is the measurement that decides
-   whether anything below is needed.
-4. **Get a green variants build and measure it.** Peak disk, wall-clock, image size. Until
-   this exists, every capacity claim here is a projection.
+3. ~~**Take the free headroom.**~~ Done, and then shown to be unnecessary — see the
+   measurement above. `free-disk-space` should be dropped from `build-image`; it costs
+   1.1 min and frees space nothing was competing for.
+4. ~~**Get a green variants build and measure it.**~~ Done: run `35937975360`, 29.4 min
+   end to end, peak 43 GB of 145 GB, images pushed. This is what falsified step 1 of the
+   disk argument.
 5. **Split `build-image` into per-target jobs.** Parallel `runtime-rdf` / `runtime-text` /
    `runtime-variants`, sharing the materialized RDF via artifact. Cuts peak disk ~3× and
    wall-clock, and is a prerequisite for sending only the heavy job elsewhere.
