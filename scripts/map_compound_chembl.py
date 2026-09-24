@@ -77,9 +77,8 @@ variant layer uses: a string that does not resolve is a curation finding, and dr
 would hide the field-hygiene problem this file exists to document.
 
 Usage:
-    python scripts/map_compound_chembl.py
+    python scripts/map_compound_chembl.py                  # portal-wide; 1,805 strings
     python scripts/map_compound_chembl.py --individual JH-2-002 --files-out reports/annot.tsv
-    python scripts/map_compound_chembl.py --all            # portal-wide; 1,844 strings
 """
 
 from __future__ import annotations

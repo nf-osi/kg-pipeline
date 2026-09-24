@@ -100,6 +100,10 @@ confident wrong answer:
   internal commas as pipes, so `11H-Benzo[a]carbazole-1|4-dione|7|11-dimethyl-` is
   corruption rather than an unknown compound. The same string spelled with commas is
   correct, so the class should empty out once every export post-dates the ingest fix.
+  It now has: against the v272 `files` snapshot the class is empty and those 33 values
+  arrive spelled with commas. None of them resolve, though — they are systematic IUPAC
+  names absent from the label index, so 32 are `unresolved` and one, a dosing schedule,
+  is `not_a_compound`. Un-shredding made them legible, not resolvable.
 - **`combination_key` makes order variants visible.** `Ribociclib;Trametinib`,
   `Trametinib;Ribociclib` and `tno155 plus ribociclib` are the same experiments written
   three ways; rows sharing a key are the same arm.

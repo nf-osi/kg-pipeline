@@ -16,7 +16,7 @@
 # Everything below them is the portal-wide tail, resolved by the same rules but
 # not yet read line by line.
 #
-# 1804 distinct strings over 13663 files carrying a value: 369 fully resolved, 2 partly, 1433 not at all.
+# 1805 distinct strings over 13667 files carrying a value: 370 fully resolved, 2 partly, 1433 not at all.
 # demo subset: 48 strings over 194 files, 41 fully resolved.
 in_demo	demo_files	raw_value	source_field	files	value_class	arm	component	chembl_id	molecule_name	match_kind	method	combination_key	notes
 yes	10	DMSO	experimentalCondition	264	control	1	DMSO	CHEMBL504	DIMETHYL SULFOXIDE	synonym	exact		vehicle or untreated control
@@ -102,7 +102,7 @@ no	0	WU_batch2	experimentalCondition	132	unresolved	1	WU_batch2				unmatched
 no	0	Binimetinib	compoundName	128	compound	1	Binimetinib	CHEMBL3187723	BINIMETINIB	preferred_name	exact		
 no	0	100 nM GSK2126458	experimentalCondition	124	compound	1	100 nM GSK2126458	CHEMBL1236962	OMIPALISIB	synonym	parsed		parsed '100 nM GSK2126458' -> 'GSK2126458'
 no	0	GSK2126458	compoundName	118	compound	1	GSK2126458	CHEMBL1236962	OMIPALISIB	synonym	exact		
-no	0	Maternal & Postnatal High-Fat|High-Sucrose Diet	experimentalCondition	109	unresolved	1	Maternal & Postnatal High-Fat|High-Sucrose Diet				unmatched		
+no	0	Maternal & Postnatal High-Fat, High-Sucrose Diet	experimentalCondition	109	unresolved	1	Maternal & Postnatal High-Fat, High-Sucrose Diet				unmatched		
 no	0	doxorubicin	experimentalCondition	103	compound	1	doxorubicin	CHEMBL53463	DOXORUBICIN	preferred_name	exact		
 no	0	Maternal & Postnatal Control Diet	experimentalCondition	97	unresolved	1	Maternal & Postnatal Control Diet				unmatched		
 no	0	WU_batch1	experimentalCondition	94	unresolved	1	WU_batch1				unmatched		
@@ -120,6 +120,7 @@ no	0	Everolimus	compoundName	68	compound	1	Everolimus	CHEMBL1908360	EVEROLIMUS	p
 no	0	vorinostat	compoundName	68	compound	1	vorinostat	CHEMBL98	VORINOSTAT	preferred_name	exact		
 no	0	Control	experimentalCondition	67	compound	1	Control	CHEMBL1200574	SODIUM CHLORIDE	synonym	exact		
 no	0	Cre+	experimentalCondition	66	unresolved	1	Cre+				unmatched		
+no	0	Onalespib	compoundName	66	compound	1	Onalespib	CHEMBL1214827	ONALESPIB	preferred_name	exact		
 no	0	Nilotinib	compoundName	65	compound	1	Nilotinib	CHEMBL255863	NILOTINIB	preferred_name	exact		
 no	0	Cabozantinib	compoundName	64	compound	1	Cabozantinib	CHEMBL2105717	CABOZANTINIB	preferred_name	exact		
 no	0	Copanlisib	compoundName	64	compound	1	Copanlisib	CHEMBL3218576	COPANLISIB	preferred_name	exact		
@@ -127,7 +128,6 @@ no	0	Digoxin	compoundName	64	compound	1	Digoxin	CHEMBL1751	DIGOXIN	preferred_nam
 no	0	Fimepinostat	compoundName	64	compound	1	Fimepinostat	CHEMBL3622533	FIMEPINOSTAT	preferred_name	exact		
 no	0	Ketotifen	compoundName	64	compound	1	Ketotifen	CHEMBL534	KETOTIFEN	preferred_name	exact		
 no	0	Linsitinib	compoundName	64	compound	1	Linsitinib	CHEMBL1091644	LINSITINIB	preferred_name	exact		
-no	0	Onalespib	compoundName	64	compound	1	Onalespib	CHEMBL1214827	ONALESPIB	preferred_name	exact		
 no	0	Rapamycin	compoundName	64	compound	1	Rapamycin	CHEMBL413	SIROLIMUS	synonym	exact		
 no	0	trabectedin	compoundName	64	compound	1	trabectedin	CHEMBL450449	TRABECTEDIN	preferred_name	exact		
 no	0	mirdametinib	compoundName	62	compound	1	mirdametinib	CHEMBL507361	MIRDAMETINIB	preferred_name	exact		
@@ -136,8 +136,8 @@ no	0	Scanner 3	experimentalCondition	57	unresolved	1	Scanner 3				unmatched
 no	0	Staurosporine	compoundName	57	compound	1	Staurosporine	CHEMBL388978	STAUROSPORINE	preferred_name	exact		
 no	0	Scanner 2	experimentalCondition	56	unresolved	1	Scanner 2				unmatched		
 no	0	doxorubicin	compoundName	56	compound	1	doxorubicin	CHEMBL53463	DOXORUBICIN	preferred_name	exact		
-no	0	Cytokines|Forskoline|StemPro	experimentalCondition	55	unresolved	1	Cytokines|Forskoline|StemPro				unmatched		
-no	0	Cytokines|Mammo	experimentalCondition	55	unresolved	1	Cytokines|Mammo				unmatched		
+no	0	Cytokines,Forskoline,StemPro	experimentalCondition	55	unresolved	1	Cytokines,Forskoline,StemPro				unmatched		
+no	0	Cytokines,Mammo	experimentalCondition	55	unresolved	1	Cytokines,Mammo				unmatched		
 no	0	DMEM	experimentalCondition	54	unresolved	1	DMEM				unmatched		
 no	0	Mammo	experimentalCondition	54	unresolved	1	Mammo				unmatched		
 no	0	palbociclib	compoundName	54	compound	1	palbociclib	CHEMBL189963	PALBOCICLIB	preferred_name	exact		
@@ -145,29 +145,29 @@ no	0	StemPro	experimentalCondition	53	unresolved	1	StemPro				unmatched
 no	0	Simvastatin	compoundName	52	compound	1	Simvastatin	CHEMBL1064	SIMVASTATIN	preferred_name	exact		
 no	0	ctrl	experimentalCondition	52	unresolved	1	ctrl				unmatched		
 no	0	olaparib	compoundName	52	compound	1	olaparib	CHEMBL521686	OLAPARIB	preferred_name	exact		
-no	0	Cytokines|StemPro	experimentalCondition	51	unresolved	1	Cytokines|StemPro				unmatched		
-no	0	Dasatinib|Brigatinib	compoundName	51	arm_list	1	Dasatinib	CHEMBL5416410	DASATINIB	preferred_name	exact		2 separately-dosed arms in one field value
-no	0	Dasatinib|Brigatinib	compoundName	51	arm_list	2	Brigatinib	CHEMBL3545311	BRIGATINIB	preferred_name	exact		2 separately-dosed arms in one field value
-no	0	Dasatinib|Brigatinib	experimentalCondition	51	arm_list	1	Dasatinib	CHEMBL5416410	DASATINIB	preferred_name	exact		2 separately-dosed arms in one field value
-no	0	Dasatinib|Brigatinib	experimentalCondition	51	arm_list	2	Brigatinib	CHEMBL3545311	BRIGATINIB	preferred_name	exact		2 separately-dosed arms in one field value
-no	0	Dasatinib|Simvastatin	compoundName	51	arm_list	1	Dasatinib	CHEMBL5416410	DASATINIB	preferred_name	exact		2 separately-dosed arms in one field value
-no	0	Dasatinib|Simvastatin	compoundName	51	arm_list	2	Simvastatin	CHEMBL1064	SIMVASTATIN	preferred_name	exact		2 separately-dosed arms in one field value
-no	0	Dasatinib|Simvastatin	experimentalCondition	51	arm_list	1	Dasatinib	CHEMBL5416410	DASATINIB	preferred_name	exact		2 separately-dosed arms in one field value
-no	0	Dasatinib|Simvastatin	experimentalCondition	51	arm_list	2	Simvastatin	CHEMBL1064	SIMVASTATIN	preferred_name	exact		2 separately-dosed arms in one field value
+no	0	Cytokines,StemPro	experimentalCondition	51	unresolved	1	Cytokines,StemPro				unmatched		
+no	0	Dasatinib,Brigatinib	compoundName	51	arm_list	1	Dasatinib	CHEMBL5416410	DASATINIB	preferred_name	exact		2 separately-dosed arms in one field value
+no	0	Dasatinib,Brigatinib	compoundName	51	arm_list	2	Brigatinib	CHEMBL3545311	BRIGATINIB	preferred_name	exact		2 separately-dosed arms in one field value
+no	0	Dasatinib,Brigatinib	experimentalCondition	51	arm_list	1	Dasatinib	CHEMBL5416410	DASATINIB	preferred_name	exact		2 separately-dosed arms in one field value
+no	0	Dasatinib,Brigatinib	experimentalCondition	51	arm_list	2	Brigatinib	CHEMBL3545311	BRIGATINIB	preferred_name	exact		2 separately-dosed arms in one field value
+no	0	Dasatinib,Simvastatin	compoundName	51	arm_list	1	Dasatinib	CHEMBL5416410	DASATINIB	preferred_name	exact		2 separately-dosed arms in one field value
+no	0	Dasatinib,Simvastatin	compoundName	51	arm_list	2	Simvastatin	CHEMBL1064	SIMVASTATIN	preferred_name	exact		2 separately-dosed arms in one field value
+no	0	Dasatinib,Simvastatin	experimentalCondition	51	arm_list	1	Dasatinib	CHEMBL5416410	DASATINIB	preferred_name	exact		2 separately-dosed arms in one field value
+no	0	Dasatinib,Simvastatin	experimentalCondition	51	arm_list	2	Simvastatin	CHEMBL1064	SIMVASTATIN	preferred_name	exact		2 separately-dosed arms in one field value
 no	0	Simvastatin	experimentalCondition	51	compound	1	Simvastatin	CHEMBL1064	SIMVASTATIN	preferred_name	exact		
 no	0	mpnst pdx 1	experimentalCondition	49	unresolved	1	mpnst pdx 1				unmatched		
 no	0	mpnst pdx 3	experimentalCondition	49	unresolved	1	mpnst pdx 3				unmatched		
 no	0	mpnst pdx 4	experimentalCondition	49	unresolved	1	mpnst pdx 4				unmatched		
 no	0	mpnst pdx2	experimentalCondition	49	unresolved	1	mpnst pdx2				unmatched		
-no	0	Cytokines|DMEM	experimentalCondition	48	unresolved	1	Cytokines|DMEM				unmatched		
-no	0	Cytokines|DMEM|Forskoline	experimentalCondition	48	unresolved	1	Cytokines|DMEM|Forskoline				unmatched		
-no	0	Cytokines|Forskoline|Mammo	experimentalCondition	48	unresolved	1	Cytokines|Forskoline|Mammo				unmatched		
-no	0	CUDC-907|Panobinostat	compoundName	46	arm_list	1	CUDC-907	CHEMBL3622533	FIMEPINOSTAT	synonym	exact		2 separately-dosed arms in one field value
-no	0	CUDC-907|Panobinostat	compoundName	46	arm_list	2	Panobinostat	CHEMBL483254	PANOBINOSTAT	preferred_name	exact		2 separately-dosed arms in one field value
+no	0	Cytokines,DMEM	experimentalCondition	48	unresolved	1	Cytokines,DMEM				unmatched		
+no	0	Cytokines,DMEM,Forskoline	experimentalCondition	48	unresolved	1	Cytokines,DMEM,Forskoline				unmatched		
+no	0	Cytokines,Forskoline,Mammo	experimentalCondition	48	unresolved	1	Cytokines,Forskoline,Mammo				unmatched		
+no	0	CUDC-907,Panobinostat	compoundName	46	arm_list	1	CUDC-907	CHEMBL3622533	FIMEPINOSTAT	synonym	exact		2 separately-dosed arms in one field value
+no	0	CUDC-907,Panobinostat	compoundName	46	arm_list	2	Panobinostat	CHEMBL483254	PANOBINOSTAT	preferred_name	exact		2 separately-dosed arms in one field value
 no	0	estremity	experimentalCondition	46	unresolved	1	estremity				unmatched		
 no	0	mpnst pdx 5	experimentalCondition	45	unresolved	1	mpnst pdx 5				unmatched		
-no	0	100 nM CUDC-907|100 nM Panobinostat	experimentalCondition	42	arm_list	1	100 nM CUDC-907	CHEMBL3622533	FIMEPINOSTAT	synonym	parsed		2 separately-dosed arms in one field value; parsed '100 nM CUDC-907' -> 'CUDC-907'
-no	0	100 nM CUDC-907|100 nM Panobinostat	experimentalCondition	42	arm_list	2	100 nM Panobinostat	CHEMBL483254	PANOBINOSTAT	preferred_name	parsed		2 separately-dosed arms in one field value; parsed '100 nM Panobinostat' -> 'Panobinostat'
+no	0	100 nM CUDC-907,100 nM Panobinostat	experimentalCondition	42	arm_list	1	100 nM CUDC-907	CHEMBL3622533	FIMEPINOSTAT	synonym	parsed		2 separately-dosed arms in one field value; parsed '100 nM CUDC-907' -> 'CUDC-907'
+no	0	100 nM CUDC-907,100 nM Panobinostat	experimentalCondition	42	arm_list	2	100 nM Panobinostat	CHEMBL483254	PANOBINOSTAT	preferred_name	parsed		2 separately-dosed arms in one field value; parsed '100 nM Panobinostat' -> 'Panobinostat'
 no	0	capmatinib	compoundName	42	compound	1	capmatinib	CHEMBL3188267	CAPMATINIB	preferred_name	exact		
 no	0	pdx	experimentalCondition	40	compound	1	pdx	CHEMBL1201746	PRALATREXATE	synonym	exact		
 no	0	pt	experimentalCondition	40	unresolved	1	pt				unmatched		
@@ -177,25 +177,25 @@ no	0	Multiple Compounds	compoundName	37	unresolved	1	Multiple Compounds				unmat
 no	0	No treatment	experimentalCondition	36	unresolved	1	No treatment				unmatched		
 no	0	AZD6244 (10mg/kg)	experimentalCondition	28	compound	1	AZD6244 (10mg/kg)	CHEMBL1614701	SELUMETINIB	synonym	parsed		parsed 'AZD6244 (10mg/kg)' -> 'AZD6244'
 no	0	Nf1 null	experimentalCondition	28	unresolved	1	Nf1 null				unmatched		
+no	0	Not Available	compoundName	28	unresolved	1	Not Available				unmatched		
 no	0	pexidartinib	compoundName	28	compound	1	pexidartinib	CHEMBL3813873	PEXIDARTINIB	preferred_name	exact		
 no	0	WU_PDX_batch2	experimentalCondition	27	unresolved	1	WU_PDX_batch2				unmatched		
 no	0	HSP90 blot	compoundName	26	unresolved	1	HSP90 blot				unmatched		
 no	0	NFN blot	compoundName	26	unresolved	1	NFN blot				unmatched		
-no	0	Not Available	compoundName	26	unresolved	1	Not Available				unmatched		
-no	0	MK2206|Brigatinib	compoundName	25	arm_list	1	MK2206	CHEMBL1079175	MK-2206	synonym	exact		2 separately-dosed arms in one field value
-no	0	MK2206|Brigatinib	compoundName	25	arm_list	2	Brigatinib	CHEMBL3545311	BRIGATINIB	preferred_name	exact		2 separately-dosed arms in one field value
-no	0	MK2206|Brigatinib	experimentalCondition	25	arm_list	1	MK2206	CHEMBL1079175	MK-2206	synonym	exact		2 separately-dosed arms in one field value
-no	0	MK2206|Brigatinib	experimentalCondition	25	arm_list	2	Brigatinib	CHEMBL3545311	BRIGATINIB	preferred_name	exact		2 separately-dosed arms in one field value
+no	0	MK2206,Brigatinib	compoundName	25	arm_list	1	MK2206	CHEMBL1079175	MK-2206	synonym	exact		2 separately-dosed arms in one field value
+no	0	MK2206,Brigatinib	compoundName	25	arm_list	2	Brigatinib	CHEMBL3545311	BRIGATINIB	preferred_name	exact		2 separately-dosed arms in one field value
+no	0	MK2206,Brigatinib	experimentalCondition	25	arm_list	1	MK2206	CHEMBL1079175	MK-2206	synonym	exact		2 separately-dosed arms in one field value
+no	0	MK2206,Brigatinib	experimentalCondition	25	arm_list	2	Brigatinib	CHEMBL3545311	BRIGATINIB	preferred_name	exact		2 separately-dosed arms in one field value
 no	0	INK128	compoundName	24	compound	1	INK128	CHEMBL3545097	SAPANISERTIB	synonym	exact		
 no	0	INK128	experimentalCondition	24	compound	1	INK128	CHEMBL3545097	SAPANISERTIB	synonym	exact		
 no	0	MK2206	experimentalCondition	24	compound	1	MK2206	CHEMBL1079175	MK-2206	synonym	exact		
 no	0	Panel 1	experimentalCondition	24	unresolved	1	Panel 1				unmatched		
 no	0	verteporfin	compoundName	24	compound	1	verteporfin	CHEMBL5314346	VERTEPORFIN	preferred_name	exact		
 no	0	12w-2H	experimentalCondition	23	unresolved	1	12w-2H				unmatched		
-no	0	INK128|Dasatinib	compoundName	23	arm_list	1	INK128	CHEMBL3545097	SAPANISERTIB	synonym	exact		2 separately-dosed arms in one field value
-no	0	INK128|Dasatinib	compoundName	23	arm_list	2	Dasatinib	CHEMBL5416410	DASATINIB	preferred_name	exact		2 separately-dosed arms in one field value
-no	0	INK128|Dasatinib	experimentalCondition	23	arm_list	1	INK128	CHEMBL3545097	SAPANISERTIB	synonym	exact		2 separately-dosed arms in one field value
-no	0	INK128|Dasatinib	experimentalCondition	23	arm_list	2	Dasatinib	CHEMBL5416410	DASATINIB	preferred_name	exact		2 separately-dosed arms in one field value
+no	0	INK128,Dasatinib	compoundName	23	arm_list	1	INK128	CHEMBL3545097	SAPANISERTIB	synonym	exact		2 separately-dosed arms in one field value
+no	0	INK128,Dasatinib	compoundName	23	arm_list	2	Dasatinib	CHEMBL5416410	DASATINIB	preferred_name	exact		2 separately-dosed arms in one field value
+no	0	INK128,Dasatinib	experimentalCondition	23	arm_list	1	INK128	CHEMBL3545097	SAPANISERTIB	synonym	exact		2 separately-dosed arms in one field value
+no	0	INK128,Dasatinib	experimentalCondition	23	arm_list	2	Dasatinib	CHEMBL5416410	DASATINIB	preferred_name	exact		2 separately-dosed arms in one field value
 no	0	12w-24H	experimentalCondition	22	unresolved	1	12w-24H				unmatched		
 no	0	12w-6H	experimentalCondition	22	unresolved	1	12w-6H				unmatched		
 no	0	KrasD12	experimentalCondition	22	unresolved	1	KrasD12				unmatched		
@@ -232,7 +232,7 @@ no	0	50 nM Decitabine (DAC)	experimentalCondition	15	compound	1	50 nM Decitabine
 no	0	AZD6244 + Imatinib	experimentalCondition	15	combination	1	AZD6244	CHEMBL1614701	SELUMETINIB	synonym	exact	CHEMBL1614701+CHEMBL941	
 no	0	AZD6244 + Imatinib	experimentalCondition	15	combination	1	Imatinib	CHEMBL941	IMATINIB	preferred_name	exact	CHEMBL1614701+CHEMBL941	
 no	0	Imatinib (Gleevec)	experimentalCondition	15	compound	1	Imatinib (Gleevec)	CHEMBL941	IMATINIB	preferred_name	parsed		parsed 'Imatinib (Gleevec)' -> 'Imatinib'
-no	0	Postnatal high-fat|high-sucrose diet	experimentalCondition	15	unresolved	1	Postnatal high-fat|high-sucrose diet				unmatched		
+no	0	Postnatal high-fat, high-sucrose diet	experimentalCondition	15	unresolved	1	Postnatal high-fat, high-sucrose diet				unmatched		
 no	0	Ripretinib	experimentalCondition	15	compound	1	Ripretinib	CHEMBL4216467	RIPRETINIB	preferred_name	exact		
 no	0	drug treated vs DMSO	experimentalCondition	15	control	1	drug treated vs DMSO				unmatched		vehicle or untreated control
 no	0	1uM brigatinib+250nM BMS-986158	experimentalCondition	14	unresolved	1	1uM brigatinib+250nM BMS-986158				unmatched		
@@ -268,8 +268,8 @@ no	0	SN38	compoundName	10	compound	1	SN38	CHEMBL837	7-ETHYL-10-HYDROXYCAMPTOTHEC
 no	0	48 hours drug treatment at normoxia	experimentalCondition	9	not_a_compound	1	48 hours drug treatment at normoxia				unmatched		describes exposure duration, not a compound; upstream fix is to move this out of the compound field
 no	0	Amik 0 24h>Amik 250 24h>Amik 500 24h>Amik 0 48h>Amik 250 48h>Amik 500 48h>Amik 0 72h>Amik 250 72h>Amik 500 72h	experimentalCondition	9	unresolved	1	Amik 0 24h>Amik 250 24h>Amik 500 24h>Amik 0 48h>Amik 250 48h>Amik 500 48h>Amik 0 72h>Amik 250 72h>Amik 500 72h				unmatched		
 no	0	Ata 0 24h>Ata 10 24h>Ata 20 24h>Ata 0 48h>Ata 10 48h>Ata 20 48h>Ata 0 72h>Ata 10 72h>Ata 20 72h	experimentalCondition	9	unresolved	1	Ata 0 24h>Ata 10 24h>Ata 20 24h>Ata 0 48h>Ata 10 48h>Ata 20 48h>Ata 0 72h>Ata 10 72h>Ata 20 72h				unmatched		
-no	0	Cre+|DMSO	experimentalCondition	9	control	1	Cre+|DMSO				unmatched		vehicle or untreated control
-no	0	Cre-|DMSO	experimentalCondition	9	control	1	Cre-|DMSO				unmatched		vehicle or untreated control
+no	0	Cre+,DMSO	experimentalCondition	9	control	1	Cre+,DMSO				unmatched		vehicle or untreated control
+no	0	Cre-,DMSO	experimentalCondition	9	control	1	Cre-,DMSO				unmatched		vehicle or untreated control
 no	0	G418 0 24h>G418 100 24h>G418 200 24h>G418 0 48h>G418 100 48h>G418 200 48h>G418 0 72h>G418 100 72h>G418 200 72h	experimentalCondition	9	unresolved	1	G418 0 24h>G418 100 24h>G418 200 24h>G418 0 48h>G418 100 48h>G418 200 48h>G418 0 72h>G418 100 72h>G418 200 72h				unmatched		
 no	0	MatOb: HFHS diet onset 4wks prior to mating	experimentalCondition	9	unresolved	1	MatOb: HFHS diet onset 4wks prior to mating				unmatched		
 no	0	Paro 0 24h>Paro 2.5 24h>Paro 5 24h>Paro 0 48h>Paro 2.5 48h>Paro 5 48h>Paro 0 72h>Paro 2.5 72h>Paro 5 72h	experimentalCondition	9	unresolved	1	Paro 0 24h>Paro 2.5 24h>Paro 5 24h>Paro 0 48h>Paro 2.5 48h>Paro 5 48h>Paro 0 72h>Paro 2.5 72h>Paro 5 72h				unmatched		
@@ -285,12 +285,12 @@ no	0	mpnst pdx5_shim17	experimentalCondition	9	unresolved	1	mpnst pdx5_shim17			
 no	0	881 PD901-Resistant	experimentalCondition	8	unresolved	1	881 PD901-Resistant				unmatched		
 no	0	ANNUBP	experimentalCondition	8	unresolved	1	ANNUBP				unmatched		
 no	0	ARV-825	compoundName	8	unresolved	1	ARV-825				unmatched		
+no	0	DMSO, 20uM Ataluren, 500ug/ml Gentamicin	experimentalCondition	8	control	1	DMSO	CHEMBL504	DIMETHYL SULFOXIDE	synonym	exact		vehicle or untreated control
+no	0	DMSO, 20uM Ataluren, 500ug/ml Gentamicin	experimentalCondition	8	control	2	20uM Ataluren	CHEMBL256997	ATALUREN	preferred_name	parsed		vehicle or untreated control; parsed '20uM Ataluren' -> 'Ataluren'
+no	0	DMSO, 20uM Ataluren, 500ug/ml Gentamicin	experimentalCondition	8	control	3	500ug/ml Gentamicin	CHEMBL6067485	GENTAMICIN	preferred_name	parsed		vehicle or untreated control; parsed '500ug/ml Gentamicin' -> 'Gentamicin'
 no	0	DMSO_24 hours_replicate 1	experimentalCondition	8	control	1	DMSO_24 hours_replicate 1				unmatched		vehicle or untreated control
 no	0	DMSO_24 hours_replicate 2	experimentalCondition	8	control	1	DMSO_24 hours_replicate 2				unmatched		vehicle or untreated control
 no	0	DMSO_24 hours_replicate 3	experimentalCondition	8	control	1	DMSO_24 hours_replicate 3				unmatched		vehicle or untreated control
-no	0	DMSO|20uM Ataluren|500ug/ml Gentamicin	experimentalCondition	8	control	1	DMSO	CHEMBL504	DIMETHYL SULFOXIDE	synonym	exact		vehicle or untreated control
-no	0	DMSO|20uM Ataluren|500ug/ml Gentamicin	experimentalCondition	8	control	2	20uM Ataluren	CHEMBL256997	ATALUREN	preferred_name	parsed		vehicle or untreated control; parsed '20uM Ataluren' -> 'Ataluren'
-no	0	DMSO|20uM Ataluren|500ug/ml Gentamicin	experimentalCondition	8	control	3	500ug/ml Gentamicin	CHEMBL6067485	GENTAMICIN	preferred_name	parsed		vehicle or untreated control; parsed '500ug/ml Gentamicin' -> 'Gentamicin'
 no	0	Malignant Peripheral Nerve Sheath Tumor	experimentalCondition	8	unresolved	1	Malignant Peripheral Nerve Sheath Tumor				unmatched		
 no	0	Neurofibroma	experimentalCondition	8	unresolved	1	Neurofibroma				unmatched		
 no	0	SHP099 treated	experimentalCondition	8	unresolved	1	SHP099 treated				unmatched		
@@ -327,24 +327,24 @@ no	0	MK-2206	compoundName	6	compound	1	MK-2206	CHEMBL1079175	MK-2206	preferred_n
 no	0	Trametinib+BMS-986158	experimentalCondition	6	unresolved	1	Trametinib+BMS-986158				unmatched		
 no	0	VU6074889	compoundName	6	unresolved	1	VU6074889				unmatched		
 no	0	WU_batch1&WU_batch2	experimentalCondition	6	unresolved	1	WU_batch1&WU_batch2				unmatched		
-no	0	control|mirdametinib|deucravacitinib	experimentalCondition	6	arm_list	1	control	CHEMBL1200574	SODIUM CHLORIDE	synonym	exact		3 separately-dosed arms in one field value
-no	0	control|mirdametinib|deucravacitinib	experimentalCondition	6	arm_list	2	mirdametinib	CHEMBL507361	MIRDAMETINIB	preferred_name	exact		3 separately-dosed arms in one field value
-no	0	control|mirdametinib|deucravacitinib	experimentalCondition	6	arm_list	3	deucravacitinib	CHEMBL4435170	DEUCRAVACITINIB	preferred_name	exact		3 separately-dosed arms in one field value
+no	0	control, mirdametinib, deucravacitinib	experimentalCondition	6	arm_list	1	control	CHEMBL1200574	SODIUM CHLORIDE	synonym	exact		3 separately-dosed arms in one field value
+no	0	control, mirdametinib, deucravacitinib	experimentalCondition	6	arm_list	2	mirdametinib	CHEMBL507361	MIRDAMETINIB	preferred_name	exact		3 separately-dosed arms in one field value
+no	0	control, mirdametinib, deucravacitinib	experimentalCondition	6	arm_list	3	deucravacitinib	CHEMBL4435170	DEUCRAVACITINIB	preferred_name	exact		3 separately-dosed arms in one field value
 no	0	everolimus	experimentalCondition	6	compound	1	everolimus	CHEMBL1908360	EVEROLIMUS	preferred_name	exact		
 no	0	Bortezomib	compoundName	5	compound	1	Bortezomib	CHEMBL325041	BORTEZOMIB	preferred_name	exact		
-no	0	Brigatinib|DMSO	compoundName	5	control	1	Brigatinib	CHEMBL3545311	BRIGATINIB	preferred_name	exact		vehicle or untreated control
-no	0	Brigatinib|DMSO	compoundName	5	control	2	DMSO	CHEMBL504	DIMETHYL SULFOXIDE	synonym	exact		vehicle or untreated control
-no	0	DMSO|100 nM CUDC-907|100 nM Panobinostat|100 nM GSK2126458	experimentalCondition	5	control	1	DMSO	CHEMBL504	DIMETHYL SULFOXIDE	synonym	exact		vehicle or untreated control
-no	0	DMSO|100 nM CUDC-907|100 nM Panobinostat|100 nM GSK2126458	experimentalCondition	5	control	2	100 nM CUDC-907	CHEMBL3622533	FIMEPINOSTAT	synonym	parsed		vehicle or untreated control; parsed '100 nM CUDC-907' -> 'CUDC-907'
-no	0	DMSO|100 nM CUDC-907|100 nM Panobinostat|100 nM GSK2126458	experimentalCondition	5	control	3	100 nM Panobinostat	CHEMBL483254	PANOBINOSTAT	preferred_name	parsed		vehicle or untreated control; parsed '100 nM Panobinostat' -> 'Panobinostat'
-no	0	DMSO|100 nM CUDC-907|100 nM Panobinostat|100 nM GSK2126458	experimentalCondition	5	control	4	100 nM GSK2126458	CHEMBL1236962	OMIPALISIB	synonym	parsed		vehicle or untreated control; parsed '100 nM GSK2126458' -> 'GSK2126458'
-no	0	DMSO|CUDC-907|Panobinostat|GSK2126458	compoundName	5	control	1	DMSO	CHEMBL504	DIMETHYL SULFOXIDE	synonym	exact		vehicle or untreated control
-no	0	DMSO|CUDC-907|Panobinostat|GSK2126458	compoundName	5	control	2	CUDC-907	CHEMBL3622533	FIMEPINOSTAT	synonym	exact		vehicle or untreated control
-no	0	DMSO|CUDC-907|Panobinostat|GSK2126458	compoundName	5	control	3	Panobinostat	CHEMBL483254	PANOBINOSTAT	preferred_name	exact		vehicle or untreated control
-no	0	DMSO|CUDC-907|Panobinostat|GSK2126458	compoundName	5	control	4	GSK2126458	CHEMBL1236962	OMIPALISIB	synonym	exact		vehicle or untreated control
-no	0	Dasatinib|DMSO	compoundName	5	control	1	Dasatinib	CHEMBL5416410	DASATINIB	preferred_name	exact		vehicle or untreated control
-no	0	Dasatinib|DMSO	compoundName	5	control	2	DMSO	CHEMBL504	DIMETHYL SULFOXIDE	synonym	exact		vehicle or untreated control
-no	0	Dual luciferase assay with construct containing Firefly|R1947X|Renilla	experimentalCondition	5	unresolved	1	Dual luciferase assay with construct containing Firefly|R1947X|Renilla				unmatched		
+no	0	Brigatinib,DMSO	compoundName	5	control	1	Brigatinib	CHEMBL3545311	BRIGATINIB	preferred_name	exact		vehicle or untreated control
+no	0	Brigatinib,DMSO	compoundName	5	control	2	DMSO	CHEMBL504	DIMETHYL SULFOXIDE	synonym	exact		vehicle or untreated control
+no	0	DMSO,100 nM CUDC-907,100 nM Panobinostat,100 nM GSK2126458	experimentalCondition	5	control	1	DMSO	CHEMBL504	DIMETHYL SULFOXIDE	synonym	exact		vehicle or untreated control
+no	0	DMSO,100 nM CUDC-907,100 nM Panobinostat,100 nM GSK2126458	experimentalCondition	5	control	2	100 nM CUDC-907	CHEMBL3622533	FIMEPINOSTAT	synonym	parsed		vehicle or untreated control; parsed '100 nM CUDC-907' -> 'CUDC-907'
+no	0	DMSO,100 nM CUDC-907,100 nM Panobinostat,100 nM GSK2126458	experimentalCondition	5	control	3	100 nM Panobinostat	CHEMBL483254	PANOBINOSTAT	preferred_name	parsed		vehicle or untreated control; parsed '100 nM Panobinostat' -> 'Panobinostat'
+no	0	DMSO,100 nM CUDC-907,100 nM Panobinostat,100 nM GSK2126458	experimentalCondition	5	control	4	100 nM GSK2126458	CHEMBL1236962	OMIPALISIB	synonym	parsed		vehicle or untreated control; parsed '100 nM GSK2126458' -> 'GSK2126458'
+no	0	DMSO,CUDC-907,Panobinostat,GSK2126458	compoundName	5	control	1	DMSO	CHEMBL504	DIMETHYL SULFOXIDE	synonym	exact		vehicle or untreated control
+no	0	DMSO,CUDC-907,Panobinostat,GSK2126458	compoundName	5	control	2	CUDC-907	CHEMBL3622533	FIMEPINOSTAT	synonym	exact		vehicle or untreated control
+no	0	DMSO,CUDC-907,Panobinostat,GSK2126458	compoundName	5	control	3	Panobinostat	CHEMBL483254	PANOBINOSTAT	preferred_name	exact		vehicle or untreated control
+no	0	DMSO,CUDC-907,Panobinostat,GSK2126458	compoundName	5	control	4	GSK2126458	CHEMBL1236962	OMIPALISIB	synonym	exact		vehicle or untreated control
+no	0	Dasatinib,DMSO	compoundName	5	control	1	Dasatinib	CHEMBL5416410	DASATINIB	preferred_name	exact		vehicle or untreated control
+no	0	Dasatinib,DMSO	compoundName	5	control	2	DMSO	CHEMBL504	DIMETHYL SULFOXIDE	synonym	exact		vehicle or untreated control
+no	0	Dual luciferase assay with construct containing Firefly, R1947X, Renilla	experimentalCondition	5	unresolved	1	Dual luciferase assay with construct containing Firefly, R1947X, Renilla				unmatched		
 no	0	MPNST (High Grade) met to lymph node	experimentalCondition	5	unresolved	1	MPNST (High Grade) met to lymph node				unmatched		
 no	0	MatOb: HFHS diet at 4wks prior to mating	experimentalCondition	5	unresolved	1	MatOb: HFHS diet at 4wks prior to mating				unmatched		
 no	0	Not Applicable	compoundName	5	unresolved	1	Not Applicable				unmatched		
@@ -357,9 +357,9 @@ no	0	Trametinib;TNO155;Ribociclib	experimentalCondition	5	combination	1	Trametin
 no	0	Trametinib;TNO155;Ribociclib	experimentalCondition	5	combination	1	TNO155	CHEMBL4650521	BATOPROTAFIB	synonym	exact	CHEMBL2103875+CHEMBL3545110+CHEMBL4650521	
 no	0	Trametinib;TNO155;Ribociclib	experimentalCondition	5	combination	1	Ribociclib	CHEMBL3545110	RIBOCICLIB	preferred_name	exact	CHEMBL2103875+CHEMBL3545110+CHEMBL4650521	
 no	0	10 ng/ml IFNγ stimulation for 24 hr	experimentalCondition	4	not_a_compound	1	10 ng/ml IFNγ stimulation for 24 hr				unmatched		describes exposure duration, not a compound; upstream fix is to move this out of the compound field
-no	0	100 nM CUDC-907|100 nM Panobinostat|100 nM GSK2126458	experimentalCondition	4	arm_list	1	100 nM CUDC-907	CHEMBL3622533	FIMEPINOSTAT	synonym	parsed		3 separately-dosed arms in one field value; parsed '100 nM CUDC-907' -> 'CUDC-907'
-no	0	100 nM CUDC-907|100 nM Panobinostat|100 nM GSK2126458	experimentalCondition	4	arm_list	2	100 nM Panobinostat	CHEMBL483254	PANOBINOSTAT	preferred_name	parsed		3 separately-dosed arms in one field value; parsed '100 nM Panobinostat' -> 'Panobinostat'
-no	0	100 nM CUDC-907|100 nM Panobinostat|100 nM GSK2126458	experimentalCondition	4	arm_list	3	100 nM GSK2126458	CHEMBL1236962	OMIPALISIB	synonym	parsed		3 separately-dosed arms in one field value; parsed '100 nM GSK2126458' -> 'GSK2126458'
+no	0	100 nM CUDC-907,100 nM Panobinostat,100 nM GSK2126458	experimentalCondition	4	arm_list	1	100 nM CUDC-907	CHEMBL3622533	FIMEPINOSTAT	synonym	parsed		3 separately-dosed arms in one field value; parsed '100 nM CUDC-907' -> 'CUDC-907'
+no	0	100 nM CUDC-907,100 nM Panobinostat,100 nM GSK2126458	experimentalCondition	4	arm_list	2	100 nM Panobinostat	CHEMBL483254	PANOBINOSTAT	preferred_name	parsed		3 separately-dosed arms in one field value; parsed '100 nM Panobinostat' -> 'Panobinostat'
+no	0	100 nM CUDC-907,100 nM Panobinostat,100 nM GSK2126458	experimentalCondition	4	arm_list	3	100 nM GSK2126458	CHEMBL1236962	OMIPALISIB	synonym	parsed		3 separately-dosed arms in one field value; parsed '100 nM GSK2126458' -> 'GSK2126458'
 no	0	881 PD901 Treated	experimentalCondition	4	unresolved	1	881 PD901 Treated				unmatched		
 no	0	881 Parental	experimentalCondition	4	unresolved	1	881 Parental				unmatched		
 no	0	881 RAD001-Resistant	experimentalCondition	4	unresolved	1	881 RAD001-Resistant				unmatched		
@@ -371,7 +371,7 @@ no	0	Alectinib	compoundName	4	compound	1	Alectinib	CHEMBL1738797	ALECTINIB	prefe
 no	0	Behavior Assessment System for Children	compoundName	4	unresolved	1	Behavior Assessment System for Children				unmatched		
 no	0	BrdU	experimentalCondition	4	unresolved	1	BrdU				unmatched		
 no	0	Cisplatin	compoundName	4	compound	1	Cisplatin	CHEMBL11359	CISPLATIN	preferred_name	exact		
-no	0	DMSO|MK-2206|Brigatinib|MK-2206+Brigatinib	compoundName	4	control	1	DMSO|MK-2206|Brigatinib|MK-2206+Brigatinib				unmatched		vehicle or untreated control
+no	0	DMSO,MK-2206,Brigatinib,MK-2206+Brigatinib	compoundName	4	control	1	DMSO,MK-2206,Brigatinib,MK-2206+Brigatinib				unmatched		vehicle or untreated control
 no	0	Diffuse NF	experimentalCondition	4	unresolved	1	Diffuse NF				unmatched		
 no	0	Doxorubicin	compoundName	4	compound	1	Doxorubicin	CHEMBL53463	DOXORUBICIN	preferred_name	exact		
 no	0	Gefitinib	compoundName	4	compound	1	Gefitinib	CHEMBL939	GEFITINIB	preferred_name	exact		
@@ -385,7 +385,7 @@ no	0	Olaparib	compoundName	4	compound	1	Olaparib	CHEMBL521686	OLAPARIB	preferred
 no	0	PERK blot	compoundName	4	unresolved	1	PERK blot				unmatched		
 no	0	RMC4530	compoundName	4	unresolved	1	RMC4530				unmatched		
 no	0	Ribociclib	compoundName	4	compound	1	Ribociclib	CHEMBL3545110	RIBOCICLIB	preferred_name	exact		
-no	0	Social Skills Improvement System|Social-Emotional Learning	compoundName	4	unresolved	1	Social Skills Improvement System|Social-Emotional Learning				unmatched		
+no	0	Social Skills Improvement System, Social-Emotional Learning	compoundName	4	unresolved	1	Social Skills Improvement System, Social-Emotional Learning				unmatched		
 no	0	Trastuzumab	compoundName	4	compound	1	Trastuzumab	CHEMBL1201585	TRASTUZUMAB	preferred_name	exact		
 no	0	Uninj vs injured retina	experimentalCondition	4	unresolved	1	Uninj vs injured retina				unmatched		
 no	0	Vehicle	experimentalCondition	4	control	1	Vehicle	CHEMBL2108661	VEHICLE	preferred_name	exact		vehicle or untreated control
@@ -394,20 +394,20 @@ no	0	WU-12	compoundName	4	unresolved	1	WU-12				unmatched
 no	0	nazartinib	compoundName	4	compound	1	nazartinib	CHEMBL3787344	NAZARTINIB	preferred_name	exact		
 no	0	needle poke injury	experimentalCondition	4	unresolved	1	needle poke injury				unmatched		
 no	0	//pubchem.ncbi.nlm.nih.gov/compound/23663996	compoundName	3	unresolved	1	//pubchem.ncbi.nlm.nih.gov/compound/23663996				unmatched		
-no	0	10|20uM Ataluren	experimentalCondition	3	shredded_name	1	10|20uM Ataluren				unmatched		the '|' multi-value delimiter appears to have replaced commas inside one systematic name; the value is corrupted rather than merely unrecognised, and the upstream fix is to restore the original name
-no	0	250|500ug/ml Gentamicin	experimentalCondition	3	shredded_name	1	250|500ug/ml Gentamicin				unmatched		the '|' multi-value delimiter appears to have replaced commas inside one systematic name; the value is corrupted rather than merely unrecognised, and the upstream fix is to restore the original name
-no	0	25uM VG1 24h|10uM Ata 24 & 48h|250ug/ml Gent 24 & 48h	experimentalCondition	3	unresolved	1	25uM VG1 24h|10uM Ata 24 & 48h|250ug/ml Gent 24 & 48h				unmatched		
+no	0	10, 20uM Ataluren	experimentalCondition	3	unresolved	1	10, 20uM Ataluren				unmatched		
+no	0	250, 500ug/ml Gentamicin	experimentalCondition	3	unresolved	1	250, 500ug/ml Gentamicin				unmatched		
+no	0	25uM VG1 24h, 10uM Ata 24 & 48h, 250ug/ml Gent 24 & 48h	experimentalCondition	3	unresolved	1	25uM VG1 24h, 10uM Ata 24 & 48h, 250ug/ml Gent 24 & 48h				unmatched		
 no	0	3 different UPF1 siRNA seqs 50nM Dharm 7.0	experimentalCondition	3	unresolved	1	3 different UPF1 siRNA seqs 50nM Dharm 7.0				unmatched		
-no	0	7.5mM Caff 6h|5uM NMDI 24h|10uM Ata 24 & 48h|250ug/ml Gent 24 & 48h	experimentalCondition	3	unresolved	1	7.5mM Caff 6h|5uM NMDI 24h|10uM Ata 24 & 48h|250ug/ml Gent 24 & 48h				unmatched		
-no	0	7.5mM Caff 6h|5uM NMDI 24h|20uM Ata 24 & 48h|200ug/ml G418 24 & 48h	experimentalCondition	3	unresolved	1	7.5mM Caff 6h|5uM NMDI 24h|20uM Ata 24 & 48h|200ug/ml G418 24 & 48h				unmatched		
+no	0	7.5mM Caff 6h, 5uM NMDI 24h, 10uM Ata 24 & 48h, 250ug/ml Gent 24 & 48h	experimentalCondition	3	unresolved	1	7.5mM Caff 6h, 5uM NMDI 24h, 10uM Ata 24 & 48h, 250ug/ml Gent 24 & 48h				unmatched		
+no	0	7.5mM Caff 6h, 5uM NMDI 24h, 20uM Ata 24 & 48h, 200ug/ml G418 24 & 48h	experimentalCondition	3	unresolved	1	7.5mM Caff 6h, 5uM NMDI 24h, 20uM Ata 24 & 48h, 200ug/ml G418 24 & 48h				unmatched		
 no	0	Ata 0 24h>Ata 10 24h>Ata 20 24h>Ata 0 48h>Ata 10 48h>Ata 20 48h>Ata 0 72h>Ata 10 72h>Ata 20 72h>Empty>het ctrl	experimentalCondition	3	unresolved	1	Ata 0 24h>Ata 10 24h>Ata 20 24h>Ata 0 48h>Ata 10 48h>Ata 20 48h>Ata 0 72h>Ata 10 72h>Ata 20 72h>Empty>het ctrl				unmatched		
 no	0	Cantharidin	compoundName	3	compound	1	Cantharidin	CHEMBL48449	CANTHARIDIN	preferred_name	exact		
-no	0	Dasatinib|Brigatinib|DMSO	compoundName	3	control	1	Dasatinib	CHEMBL5416410	DASATINIB	preferred_name	exact		vehicle or untreated control
-no	0	Dasatinib|Brigatinib|DMSO	compoundName	3	control	2	Brigatinib	CHEMBL3545311	BRIGATINIB	preferred_name	exact		vehicle or untreated control
-no	0	Dasatinib|Brigatinib|DMSO	compoundName	3	control	3	DMSO	CHEMBL504	DIMETHYL SULFOXIDE	synonym	exact		vehicle or untreated control
-no	0	Dasatinib|Simvastatin|DMSO	compoundName	3	control	1	Dasatinib	CHEMBL5416410	DASATINIB	preferred_name	exact		vehicle or untreated control
-no	0	Dasatinib|Simvastatin|DMSO	compoundName	3	control	2	Simvastatin	CHEMBL1064	SIMVASTATIN	preferred_name	exact		vehicle or untreated control
-no	0	Dasatinib|Simvastatin|DMSO	compoundName	3	control	3	DMSO	CHEMBL504	DIMETHYL SULFOXIDE	synonym	exact		vehicle or untreated control
+no	0	Dasatinib,Brigatinib,DMSO	compoundName	3	control	1	Dasatinib	CHEMBL5416410	DASATINIB	preferred_name	exact		vehicle or untreated control
+no	0	Dasatinib,Brigatinib,DMSO	compoundName	3	control	2	Brigatinib	CHEMBL3545311	BRIGATINIB	preferred_name	exact		vehicle or untreated control
+no	0	Dasatinib,Brigatinib,DMSO	compoundName	3	control	3	DMSO	CHEMBL504	DIMETHYL SULFOXIDE	synonym	exact		vehicle or untreated control
+no	0	Dasatinib,Simvastatin,DMSO	compoundName	3	control	1	Dasatinib	CHEMBL5416410	DASATINIB	preferred_name	exact		vehicle or untreated control
+no	0	Dasatinib,Simvastatin,DMSO	compoundName	3	control	2	Simvastatin	CHEMBL1064	SIMVASTATIN	preferred_name	exact		vehicle or untreated control
+no	0	Dasatinib,Simvastatin,DMSO	compoundName	3	control	3	DMSO	CHEMBL504	DIMETHYL SULFOXIDE	synonym	exact		vehicle or untreated control
 no	0	GE: HFHS diet onset @E6	experimentalCondition	3	unresolved	1	GE: HFHS diet onset @E6				unmatched		
 no	0	GPHR-00000254	experimentalCondition	3	unresolved	1	GPHR-00000254				unmatched		
 no	0	GPHR-00000291	experimentalCondition	3	unresolved	1	GPHR-00000291				unmatched		
@@ -438,28 +438,28 @@ no	0	H20 48h>0.375Caff 48/F24h>0.75Caff 48/F24h>0.375Caff 48/L24h>0.75Caff 48/L2
 no	0	H20 48h>Gent 500 48h>Gent500 48h+0.375Caff F24h>Gent500 48h+0.75Caff F24h>Gent500 48h+0.375Caff L24h>Gent500 48h+0.75Caff L24h	experimentalCondition	3	unresolved	1	H20 48h>Gent 500 48h>Gent500 48h+0.375Caff F24h>Gent500 48h+0.75Caff F24h>Gent500 48h+0.375Caff L24h>Gent500 48h+0.75Caff L24h				unmatched		
 no	0	Idarubicin	compoundName	3	compound	1	Idarubicin	CHEMBL1117	IDARUBICIN	preferred_name	exact		
 no	0	Parthenolide	compoundName	3	compound	1	Parthenolide	CHEMBL540445	PARTHENOLIDE	preferred_name	exact		
-no	0	Simvastatin|DMSO	compoundName	3	control	1	Simvastatin	CHEMBL1064	SIMVASTATIN	preferred_name	exact		vehicle or untreated control
-no	0	Simvastatin|DMSO	compoundName	3	control	2	DMSO	CHEMBL504	DIMETHYL SULFOXIDE	synonym	exact		vehicle or untreated control
+no	0	Simvastatin,DMSO	compoundName	3	control	1	Simvastatin	CHEMBL1064	SIMVASTATIN	preferred_name	exact		vehicle or untreated control
+no	0	Simvastatin,DMSO	compoundName	3	control	2	DMSO	CHEMBL504	DIMETHYL SULFOXIDE	synonym	exact		vehicle or untreated control
 no	0	TB 1	experimentalCondition	3	unresolved	1	TB 1				unmatched		
-no	0	UPF1 siRNA 50nM_100nM|Dharm 7.0|10.0ul	experimentalCondition	3	unresolved	1	UPF1 siRNA 50nM_100nM|Dharm 7.0|10.0ul				unmatched		
+no	0	UPF1 siRNA 50nM_100nM, Dharm 7.0, 10.0ul	experimentalCondition	3	unresolved	1	UPF1 siRNA 50nM_100nM, Dharm 7.0, 10.0ul				unmatched		
 no	0	Uninj	experimentalCondition	3	unresolved	1	Uninj				unmatched		
-no	0	Uninj|ascl1a|lin28a	experimentalCondition	3	unresolved	1	Uninj|ascl1a|lin28a				unmatched		
-no	0	(2 Z|3 E)-6-Bromoindirubin-3 -oxime	compoundName	2	shredded_name	1	(2 Z|3 E)-6-Bromoindirubin-3 -oxime				unmatched		the '|' multi-value delimiter appears to have replaced commas inside one systematic name; the value is corrupted rather than merely unrecognised, and the upstream fix is to restore the original name
+no	0	Uninj, ascl1a, lin28a	experimentalCondition	3	unresolved	1	Uninj, ascl1a, lin28a				unmatched		
+no	0	(2 Z,3 E)-6-Bromoindirubin-3 -oxime	compoundName	2	unresolved	1	(2 Z,3 E)-6-Bromoindirubin-3 -oxime				unmatched		
 no	0	(S)-(+)-Camptothecin	compoundName	2	unresolved	1	(S)-(+)-Camptothecin				unmatched		
 no	0	1= NF 2= cellular NF	experimentalCondition	2	unresolved	1	1= NF 2= cellular NF				unmatched		
 no	0	ANNUBP in NF	experimentalCondition	2	unresolved	1	ANNUBP in NF				unmatched		
+no	0	ANNUBP in red circle, NF with atypia elsewhere	experimentalCondition	2	unresolved	1	ANNUBP in red circle, NF with atypia elsewhere				unmatched		
 no	0	ANNUBP in red circles	experimentalCondition	2	unresolved	1	ANNUBP in red circles				unmatched		
-no	0	ANNUBP in red circle|NF with atypia elsewhere	experimentalCondition	2	unresolved	1	ANNUBP in red circle|NF with atypia elsewhere				unmatched		
 no	0	Alamar blue assay to measure proliferation of cNF-SCs with drugs	experimentalCondition	2	unresolved	1	Alamar blue assay to measure proliferation of cNF-SCs with drugs				unmatched		
-no	0	Ata 0 48h|Ata 10 48h|Ata 20 48h|Gent 0 48h|Gent 250 48h|Gent 500 48h|WT Ctrl|Het Cntrl	experimentalCondition	2	unresolved	1	Ata 0 48h|Ata 10 48h|Ata 20 48h|Gent 0 48h|Gent 250 48h|Gent 500 48h|WT Ctrl|Het Cntrl				unmatched		
+no	0	Ata 0 48h, Ata 10 48h, Ata 20 48h, Gent 0 48h, Gent 250 48h, Gent 500 48h, WT Ctrl, Het Cntrl	experimentalCondition	2	unresolved	1	Ata 0 48h, Ata 10 48h, Ata 20 48h, Gent 0 48h, Gent 250 48h, Gent 500 48h, WT Ctrl, Het Cntrl				unmatched		
 no	0	Bay 11-7085	compoundName	2	unresolved	1	Bay 11-7085				unmatched		
 no	0	Calcimycin	compoundName	2	compound	1	Calcimycin	CHEMBL1256686	CALCIMYCIN	preferred_name	exact		
 no	0	Calmidazolium chloride	compoundName	2	unresolved	1	Calmidazolium chloride				unmatched		
 no	0	Colchicine	compoundName	2	compound	1	Colchicine	CHEMBL107	COLCHICINE	preferred_name	exact		
-no	0	DMSO|Simvastatin|Dasatinib|Brigatinib	compoundName	2	control	1	DMSO	CHEMBL504	DIMETHYL SULFOXIDE	synonym	exact		vehicle or untreated control
-no	0	DMSO|Simvastatin|Dasatinib|Brigatinib	compoundName	2	control	2	Simvastatin	CHEMBL1064	SIMVASTATIN	preferred_name	exact		vehicle or untreated control
-no	0	DMSO|Simvastatin|Dasatinib|Brigatinib	compoundName	2	control	3	Dasatinib	CHEMBL5416410	DASATINIB	preferred_name	exact		vehicle or untreated control
-no	0	DMSO|Simvastatin|Dasatinib|Brigatinib	compoundName	2	control	4	Brigatinib	CHEMBL3545311	BRIGATINIB	preferred_name	exact		vehicle or untreated control
+no	0	DMSO,Simvastatin,Dasatinib,Brigatinib	compoundName	2	control	1	DMSO	CHEMBL504	DIMETHYL SULFOXIDE	synonym	exact		vehicle or untreated control
+no	0	DMSO,Simvastatin,Dasatinib,Brigatinib	compoundName	2	control	2	Simvastatin	CHEMBL1064	SIMVASTATIN	preferred_name	exact		vehicle or untreated control
+no	0	DMSO,Simvastatin,Dasatinib,Brigatinib	compoundName	2	control	3	Dasatinib	CHEMBL5416410	DASATINIB	preferred_name	exact		vehicle or untreated control
+no	0	DMSO,Simvastatin,Dasatinib,Brigatinib	compoundName	2	control	4	Brigatinib	CHEMBL3545311	BRIGATINIB	preferred_name	exact		vehicle or untreated control
 no	0	Day 94	experimentalCondition	2	not_a_compound	1	Day 94				unmatched		describes exposure duration, not a compound; upstream fix is to move this out of the compound field
 no	0	Diphenyleneiodonium chloride	compoundName	2	unresolved	1	Diphenyleneiodonium chloride				unmatched		
 no	0	Ellipticine	compoundName	2	unresolved	1	Ellipticine				unmatched		
@@ -944,37 +944,38 @@ no	0	GPHR-00312507	experimentalCondition	2	unresolved	1	GPHR-00312507				unmatch
 no	0	GPHR-00312508	experimentalCondition	2	unresolved	1	GPHR-00312508				unmatched		
 no	0	GPHR-00312620	experimentalCondition	2	unresolved	1	GPHR-00312620				unmatched		
 no	0	GPHR-00312701	experimentalCondition	2	unresolved	1	GPHR-00312701				unmatched		
-no	0	GSK2126458|Panobinostat|CUDC907	compoundName	2	arm_list	1	GSK2126458	CHEMBL1236962	OMIPALISIB	synonym	exact		3 separately-dosed arms in one field value
-no	0	GSK2126458|Panobinostat|CUDC907	compoundName	2	arm_list	2	Panobinostat	CHEMBL483254	PANOBINOSTAT	preferred_name	exact		3 separately-dosed arms in one field value
-no	0	GSK2126458|Panobinostat|CUDC907	compoundName	2	arm_list	3	CUDC907	CHEMBL3622533	FIMEPINOSTAT	synonym	exact		3 separately-dosed arms in one field value
+no	0	GSK2126458,Panobinostat,CUDC907	compoundName	2	arm_list	1	GSK2126458	CHEMBL1236962	OMIPALISIB	synonym	exact		3 separately-dosed arms in one field value
+no	0	GSK2126458,Panobinostat,CUDC907	compoundName	2	arm_list	2	Panobinostat	CHEMBL483254	PANOBINOSTAT	preferred_name	exact		3 separately-dosed arms in one field value
+no	0	GSK2126458,Panobinostat,CUDC907	compoundName	2	arm_list	3	CUDC907	CHEMBL3622533	FIMEPINOSTAT	synonym	exact		3 separately-dosed arms in one field value
 no	0	HGMPNST	experimentalCondition	2	unresolved	1	HGMPNST				unmatched		
 no	0	HandE 1	experimentalCondition	2	unresolved	1	HandE 1				unmatched		
 no	0	INK-128	compoundName	2	compound	1	INK-128	CHEMBL3545097	SAPANISERTIB	synonym	exact		
-no	0	INK-128|DMSO	compoundName	2	control	1	INK-128	CHEMBL3545097	SAPANISERTIB	synonym	exact		vehicle or untreated control
-no	0	INK-128|DMSO	compoundName	2	control	2	DMSO	CHEMBL504	DIMETHYL SULFOXIDE	synonym	exact		vehicle or untreated control
-no	0	INK-128|Dasatinib|DMSO	compoundName	2	control	1	INK-128	CHEMBL3545097	SAPANISERTIB	synonym	exact		vehicle or untreated control
-no	0	INK-128|Dasatinib|DMSO	compoundName	2	control	2	Dasatinib	CHEMBL5416410	DASATINIB	preferred_name	exact		vehicle or untreated control
-no	0	INK-128|Dasatinib|DMSO	compoundName	2	control	3	DMSO	CHEMBL504	DIMETHYL SULFOXIDE	synonym	exact		vehicle or untreated control
+no	0	INK-128,DMSO	compoundName	2	control	1	INK-128	CHEMBL3545097	SAPANISERTIB	synonym	exact		vehicle or untreated control
+no	0	INK-128,DMSO	compoundName	2	control	2	DMSO	CHEMBL504	DIMETHYL SULFOXIDE	synonym	exact		vehicle or untreated control
+no	0	INK-128,Dasatinib,DMSO	compoundName	2	control	1	INK-128	CHEMBL3545097	SAPANISERTIB	synonym	exact		vehicle or untreated control
+no	0	INK-128,Dasatinib,DMSO	compoundName	2	control	2	Dasatinib	CHEMBL5416410	DASATINIB	preferred_name	exact		vehicle or untreated control
+no	0	INK-128,Dasatinib,DMSO	compoundName	2	control	3	DMSO	CHEMBL504	DIMETHYL SULFOXIDE	synonym	exact		vehicle or untreated control
 no	0	Infected with Ascl1 lentivirus   for 1 week	experimentalCondition	2	unresolved	1	Infected with Ascl1 lentivirus   for 1 week				unmatched		
 no	0	MIPE	compoundName	2	unresolved	1	MIPE				unmatched		
 no	0	MIPE	experimentalCondition	2	unresolved	1	MIPE				unmatched		
-no	0	MK2206|Brigatinib|DMSO	compoundName	2	control	1	MK2206	CHEMBL1079175	MK-2206	synonym	exact		vehicle or untreated control
-no	0	MK2206|Brigatinib|DMSO	compoundName	2	control	2	Brigatinib	CHEMBL3545311	BRIGATINIB	preferred_name	exact		vehicle or untreated control
-no	0	MK2206|Brigatinib|DMSO	compoundName	2	control	3	DMSO	CHEMBL504	DIMETHYL SULFOXIDE	synonym	exact		vehicle or untreated control
-no	0	MK2206|DMSO	compoundName	2	control	1	MK2206	CHEMBL1079175	MK-2206	synonym	exact		vehicle or untreated control
-no	0	MK2206|DMSO	compoundName	2	control	2	DMSO	CHEMBL504	DIMETHYL SULFOXIDE	synonym	exact		vehicle or untreated control
+no	0	MK2206,Brigatinib,DMSO	compoundName	2	control	1	MK2206	CHEMBL1079175	MK-2206	synonym	exact		vehicle or untreated control
+no	0	MK2206,Brigatinib,DMSO	compoundName	2	control	2	Brigatinib	CHEMBL3545311	BRIGATINIB	preferred_name	exact		vehicle or untreated control
+no	0	MK2206,Brigatinib,DMSO	compoundName	2	control	3	DMSO	CHEMBL504	DIMETHYL SULFOXIDE	synonym	exact		vehicle or untreated control
+no	0	MK2206,DMSO	compoundName	2	control	1	MK2206	CHEMBL1079175	MK-2206	synonym	exact		vehicle or untreated control
+no	0	MK2206,DMSO	compoundName	2	control	2	DMSO	CHEMBL504	DIMETHYL SULFOXIDE	synonym	exact		vehicle or untreated control
 no	0	MPNST (High Grade)	experimentalCondition	2	unresolved	1	MPNST (High Grade)				unmatched		
-no	0	MPNST|high grade	experimentalCondition	2	unresolved	1	MPNST|high grade				unmatched		
+no	0	MPNST, high grade	experimentalCondition	2	unresolved	1	MPNST, high grade				unmatched		
 no	0	MatOb: HFHS diet 4 wks prior to mating	experimentalCondition	2	unresolved	1	MatOb: HFHS diet 4 wks prior to mating				unmatched		
 no	0	Mevastatin	compoundName	2	compound	1	Mevastatin	CHEMBL54440	MEVASTATIN	preferred_name	exact		
 no	0	Mitoxantrone	compoundName	2	compound	1	Mitoxantrone	CHEMBL58	MITOXANTRONE	preferred_name	exact		
+no	0	NF, NF with atypia, ANNUBP	experimentalCondition	2	unresolved	1	NF, NF with atypia, ANNUBP				unmatched		
+no	0	NF, diffuse v plexiform	experimentalCondition	2	unresolved	1	NF, diffuse v plexiform				unmatched		
 no	0	NF1- (rep1)	experimentalCondition	2	unresolved	1	NF1- (rep1)				unmatched		
 no	0	NF1- (rep2)	experimentalCondition	2	unresolved	1	NF1- (rep2)				unmatched		
-no	0	NF|NF with atypia|ANNUBP	experimentalCondition	2	unresolved	1	NF|NF with atypia|ANNUBP				unmatched		
-no	0	NF|diffuse v plexiform	experimentalCondition	2	unresolved	1	NF|diffuse v plexiform				unmatched		
 no	0	NMDA injury	experimentalCondition	2	unresolved	1	NMDA injury				unmatched		
 no	0	Niclosamide	compoundName	2	compound	1	Niclosamide	CHEMBL1448	NICLOSAMIDE	preferred_name	exact		
 no	0	Nocodazole	compoundName	2	compound	1	Nocodazole	CHEMBL9514	NOCODAZOLE	preferred_name	exact		
+no	0	Onalespib	experimentalCondition	2	compound	1	Onalespib	CHEMBL1214827	ONALESPIB	preferred_name	exact		
 no	0	Ouabain	compoundName	2	compound	1	Ouabain	CHEMBL222863	OUABAIN	preferred_name	exact		
 no	0	PD901	experimentalCondition	2	compound	1	PD901	CHEMBL507361	MIRDAMETINIB	synonym	parsed		punctuation-insensitive match to 'Pd 901'
 no	0	PLX51107+MK2206	compoundName	2	unresolved	1	PLX51107+MK2206				unmatched		
@@ -1006,83 +1007,83 @@ no	0	defactinib	compoundName	2	compound	1	defactinib	CHEMBL3137331	DEFACTINIB	pr
 no	0	end cycle 1	experimentalCondition	2	unresolved	1	end cycle 1				unmatched		
 no	0	end cycle 2	experimentalCondition	2	unresolved	1	end cycle 2				unmatched		
 no	0	p-ERK blot	compoundName	2	unresolved	1	p-ERK blot				unmatched		
-no	0	#1212: Genotype GFAP-Cre; Nf1FloxR681X/Flox. Male. 6wo. Control diet.  #1213: Genotype GFAP-Cre; Nf1FloxR681X/Flox. Female. 6wo. High-fat|high-sucrose diet.  #1214: Genotype GFAP-Cre; Nf1FloxR681X/Flox. Male. 6wo. High-fat|high-sucrose diet.  #1215: Genotype GFAP-Cre; Nf1FloxR681X/Flox. Male. 6wo. High-fat|high-sucrose diet.	experimentalCondition	1	unresolved	1	#1212: Genotype GFAP-Cre				unmatched		
-no	0	#1212: Genotype GFAP-Cre; Nf1FloxR681X/Flox. Male. 6wo. Control diet.  #1213: Genotype GFAP-Cre; Nf1FloxR681X/Flox. Female. 6wo. High-fat|high-sucrose diet.  #1214: Genotype GFAP-Cre; Nf1FloxR681X/Flox. Male. 6wo. High-fat|high-sucrose diet.  #1215: Genotype GFAP-Cre; Nf1FloxR681X/Flox. Male. 6wo. High-fat|high-sucrose diet.	experimentalCondition	1	unresolved	1	Nf1FloxR681X/Flox. Male. 6wo. Control diet.  #1213: Genotype GFAP-Cre				unmatched		
-no	0	#1212: Genotype GFAP-Cre; Nf1FloxR681X/Flox. Male. 6wo. Control diet.  #1213: Genotype GFAP-Cre; Nf1FloxR681X/Flox. Female. 6wo. High-fat|high-sucrose diet.  #1214: Genotype GFAP-Cre; Nf1FloxR681X/Flox. Male. 6wo. High-fat|high-sucrose diet.  #1215: Genotype GFAP-Cre; Nf1FloxR681X/Flox. Male. 6wo. High-fat|high-sucrose diet.	experimentalCondition	1	unresolved	1	Nf1FloxR681X/Flox. Female. 6wo. High-fat|high-sucrose diet.  #1214: Genotype GFAP-Cre				unmatched		
-no	0	#1212: Genotype GFAP-Cre; Nf1FloxR681X/Flox. Male. 6wo. Control diet.  #1213: Genotype GFAP-Cre; Nf1FloxR681X/Flox. Female. 6wo. High-fat|high-sucrose diet.  #1214: Genotype GFAP-Cre; Nf1FloxR681X/Flox. Male. 6wo. High-fat|high-sucrose diet.  #1215: Genotype GFAP-Cre; Nf1FloxR681X/Flox. Male. 6wo. High-fat|high-sucrose diet.	experimentalCondition	1	unresolved	1	Nf1FloxR681X/Flox. Male. 6wo. High-fat|high-sucrose diet.  #1215: Genotype GFAP-Cre				unmatched		
-no	0	#1212: Genotype GFAP-Cre; Nf1FloxR681X/Flox. Male. 6wo. Control diet.  #1213: Genotype GFAP-Cre; Nf1FloxR681X/Flox. Female. 6wo. High-fat|high-sucrose diet.  #1214: Genotype GFAP-Cre; Nf1FloxR681X/Flox. Male. 6wo. High-fat|high-sucrose diet.  #1215: Genotype GFAP-Cre; Nf1FloxR681X/Flox. Male. 6wo. High-fat|high-sucrose diet.	experimentalCondition	1	unresolved	1	Nf1FloxR681X/Flox. Male. 6wo. High-fat|high-sucrose diet.				unmatched		
+no	0	#1212: Genotype GFAP-Cre; Nf1FloxR681X/Flox. Male. 6wo. Control diet.  #1213: Genotype GFAP-Cre; Nf1FloxR681X/Flox. Female. 6wo. High-fat, high-sucrose diet.  #1214: Genotype GFAP-Cre; Nf1FloxR681X/Flox. Male. 6wo. High-fat, high-sucrose diet.  #1215: Genotype GFAP-Cre; Nf1FloxR681X/Flox. Male. 6wo. High-fat, high-sucrose diet.	experimentalCondition	1	unresolved	1	#1212: Genotype GFAP-Cre				unmatched		
+no	0	#1212: Genotype GFAP-Cre; Nf1FloxR681X/Flox. Male. 6wo. Control diet.  #1213: Genotype GFAP-Cre; Nf1FloxR681X/Flox. Female. 6wo. High-fat, high-sucrose diet.  #1214: Genotype GFAP-Cre; Nf1FloxR681X/Flox. Male. 6wo. High-fat, high-sucrose diet.  #1215: Genotype GFAP-Cre; Nf1FloxR681X/Flox. Male. 6wo. High-fat, high-sucrose diet.	experimentalCondition	1	unresolved	1	Nf1FloxR681X/Flox. Male. 6wo. Control diet.  #1213: Genotype GFAP-Cre				unmatched		
+no	0	#1212: Genotype GFAP-Cre; Nf1FloxR681X/Flox. Male. 6wo. Control diet.  #1213: Genotype GFAP-Cre; Nf1FloxR681X/Flox. Female. 6wo. High-fat, high-sucrose diet.  #1214: Genotype GFAP-Cre; Nf1FloxR681X/Flox. Male. 6wo. High-fat, high-sucrose diet.  #1215: Genotype GFAP-Cre; Nf1FloxR681X/Flox. Male. 6wo. High-fat, high-sucrose diet.	experimentalCondition	1	unresolved	1	Nf1FloxR681X/Flox. Female. 6wo. High-fat, high-sucrose diet.  #1214: Genotype GFAP-Cre				unmatched		
+no	0	#1212: Genotype GFAP-Cre; Nf1FloxR681X/Flox. Male. 6wo. Control diet.  #1213: Genotype GFAP-Cre; Nf1FloxR681X/Flox. Female. 6wo. High-fat, high-sucrose diet.  #1214: Genotype GFAP-Cre; Nf1FloxR681X/Flox. Male. 6wo. High-fat, high-sucrose diet.  #1215: Genotype GFAP-Cre; Nf1FloxR681X/Flox. Male. 6wo. High-fat, high-sucrose diet.	experimentalCondition	1	unresolved	1	Nf1FloxR681X/Flox. Male. 6wo. High-fat, high-sucrose diet.  #1215: Genotype GFAP-Cre				unmatched		
+no	0	#1212: Genotype GFAP-Cre; Nf1FloxR681X/Flox. Male. 6wo. Control diet.  #1213: Genotype GFAP-Cre; Nf1FloxR681X/Flox. Female. 6wo. High-fat, high-sucrose diet.  #1214: Genotype GFAP-Cre; Nf1FloxR681X/Flox. Male. 6wo. High-fat, high-sucrose diet.  #1215: Genotype GFAP-Cre; Nf1FloxR681X/Flox. Male. 6wo. High-fat, high-sucrose diet.	experimentalCondition	1	unresolved	1	Nf1FloxR681X/Flox. Male. 6wo. High-fat, high-sucrose diet.				unmatched		
 no	0	(+)-N-Allylnormetazocine hydrochloride	compoundName	1	unresolved	1	(+)-N-Allylnormetazocine hydrochloride				unmatched		
-no	0	(1S|2S)-2-(2-(N-[(3-Benzimidazol-2-yl)propyl]-N-methylamino)ethyl)-6-fluoro-1|2|3|4-tetrahydro-1-isopropyl-2-naphtyl cyclopropanecarboxylate dihydrochloride	compoundName	1	shredded_name	1	(1S|2S)-2-(2-(N-[(3-Benzimidazol-2-yl)propyl]-N-methylamino)ethyl)-6-fluoro-1|2|3|4-tetrahydro-1-isopropyl-2-naphtyl cyclopropanecarboxylate dihydrochloride				unmatched		the '|' multi-value delimiter appears to have replaced commas inside one systematic name; the value is corrupted rather than merely unrecognised, and the upstream fix is to restore the original name
+no	0	(1S,2S)-2-(2-(N-[(3-Benzimidazol-2-yl)propyl]-N-methylamino)ethyl)-6-fluoro-1,2,3,4-tetrahydro-1-isopropyl-2-naphtyl cyclopropanecarboxylate dihydrochloride	compoundName	1	unresolved	1	(1S,2S)-2-(2-(N-[(3-Benzimidazol-2-yl)propyl]-N-methylamino)ethyl)-6-fluoro-1,2,3,4-tetrahydro-1-isopropyl-2-naphtyl cyclopropanecarboxylate dihydrochloride				unmatched		
 no	0	(2-(4-chlorophenyl)quinolin-4-yl)(piperidin-2-yl)methanol	compoundName	1	unresolved	1	(2-(4-chlorophenyl)quinolin-4-yl)(piperidin-2-yl)methanol				unmatched		
 no	0	(?)-AMPA hydrobromide	compoundName	1	unresolved	1	(?)-AMPA hydrobromide				unmatched		
 no	0	(?)-Vanillylmandelic acid	compoundName	1	unresolved	1	(?)-Vanillylmandelic acid				unmatched		
 no	0	(S)-(+)-Niguldipine hydrochloride	compoundName	1	unresolved	1	(S)-(+)-Niguldipine hydrochloride				unmatched		
-no	0	(S)-3|4-DCPG	compoundName	1	unresolved	1	(S)-3|4-DCPG				unmatched		
+no	0	(S)-3,4-DCPG	compoundName	1	unresolved	1	(S)-3,4-DCPG				unmatched		
 no	0	//pubchem.ncbi.nlm.nih.gov/compound/10127622 and //pubchem.ncbi.nlm.nih.gov/compound/23663996	compoundName	1	unresolved	1	//pubchem.ncbi.nlm.nih.gov/compound/10127622 and //pubchem.ncbi.nlm.nih.gov/compound/23663996				unmatched		
 no	0	//pubchem.ncbi.nlm.nih.gov/compound/10127622 and //pubchem.ncbi.nlm.nih.gov/compound/23663997	compoundName	1	unresolved	1	//pubchem.ncbi.nlm.nih.gov/compound/10127622 and //pubchem.ncbi.nlm.nih.gov/compound/23663997				unmatched		
 no	0	//pubchem.ncbi.nlm.nih.gov/compound/10127622 and //pubchem.ncbi.nlm.nih.gov/compound/23663998	compoundName	1	unresolved	1	//pubchem.ncbi.nlm.nih.gov/compound/10127622 and //pubchem.ncbi.nlm.nih.gov/compound/23663998				unmatched		
 no	0	//pubchem.ncbi.nlm.nih.gov/compound/10127622 and //pubchem.ncbi.nlm.nih.gov/compound/23663999	compoundName	1	unresolved	1	//pubchem.ncbi.nlm.nih.gov/compound/10127622 and //pubchem.ncbi.nlm.nih.gov/compound/23663999				unmatched		
 no	0	//pubchem.ncbi.nlm.nih.gov/compound/10127622 and //pubchem.ncbi.nlm.nih.gov/compound/23664000	compoundName	1	unresolved	1	//pubchem.ncbi.nlm.nih.gov/compound/10127622 and //pubchem.ncbi.nlm.nih.gov/compound/23664000				unmatched		
 no	0	//pubchem.ncbi.nlm.nih.gov/compound/10127622 and //pubchem.ncbi.nlm.nih.gov/compound/23664001	compoundName	1	unresolved	1	//pubchem.ncbi.nlm.nih.gov/compound/10127622 and //pubchem.ncbi.nlm.nih.gov/compound/23664001				unmatched		
+no	0	1,2,4-Dithiazol-3-amine, 5-[(2-furanyl)methylimino]- N,N-dimethyl-, monohydrobromide	compoundName	1	unresolved	1	1,2,4-Dithiazol-3-amine, 5-[(2-furanyl)methylimino]- N,N-dimethyl-, monohydrobromide				unmatched		
+no	0	1,3,2-Thiazastannolidine, 2,2-dibutyl-3-[(4-methylphenyl)sulfonyl]-	compoundName	1	unresolved	1	1,3,2-Thiazastannolidine, 2,2-dibutyl-3-[(4-methylphenyl)sulfonyl]-				unmatched		
+no	0	1,3-Dihydro-3-[(2,4,6-trimethoxyphenyl)methylene]-2H-indol-2-one	compoundName	1	unresolved	1	1,3-Dihydro-3-[(2,4,6-trimethoxyphenyl)methylene]-2H-indol-2-one				unmatched		
+no	0	1,4-Benzenediamine,N-phenyl-N -(2,2,6,6-tetramethyl-4-piperidinyl)-	compoundName	1	unresolved	1	1,4-Benzenediamine,N-phenyl-N -(2,2,6,6-tetramethyl-4-piperidinyl)-				unmatched		
+no	0	1,4-Pentadien-3-one, 1,5-di-3-pyridyl-	compoundName	1	unresolved	1	1,4-Pentadien-3-one, 1,5-di-3-pyridyl-				unmatched		
 no	0	1-(2-Thiazoylazo)-2-naphthol	compoundName	1	unresolved	1	1-(2-Thiazoylazo)-2-naphthol				unmatched		
 no	0	1-BCP	compoundName	1	unresolved	1	1-BCP				unmatched		
-no	0	1-Piperidinecarboxylic acid|4-oxo-3|5-bis(phenyl- methylene)-|ethyl ester	compoundName	1	unresolved	1	1-Piperidinecarboxylic acid|4-oxo-3|5-bis(phenyl- methylene)-|ethyl ester				unmatched		
+no	0	1-Piperidinecarboxylic acid, 4-oxo-3,5-bis(phenyl- methylene)-, ethyl ester	compoundName	1	unresolved	1	1-Piperidinecarboxylic acid, 4-oxo-3,5-bis(phenyl- methylene)-, ethyl ester				unmatched		
 no	0	100688	compoundName	1	unresolved	1	100688				unmatched		
 no	0	105014	compoundName	1	unresolved	1	105014				unmatched		
-no	0	11H-Benzo[a]carbazole-1|4-dione|7|11-dimethyl-	compoundName	1	shredded_name	1	11H-Benzo[a]carbazole-1|4-dione|7|11-dimethyl-				unmatched		the '|' multi-value delimiter appears to have replaced commas inside one systematic name; the value is corrupted rather than merely unrecognised, and the upstream fix is to restore the original name
-no	0	11H-Indolo[3|2-c]quinolin-9-amine|3-chloro-N|N-diethyl-8-methoxy-	compoundName	1	shredded_name	1	11H-Indolo[3|2-c]quinolin-9-amine|3-chloro-N|N-diethyl-8-methoxy-				unmatched		the '|' multi-value delimiter appears to have replaced commas inside one systematic name; the value is corrupted rather than merely unrecognised, and the upstream fix is to restore the original name
+no	0	11H-Benzo[a]carbazole-1,4-dione, 7,11-dimethyl-	compoundName	1	unresolved	1	11H-Benzo[a]carbazole-1,4-dione, 7,11-dimethyl-				unmatched		
+no	0	11H-Indolo[3,2-c]quinolin-9-amine, 3-chloro-N,N-diethyl-8-methoxy-	compoundName	1	unresolved	1	11H-Indolo[3,2-c]quinolin-9-amine, 3-chloro-N,N-diethyl-8-methoxy-				unmatched		
 no	0	12-O-Palmitoyl-16-hydroxyphorbol-13-acetate	compoundName	1	unresolved	1	12-O-Palmitoyl-16-hydroxyphorbol-13-acetate				unmatched		
 no	0	122819	compoundName	1	unresolved	1	122819				unmatched		
 no	0	12ph contrast	experimentalCondition	1	unresolved	1	12ph contrast				unmatched		
 no	0	12w-24h	experimentalCondition	1	unresolved	1	12w-24h				unmatched		
 no	0	141540	compoundName	1	unresolved	1	141540				unmatched		
-no	0	1H-Benzo(a)carbazole-1|4-dione|8|11-dimethyl-	compoundName	1	shredded_name	1	1H-Benzo(a)carbazole-1|4-dione|8|11-dimethyl-				unmatched		the '|' multi-value delimiter appears to have replaced commas inside one systematic name; the value is corrupted rather than merely unrecognised, and the upstream fix is to restore the original name
-no	0	1H-Benzo[a]carbazole-1|4(11H)-dione|8-methoxy-	compoundName	1	unresolved	1	1H-Benzo[a]carbazole-1|4(11H)-dione|8-methoxy-				unmatched		
-no	0	1H-Benzo[a]carbazole-1|4(11H)-dione|8-methoxy-11- methyl-	compoundName	1	unresolved	1	1H-Benzo[a]carbazole-1|4(11H)-dione|8-methoxy-11- methyl-				unmatched		
-no	0	1S|9R-HYDRASTINE	compoundName	1	unresolved	1	1S|9R-HYDRASTINE				unmatched		
-no	0	1|2|4-Dithiazol-3-amine|5-[(2-furanyl)methylimino]- N|N-dimethyl-|monohydrobromide	compoundName	1	shredded_name	1	1|2|4-Dithiazol-3-amine|5-[(2-furanyl)methylimino]- N|N-dimethyl-|monohydrobromide				unmatched		the '|' multi-value delimiter appears to have replaced commas inside one systematic name; the value is corrupted rather than merely unrecognised, and the upstream fix is to restore the original name
-no	0	1|3-Dihydro-3-[(2|4|6-trimethoxyphenyl)methylene]-2H-indol-2-one	compoundName	1	shredded_name	1	1|3-Dihydro-3-[(2|4|6-trimethoxyphenyl)methylene]-2H-indol-2-one				unmatched		the '|' multi-value delimiter appears to have replaced commas inside one systematic name; the value is corrupted rather than merely unrecognised, and the upstream fix is to restore the original name
-no	0	1|3|2-Thiazastannolidine|2|2-dibutyl-3-[(4-methylphenyl)sulfonyl]-	compoundName	1	shredded_name	1	1|3|2-Thiazastannolidine|2|2-dibutyl-3-[(4-methylphenyl)sulfonyl]-				unmatched		the '|' multi-value delimiter appears to have replaced commas inside one systematic name; the value is corrupted rather than merely unrecognised, and the upstream fix is to restore the original name
-no	0	1|4-Benzenediamine|N-phenyl-N -(2|2|6|6-tetramethyl-4-piperidinyl)-	compoundName	1	shredded_name	1	1|4-Benzenediamine|N-phenyl-N -(2|2|6|6-tetramethyl-4-piperidinyl)-				unmatched		the '|' multi-value delimiter appears to have replaced commas inside one systematic name; the value is corrupted rather than merely unrecognised, and the upstream fix is to restore the original name
-no	0	1|4-Pentadien-3-one|1|5-di-3-pyridyl-	compoundName	1	shredded_name	1	1|4-Pentadien-3-one|1|5-di-3-pyridyl-				unmatched		the '|' multi-value delimiter appears to have replaced commas inside one systematic name; the value is corrupted rather than merely unrecognised, and the upstream fix is to restore the original name
-no	0	2'|beta-DIHYDROXYCHALCONE	compoundName	1	unresolved	1	2'|beta-DIHYDROXYCHALCONE				unmatched		
-no	0	2-Butenoic acid|3-[(1|3-dihydroxy-2-naphthalenyl)thio]-|ethyl ester|(Z)-	compoundName	1	shredded_name	1	2-Butenoic acid|3-[(1|3-dihydroxy-2-naphthalenyl)thio]-|ethyl ester|(Z)-				unmatched		the '|' multi-value delimiter appears to have replaced commas inside one systematic name; the value is corrupted rather than merely unrecognised, and the upstream fix is to restore the original name
-no	0	2-CYANO-6-METHOXY-1(2H)-QUINOLINECARBOTHIOIC ACID|S-ETHYL ESTER	compoundName	1	unresolved	1	2-CYANO-6-METHOXY-1(2H)-QUINOLINECARBOTHIOIC ACID|S-ETHYL ESTER				unmatched		
+no	0	1H-Benzo(a)carbazole-1,4-dione, 8,11-dimethyl-	compoundName	1	unresolved	1	1H-Benzo(a)carbazole-1,4-dione, 8,11-dimethyl-				unmatched		
+no	0	1H-Benzo[a]carbazole-1,4(11H)-dione, 8-methoxy-	compoundName	1	unresolved	1	1H-Benzo[a]carbazole-1,4(11H)-dione, 8-methoxy-				unmatched		
+no	0	1H-Benzo[a]carbazole-1,4(11H)-dione, 8-methoxy-11- methyl-	compoundName	1	unresolved	1	1H-Benzo[a]carbazole-1,4(11H)-dione, 8-methoxy-11- methyl-				unmatched		
+no	0	1S,9R-HYDRASTINE	compoundName	1	unresolved	1	1S,9R-HYDRASTINE				unmatched		
+no	0	2',beta-DIHYDROXYCHALCONE	compoundName	1	unresolved	1	2',beta-DIHYDROXYCHALCONE				unmatched		
+no	0	2,2 -Spirobi[2H-benz[f]indene]-5,5 -dione, 1,1 ,3,3 ,5,5 ,6,6 ,7,7 ,8,8 -dodecahydro-	compoundName	1	unresolved	1	2,2 -Spirobi[2H-benz[f]indene]-5,5 -dione, 1,1 ,3,3 ,5,5 ,6,6 ,7,7 ,8,8 -dodecahydro-				unmatched		
+no	0	2,3-DICHLORO-5,8-DIHYDROXYNAPTHOQUINONE	compoundName	1	unresolved	1	2,3-DICHLORO-5,8-DIHYDROXYNAPTHOQUINONE				unmatched		
+no	0	2,3-Dimethoxy-1,4-naphthoquinone	compoundName	1	unresolved	1	2,3-Dimethoxy-1,4-naphthoquinone				unmatched		
+no	0	2,3-bis[(2-Hydroxyethyl)thio]-1,4-naphthoquinone	compoundName	1	unresolved	1	2,3-bis[(2-Hydroxyethyl)thio]-1,4-naphthoquinone				unmatched		
+no	0	2,6-DIMETHOXYQUINONE	compoundName	1	unresolved	1	2,6-DIMETHOXYQUINONE				unmatched		
+no	0	2-Butenoic acid, 3-[(1,3-dihydroxy-2-naphthalenyl)thio]-, ethyl ester, (Z)-	compoundName	1	unresolved	1	2-Butenoic acid, 3-[(1,3-dihydroxy-2-naphthalenyl)thio]-, ethyl ester, (Z)-				unmatched		
+no	0	2-CYANO-6-METHOXY-1(2H)-QUINOLINECARBOTHIOIC ACID, S-ETHYL ESTER	compoundName	1	unresolved	1	2-CYANO-6-METHOXY-1(2H)-QUINOLINECARBOTHIOIC ACID, S-ETHYL ESTER				unmatched		
 no	0	2-Methoxyestradiol	compoundName	1	compound	1	2-Methoxyestradiol	CHEMBL299613	2-METHOXYESTRADIOL	preferred_name	exact		
 no	0	2-Nitro-5-p-toluenesulfonylfuran	compoundName	1	unresolved	1	2-Nitro-5-p-toluenesulfonylfuran				unmatched		
-no	0	2-Propenenitrile|3-[3-(dimethylamino)phenyl]-2-phenyl-	compoundName	1	unresolved	1	2-Propenenitrile|3-[3-(dimethylamino)phenyl]-2-phenyl-				unmatched		
-no	0	2-Pyrrolidinecarboxlic acid|1-[.alpha.-(4-methoxyphenyl)-.alpha.- (3|4|5-trimethoxyphenyl)methyl]-5-oxo-|methyl ester	compoundName	1	shredded_name	1	2-Pyrrolidinecarboxlic acid|1-[.alpha.-(4-methoxyphenyl)-.alpha.- (3|4|5-trimethoxyphenyl)methyl]-5-oxo-|methyl ester				unmatched		the '|' multi-value delimiter appears to have replaced commas inside one systematic name; the value is corrupted rather than merely unrecognised, and the upstream fix is to restore the original name
-no	0	2-acetyl-1|2-dihydroellipticine	compoundName	1	unresolved	1	2-acetyl-1|2-dihydroellipticine				unmatched		
+no	0	2-Propenenitrile, 3-[3-(dimethylamino)phenyl]-2-phenyl-	compoundName	1	unresolved	1	2-Propenenitrile, 3-[3-(dimethylamino)phenyl]-2-phenyl-				unmatched		
+no	0	2-Pyrrolidinecarboxlic acid, 1-[.alpha.-(4-methoxyphenyl)-.alpha.- (3,4,5-trimethoxyphenyl)methyl]-5-oxo-, methyl ester	compoundName	1	unresolved	1	2-Pyrrolidinecarboxlic acid, 1-[.alpha.-(4-methoxyphenyl)-.alpha.- (3,4,5-trimethoxyphenyl)methyl]-5-oxo-, methyl ester				unmatched		
+no	0	2-acetyl-1,2-dihydroellipticine	compoundName	1	unresolved	1	2-acetyl-1,2-dihydroellipticine				unmatched		
 no	0	2-methoxyestradiol	compoundName	1	compound	1	2-methoxyestradiol	CHEMBL299613	2-METHOXYESTRADIOL	preferred_name	exact		
 no	0	21683	compoundName	1	unresolved	1	21683				unmatched		
 no	0	26980	compoundName	1	unresolved	1	26980				unmatched		
 no	0	27640	compoundName	1	unresolved	1	27640				unmatched		
-no	0	2|2 -Spirobi[2H-benz[f]indene]-5|5 -dione|1|1|3|3|5|5|6|6|7|7|8|8 -dodecahydro-	compoundName	1	shredded_name	1	2|2 -Spirobi[2H-benz[f]indene]-5|5 -dione|1|1|3|3|5|5|6|6|7|7|8|8 -dodecahydro-				unmatched		the '|' multi-value delimiter appears to have replaced commas inside one systematic name; the value is corrupted rather than merely unrecognised, and the upstream fix is to restore the original name
-no	0	2|3-DICHLORO-5|8-DIHYDROXYNAPTHOQUINONE	compoundName	1	shredded_name	1	2|3-DICHLORO-5|8-DIHYDROXYNAPTHOQUINONE				unmatched		the '|' multi-value delimiter appears to have replaced commas inside one systematic name; the value is corrupted rather than merely unrecognised, and the upstream fix is to restore the original name
-no	0	2|3-Dimethoxy-1|4-naphthoquinone	compoundName	1	shredded_name	1	2|3-Dimethoxy-1|4-naphthoquinone				unmatched		the '|' multi-value delimiter appears to have replaced commas inside one systematic name; the value is corrupted rather than merely unrecognised, and the upstream fix is to restore the original name
-no	0	2|3-bis[(2-Hydroxyethyl)thio]-1|4-naphthoquinone	compoundName	1	shredded_name	1	2|3-bis[(2-Hydroxyethyl)thio]-1|4-naphthoquinone				unmatched		the '|' multi-value delimiter appears to have replaced commas inside one systematic name; the value is corrupted rather than merely unrecognised, and the upstream fix is to restore the original name
-no	0	2|6-DIMETHOXYQUINONE	compoundName	1	shredded_name	1	2|6-DIMETHOXYQUINONE				unmatched		the '|' multi-value delimiter appears to have replaced commas inside one systematic name; the value is corrupted rather than merely unrecognised, and the upstream fix is to restore the original name
+no	0	3 ,4 -Dichlorobenzamil	compoundName	1	unresolved	1	3 ,4 -Dichlorobenzamil				unmatched		
 no	0	3-DESMETHYLCOLCHICINE	compoundName	1	unresolved	1	3-DESMETHYLCOLCHICINE				unmatched		
-no	0	3|4 -Dichlorobenzamil	compoundName	1	shredded_name	1	3|4 -Dichlorobenzamil				unmatched		the '|' multi-value delimiter appears to have replaced commas inside one systematic name; the value is corrupted rather than merely unrecognised, and the upstream fix is to restore the original name
 no	0	4'-DEMETHYLEPIPODOPHYLLOTOXIN	compoundName	1	unresolved	1	4'-DEMETHYLEPIPODOPHYLLOTOXIN				unmatched		
-no	0	4(1H)-Quinazolinone|2-(2|5-dimethylphenyl)-2|3-dihydro-	compoundName	1	shredded_name	1	4(1H)-Quinazolinone|2-(2|5-dimethylphenyl)-2|3-dihydro-				unmatched		the '|' multi-value delimiter appears to have replaced commas inside one systematic name; the value is corrupted rather than merely unrecognised, and the upstream fix is to restore the original name
-no	0	4(1H)-Quinazolinone|2|3-dihydro-2-(1-naphthalenyl)-	compoundName	1	shredded_name	1	4(1H)-Quinazolinone|2|3-dihydro-2-(1-naphthalenyl)-				unmatched		the '|' multi-value delimiter appears to have replaced commas inside one systematic name; the value is corrupted rather than merely unrecognised, and the upstream fix is to restore the original name
-no	0	4(1H)-Quinazolinone|6-chloro-2|3-dihydro-2-(1-naphthalenyl)-	compoundName	1	unresolved	1	4(1H)-Quinazolinone|6-chloro-2|3-dihydro-2-(1-naphthalenyl)-				unmatched		
-no	0	4-(2|3-Dihydro-1|4-benzodioxin-6-yl)-2|4-dihydro-5-[(5-nitro-2-thiazolyl)thio]-3H-1|2|4-triazol-3-one	compoundName	1	shredded_name	1	4-(2|3-Dihydro-1|4-benzodioxin-6-yl)-2|4-dihydro-5-[(5-nitro-2-thiazolyl)thio]-3H-1|2|4-triazol-3-one				unmatched		the '|' multi-value delimiter appears to have replaced commas inside one systematic name; the value is corrupted rather than merely unrecognised, and the upstream fix is to restore the original name
+no	0	4(1H)-Quinazolinone, 2,3-dihydro-2-(1-naphthalenyl)-	compoundName	1	unresolved	1	4(1H)-Quinazolinone, 2,3-dihydro-2-(1-naphthalenyl)-				unmatched		
+no	0	4(1H)-Quinazolinone, 2-(2,5-dimethylphenyl)-2,3-dihydro-	compoundName	1	unresolved	1	4(1H)-Quinazolinone, 2-(2,5-dimethylphenyl)-2,3-dihydro-				unmatched		
+no	0	4(1H)-Quinazolinone, 6-chloro-2,3-dihydro-2-(1-naphthalenyl)-	compoundName	1	unresolved	1	4(1H)-Quinazolinone, 6-chloro-2,3-dihydro-2-(1-naphthalenyl)-				unmatched		
+no	0	4-(2,3-Dihydro-1,4-benzodioxin-6-yl)-2,4-dihydro-5-[(5-nitro-2-thiazolyl)thio]-3H-1,2,4-triazol-3-one	compoundName	1	unresolved	1	4-(2,3-Dihydro-1,4-benzodioxin-6-yl)-2,4-dihydro-5-[(5-nitro-2-thiazolyl)thio]-3H-1,2,4-triazol-3-one				unmatched		
 no	0	4-IPOMEANOL	compoundName	1	unresolved	1	4-IPOMEANOL				unmatched		
-no	0	4-Piperidinone|1-(1-oxo-2-propenyl)-3|5-bis(phenyl- methylene)-	compoundName	1	unresolved	1	4-Piperidinone|1-(1-oxo-2-propenyl)-3|5-bis(phenyl- methylene)-				unmatched		
+no	0	4-Piperidinone, 1-(1-oxo-2-propenyl)-3,5-bis(phenyl- methylene)-	compoundName	1	unresolved	1	4-Piperidinone, 1-(1-oxo-2-propenyl)-3,5-bis(phenyl- methylene)-				unmatched		
 no	0	43308	compoundName	1	unresolved	1	43308				unmatched		
 no	0	4B_00002465D7	experimentalCondition	1	unresolved	1	4B_00002465D7				unmatched		
-no	0	4H-1|3-Thiazine|5|6-dihydro-4|4-dimethyl-2-(2-phenylethenyl)-	compoundName	1	shredded_name	1	4H-1|3-Thiazine|5|6-dihydro-4|4-dimethyl-2-(2-phenylethenyl)-				unmatched		the '|' multi-value delimiter appears to have replaced commas inside one systematic name; the value is corrupted rather than merely unrecognised, and the upstream fix is to restore the original name
-no	0	5-(5|6-Dimethoxy-1H-benzimidazol-1-yl)-3-[[2-(trifluoromethyl)phenyl]methoxy]-2-thiophenecarboxamide	compoundName	1	shredded_name	1	5-(5|6-Dimethoxy-1H-benzimidazol-1-yl)-3-[[2-(trifluoromethyl)phenyl]methoxy]-2-thiophenecarboxamide				unmatched		the '|' multi-value delimiter appears to have replaced commas inside one systematic name; the value is corrupted rather than merely unrecognised, and the upstream fix is to restore the original name
+no	0	4H-1,3-Thiazine, 5,6-dihydro-4,4-dimethyl-2-(2-phenylethenyl)-	compoundName	1	unresolved	1	4H-1,3-Thiazine, 5,6-dihydro-4,4-dimethyl-2-(2-phenylethenyl)-				unmatched		
+no	0	5-(5,6-Dimethoxy-1H-benzimidazol-1-yl)-3-[[2-(trifluoromethyl)phenyl]methoxy]-2-thiophenecarboxamide	compoundName	1	unresolved	1	5-(5,6-Dimethoxy-1H-benzimidazol-1-yl)-3-[[2-(trifluoromethyl)phenyl]methoxy]-2-thiophenecarboxamide				unmatched		
 no	0	5-azacytidine	compoundName	1	compound	1	5-azacytidine	CHEMBL1489	AZACITIDINE	synonym	exact		
 no	0	50mg/kg	experimentalCondition	1	unresolved	1	50mg/kg				unmatched		
 no	0	6-Mercaptopurine monohydrate	compoundName	1	compound	1	6-Mercaptopurine monohydrate	CHEMBL1200751	MERCAPTOPURINE	synonym	exact		
 no	0	6-Methyl-2-(phenylazo)-3-pyridinol	compoundName	1	unresolved	1	6-Methyl-2-(phenylazo)-3-pyridinol				unmatched		
-no	0	6-[4-[2-(1-Piperidinyl)ethoxy]phenyl]-3-(4-pyridinyl)-pyrazolo[1|5-a]pyrimidine dihydrochloride	compoundName	1	shredded_name	1	6-[4-[2-(1-Piperidinyl)ethoxy]phenyl]-3-(4-pyridinyl)-pyrazolo[1|5-a]pyrimidine dihydrochloride				unmatched		the '|' multi-value delimiter appears to have replaced commas inside one systematic name; the value is corrupted rather than merely unrecognised, and the upstream fix is to restore the original name
+no	0	6-[4-[2-(1-Piperidinyl)ethoxy]phenyl]-3-(4-pyridinyl)-pyrazolo[1,5-a]pyrimidine dihydrochloride	compoundName	1	unresolved	1	6-[4-[2-(1-Piperidinyl)ethoxy]phenyl]-3-(4-pyridinyl)-pyrazolo[1,5-a]pyrimidine dihydrochloride				unmatched		
 no	0	628503	compoundName	1	unresolved	1	628503				unmatched		
-no	0	7-Chloro-4-hydroxy-2-phenyl-1|8-naphthyridine	compoundName	1	unresolved	1	7-Chloro-4-hydroxy-2-phenyl-1|8-naphthyridine				unmatched		
-no	0	7-DESACETOXY-6|7-DEHYDROGEDUNIN	compoundName	1	unresolved	1	7-DESACETOXY-6|7-DEHYDROGEDUNIN				unmatched		
+no	0	7-Chloro-4-hydroxy-2-phenyl-1,8-naphthyridine	compoundName	1	unresolved	1	7-Chloro-4-hydroxy-2-phenyl-1,8-naphthyridine				unmatched		
+no	0	7-DESACETOXY-6,7-DEHYDROGEDUNIN	compoundName	1	unresolved	1	7-DESACETOXY-6,7-DEHYDROGEDUNIN				unmatched		
 no	0	7-OMEN	compoundName	1	unresolved	1	7-OMEN				unmatched		
 no	0	790	compoundName	1	unresolved	1	790				unmatched		
 no	0	9-AMINO-20-CAMPTOTHECIN	compoundName	1	unresolved	1	9-AMINO-20-CAMPTOTHECIN				unmatched		
@@ -1121,7 +1122,7 @@ no	0	AZD2014	compoundName	1	compound	1	AZD2014	CHEMBL2336325	VISTUSERTIB	synonym
 no	0	AZD5438	compoundName	1	compound	1	AZD5438	CHEMBL488436	AZD-5438	preferred_name	parsed		punctuation-insensitive match to 'AZD-5438'
 no	0	AZD7762	compoundName	1	compound	1	AZD7762	CHEMBL2041933	AZD-7762	synonym	exact		
 no	0	AZD8055	compoundName	1	compound	1	AZD8055	CHEMBL1801204	AZD-8055	synonym	exact		
-no	0	Acridine|9-phenoxy-	compoundName	1	unresolved	1	Acridine|9-phenoxy-				unmatched		
+no	0	Acridine, 9-phenoxy-	compoundName	1	unresolved	1	Acridine, 9-phenoxy-				unmatched		
 no	0	Acriflavine hydrochloride	compoundName	1	unresolved	1	Acriflavine hydrochloride				unmatched		
 no	0	Afatinib (BIBW2992)	compoundName	1	compound	1	Afatinib (BIBW2992)	CHEMBL1173655	AFATINIB	synonym	exact		
 no	0	Alamar blue assay to measure basal proliferation of SCs	experimentalCondition	1	unresolved	1	Alamar blue assay to measure basal proliferation of SCs				unmatched		
@@ -1145,8 +1146,8 @@ no	0	BVT 948	compoundName	1	unresolved	1	BVT 948				unmatched
 no	0	Baccatin III	compoundName	1	unresolved	1	Baccatin III				unmatched		
 no	0	Bax channel blocker	compoundName	1	unresolved	1	Bax channel blocker				unmatched		
 no	0	Bay 11-7821	compoundName	1	unresolved	1	Bay 11-7821				unmatched		
-no	0	Benzo[f]quinazoline-7|10-dione|1-amino-7|10-dihydro-8-methoxy-	compoundName	1	unresolved	1	Benzo[f]quinazoline-7|10-dione|1-amino-7|10-dihydro-8-methoxy-				unmatched		
-no	0	Benzofurazan|4-(4-methyl-1-piperazinyl)-7-nitro-|3-oxide	compoundName	1	unresolved	1	Benzofurazan|4-(4-methyl-1-piperazinyl)-7-nitro-|3-oxide				unmatched		
+no	0	Benzo[f]quinazoline-7,10-dione, 1-amino-7,10-dihydro-8-methoxy-	compoundName	1	unresolved	1	Benzo[f]quinazoline-7,10-dione, 1-amino-7,10-dihydro-8-methoxy-				unmatched		
+no	0	Benzofurazan, 4-(4-methyl-1-piperazinyl)-7-nitro-, 3-oxide	compoundName	1	unresolved	1	Benzofurazan, 4-(4-methyl-1-piperazinyl)-7-nitro-, 3-oxide				unmatched		
 no	0	Bisantrene hydrochloride	compoundName	1	unresolved	1	Bisantrene hydrochloride				unmatched		
 no	0	Bosutinib (SKI-606)	compoundName	1	compound	1	Bosutinib (SKI-606)	CHEMBL288441	BOSUTINIB	preferred_name	parsed		parsed 'Bosutinib (SKI-606)' -> 'Bosutinib'
 no	0	Brefeldin A	compoundName	1	compound	1	Brefeldin A	CHEMBL19980	BREFELDIN A	preferred_name	exact		
@@ -1183,7 +1184,7 @@ no	0	CORYNANTHINE	compoundName	1	unresolved	1	CORYNANTHINE				unmatched
 no	0	CRASSIN	compoundName	1	unresolved	1	CRASSIN				unmatched		
 no	0	CRASSIN ACETATE	compoundName	1	unresolved	1	CRASSIN ACETATE				unmatched		
 no	0	CRINAMINE	compoundName	1	unresolved	1	CRINAMINE				unmatched		
-no	0	CTL|NF1-mutant iPSC-sensory neuron conditioned media	experimentalCondition	1	unresolved	1	CTL|NF1-mutant iPSC-sensory neuron conditioned media				unmatched		
+no	0	CTL, NF1-mutant iPSC-sensory neuron conditioned media	experimentalCondition	1	unresolved	1	CTL, NF1-mutant iPSC-sensory neuron conditioned media				unmatched		
 no	0	CUBE	compoundName	1	unresolved	1	CUBE				unmatched		
 no	0	CUE	compoundName	1	unresolved	1	CUE				unmatched		
 no	0	CURCUMIN	compoundName	1	compound	1	CURCUMIN	CHEMBL140	CURCUMIN	preferred_name	exact		
@@ -1191,9 +1192,9 @@ no	0	CYANOCYCLINE A	compoundName	1	unresolved	1	CYANOCYCLINE A				unmatched
 no	0	CYCLOHEXIMIDE	compoundName	1	compound	1	CYCLOHEXIMIDE	CHEMBL123292	CYCLOHEXIMIDE	preferred_name	exact		
 no	0	CYMARIN	compoundName	1	compound	1	CYMARIN	CHEMBL1075788	CYMARIN	preferred_name	exact		
 no	0	CYTOCHALASIN A	compoundName	1	unresolved	1	CYTOCHALASIN A				unmatched		
-no	0	Caff 7.5mM 6h|NMDI1 5uM 24h|NMDI14 5uM 24h|VG1 25uM 24hr	experimentalCondition	1	unresolved	1	Caff 7.5mM 6h|NMDI1 5uM 24h|NMDI14 5uM 24h|VG1 25uM 24hr				unmatched		
+no	0	Caff 7.5mM 6h, NMDI1 5uM 24h, NMDI14 5uM 24h, VG1 25uM 24hr	experimentalCondition	1	unresolved	1	Caff 7.5mM 6h, NMDI1 5uM 24h, NMDI14 5uM 24h, VG1 25uM 24hr				unmatched		
 no	0	Cantharidic Acid	compoundName	1	unresolved	1	Cantharidic Acid				unmatched		
-no	0	Carbamic acid|(5-amino-3-phenyl-2H-pyrido[4|3-b]-1|4-oxazin-7-yl)-|ethyl ester	compoundName	1	shredded_name	1	Carbamic acid|(5-amino-3-phenyl-2H-pyrido[4|3-b]-1|4-oxazin-7-yl)-|ethyl ester				unmatched		the '|' multi-value delimiter appears to have replaced commas inside one systematic name; the value is corrupted rather than merely unrecognised, and the upstream fix is to restore the original name
+no	0	Carbamic acid, (5-amino-3-phenyl-2H-pyrido[4,3-b]-1,4-oxazin-7-yl)-, ethyl ester	compoundName	1	unresolved	1	Carbamic acid, (5-amino-3-phenyl-2H-pyrido[4,3-b]-1,4-oxazin-7-yl)-, ethyl ester				unmatched		
 no	0	Cediranib (AZD2171)	compoundName	1	compound	1	Cediranib (AZD2171)	CHEMBL491473	CEDIRANIB	preferred_name	parsed		parsed 'Cediranib (AZD2171)' -> 'Cediranib'
 no	0	Celcot RM	compoundName	1	unresolved	1	Celcot RM				unmatched		
 no	0	Cetylpyridinium bromide monohydrate	compoundName	1	unresolved	1	Cetylpyridinium bromide monohydrate				unmatched		
@@ -1201,7 +1202,7 @@ no	0	Chelerythrine chloride	compoundName	1	unresolved	1	Chelerythrine chloride		
 no	0	Chrysanthin	compoundName	1	unresolved	1	Chrysanthin				unmatched		
 no	0	Clofarabine	compoundName	1	compound	1	Clofarabine	CHEMBL1750	CLOFARABINE	preferred_name	exact		
 no	0	Conners 3rd Edition Gender Specific Norms	compoundName	1	unresolved	1	Conners 3rd Edition Gender Specific Norms				unmatched		
-no	0	Copper|bromo[2-[1-(2-pyridinyl)ethylidene][N|N-dimethyl-hydrazinecarbothioamidato-N|N|S]-	compoundName	1	shredded_name	1	Copper|bromo[2-[1-(2-pyridinyl)ethylidene][N|N-dimethyl-hydrazinecarbothioamidato-N|N|S]-				unmatched		the '|' multi-value delimiter appears to have replaced commas inside one systematic name; the value is corrupted rather than merely unrecognised, and the upstream fix is to restore the original name
+no	0	Copper, bromo[2-[1-(2-pyridinyl)ethylidene][N,N-dimethyl-hydrazinecarbothioamidato-N,N,S]-	compoundName	1	unresolved	1	Copper, bromo[2-[1-(2-pyridinyl)ethylidene][N,N-dimethyl-hydrazinecarbothioamidato-N,N,S]-				unmatched		
 no	0	Crenolanib (CP-868596)	compoundName	1	compound	1	Crenolanib (CP-868596)	CHEMBL2105728	CRENOLANIB	preferred_name	parsed		parsed 'Crenolanib (CP-868596)' -> 'Crenolanib'
 no	0	Crizotinib (PF-02341066)	compoundName	1	compound	1	Crizotinib (PF-02341066)	CHEMBL601719	CRIZOTINIB	preferred_name	parsed		parsed 'Crizotinib (PF-02341066)' -> 'Crizotinib'
 no	0	Cytochalasin D	compoundName	1	unresolved	1	Cytochalasin D				unmatched		
@@ -1211,8 +1212,8 @@ no	0	DACTINOMYCIN	compoundName	1	compound	1	DACTINOMYCIN	CHEMBL1554	DACTINOMYCIN
 no	0	DACTOLISIB	compoundName	1	compound	1	DACTOLISIB	CHEMBL1879463	DACTOLISIB	preferred_name	exact		
 no	0	DAPHNETIN DIACETATE	compoundName	1	unresolved	1	DAPHNETIN DIACETATE				unmatched		
 no	0	DCC-2036 (Rebastinib)	compoundName	1	compound	1	DCC-2036 (Rebastinib)	CHEMBL1738757	REBASTINIB	synonym	parsed		parsed 'DCC-2036 (Rebastinib)' -> 'DCC-2036'
-no	0	DEOXYSAPPANONE B 7|3'-DIMETHYL ETHER ACETATE	compoundName	1	unresolved	1	DEOXYSAPPANONE B 7|3'-DIMETHYL ETHER ACETATE				unmatched		
-no	0	DEOXYSAPPANONE B 7|4'-DIMETHYL ETHER	compoundName	1	unresolved	1	DEOXYSAPPANONE B 7|4'-DIMETHYL ETHER				unmatched		
+no	0	DEOXYSAPPANONE B 7,3'-DIMETHYL ETHER ACETATE	compoundName	1	unresolved	1	DEOXYSAPPANONE B 7,3'-DIMETHYL ETHER ACETATE				unmatched		
+no	0	DEOXYSAPPANONE B 7,4'-DIMETHYL ETHER	compoundName	1	unresolved	1	DEOXYSAPPANONE B 7,4'-DIMETHYL ETHER				unmatched		
 no	0	DESMETHOXY-B-PELTATIN-A METHYL ETHER	compoundName	1	unresolved	1	DESMETHOXY-B-PELTATIN-A METHYL ETHER				unmatched		
 no	0	DIBENZOYLFURAN DERIV	compoundName	1	unresolved	1	DIBENZOYLFURAN DERIV				unmatched		
 no	0	DIDEMNIN B	compoundName	1	unresolved	1	DIDEMNIN B				unmatched		
@@ -1222,20 +1223,20 @@ no	0	DIHYDROCELASTROL	compoundName	1	unresolved	1	DIHYDROCELASTROL				unmatched
 no	0	DIHYDROGAMBOGIC ACID	compoundName	1	unresolved	1	DIHYDROGAMBOGIC ACID				unmatched		
 no	0	DIMETHYL GAMBOGATE	compoundName	1	unresolved	1	DIMETHYL GAMBOGATE				unmatched		
 no	0	DL-erythro-Dihydrosphingosine	compoundName	1	unresolved	1	DL-erythro-Dihydrosphingosine				unmatched		
-no	0	DMSO|INK128|mocetinostat|INK128+mocetinostat	experimentalCondition	1	control	1	DMSO|INK128|mocetinostat|INK128+mocetinostat				unmatched		vehicle or untreated control
-no	0	DMSO|PD901|merestinib|PD901+merestinib	experimentalCondition	1	control	1	DMSO|PD901|merestinib|PD901+merestinib				unmatched		vehicle or untreated control
+no	0	DMSO,INK128,mocetinostat,INK128+mocetinostat	experimentalCondition	1	control	1	DMSO,INK128,mocetinostat,INK128+mocetinostat				unmatched		vehicle or untreated control
+no	0	DMSO,PD901,merestinib,PD901+merestinib	experimentalCondition	1	control	1	DMSO,PD901,merestinib,PD901+merestinib				unmatched		vehicle or untreated control
 no	0	DR-15977	compoundName	1	unresolved	1	DR-15977				unmatched		
 no	0	DX-52-1	compoundName	1	unresolved	1	DX-52-1				unmatched		
-no	0	Dacomitinib (PF299804|PF-00299804)	compoundName	1	compound	1	Dacomitinib (PF299804|PF-00299804)	CHEMBL2105719	DACOMITINIB	preferred_name	parsed		parsed 'Dacomitinib (PF299804|PF-00299804)' -> 'Dacomitinib'
-no	0	Dasatinib|Brigatinib|Simvastatin|DMSO	compoundName	1	control	1	Dasatinib	CHEMBL5416410	DASATINIB	preferred_name	exact		vehicle or untreated control
-no	0	Dasatinib|Brigatinib|Simvastatin|DMSO	compoundName	1	control	2	Brigatinib	CHEMBL3545311	BRIGATINIB	preferred_name	exact		vehicle or untreated control
-no	0	Dasatinib|Brigatinib|Simvastatin|DMSO	compoundName	1	control	3	Simvastatin	CHEMBL1064	SIMVASTATIN	preferred_name	exact		vehicle or untreated control
-no	0	Dasatinib|Brigatinib|Simvastatin|DMSO	compoundName	1	control	4	DMSO	CHEMBL504	DIMETHYL SULFOXIDE	synonym	exact		vehicle or untreated control
+no	0	Dacomitinib (PF299804, PF-00299804)	compoundName	1	compound	1	Dacomitinib (PF299804, PF-00299804)	CHEMBL2105719	DACOMITINIB	preferred_name	parsed		parsed 'Dacomitinib (PF299804, PF-00299804)' -> 'Dacomitinib'
+no	0	Dasatinib,Brigatinib,Simvastatin,DMSO	compoundName	1	control	1	Dasatinib	CHEMBL5416410	DASATINIB	preferred_name	exact		vehicle or untreated control
+no	0	Dasatinib,Brigatinib,Simvastatin,DMSO	compoundName	1	control	2	Brigatinib	CHEMBL3545311	BRIGATINIB	preferred_name	exact		vehicle or untreated control
+no	0	Dasatinib,Brigatinib,Simvastatin,DMSO	compoundName	1	control	3	Simvastatin	CHEMBL1064	SIMVASTATIN	preferred_name	exact		vehicle or untreated control
+no	0	Dasatinib,Brigatinib,Simvastatin,DMSO	compoundName	1	control	4	DMSO	CHEMBL504	DIMETHYL SULFOXIDE	synonym	exact		vehicle or untreated control
 no	0	Daunorubicin hydrochloride	compoundName	1	compound	1	Daunorubicin hydrochloride	CHEMBL1563	DAUNORUBICIN HYDROCHLORIDE	preferred_name	exact		
 no	0	Demethylasterriquinone B1	compoundName	1	unresolved	1	Demethylasterriquinone B1				unmatched		
 no	0	Dequalinium dichloride	compoundName	1	compound	1	Dequalinium dichloride	CHEMBL121663	DEQUALINIUM CHLORIDE	synonym	exact		
-no	0	Development|retina injury	experimentalCondition	1	unresolved	1	Development|retina injury				unmatched		
-no	0	Development|uninj vs injured retina	experimentalCondition	1	unresolved	1	Development|uninj vs injured retina				unmatched		
+no	0	Development, retina injury	experimentalCondition	1	unresolved	1	Development, retina injury				unmatched		
+no	0	Development, uninj vs injured retina	experimentalCondition	1	unresolved	1	Development, uninj vs injured retina				unmatched		
 no	0	Dihydroouabain	compoundName	1	unresolved	1	Dihydroouabain				unmatched		
 no	0	Dinaciclib (SCH727965)	compoundName	1	compound	1	Dinaciclib (SCH727965)	CHEMBL2103840	DINACICLIB	preferred_name	parsed		parsed 'Dinaciclib (SCH727965)' -> 'Dinaciclib'
 no	0	Domiphen bromide	compoundName	1	compound	1	Domiphen bromide	CHEMBL486696	DOMIPHEN BROMIDE	preferred_name	exact		
@@ -1251,8 +1252,8 @@ no	0	ETHACRIDINE LACTATE	compoundName	1	unresolved	1	ETHACRIDINE LACTATE				unma
 no	0	EUPARIN	compoundName	1	unresolved	1	EUPARIN				unmatched		
 no	0	Echujetin	compoundName	1	unresolved	1	Echujetin				unmatched		
 no	0	Epithelioid MPNST (High grade)	experimentalCondition	1	unresolved	1	Epithelioid MPNST (High grade)				unmatched		
-no	0	Ethacridine lactate (Acrinol (6|9-diamino-2-ethoxyacrinide lactate monohydrate))	compoundName	1	shredded_name	1	Ethacridine lactate (Acrinol (6|9-diamino-2-ethoxyacrinide lactate monohydrate))				unmatched		the '|' multi-value delimiter appears to have replaced commas inside one systematic name; the value is corrupted rather than merely unrecognised, and the upstream fix is to restore the original name
-no	0	Ethanesulfonic acid|compd. with 4|6-diamino-1-[3-chloro-4-(3-phenoxypropoxy)phenyl]-1|2-dihydro-2|2-dimethyl-s-triazine (1:1)	compoundName	1	unresolved	1	Ethanesulfonic acid|compd. with 4|6-diamino-1-[3-chloro-4-(3-phenoxypropoxy)phenyl]-1|2-dihydro-2|2-dimethyl-s-triazine (1:1)				ambiguous		2 molecules share this label at the same match strength; a curator must choose: CHEMBL2364601/AFTOBETIN, CHEMBL4446378/TAPOTOCLAX
+no	0	Ethacridine lactate (Acrinol (6,9-diamino-2-ethoxyacrinide lactate monohydrate))	compoundName	1	unresolved	1	Ethacridine lactate (Acrinol (6,9-diamino-2-ethoxyacrinide lactate monohydrate))				unmatched		
+no	0	Ethanesulfonic acid, compd. with 4,6-diamino-1-[3-chloro-4-(3-phenoxypropoxy)phenyl]-1,2-dihydro-2,2-dimethyl-s-triazine (1:1)	compoundName	1	unresolved	1	Ethanesulfonic acid, compd. with 4,6-diamino-1-[3-chloro-4-(3-phenoxypropoxy)phenyl]-1,2-dihydro-2,2-dimethyl-s-triazine (1:1)				ambiguous		2 molecules share this label at the same match strength; a curator must choose: CHEMBL2364601/AFTOBETIN, CHEMBL4446378/TAPOTOCLAX
 no	0	Everolimus;Doxorubicin	experimentalCondition	1	combination	1	Everolimus	CHEMBL1908360	EVEROLIMUS	preferred_name	exact	CHEMBL1908360+CHEMBL53463	
 no	0	Everolimus;Doxorubicin	experimentalCondition	1	combination	1	Doxorubicin	CHEMBL53463	DOXORUBICIN	preferred_name	exact	CHEMBL1908360+CHEMBL53463	
 no	0	FCCP	compoundName	1	unresolved	1	FCCP				unmatched		
@@ -1265,17 +1266,17 @@ no	0	Floxuridine (5-fluorodeoxyuridine)	compoundName	1	compound	1	Floxuridine (5
 no	0	Fluphenazine dihydrochloride	compoundName	1	compound	1	Fluphenazine dihydrochloride	CHEMBL1448187	FLUPHENAZINE HYDROCHLORIDE	synonym	exact		
 no	0	Fluspirilene	compoundName	1	compound	1	Fluspirilene	CHEMBL46516	FLUSPIRILENE	preferred_name	exact		
 no	0	Fluvastatin sodium salt	compoundName	1	compound	1	Fluvastatin sodium salt	CHEMBL2218894	FLUVASTATIN SODIUM	synonym	exact		
-no	0	Foretinib (GSK1363089|XL880)	compoundName	1	compound	1	Foretinib (GSK1363089|XL880)	CHEMBL1230609	FORETINIB	preferred_name	parsed		parsed 'Foretinib (GSK1363089|XL880)' -> 'Foretinib'
+no	0	Foretinib (GSK1363089, XL880)	compoundName	1	compound	1	Foretinib (GSK1363089, XL880)	CHEMBL1230609	FORETINIB	preferred_name	parsed		parsed 'Foretinib (GSK1363089, XL880)' -> 'Foretinib'
 no	0	GAMBOGIC ACID	compoundName	1	unresolved	1	GAMBOGIC ACID				unmatched		
 no	0	GAMBOGIC ACID AMIDE	compoundName	1	unresolved	1	GAMBOGIC ACID AMIDE				unmatched		
 no	0	GBR-12909 dihydrochloride	compoundName	1	unresolved	1	GBR-12909 dihydrochloride				unmatched		
 no	0	GDC-0941	compoundName	1	compound	1	GDC-0941	CHEMBL521851	PICTILISIB	synonym	exact		
 no	0	GDC-0980 (RG7422)	compoundName	1	compound	1	GDC-0980 (RG7422)	CHEMBL1922094	APITOLISIB	synonym	exact		
-no	0	GE: HFHS diet|onset at E6.	experimentalCondition	1	unresolved	1	GE: HFHS diet|onset at E6.				unmatched		
+no	0	GE: HFHS diet, onset at E6.	experimentalCondition	1	unresolved	1	GE: HFHS diet, onset at E6.				unmatched		
 no	0	GELDANAMYCIN ANALOG	compoundName	1	unresolved	1	GELDANAMYCIN ANALOG				unmatched		
 no	0	GENTIAN VIOLET	compoundName	1	compound	1	GENTIAN VIOLET	CHEMBL64894	GENTIAN VIOLET	preferred_name	exact		
 no	0	GI261656A	compoundName	1	unresolved	1	GI261656A				unmatched		
-no	0	GINKGETIN|K salt	compoundName	1	unresolved	1	GINKGETIN|K salt				unmatched		
+no	0	GINKGETIN, K salt	compoundName	1	unresolved	1	GINKGETIN, K salt				unmatched		
 no	0	GITOXIGENIN DIACETATE	compoundName	1	unresolved	1	GITOXIGENIN DIACETATE				unmatched		
 no	0	GITOXIN	compoundName	1	unresolved	1	GITOXIN				unmatched		
 no	0	GPHR-00000032	experimentalCondition	1	unresolved	1	GPHR-00000032				unmatched		
@@ -1489,7 +1490,7 @@ no	0	HBE-NF1- R2 (T6)	experimentalCondition	1	unresolved	1	HBE-NF1- R2 (T6)				u
 no	0	HMN-214	compoundName	1	compound	1	HMN-214	CHEMBL3991927	HMN-214	preferred_name	exact		
 no	0	HOMIDIUM BROMIDE	compoundName	1	unresolved	1	HOMIDIUM BROMIDE				unmatched		
 no	0	HandE surrogate	experimentalCondition	1	unresolved	1	HandE surrogate				unmatched		
-no	0	Hemorrhage|necrosis	experimentalCondition	1	unresolved	1	Hemorrhage|necrosis				unmatched		
+no	0	Hemorrhage, necrosis	experimentalCondition	1	unresolved	1	Hemorrhage, necrosis				unmatched		
 no	0	Hesperadin	compoundName	1	unresolved	1	Hesperadin				unmatched		
 no	0	Homoharringtonine	compoundName	1	compound	1	Homoharringtonine	CHEMBL46286	OMACETAXINE MEPESUCCINATE	synonym	exact		
 no	0	Hydroquinone	compoundName	1	compound	1	Hydroquinone	CHEMBL537	HYDROQUINONE	preferred_name	exact		
@@ -1498,10 +1499,10 @@ no	0	IMD 0354	compoundName	1	compound	1	IMD 0354	CHEMBL536151	IMD-0354	preferred
 no	0	INK 128 (MLN0128)	compoundName	1	compound	1	INK 128 (MLN0128)	CHEMBL3545097	SAPANISERTIB	synonym	parsed		parsed 'INK 128 (MLN0128)' -> 'INK 128'
 no	0	IPATASERTIB	compoundName	1	compound	1	IPATASERTIB	CHEMBL2177390	IPATASERTIB	preferred_name	exact		
 no	0	Indatraline hydrochloride	compoundName	1	unresolved	1	Indatraline hydrochloride				unmatched		
-no	0	Infant|infected with   Ascl1-mNG-miR124T lentivirus for 1 week	experimentalCondition	1	unresolved	1	Infant|infected with   Ascl1-mNG-miR124T lentivirus for 1 week				unmatched		
-no	0	Infant|infected with   mNG-miR124T lentivirus for 1 week	experimentalCondition	1	unresolved	1	Infant|infected with   mNG-miR124T lentivirus for 1 week				unmatched		
-no	0	Infant|infected with Ascl1   lentivirus for 1 week	experimentalCondition	1	unresolved	1	Infant|infected with Ascl1   lentivirus for 1 week				unmatched		
-no	0	Infant|infected with control   GFP lentivirus for 1 week	experimentalCondition	1	unresolved	1	Infant|infected with control   GFP lentivirus for 1 week				unmatched		
+no	0	Infant, infected with   Ascl1-mNG-miR124T lentivirus for 1 week	experimentalCondition	1	unresolved	1	Infant, infected with   Ascl1-mNG-miR124T lentivirus for 1 week				unmatched		
+no	0	Infant, infected with   mNG-miR124T lentivirus for 1 week	experimentalCondition	1	unresolved	1	Infant, infected with   mNG-miR124T lentivirus for 1 week				unmatched		
+no	0	Infant, infected with Ascl1   lentivirus for 1 week	experimentalCondition	1	unresolved	1	Infant, infected with Ascl1   lentivirus for 1 week				unmatched		
+no	0	Infant, infected with control   GFP lentivirus for 1 week	experimentalCondition	1	unresolved	1	Infant, infected with control   GFP lentivirus for 1 week				unmatched		
 no	0	Infected   with control GFP lentivirus for 1 week	experimentalCondition	1	unresolved	1	Infected   with control GFP lentivirus for 1 week				unmatched		
 no	0	Infected with   Ascl1-mNG-miR124T lentivirus for 1 week	experimentalCondition	1	unresolved	1	Infected with   Ascl1-mNG-miR124T lentivirus for 1 week				unmatched		
 no	0	Infected with   Ascl1-mNG-miR124T lentivirus for 3 weeks	experimentalCondition	1	unresolved	1	Infected with   Ascl1-mNG-miR124T lentivirus for 3 weeks				unmatched		
@@ -1532,7 +1533,7 @@ no	0	Linifanib (ABT-869)	compoundName	1	compound	1	Linifanib (ABT-869)	CHEMBL223
 no	0	Lovastatin	compoundName	1	compound	1	Lovastatin	CHEMBL503	LOVASTATIN	preferred_name	exact		
 no	0	Lunatin	compoundName	1	unresolved	1	Lunatin				unmatched		
 no	0	MARGETINE	compoundName	1	unresolved	1	MARGETINE				unmatched		
-no	0	MARK-IN-1|PCC0208017|Taxol|Colchicine|Nocodazole	compoundName	1	unresolved	1	MARK-IN-1|PCC0208017|Taxol|Colchicine|Nocodazole				unmatched		
+no	0	MARK-IN-1, PCC0208017, Taxol, Colchicine, Nocodazole	compoundName	1	unresolved	1	MARK-IN-1, PCC0208017, Taxol, Colchicine, Nocodazole				unmatched		
 no	0	MAYTANSINE	compoundName	1	unresolved	1	MAYTANSINE				unmatched		
 no	0	MEBENDAZOLE	compoundName	1	compound	1	MEBENDAZOLE	CHEMBL685	MEBENDAZOLE	preferred_name	exact		
 no	0	MG 132	compoundName	1	compound	1	MG 132	CHEMBL64925	MG-132	preferred_name	parsed		punctuation-insensitive match to 'MG-132'
@@ -1549,10 +1550,10 @@ no	0	Medicarpin	compoundName	1	unresolved	1	Medicarpin				unmatched
 no	0	Merestinib	compoundName	1	compound	1	Merestinib	CHEMBL3545307	MERESTINIB	preferred_name	exact		
 no	0	Metaphit	compoundName	1	unresolved	1	Metaphit				unmatched		
 no	0	Methotrexate	compoundName	1	compound	1	Methotrexate	CHEMBL34259	METHOTREXATE	preferred_name	exact		
-no	0	Methyl 2|5-dihydroxycinnamate	compoundName	1	unresolved	1	Methyl 2|5-dihydroxycinnamate				unmatched		
+no	0	Methyl 2,5-dihydroxycinnamate	compoundName	1	unresolved	1	Methyl 2,5-dihydroxycinnamate				unmatched		
 no	0	N-BENZOYL-DEACETYLCOLCHICINE	compoundName	1	unresolved	1	N-BENZOYL-DEACETYLCOLCHICINE				unmatched		
 no	0	N-Ethylmaleimide	compoundName	1	compound	1	N-Ethylmaleimide	CHEMBL8211	N-ETHYLMALEIMIDE	preferred_name	exact		
-no	0	N-[3-Fluoro-5-(3-pyridinyl)phenyl]-2|3-dihydro-5-methoxy-6-(trifluoromethyl)-1H-indole-1-carboxamide	compoundName	1	unresolved	1	N-[3-Fluoro-5-(3-pyridinyl)phenyl]-2|3-dihydro-5-methoxy-6-(trifluoromethyl)-1H-indole-1-carboxamide				unmatched		
+no	0	N-[3-Fluoro-5-(3-pyridinyl)phenyl]-2,3-dihydro-5-methoxy-6-(trifluoromethyl)-1H-indole-1-carboxamide	compoundName	1	unresolved	1	N-[3-Fluoro-5-(3-pyridinyl)phenyl]-2,3-dihydro-5-methoxy-6-(trifluoromethyl)-1H-indole-1-carboxamide				unmatched		
 no	0	N3343-60-3	compoundName	1	unresolved	1	N3343-60-3				unmatched		
 no	0	NANAOMYCIN	compoundName	1	unresolved	1	NANAOMYCIN				unmatched		
 no	0	NAVITOCLAX	compoundName	1	compound	1	NAVITOCLAX	CHEMBL443684	NAVITOCLAX	preferred_name	exact		
@@ -1607,7 +1608,7 @@ no	0	NVP-BHG712	compoundName	1	unresolved	1	NVP-BHG712				unmatched
 no	0	NVP-BSK805 2HCl	compoundName	1	unresolved	1	NVP-BSK805 2HCl				unmatched		
 no	0	NVP-TAE226	compoundName	1	unresolved	1	NVP-TAE226				unmatched		
 no	0	Napabucasin	compoundName	1	compound	1	Napabucasin	CHEMBL64130	NAPABUCASIN	preferred_name	exact		
-no	0	Naphthalene-1|4-dione|2-chloro-5|8-dihydroxy- 3-(2-methoxyethoxy)-	compoundName	1	unresolved	1	Naphthalene-1|4-dione|2-chloro-5|8-dihydroxy- 3-(2-methoxyethoxy)-				unmatched		
+no	0	Naphthalene-1,4-dione, 2-chloro-5,8-dihydroxy- 3-(2-methoxyethoxy)-	compoundName	1	unresolved	1	Naphthalene-1,4-dione, 2-chloro-5,8-dihydroxy- 3-(2-methoxyethoxy)-				unmatched		
 no	0	Narciclasine	compoundName	1	compound	1	Narciclasine	CHEMBL98745	NARCICLASINE	preferred_name	exact		
 no	0	Nigericin	compoundName	1	compound	1	Nigericin	CHEMBL405862	NIGERICIN	preferred_name	exact		
 no	0	OLDA	compoundName	1	unresolved	1	OLDA				unmatched		
@@ -1615,8 +1616,8 @@ no	0	OLEANDRIN	compoundName	1	compound	1	OLEANDRIN	CHEMBL4285883	OLEANDRIN	prefe
 no	0	OUABAIN	compoundName	1	compound	1	OUABAIN	CHEMBL222863	OUABAIN	preferred_name	exact		
 no	0	OXIBENDAZOLE	compoundName	1	compound	1	OXIBENDAZOLE	CHEMBL1087630	OXIBENDAZOLE	preferred_name	exact		
 no	0	OXYPHENBUTAZONE	compoundName	1	compound	1	OXYPHENBUTAZONE	CHEMBL3989676	OXYPHENBUTAZONE	preferred_name	exact		
-no	0	One dosage 1e12 AAV9-GRD-C24 or 1e12 K55-GRD-C24 through tail vein|5 mg/kg desamethasone every other day from Day 1.	experimentalCondition	1	not_a_compound	1	One dosage 1e12 AAV9-GRD-C24 or 1e12 K55-GRD-C24 through tail vein|5 mg/kg desamethasone every other day from Day 1.				unmatched		describes exposure duration, not a compound; upstream fix is to move this out of the compound field
-no	0	Optic nerve|Cortex|Skin|Sciatic nerve from animals treated with Gentamicin	experimentalCondition	1	unresolved	1	Optic nerve|Cortex|Skin|Sciatic nerve from animals treated with Gentamicin				unmatched		
+no	0	One dosage 1e12 AAV9-GRD-C24 or 1e12 K55-GRD-C24 through tail vein, 5 mg/kg desamethasone every other day from Day 1.	experimentalCondition	1	not_a_compound	1	One dosage 1e12 AAV9-GRD-C24 or 1e12 K55-GRD-C24 through tail vein, 5 mg/kg desamethasone every other day from Day 1.				unmatched		describes exposure duration, not a compound; upstream fix is to move this out of the compound field
+no	0	Optic nerve, Cortex, Skin, Sciatic nerve from animals treated with Gentamicin	experimentalCondition	1	unresolved	1	Optic nerve, Cortex, Skin, Sciatic nerve from animals treated with Gentamicin				unmatched		
 no	0	PARAROSANILINE PAMOATE	compoundName	1	unresolved	1	PARAROSANILINE PAMOATE				unmatched		
 no	0	PATULIN	compoundName	1	compound	1	PATULIN	CHEMBL294018	PATULIN	preferred_name	exact		
 no	0	PAZOPANIB	compoundName	1	compound	1	PAZOPANIB	CHEMBL477772	PAZOPANIB	preferred_name	exact		
@@ -1662,7 +1663,7 @@ no	0	Participant Demographics	compoundName	1	unresolved	1	Participant Demographi
 no	0	Pazopanib HCl	compoundName	1	compound	1	Pazopanib HCl	CHEMBL1201733	PAZOPANIB HYDROCHLORIDE	synonym	exact		
 no	0	Pelitinib (EKB-569)	compoundName	1	compound	1	Pelitinib (EKB-569)	CHEMBL607707	PELITINIB	preferred_name	parsed		parsed 'Pelitinib (EKB-569)' -> 'Pelitinib'
 no	0	Pentoxifylline	compoundName	1	compound	1	Pentoxifylline	CHEMBL628	PENTOXIFYLLINE	preferred_name	exact		
-no	0	Phenol|3|5-dichloro-4-[(4-nitrophenyl)azo]-	compoundName	1	shredded_name	1	Phenol|3|5-dichloro-4-[(4-nitrophenyl)azo]-				unmatched		the '|' multi-value delimiter appears to have replaced commas inside one systematic name; the value is corrupted rather than merely unrecognised, and the upstream fix is to restore the original name
+no	0	Phenol, 3,5-dichloro-4-[(4-nitrophenyl)azo]-	compoundName	1	unresolved	1	Phenol, 3,5-dichloro-4-[(4-nitrophenyl)azo]-				unmatched		
 no	0	Pifithrin-mu	compoundName	1	unresolved	1	Pifithrin-mu				unmatched		
 no	0	Pinafide	compoundName	1	compound	1	Pinafide	CHEMBL46874	PINAFIDE	preferred_name	exact		
 no	0	Piperidin-2-yl{2-(trifluoromethyl)-6-[4-(trifluoromethyl)phenyl]pyridin-4-yl}methanol	compoundName	1	unresolved	1	Piperidin-2-yl{2-(trifluoromethyl)-6-[4-(trifluoromethyl)phenyl]pyridin-4-yl}methanol				unmatched		
@@ -1687,8 +1688,8 @@ no	0	Prodigiosin	compoundName	1	compound	1	Prodigiosin	CHEMBL275787	PRODIGIOSIN	
 no	0	Proscillaridin A	compoundName	1	compound	1	Proscillaridin A	CHEMBL600325	PROSCILLARIDIN	synonym	exact		
 no	0	Protoporphyrin IX disodium	compoundName	1	unresolved	1	Protoporphyrin IX disodium				unmatched		
 no	0	Protriptyline hydrochloride	compoundName	1	compound	1	Protriptyline hydrochloride	CHEMBL1200332	PROTRIPTYLINE HYDROCHLORIDE	preferred_name	exact		
-no	0	Pyrazolo[3|4-d][1]benzazepin-5-one|1|4|5|6-tetrahydro-3-methyl-1-phenyl-	compoundName	1	shredded_name	1	Pyrazolo[3|4-d][1]benzazepin-5-one|1|4|5|6-tetrahydro-3-methyl-1-phenyl-				unmatched		the '|' multi-value delimiter appears to have replaced commas inside one systematic name; the value is corrupted rather than merely unrecognised, and the upstream fix is to restore the original name
-no	0	Pyrimidine-2|4(1H|3H)-dione|6-[(4-chlorophenyl)azo]-	compoundName	1	shredded_name	1	Pyrimidine-2|4(1H|3H)-dione|6-[(4-chlorophenyl)azo]-				unmatched		the '|' multi-value delimiter appears to have replaced commas inside one systematic name; the value is corrupted rather than merely unrecognised, and the upstream fix is to restore the original name
+no	0	Pyrazolo[3,4-d][1]benzazepin-5-one, 1,4,5,6-tetrahydro-3-methyl-1-phenyl-	compoundName	1	unresolved	1	Pyrazolo[3,4-d][1]benzazepin-5-one, 1,4,5,6-tetrahydro-3-methyl-1-phenyl-				unmatched		
+no	0	Pyrimidine-2,4(1H,3H)-dione, 6-[(4-chlorophenyl)azo]-	compoundName	1	unresolved	1	Pyrimidine-2,4(1H,3H)-dione, 6-[(4-chlorophenyl)azo]-				unmatched		
 no	0	Pyrithione zinc (1-Hydroxypyridine-2-Thione Zinc Salt)	compoundName	1	compound	1	Pyrithione zinc (1-Hydroxypyridine-2-Thione Zinc Salt)	CHEMBL1200471	PYRITHIONE ZINC	preferred_name	parsed		parsed 'Pyrithione zinc (1-Hydroxypyridine-2-Thione Zinc Salt)' -> 'Pyrithione zinc'
 no	0	QUADRONE	compoundName	1	unresolved	1	QUADRONE				unmatched		
 no	0	Qinghaosu	compoundName	1	unresolved	1	Qinghaosu				unmatched		
@@ -1708,7 +1709,7 @@ no	0	Ryuvidine	compoundName	1	unresolved	1	Ryuvidine				unmatched
 no	0	S-Trityl-L-cysteine	compoundName	1	compound	1	S-Trityl-L-cysteine	CHEMBL392695	S-TRITYL-L-CYSTEINE	preferred_name	exact		
 no	0	S100B p16	experimentalCondition	1	unresolved	1	S100B p16				unmatched		
 no	0	S100B p20	experimentalCondition	1	unresolved	1	S100B p20				unmatched		
-no	0	SALINOMYCIN|SODIUM	compoundName	1	unresolved	1	SALINOMYCIN|SODIUM				unmatched		
+no	0	SALINOMYCIN, SODIUM	compoundName	1	unresolved	1	SALINOMYCIN, SODIUM				unmatched		
 no	0	SAM001246554	compoundName	1	unresolved	1	SAM001246554				unmatched		
 no	0	SAM001246559	compoundName	1	unresolved	1	SAM001246559				unmatched		
 no	0	SAM001246568	compoundName	1	unresolved	1	SAM001246568				unmatched		
@@ -1798,12 +1799,12 @@ no	0	Tetrindole mesylate	compoundName	1	unresolved	1	Tetrindole mesylate				unma
 no	0	Tetrocarcin A	compoundName	1	unresolved	1	Tetrocarcin A				unmatched		
 no	0	Thapsigargin	compoundName	1	unresolved	1	Thapsigargin				unmatched		
 no	0	Thioridazine hydrochloride	compoundName	1	compound	1	Thioridazine hydrochloride	CHEMBL1200916	THIORIDAZINE HYDROCHLORIDE	preferred_name	exact		
-no	0	Tin(IV) chlorotriphenyl[1-(4-ethoxyphenyl)- 3-cyanoureato]-|hydrogen|triethylamine	compoundName	1	unresolved	1	Tin(IV) chlorotriphenyl[1-(4-ethoxyphenyl)- 3-cyanoureato]-|hydrogen|triethylamine				unmatched		
+no	0	Tin(IV) chlorotriphenyl[1-(4-ethoxyphenyl)- 3-cyanoureato]-, hydrogen, triethylamine	compoundName	1	unresolved	1	Tin(IV) chlorotriphenyl[1-(4-ethoxyphenyl)- 3-cyanoureato]-, hydrogen, triethylamine				unmatched		
 no	0	Tolonium chloride (Toluidine blue O)	compoundName	1	compound	1	Tolonium chloride (Toluidine blue O)	CHEMBL1790006	TOLONIUM CHLORIDE	preferred_name	parsed		parsed 'Tolonium chloride (Toluidine blue O)' -> 'Tolonium chloride'
 no	0	Torin 1	compoundName	1	compound	1	Torin 1	CHEMBL1256459	TORIN1	preferred_name	parsed		punctuation-insensitive match to 'TORIN1'
 no	0	Torin 2	compoundName	1	unresolved	1	Torin 2				unmatched		
 no	0	Tributylchlorolead	compoundName	1	unresolved	1	Tributylchlorolead				unmatched		
-no	0	Two dosages of 1e12 K55-GRD-C24 (Day 0|Day7) through tail vein	experimentalCondition	1	shredded_name	1	Two dosages of 1e12 K55-GRD-C24 (Day 0|Day7) through tail vein				unmatched		the '|' multi-value delimiter appears to have replaced commas inside one systematic name; the value is corrupted rather than merely unrecognised, and the upstream fix is to restore the original name
+no	0	Two dosages of 1e12 K55-GRD-C24 (Day 0, Day7) through tail vein	experimentalCondition	1	not_a_compound	1	Two dosages of 1e12 K55-GRD-C24 (Day 0, Day7) through tail vein				unmatched		describes exposure duration, not a compound; upstream fix is to move this out of the compound field
 no	0	Tyrphostin A9	compoundName	1	unresolved	1	Tyrphostin A9				unmatched		
 no	0	U-73122	compoundName	1	unresolved	1	U-73122				unmatched		
 no	0	U11667/23/1	compoundName	1	unresolved	1	U11667/23/1				unmatched		
@@ -1841,9 +1842,9 @@ no	0	Vorinostat	compoundName	1	compound	1	Vorinostat	CHEMBL98	VORINOSTAT	preferr
 no	0	WAY 170523	compoundName	1	unresolved	1	WAY 170523				unmatched		
 no	0	WAY-600	compoundName	1	unresolved	1	WAY-600				unmatched		
 no	0	WG 696	compoundName	1	unresolved	1	WG 696				unmatched		
-no	0	WIN 55|212-2 mesylate	compoundName	1	unresolved	1	WIN 55|212-2 mesylate				unmatched		
+no	0	WIN 55,212-2 mesylate	compoundName	1	unresolved	1	WIN 55,212-2 mesylate				unmatched		
 no	0	WP1066	compoundName	1	compound	1	WP1066	CHEMBL1923234	WP 1066	synonym	exact		
-no	0	WT|Het|KO SCs NF1 mRNA levels	experimentalCondition	1	unresolved	1	WT|Het|KO SCs NF1 mRNA levels				unmatched		
+no	0	WT, Het, KO SCs NF1 mRNA levels	experimentalCondition	1	unresolved	1	WT, Het, KO SCs NF1 mRNA levels				unmatched		
 no	0	WYE-125132	compoundName	1	unresolved	1	WYE-125132				unmatched		
 no	0	WYE-354	compoundName	1	unresolved	1	WYE-354				unmatched		
 no	0	WZ8040	compoundName	1	unresolved	1	WZ8040				unmatched		
@@ -1865,11 +1866,11 @@ no	0	cNF97.2a	experimentalCondition	1	unresolved	1	cNF97.2a				unmatched
 no	0	cNF98.4d	experimentalCondition	1	unresolved	1	cNF98.4d				unmatched		
 no	0	co-cultured	experimentalCondition	1	unresolved	1	co-cultured				unmatched		
 no	0	cx-4945 (Silmitasertib)	compoundName	1	compound	1	cx-4945 (Silmitasertib)	CHEMBL1230165	SILMITASERTIB	synonym	exact		
-no	0	dmso|selumetinib|doxorubicin	experimentalCondition	1	control	1	dmso	CHEMBL504	DIMETHYL SULFOXIDE	synonym	exact		vehicle or untreated control
-no	0	dmso|selumetinib|doxorubicin	experimentalCondition	1	control	2	selumetinib	CHEMBL1614701	SELUMETINIB	preferred_name	exact		vehicle or untreated control
-no	0	dmso|selumetinib|doxorubicin	experimentalCondition	1	control	3	doxorubicin	CHEMBL53463	DOXORUBICIN	preferred_name	exact		vehicle or untreated control
+no	0	dmso, selumetinib, doxorubicin	experimentalCondition	1	control	1	dmso	CHEMBL504	DIMETHYL SULFOXIDE	synonym	exact		vehicle or untreated control
+no	0	dmso, selumetinib, doxorubicin	experimentalCondition	1	control	2	selumetinib	CHEMBL1614701	SELUMETINIB	preferred_name	exact		vehicle or untreated control
+no	0	dmso, selumetinib, doxorubicin	experimentalCondition	1	control	3	doxorubicin	CHEMBL53463	DOXORUBICIN	preferred_name	exact		vehicle or untreated control
 no	0	empty vector	experimentalCondition	1	unresolved	1	empty vector				unmatched		
-no	0	heat|cold|vibration and pressure	experimentalCondition	1	unresolved	1	heat|cold|vibration and pressure				unmatched		
+no	0	heat, cold, vibration and pressure	experimentalCondition	1	unresolved	1	heat, cold, vibration and pressure				unmatched		
 no	0	iPNF05.5 NF1- (rep1)-T4	experimentalCondition	1	unresolved	1	iPNF05.5 NF1- (rep1)-T4				unmatched		
 no	0	iPNF05.5 NF1- (rep1)-T5	experimentalCondition	1	unresolved	1	iPNF05.5 NF1- (rep1)-T5				unmatched		
 no	0	iPNF05.5 NF1- (rep1)-T6	experimentalCondition	1	unresolved	1	iPNF05.5 NF1- (rep1)-T6				unmatched		
@@ -1889,10 +1890,10 @@ no	0	iPNF96.11bC NF1- (rep2)-T4	experimentalCondition	1	unresolved	1	iPNF96.11bC
 no	0	iPNF96.11bC NF1- (rep2)-T5	experimentalCondition	1	unresolved	1	iPNF96.11bC NF1- (rep2)-T5				unmatched		
 no	0	iPNF96.11bC NF1- (rep2)-T6	experimentalCondition	1	unresolved	1	iPNF96.11bC NF1- (rep2)-T6				unmatched		
 no	0	lovastatin	compoundName	1	compound	1	lovastatin	CHEMBL503	LOVASTATIN	preferred_name	exact		
-no	0	mocetinostat + INK128|mocetinostat + rapamycin	experimentalCondition	1	arm_list	1	mocetinostat	CHEMBL272980	MOCETINOSTAT	preferred_name	exact	CHEMBL272980+CHEMBL3545097	2 separately-dosed arms in one field value
-no	0	mocetinostat + INK128|mocetinostat + rapamycin	experimentalCondition	1	arm_list	1	INK128	CHEMBL3545097	SAPANISERTIB	synonym	exact	CHEMBL272980+CHEMBL3545097	2 separately-dosed arms in one field value
-no	0	mocetinostat + INK128|mocetinostat + rapamycin	experimentalCondition	1	arm_list	2	mocetinostat	CHEMBL272980	MOCETINOSTAT	preferred_name	exact	CHEMBL272980+CHEMBL413	2 separately-dosed arms in one field value
-no	0	mocetinostat + INK128|mocetinostat + rapamycin	experimentalCondition	1	arm_list	2	rapamycin	CHEMBL413	SIROLIMUS	synonym	exact	CHEMBL272980+CHEMBL413	2 separately-dosed arms in one field value
+no	0	mocetinostat + INK128,mocetinostat + rapamycin	experimentalCondition	1	arm_list	1	mocetinostat	CHEMBL272980	MOCETINOSTAT	preferred_name	exact	CHEMBL272980+CHEMBL3545097	2 separately-dosed arms in one field value
+no	0	mocetinostat + INK128,mocetinostat + rapamycin	experimentalCondition	1	arm_list	1	INK128	CHEMBL3545097	SAPANISERTIB	synonym	exact	CHEMBL272980+CHEMBL3545097	2 separately-dosed arms in one field value
+no	0	mocetinostat + INK128,mocetinostat + rapamycin	experimentalCondition	1	arm_list	2	mocetinostat	CHEMBL272980	MOCETINOSTAT	preferred_name	exact	CHEMBL272980+CHEMBL413	2 separately-dosed arms in one field value
+no	0	mocetinostat + INK128,mocetinostat + rapamycin	experimentalCondition	1	arm_list	2	rapamycin	CHEMBL413	SIROLIMUS	synonym	exact	CHEMBL272980+CHEMBL413	2 separately-dosed arms in one field value
 no	0	no .svs file	experimentalCondition	1	unresolved	1	no .svs file				unmatched		
 no	0	no-cell control for autofluorescence	experimentalCondition	1	unresolved	1	no-cell control for autofluorescence				unmatched		
 no	0	p10 phase contrast	experimentalCondition	1	unresolved	1	p10 phase contrast				unmatched		
@@ -1902,5 +1903,6 @@ no	0	rac-2-Ethoxy-3-hexadecanamido-1-propylphosphocholine	compoundName	1	unresol
 no	0	rac-2-Ethoxy-3-octadecanamido-1-propylphosphocholine	compoundName	1	unresolved	1	rac-2-Ethoxy-3-octadecanamido-1-propylphosphocholine				unmatched		
 no	0	retinal needle poke injury	experimentalCondition	1	unresolved	1	retinal needle poke injury				unmatched		
 no	0	scar vs fibromatosis	experimentalCondition	1	unresolved	1	scar vs fibromatosis				unmatched		
-no	0	tetrodotoxin|lamotrigine	compoundName	1	arm_list	1	tetrodotoxin	CHEMBL507974	TETRODOTOXIN	preferred_name	exact		2 separately-dosed arms in one field value
-no	0	tetrodotoxin|lamotrigine	compoundName	1	arm_list	2	lamotrigine	CHEMBL741	LAMOTRIGINE	preferred_name	exact		2 separately-dosed arms in one field value
+no	0	tetrodotoxin, lamotrigine	compoundName	1	arm_list	1	tetrodotoxin	CHEMBL507974	TETRODOTOXIN	preferred_name	exact		2 separately-dosed arms in one field value
+no	0	tetrodotoxin, lamotrigine	compoundName	1	arm_list	2	lamotrigine	CHEMBL741	LAMOTRIGINE	preferred_name	exact		2 separately-dosed arms in one field value
+yes	6	dox treated for 72hours	experimentalCondition	6	compound	1	dox treated for 72hours	CHEMBL1200699	DOXYCYCLINE		manual		describes exposure duration, not a compound; upstream fix is to move this out of the compound field
