@@ -39,13 +39,6 @@ scope if a narrower pass is wanted.
    fails the same way. Requiring all arms costs a couple of recoverable values
    (`10|20uM Ataluren` loses its dose range) and those stay visible as unresolved,
    which is the trade this file makes everywhere.
-
-   A pre-fix export can also contain **systematic names whose commas became pipes**:
-   `11H-Benzo[a]carbazole-1|4-dione|7|11-dimethyl-` was
-   `11H-Benzo[a]carbazole-1,4-dione, 7,11-dimethyl-`. Those are classified
-   `shredded_name` -- a corrupted value, not an unknown compound. That detection is
-   deliberately pipe-only and transitional: the same string spelled with commas is
-   correct, and the class should disappear once every export post-dates the ingest fix.
 2. **Split combinations** within an arm on `;`, ` + ` and ` plus `. Each component becomes
    its own row, so a two-drug arm is two annotations rather than one unparseable string.
    ` + ` needs the spaces: `(+)-Camptothecin` must not split.
@@ -120,11 +113,6 @@ COMBINATION_SPLIT = re.compile(r";|\s\+\s|\bplus\b", re.IGNORECASE)
 #: the ingest stopped comma-splitting these fields, where it stands for a comma. Both
 #: are accepted so this script reads either vintage -- see rule 1.
 ARM_SPLIT = re.compile(r"[|,]")
-
-#: Pipe only. A pre-fix export encodes a name's internal commas as pipes, so an
-#: unbalanced part is evidence of corruption; the same string spelled with commas is
-#: simply the correct value. See `looks_shredded`.
-SHREDDED_DELIMITER = "|"
 
 #: A leading concentration, e.g. `100 nM CUDC-907` or `0.0125% DMSO`.
 LEADING_DOSE = re.compile(
@@ -263,32 +251,6 @@ class LabelIndex:
         return None, [], False
 
 
-def looks_shredded(raw: str) -> bool:
-    """Whether `|` appears to have cut through one name rather than separated values.
-
-    Two signals, both taken from the real values:
-
-    * A part whose brackets do not balance. Checked PER PART, not across the whole
-      string -- `11H-Indolo[3|2-c]quinolin-9-amine|...` balances globally because the
-      `[` and the `]` are both present, just on opposite sides of a delimiter that
-      should not be there. That is precisely the tell.
-    * A part that is bare digits, as in `1|2|4-Dithiazol-3-amine|...`.
-
-    A genuine list of compound names has neither.
-    """
-    if SHREDDED_DELIMITER not in raw:
-        return False
-    for part in raw.split(SHREDDED_DELIMITER):
-        stripped = part.strip()
-        if stripped.isdigit():
-            return True
-        if stripped.count("[") != stripped.count("]"):
-            return True
-        if stripped.count("(") != stripped.count(")"):
-            return True
-    return False
-
-
 def split_components(raw: str) -> list[str]:
     return [part.strip() for part in COMBINATION_SPLIT.split(raw) if part.strip()]
 
@@ -360,11 +322,6 @@ def classify(raw: str, resolutions: list[Resolution], arms: int) -> tuple[str, s
     """``(value_class, note)`` for the raw string as a whole."""
     resolved = [r for r in resolutions if r.hit]
     lowered = raw.casefold()
-    if not resolved and looks_shredded(raw):
-        return "shredded_name", (
-            "the '|' multi-value delimiter appears to have replaced commas inside one "
-            "systematic name; the value is corrupted rather than merely unrecognised, "
-            "and the upstream fix is to restore the original name")
     if ZERO_DOSE.search(raw):
         return "control", ("zero-dose arm; the compound named is the series agent, "
                            "not an exposure")

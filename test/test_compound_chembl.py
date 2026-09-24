@@ -1,8 +1,8 @@
 """Tests for the portal compound string -> ChEMBL crosswalk.
 
 Weighted towards the cases where a wrong answer looks right: an ambiguous label
-resolving to a different drug, a systematic name shredded by the multi-value
-delimiter, and a multi-line portal value corrupting the file it is written to.
+resolving to a different drug, an arm split that half-works, and a multi-line
+portal value corrupting the file it is written to.
 """
 
 import csv
@@ -20,7 +20,6 @@ from scripts.map_compound_chembl import (
     candidate_tokens,
     classify,
     flatten,
-    looks_shredded,
     read_manual_rows,
     resolve_component,
     split_components,
@@ -130,37 +129,6 @@ class TestParsing:
         assert LabelIndex.worth_looking_up("DMSO")
 
 
-class TestShreddedNames:
-    @pytest.mark.parametrize("raw", [
-        "11H-Benzo[a]carbazole-1|4-dione|7|11-dimethyl-",       # unbalanced [
-        "1|2|4-Dithiazol-3-amine|5-[(2-furanyl)methylimino]-",  # bare-digit part
-        "11H-Indolo[3|2-c]quinolin-9-amine|3-chloro-N|N-diethyl-",
-    ])
-    def test_delimiter_cutting_through_one_name_is_detected(self, raw):
-        assert looks_shredded(raw)
-
-    @pytest.mark.parametrize("raw", [
-        "100 nM CUDC-907|100 nM Panobinostat",
-        "Olaparib;Trabectedin",
-        "Trametinib",
-    ])
-    def test_a_real_list_is_not_flagged(self, raw):
-        assert not looks_shredded(raw)
-
-    def test_a_comma_spelled_systematic_name_is_not_shredded(self, index):
-        """Detection is pipe-only on purpose. Once the ingest stopped comma-splitting,
-        the same string spelled with commas is simply the correct value, and flagging
-        it would report a fixed problem as still broken."""
-        assert not looks_shredded("11H-Benzo[a]carbazole-1,4-dione, 7,11-dimethyl-")
-        assert looks_shredded("11H-Benzo[a]carbazole-1|4-dione|7|11-dimethyl-")
-
-    def test_shredded_value_is_classified_as_corrupted_not_unknown(self, index):
-        raw = "11H-Benzo[a]carbazole-1|4-dione|7|11-dimethyl-"
-        value_class, note = classify(raw, [resolved(raw, index)], arms=1)
-        assert value_class == "shredded_name"
-        assert "comma" in note
-
-
 class TestArmSplitting:
     def test_comma_is_an_arm_separator(self, index):
         """What the portal records after the ingest stopped comma-splitting."""
@@ -197,11 +165,14 @@ class TestArmSplitting:
         assert all(not r["combination_key"] for r in rows)
 
     def test_pipe_split_is_discarded_when_it_resolves_nothing(self, index):
+        """A systematic name from a pre-fix export, where `|` stands in for the
+        commas inside it. Nothing resolves, so the all-arms rule keeps the value
+        whole and it reads as unresolved rather than as several bogus compounds."""
         raw = "11H-Benzo[a]carbazole-1|4-dione|7|11-dimethyl-"
         rows = build_rows({(raw, "compoundName"): 1}, {}, index)
-        assert len(rows) == 1, "the shredded name must stay whole"
+        assert len(rows) == 1, "the name must stay whole"
         assert rows[0]["component"] == raw
-        assert rows[0]["value_class"] == "shredded_name"
+        assert rows[0]["value_class"] == "unresolved"
 
     def test_combination_key_is_per_arm(self, index):
         raw = "trametinib;ribociclib|tno155"
