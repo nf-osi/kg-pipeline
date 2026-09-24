@@ -907,6 +907,44 @@ map:FileCompoundName a rr:TriplesMap ;
     # values into the graph.
     rr:predicateObjectMap [ rr:predicate nf:compoundName ; rr:objectMap [ rml:reference "compoundName" ; rr:datatype xsd:string ] ] .
 
+map:FileCompound a rr:TriplesMap ;
+    rdfs:label "File Compound" ;
+    rml:logicalSource map:PortalFilesSource ;
+    rr:subjectMap [ rr:template "https://www.synapse.org/Synapse:{id}" ; rr:termType rr:IRI ] ;
+    # The resolved molecule, read off the portal's compoundChemblID annotation rather
+    # than derived here -- map-compound-chembl in nf-osi/jobs owns the resolution, so
+    # every fileview consumer gets the same answer. harmonize_files.py has already
+    # turned each accession into an identifiers.org IRI and pipe-joined them, the same
+    # hand-off as tumorTypeIRI; splitting on "\|" is what makes a combination arm one
+    # object per drug rather than one unusable IRI.
+    #
+    # Additive, like nf:tumorTypeTerm: nf:compoundName and nf:experimentalCondition
+    # keep their free text, because most distinct compound strings do not resolve and
+    # replacing the string would delete the compound from those files.
+    rr:predicateObjectMap [
+        rr:predicate nf:compound ;
+        rr:objectMap [
+            a fnml:FunctionTermMap ;
+            rr:termType rr:IRI ;
+            fnml:functionValue [
+                a fno:Execution ;
+                rml:logicalSource map:PortalFilesSource ;
+                rr:predicateObjectMap [
+                    rr:predicate fno:executes ;
+                    rr:objectMap [ rr:constant grel:string_split ; rr:termType rr:IRI ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:valueParameter ;
+                    rr:objectMap [ rml:reference "compoundIRI" ; rr:termType rr:Literal ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:p_string_sep ;
+                    rr:objectMap [ rr:constant "\\|" ; rr:termType rr:Literal ]
+                ]
+            ]
+        ]
+    ] .
+
 map:FileExperimentalCondition a rr:TriplesMap ;
     rdfs:label "File ExperimentalCondition" ;
     rml:logicalSource map:PortalFilesSource ;

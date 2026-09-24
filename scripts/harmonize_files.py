@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import re
 import sys
 from collections import Counter
 from pathlib import Path
@@ -38,6 +39,39 @@ DEFAULT_OUTPUT = Path("data/csv/files_harmonized.csv")
 DEFAULT_LOOKUP = Path("mappings/sssom/data_lookup.sssom.tsv")
 DEFAULT_NF1_LOOKUP = Path("mappings/sssom/nf1_genotype_lookup.sssom.tsv")
 DEFAULT_NF2_LOOKUP = Path("mappings/sssom/nf2_genotype_lookup.sssom.tsv")
+
+#: A ChEMBL accession, as the portal's compoundChemblID annotation carries it. Matched
+#: rather than trusted: the prefix below turns whatever is in the column into an IRI,
+#: and a typo would mint a resolvable-looking IRI for a molecule that does not exist.
+CHEMBL_ACCESSION = re.compile(r"^CHEMBL[0-9]+$")
+#: Same authority and spelling as materialize_orthologs.py uses for HGNC and MGI, so
+#: every external identifier in this graph is an identifiers.org IRI.
+CHEMBL_IRI = "https://identifiers.org/chembl:{}"
+
+
+def chembl_iris(raw: str) -> tuple[list[str], list[str]]:
+    """``(iris, malformed)`` for one pipe-joined compoundChemblID value.
+
+    Pipe-joined because a file can carry more than one molecule: a combination arm is
+    several drugs, and compoundName and experimentalCondition are resolved
+    independently.
+
+    Anything that is not a bare ChEMBL accession is reported rather than prefixed. The
+    prefix would turn `CHEMB504` or `chembl:CHEMBL504` into an IRI that looks
+    resolvable and is not, and a wrong molecule IRI is a wrong drug rather than a near
+    miss -- the same reason the upstream resolver refuses ambiguity instead of guessing.
+    """
+    iris: list[str] = []
+    malformed: list[str] = []
+    for part in raw.split("|"):
+        part = part.strip()
+        if not part:
+            continue
+        if CHEMBL_ACCESSION.match(part):
+            iris.append(CHEMBL_IRI.format(part))
+        else:
+            malformed.append(part)
+    return iris, malformed
 DEFAULT_TUMOR_TYPE_LOOKUP = Path("mappings/sssom/tumor_type_lookup.sssom.tsv")
 
 NF_NS = "http://nf-osi.github.com/terms#"
@@ -197,6 +231,8 @@ def main(argv: list[str] | None = None) -> int:
     nf1_unmapped: Counter[str] = Counter()
     nf2_counts: Counter[str] = Counter()
     nf2_unmapped: Counter[str] = Counter()
+    chembl_counts: Counter[str] = Counter()
+    chembl_malformed: Counter[str] = Counter()
 
     with open(args.files, "r") as f:
         reader = csv.DictReader(f)
@@ -252,6 +288,24 @@ def main(argv: list[str] | None = None) -> int:
                     if part and part.lower() not in tumor_type_lookup:
                         tt_unmapped[part] += 1
             row["tumorTypeIRI"] = tumor_type_iri
+
+            # Turn the compoundChemblID annotation into a ChEMBL IRI.
+            #
+            # No lookup: the resolution already happened upstream, in
+            # map-compound-chembl in nf-osi/jobs, and this is only the prefix that
+            # makes the accession an IRI. Multi-valued because one file can carry a
+            # combination arm, and because compoundName and experimentalCondition are
+            # resolved independently.
+            #
+            # Additive, like tumorType: nf:compoundName keeps the free text. Most
+            # distinct compound strings do not resolve, so replacing the string would
+            # delete the compound from those files.
+            iris, malformed = chembl_iris(row.get("compoundChemblID", ""))
+            for iri in iris:
+                chembl_counts[iri] += 1
+            for value in malformed:
+                chembl_malformed[value] += 1
+            row["compoundIRI"] = "|".join(iris)
 
             # Classify NF1 genotype
             nf1_raw = row.get("nf1Genotype", "").strip()
@@ -311,6 +365,21 @@ def main(argv: list[str] | None = None) -> int:
         for term, count in tt_unmapped.most_common():
             print(f"  {count:>7}  {term}")
 
+    # Silence here means the annotation is not on portal files yet, which is the
+    # expected state until map-compound-chembl writes it. Say so rather than print
+    # nothing, so an absent column is not read as an absent compound.
+    if chembl_counts:
+        print(f"\ncompoundChemblID resolved to {len(chembl_counts)} distinct ChEMBL "
+              f"molecules over {sum(chembl_counts.values())} file values")
+    else:
+        print("\ncompoundChemblID: no values on any file row; nf:compound will be "
+              "absent from the graph")
+    if chembl_malformed:
+        print(f"Malformed compoundChemblID values ({len(chembl_malformed)} unique, "
+              "dropped rather than minted into IRIs):")
+        for term, count in chembl_malformed.most_common():
+            print(f"  {count:3d}x  {term}")
+
     if nf1_unmapped:
         print(f"\nUnmapped NF1 genotype values ({len(nf1_unmapped)} unique):")
         for term, count in nf1_unmapped.most_common():
@@ -329,6 +398,7 @@ def main(argv: list[str] | None = None) -> int:
 
     out_fieldnames = list(fieldnames) + [
         "modelSystemId", "dataTypeIRI", "tumorTypeIRI", "nf1GenotypeIRI", "nf2GenotypeIRI",
+        "compoundIRI",
     ]
     args.output.parent.mkdir(parents=True, exist_ok=True)
     with open(args.output, "w", newline="", encoding="utf-8") as f:

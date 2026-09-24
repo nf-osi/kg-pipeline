@@ -50,7 +50,6 @@ diffable mapping rather than a regex buried in a script.
 | `cbioportal_sample_specimen.tsv` | cBioPortal `Tumor_Sample_Barcode` → portal `specimenID`/`individualID` | `scripts/map_cbioportal_samples.py` |
 | `orthologs.tsv` | model-organism gene (MGI/ZFIN/RGD) → human gene (HGNC IRI) | `scripts/fetch_orthologs.py` |
 | `model_mutation_vrs.tsv` | curated `humanClinVarMutation` → GRCh38 coordinates → `ga4gh:VA.*` | `scripts/mint_model_mutation_vrs.py` |
-| `compound_chembl.tsv` | free-text `compoundName` / `experimentalCondition` → ChEMBL molecule | `scripts/map_compound_chembl.py` |
 
 Rows whose `method` is not one of the derived values (`strip_last_segment`,
 `prefix_guess`, `unmatched`) are treated as human-authored and preserved on
@@ -68,46 +67,16 @@ offline by `scripts/materialize_orthologs.py` and
 Cre driver lines curated under promoter symbols such as `Dhh`, `GFAP`, and `SynI` are marked `status=excluded` with a reason. 
 The source is SHA-256 pinned in `fetch_orthologs.py`, and `check_source_versions.py --check-external` reports source drift without modifying the pin.
 
-`compound_chembl.tsv` is the crosswalk for the portal's two free-text compound fields,
-built for demo 2 and intended to be pushed back upstream as file annotations. It covers
-every file carrying one of the two fields, but rows whose strings appear on demo 2's
-files are marked `in_demo=yes` and **sort to the top**, because those are the ones being
-annotated first and read line by line; the portal-wide tail below them is resolved by
-the same rules but not yet reviewed.
+The compound crosswalk used to live here and does not any more. Resolving the portal's
+two free-text compound fields to ChEMBL is upstream of this repo, not part of it, so it
+moved to [`map-compound-chembl`](https://github.com/nf-osi/jobs/tree/main/map-compound-chembl)
+in nf-osi/jobs, where it can carry a chemistry toolkit without one landing in a graph
+build. This pipeline reads the answer off the file instead: a `compoundChemblID`
+annotation becomes `nf:compound` via `rml/files.rml.ttl`, the same shape as
+`nf:tumorTypeTerm`.
 
-It resolves against a ChEMBL label index exported from the
-[sagebrain-tap](https://github.com/Sage-Bionetworks/sagebrain-tap) Open Targets ingest —
-`python -m opentargets.export_label_index` — staged at `data/reference/chembl_labels.tsv`.
-The index release and its SHA-256 are recorded in the file header, because a crosswalk is
-only reproducible against the label set that produced it.
-
-Three behaviours worth knowing, each of which exists because the alternative produces a
-confident wrong answer:
-
-- **Ambiguity is refused.** A label can name several molecules, and the wrong pick is a
-  different drug rather than a near miss: taking the first candidate resolves `Olaparib`
-  to PARPI, `Doxorubicin` to DAUNORUBICIN HYDROCHLORIDE and `Sirolimus` to EVEROLIMUS.
-  Candidates are ranked by match kind, and a remaining tie is written with
-  `method=ambiguous`, no ChEMBL id, and the candidates in `notes` for a curator.
-- **An arm split is kept only if EVERY arm resolves.** Arms are separated by a comma
-  (what the portal records) or by `|` (what exports predating the ingest fix contain),
-  and both are read without a flag. The comma is also a character inside chemical names,
-  so a partial match is not good enough: `Acridine, 9-phenoxy-` is one compound, and
-  accepting the split because one arm resolves returns ACRIDINE — a real molecule and
-  the wrong one. `SALINOMYCIN, SODIUM` fails identically. Requiring every arm costs a
-  couple of recoverable values, which stay visible as unresolved.
-- **`combination_key` makes order variants visible.** `Ribociclib;Trametinib`,
-  `Trametinib;Ribociclib` and `tno155 plus ribociclib` are the same experiments written
-  three ways; rows sharing a key are the same arm.
-
-`value_class` separates what upstream actually needs to fix: `compound`, `combination`,
-`arm_list`, `control`, `not_a_compound` (durations sitting in a compound field) and
-`unresolved`. Unresolved strings are kept with an empty `chembl_id`,
-the same keep-don't-drop rule the variant layer uses — a string that does not resolve is
-a curation finding, not noise to hide.
-
-`--files-out` writes the per-file expansion used to push annotations upstream. That sheet
-is derived and not checked in; the mapping is the reviewable artifact.
+Until that annotation exists on portal files, `nf:compound` is simply absent and
+`nf:compoundName` is all a query has, which is the pre-move state.
 
 ## RML (`rml/`)
 
