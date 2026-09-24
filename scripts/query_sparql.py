@@ -254,6 +254,259 @@ SELECT ?metric (COUNT(DISTINCT ?s) AS ?count) WHERE {
   }
 } GROUP BY ?metric ORDER BY ?metric""",
     },
+    # --- Model-system coverage (docs/demos/demo-1-model-coverage.md) --------------
+    # The inversion of B5: not "which patient allele has a model" but "which recurrent
+    # patient allele has NONE", plus its mirror. All four need the two bridges that
+    # demo built -- nf:mutationVrsId (mappings/model_mutation_vrs.tsv) and
+    # nf:hasOrtholog (mappings/orthologs.tsv) -- and all four label which join tier a
+    # row came from, because the tiers do not mean the same thing:
+    #
+    #   tier 1  allele identity     the curated mutation and the patient call are the
+    #                               same allele: digest == digest, nothing else compared
+    #   tier 2  protein string      the curated HGVS protein change equals the call's,
+    #                               with the gene constrained on BOTH sides (pitfall 2)
+    #
+    # Tier 2 compares protein strings for pairs without an identity match. It can
+    # connect different nucleotide alleles and also supports mutations whose bare
+    # cDNA curation cannot reach tier 1 (see scripts/mint_model_mutation_vrs.py).
+    "variant-model-match": {
+        "help": "Patient alleles that a curated model system carries, on both join tiers (1 = VRS allele identity, 2 = gene-constrained protein string). Params: gene",
+        "binds": {"gene": "NF1"},
+        "query": """\
+SELECT ?tier ?vrsId ?patientChange ?curatedChange ?curatedClinVar ?model ?kind ?species ?manifestation
+       (COUNT(DISTINCT ?specimen) AS ?patientSpecimens)
+WHERE {{
+  ?gene a biolink:Gene ; nf:geneSymbol "{gene}" .
+  ?mutation a nf:Mutation .
+  {{
+    # Tier 1. No symbol constraint on the curated side, and that is deliberate: the
+    # digest already fixes the locus, so demanding the curated symbol match would drop
+    # a model curated as `Nf1` (mouse casing on a human cell line) or `NF1` on a pig.
+    ?mutation nf:mutationVrsId ?vrsId .
+    ?variant nf:vrsId ?vrsId .
+    ?obs nf:observesVariant ?variant ; nf:affectedGene ?gene .
+    BIND("1 allele identity" AS ?tier)
+  }} UNION {{
+    # Tier 2. The gene constraint is on both sides -- without it this returns matches
+    # in TTLL12, LPCAT1, PLCG2, DUSP2, ANKS6 and CD164.
+    ?mutation nf:affectedGeneSymbol "{gene}" ; nf:proteinVariation ?tier2Change .
+    ?obs nf:hgvsP ?tier2Change ; nf:affectedGene ?gene ; nf:observesVariant ?variant .
+    ?variant nf:vrsId ?vrsId .
+    # Deduplicate this mutation/allele pair only. A different patient allele can
+    # share its protein string and must still be reported as a tier-2 match.
+    FILTER NOT EXISTS {{
+      ?mutation nf:mutationVrsId ?vrsId .
+    }}
+    BIND("2 protein string" AS ?tier)
+  }}
+  OPTIONAL {{ ?obs nf:hgvsP ?patientChange }}
+  # Projected on BOTH tiers, not just the one that joined on it: where it differs from
+  # ?patientChange the row is a transcript-numbering discrepancy that only the digest
+  # could see through -- p.Arg1947Ter (NM_000267.3) vs p.Arg1968Ter (NM_001042492.3).
+  OPTIONAL {{ ?mutation nf:proteinVariation ?curatedChange }}
+  # The tier-1-only column. Some curated mutations carry no nf:proteinVariation at all
+  # -- only this ClinVar expression -- so tier 2 has nothing to compare and they are
+  # invisible to the protein-string join no matter how the strings are spelled.
+  OPTIONAL {{ ?mutation nf:humanClinVarMutation ?curatedClinVar }}
+  OPTIONAL {{ ?obs nf:fromSpecimen ?specimen }}
+  {{ ?resource nf:hasMutation ?mutation }}
+  UNION {{ ?resource nf:hasNf1MutationSet/nf:hasMutation ?mutation }}
+  ?resource nf:name ?model .
+  {{ ?resource a nf:CellLine . BIND("cell line" AS ?kind) }}
+  UNION {{ ?resource a nf:AnimalModel . BIND("animal model" AS ?kind) }}
+  OPTIONAL {{ ?resource nf:species ?species }}
+  OPTIONAL {{ ?resource nf:manifestation ?manifestation }}
+}}
+GROUP BY ?tier ?vrsId ?patientChange ?curatedChange ?curatedClinVar ?model ?kind ?species ?manifestation
+ORDER BY ?tier DESC(?patientSpecimens) ?model""",
+    },
+    "variant-model-gap": {
+        "help": "The gap list: recurrent protein-altering patient alleles with NO model system on either join tier, ranked by specimens, with germline-artifact flags. Params: minSpecimens, limit",
+        "numeric_binds": {"minSpecimens": 4, "limit": 50},
+        "query": """\
+SELECT ?genes ?changes ?vrsId ?specimens ?cohorts ?gnomadAf ?geneAllelesPerSpecimen ?flag
+       (GROUP_CONCAT(DISTINCT ?tumourType; separator="; ") AS ?tumourTypes)
+WHERE {{
+  {{
+    # Grouped on the VRS id, NOT on the protein string: ADPRHL1's single allele is
+    # spelled p.Arg1441Trp and p.Arg1805Trp against two transcripts, and grouping by
+    # string reports it as two gaps of 18 and 7 instead of one of 25 (pitfall 3).
+    SELECT ?vrsId
+           (GROUP_CONCAT(DISTINCT ?symbol; separator="/") AS ?genes)
+           (GROUP_CONCAT(DISTINCT ?hgvsP; separator="/") AS ?changes)
+           (COUNT(DISTINCT ?specimen) AS ?specimens)
+           (COUNT(DISTINCT ?dataset) AS ?cohorts)
+           (MAX(?af) AS ?gnomadAf)
+           (MIN(?ratio) AS ?geneAllelesPerSpecimen)
+    WHERE {{
+      ?gene a biolink:Gene ; nf:geneSymbol ?symbol .
+      ?obs a nf:VariantObservation ; nf:affectedGene ?gene ; nf:hgvsP ?hgvsP ;
+           nf:observesVariant ?variant ; nf:hasConsequence ?so ;
+           nf:fromSpecimen ?specimen ; nf:fromVariantDataset ?dataset .
+      ?variant nf:vrsId ?vrsId .
+      # Protein-altering only, same VALUES set as variant-gene-summary.
+      VALUES ?so {{ obo:SO_0001583 obo:SO_0001587 obo:SO_0001578 obo:SO_0001589
+                   obo:SO_0001822 obo:SO_0001821 obo:SO_0002012 }}
+      # OPTIONAL, so an unannotated call is not silently treated as AF 0.
+      OPTIONAL {{ ?obs nf:gnomadAlleleFrequency ?af }}
+      {{
+        # The A3 heuristic, computed rather than eyeballed: alleles per specimen for
+        # the whole gene. Much less than 1 means a few alleles shared by many samples
+        # -- germline leakage or a mapping artifact -- and without it ADPRHL1 and the
+        # keratin-associated proteins own the top of this list.
+        SELECT ?gene (xsd:decimal(COUNT(DISTINCT ?gv)) / COUNT(DISTINCT ?gs) AS ?ratio)
+        WHERE {{
+          ?gene a biolink:Gene .
+          ?go nf:affectedGene ?gene ; nf:fromSpecimen ?gs ; nf:observesVariant ?gv ;
+              nf:hasConsequence ?gso .
+          VALUES ?gso {{ obo:SO_0001583 obo:SO_0001587 obo:SO_0001578 obo:SO_0001589
+                        obo:SO_0001822 obo:SO_0001821 obo:SO_0002012 }}
+        }} GROUP BY ?gene
+      }}
+    }}
+    GROUP BY ?vrsId
+    HAVING (COUNT(DISTINCT ?specimen) >= {minSpecimens})
+  }}
+  # Coverage is an allele-level decision, made after counting all observations.
+  # Tier 1: no curated mutation attached to a model carries this exact allele.
+  FILTER NOT EXISTS {{
+    ?m1 a nf:Mutation ; nf:mutationVrsId ?vrsId .
+    {{ ?r1 nf:hasMutation ?m1 }} UNION {{ ?r1 nf:hasNf1MutationSet/nf:hasMutation ?m1 }}
+  }}
+  # Tier 2: no observation of this allele matches a curated protein change in
+  # the same human gene. Fresh variables check every annotation: correlating on
+  # the counted observation's protein string would leave other transcripts of
+  # an already-covered allele in the gap list.
+  FILTER NOT EXISTS {{
+    ?coveredVariant nf:vrsId ?vrsId .
+    ?coveredObs nf:observesVariant ?coveredVariant ; nf:affectedGene ?coveredGene ;
+                nf:hgvsP ?coveredChange .
+    ?coveredGene a biolink:Gene ; nf:geneSymbol ?coveredSymbol .
+    ?m2 a nf:Mutation ; nf:affectedGeneSymbol ?coveredSymbol ;
+        nf:proteinVariation ?coveredChange .
+    {{ ?r2 nf:hasMutation ?m2 }} UNION {{ ?r2 nf:hasNf1MutationSet/nf:hasMutation ?m2 }}
+  }}
+  # Tumour types come from the file layer and fan out; ?vrsId is already bound to a
+  # short list by the subquery above, so this stays a bound lookup rather than a
+  # 620k-observation cross-product (pitfalls 5 and 6).
+  OPTIONAL {{
+    ?tumourVariant nf:vrsId ?vrsId .
+    ?tumourObs nf:observesVariant ?tumourVariant ; nf:fromSpecimen ?tumourSpecimen .
+    ?tumourSpecimen nf:hasFile ?tumourFile .
+    ?tumourFile nf:tumorType ?tumourType .
+  }}
+  # Flags, not filters: a flagged row stays on the list and says why to distrust it.
+  BIND(CONCAT(
+    IF(?geneAllelesPerSpecimen < 0.5, "recurrent-in-few-alleles ", ""),
+    IF(BOUND(?gnomadAf) && ?gnomadAf >= 0.0001, "gnomad-frequent ", "")
+  ) AS ?flag)
+}}
+GROUP BY ?genes ?changes ?vrsId ?specimens ?cohorts ?gnomadAf ?geneAllelesPerSpecimen ?flag
+ORDER BY DESC(?specimens) ?genes LIMIT {limit}""",
+    },
+    "variant-model-gap-genes": {
+        "help": "Gene-level model coverage for recurrently-altered genes, INCLUDING animal models reached through the ortholog crosswalk. Rows with 0 models are the gene-level gap list. Params: minSpecimens, limit",
+        "numeric_binds": {"minSpecimens": 10, "limit": 50},
+        "query": """\
+SELECT ?symbol ?specimens ?alleles ?cohorts
+       (COUNT(DISTINCT ?cellLine) AS ?cellLines)
+       (COUNT(DISTINCT ?animalModel) AS ?animalModels)
+       (GROUP_CONCAT(DISTINCT ?route; separator="+") AS ?routes)
+       (GROUP_CONCAT(DISTINCT ?species; separator="; ") AS ?modelSpecies)
+       (GROUP_CONCAT(DISTINCT ?driverCaveat; separator="; ") AS ?caveats)
+WHERE {{
+  {{
+    SELECT ?gene ?symbol (COUNT(DISTINCT ?specimen) AS ?specimens)
+           (COUNT(DISTINCT ?variant) AS ?alleles) (COUNT(DISTINCT ?dataset) AS ?cohorts)
+    WHERE {{
+      ?gene a biolink:Gene ; nf:geneSymbol ?symbol .
+      ?obs nf:affectedGene ?gene ; nf:fromSpecimen ?specimen ;
+           nf:observesVariant ?variant ; nf:hasConsequence ?so ;
+           nf:fromVariantDataset ?dataset .
+      VALUES ?so {{ obo:SO_0001583 obo:SO_0001587 obo:SO_0001578 obo:SO_0001589
+                   obo:SO_0001822 obo:SO_0001821 obo:SO_0002012 }}
+    }} GROUP BY ?gene ?symbol
+    HAVING (COUNT(DISTINCT ?specimen) >= {minSpecimens})
+  }}
+  # OPTIONAL, because the whole point is the rows where it finds nothing.
+  OPTIONAL {{
+    {{
+      ?mutation nf:affectedGeneSymbol ?symbol .
+      BIND("direct" AS ?route)
+    }} UNION {{
+      # The ortholog hop. `Nf1`/`Trp53`/`nf1a` can never equal a human HGNC symbol, so
+      # before mappings/orthologs.tsv every animal model matched nothing, structurally.
+      # The model-organism symbol is only ever compared INSIDE an established ortholog
+      # pair, so this is not the bare-symbol join pitfall 2 warns about.
+      ?gene nf:hasOrtholog ?modelGene .
+      ?modelGene nf:geneSymbol ?modelSymbol .
+      ?mutation nf:affectedGeneSymbol ?modelSymbol .
+      BIND("ortholog" AS ?route)
+    }}
+    ?mutation a nf:Mutation .
+    {{ ?resource nf:hasMutation ?mutation }}
+    UNION {{ ?resource nf:hasNf1MutationSet/nf:hasMutation ?mutation }}
+    OPTIONAL {{ ?resource a nf:CellLine . BIND(?resource AS ?cellLine) }}
+    OPTIONAL {{ ?resource a nf:AnimalModel . BIND(?resource AS ?animalModel) }}
+    # COALESCE, not a bare OPTIONAL: QLever's GROUP_CONCAT returns the EMPTY STRING for
+    # the whole group if any member is unbound, and cell lines carry no nf:species --
+    # so the naive form silently blanks the column for every gene that has both kinds
+    # of model. Same failure family as pitfall 4 (GROUP_CONCAT over an IRI).
+    OPTIONAL {{ ?resource nf:species ?rawSpecies }}
+    BIND(COALESCE(?rawSpecies, "unstated") AS ?species)
+    # A recombinase driver line is curated with the promoter's symbol, so a Gfap-Cre
+    # mouse reports as GFAP "coverage". mappings/orthologs.tsv lists these symbols as
+    # status=excluded; this flags the ones that still reach a gene through the direct
+    # human-symbol route, where no ortholog row is involved to exclude them.
+    OPTIONAL {{
+      ?mutation nf:alleleType ?alleleType .
+      FILTER(CONTAINS(?alleleType, "Recombinase"))
+      BIND("driver line: the symbol is the promoter, not the modelled gene" AS ?driverCaveat)
+    }}
+  }}
+}}
+GROUP BY ?symbol ?specimens ?alleles ?cohorts
+ORDER BY DESC(?specimens) ?symbol LIMIT {limit}""",
+    },
+    "model-without-patient-allele": {
+        "help": "The mirror audit: curated model mutations that match no observed patient allele on either tier, with why (no VRS identity was mintable, or the allele was minted and simply never seen)",
+        "query": """\
+SELECT ?reason ?gene ?curatedProtein ?curatedCdna ?vrsId
+       (COUNT(DISTINCT ?resource) AS ?models)
+       (GROUP_CONCAT(DISTINCT ?model; separator="; ") AS ?modelNames)
+WHERE {
+  ?mutation a nf:Mutation ; nf:affectedGeneSymbol ?gene .
+  { ?resource nf:hasMutation ?mutation }
+  UNION { ?resource nf:hasNf1MutationSet/nf:hasMutation ?mutation }
+  ?resource nf:name ?model .
+  OPTIONAL { ?mutation nf:proteinVariation ?curatedProtein }
+  OPTIONAL { ?mutation nf:sequenceVariation ?curatedCdna }
+  OPTIONAL { ?mutation nf:mutationVrsId ?vrsId }
+  # BIND(EXISTS {...}), not OPTIONAL: the answer wanted is a boolean, and an OPTIONAL
+  # here multiplies rows by every matching observation before being collapsed again
+  # (pitfall 6 -- the formulation with OPTIONAL exceeded QLever's memory limit).
+  BIND(EXISTS {
+    ?mutation nf:mutationVrsId ?matchId .
+    ?matchVariant nf:vrsId ?matchId .
+    ?matchObs nf:observesVariant ?matchVariant .
+  } AS ?matchedAllele)
+  BIND(EXISTS {
+    ?mutation nf:proteinVariation ?matchProtein .
+    ?matchGene a biolink:Gene ; nf:geneSymbol ?gene .
+    ?proteinObs nf:affectedGene ?matchGene ; nf:hgvsP ?matchProtein .
+  } AS ?matchedProtein)
+  FILTER(!?matchedAllele && !?matchedProtein)
+  # Two different findings wearing the same "no match" label. A minted-but-unobserved
+  # allele is a real statement about these cohorts; a mutation with no digest is a
+  # statement about the curation, and the gap list must not be read as the first when
+  # it is the second.
+  BIND(IF(BOUND(?vrsId),
+          "1 allele minted, never observed in these cohorts",
+          "2 no VRS identity mintable (cDNA-only or free-text curation)") AS ?reason)
+}
+GROUP BY ?reason ?gene ?curatedProtein ?curatedCdna ?vrsId
+ORDER BY ?reason ?gene ?curatedProtein ?curatedCdna""",
+    },
 }
 
 
@@ -268,23 +521,34 @@ def build_canned_query(
             raise ValueError(f"invalid --class-name: {class_name!r}")
         class_ref = class_name if ":" in class_name else f"nf:{class_name}"
         query = spec["query"].format(class_ref=class_ref)
-    elif spec.get("binds"):
+    elif spec.get("binds") or spec.get("numeric_binds"):
         # Queries with free-text parameters (a gene symbol, a protein change). Values
         # are interpolated into SPARQL string literals, so quotes and backslashes are
         # escaped rather than passed through -- a value like `p."x` must not be able to
         # close the literal and continue the query.
-        supplied = dict(spec["binds"])
+        supplied = dict(spec.get("binds", {}))
+        numeric = {k: str(v) for k, v in spec.get("numeric_binds", {}).items()}
         for key, value in (binds or {}).items():
-            if key not in supplied:
+            if key in numeric:
+                numeric[key] = value
+            elif key in supplied:
+                supplied[key] = value
+            else:
+                accepted = sorted({*supplied, *numeric})
                 raise ValueError(
-                    f"--canned {name} takes {', '.join(sorted(supplied))}, not {key!r}"
+                    f"--canned {name} takes {', '.join(accepted)}, not {key!r}"
                 )
-            supplied[key] = value
+        # Numeric parameters land OUTSIDE a string literal -- in a HAVING or a LIMIT --
+        # where escaping buys nothing and a value like `0) || (1=1` would be injected
+        # verbatim. They are required to be integers instead.
+        for key, value in numeric.items():
+            if not re.fullmatch(r"\d+", value):
+                raise ValueError(f"--canned {name}: {key} must be a whole number, got {value!r}")
         escaped = {
             k: v.replace("\\", "\\\\").replace('"', '\\"')
             for k, v in supplied.items()
         }
-        query = spec["query"].format(**escaped)
+        query = spec["query"].format(**escaped, **numeric)
     else:
         query = spec["query"]
     return query, spec.get("extra_prefixes", {})

@@ -36,6 +36,15 @@ Each portal table has its own asset group (17 tables total):
    - Writes `data/rdf/shared_donor_links.ttl`
    - Only asserts `sharedDonor` when `AnimalModel.transplantationDonorId` matches `CellLine.donorId`
 
+4b. **Model↔patient bridge assets** (`portal/rdf/orthologs`, `portal/rdf/model_mutation_vrs`)
+   - Serialize the checked-in crosswalks in `mappings/` into RDF; see
+     [`mappings/README.md`](../mappings/README.md)
+   - The networked half of each (Alliance orthology download; ClinVar/NCBI coordinate
+     resolution plus `vrsify`) is **not** an asset — it needs the network, it changes
+     only when the curation or the pinned release does, and its output is a reviewed,
+     checked-in TSV. Regenerate with `scripts/fetch_orthologs.py` and
+     `scripts/mint_model_mutation_vrs.py`.
+
 5. **FK Validation Asset** (`portal/quality/fk_validation`) - *single asset, runs once*
    - Depends on all CSV assets
    - Checks referential integrity across tables (see [HARMONIZATION.md](../HARMONIZATION.md))

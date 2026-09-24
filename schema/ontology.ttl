@@ -959,6 +959,12 @@ nf:chromosome a owl:DatatypeProperty ;
     rdfs:domain nf:Mutation ;
     rdfs:range xsd:string .
 
+nf:mutationVrsId a owl:DatatypeProperty ;
+    rdfs:label "mutationVrsId" ;
+    rdfs:comment "GA4GH VRS 2.0 computed identifier (`ga4gh:VA.<digest>`) of the allele a curated model-system mutation carries. Same identifier space as nf:vrsId, so a model mutation and a patient allele are the same allele exactly when the two values are equal -- which is the allele-identity tier of the model-coverage join, with the gene-constrained nf:proteinVariation comparison as the fallback tier below it. Kept as a separate predicate from nf:vrsId because the subject and the provenance differ: nf:vrsId is minted from a sequenced sample's MAF row, this from a curator's ClinVar expression resolved through NCBI and re-minted with the same tool and reference. Present only on mutations whose humanClinVarMutation could be resolved to GRCh38 coordinates; see mappings/model_mutation_vrs.tsv for the per-row evidence." ;
+    rdfs:domain nf:Mutation ;
+    rdfs:range xsd:string .
+
 nf:animalModelMutation a owl:DatatypeProperty ;
     rdfs:label "animalModelMutation" ;
     rdfs:comment "Description of the mutation as engineered in the animal model." ;
@@ -1985,6 +1991,33 @@ nf:entrezGeneId a owl:DatatypeProperty ;
     rdfs:comment "NCBI Entrez gene identifier." ;
     rdfs:domain [ a owl:Class ; owl:unionOf (biolink:Gene nf:VariantObservation) ] ;
     rdfs:range xsd:string .
+
+################################################################################
+# Ortholog layer
+#
+# Curated model-system mutations name their gene with a model-organism symbol (Nf1,
+# Trp53, nf1a) while the variant layer names genes by HGNC IRI, so an animal model
+# matches zero patient alleles structurally. These terms carry the crosswalk; see
+# mappings/orthologs.tsv and scripts/materialize_orthologs.py.
+################################################################################
+
+nf:ModelOrganismGene a owl:Class ;
+    rdfs:subClassOf biolink:Gene ;
+    rdfs:label "Model Organism Gene" ;
+    rdfs:comment "A non-human gene, named by its model-organism database identifier (MGI, ZFIN, RGD), that exists in this graph only as the far end of an ortholog edge. It is a gene, hence the subclass, but instances are deliberately NOT also typed biolink:Gene: that type denotes the human, HGNC-keyed gene nodes of the variant layer, and every per-gene count in docs/demos/variant-layer-demo.md is a count over that set. The index does no OWL reasoning, so the subclass declaration documents the semantics without letting mouse genes into `?s a biolink:Gene`. Contrast nf:Specimen, where materialize_specimens.py emits both types on purpose for the opposite reason." .
+
+nf:hasOrtholog a owl:ObjectProperty ;
+    owl:inverseOf nf:orthologOf ;
+    rdfs:label "hasOrtholog" ;
+    rdfs:comment "Links a human gene node to its model-organism ortholog. Asserted only for the genes NF-OSI curates mutations on, from a pinned Alliance of Genome Resources release under its Stringent filter; the per-pair supporting-algorithm counts stay in mappings/orthologs.tsv rather than being reified here, because the edge is the assertion and the counts are its evidence. A gene-level ortholog match is not an allele match: a mouse Nf1 knockout covers an NF1 patient at the mechanism level only." ;
+    rdfs:domain biolink:Gene ;
+    rdfs:range nf:ModelOrganismGene .
+
+nf:orthologOf a owl:ObjectProperty ;
+    rdfs:label "orthologOf" ;
+    rdfs:comment "Inverse of nf:hasOrtholog: links a model-organism gene to the human gene it is an ortholog of." ;
+    rdfs:domain nf:ModelOrganismGene ;
+    rdfs:range biolink:Gene .
 
 ################################################################################
 # Classes - Somatic variant layer (cBioPortal)

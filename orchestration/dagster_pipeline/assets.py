@@ -1,6 +1,7 @@
 """Asset definitions for portal tables pipeline."""
 
 import os
+from collections import Counter
 from pathlib import Path
 from typing import List
 
@@ -474,6 +475,80 @@ def specimens_asset(context: AssetExecutionContext) -> Path:
 
 
 # =============================================================================
+# Model <-> patient bridges (core graph)
+#
+# Both read a CHECKED-IN TSV and emit tens of triples. The expensive, networked half
+# of each -- resolving orthologs from a pinned Alliance release, resolving ClinVar
+# expressions to GRCh38 coordinates and minting VRS digests -- is deliberately NOT an
+# asset: it needs NCBI, it changes only when the curation or the source release does,
+# and 46 rows do not need orchestration. They need provenance, which is what the TSVs
+# carry. Regenerate them by hand with scripts/fetch_orthologs.py and
+# scripts/mint_model_mutation_vrs.py; these assets just turn them into RDF.
+# =============================================================================
+
+
+@asset(
+    name="orthologs",
+    key_prefix=["portal", "rdf"],
+    compute_kind="python",
+    group_name="relationships",
+)
+def orthologs_asset(context: AssetExecutionContext) -> Path:
+    """Emit nf:hasOrtholog edges so animal models can meet human gene nodes."""
+    from scripts.materialize_orthologs import build_graph, read_orthologs
+
+    project_root = Path(__file__).parent.parent.parent
+    source = project_root / "mappings" / "orthologs.tsv"
+    output_file = project_root / "data" / "rdf" / "orthologs.ttl"
+
+    rows = read_orthologs(source)
+    graph = build_graph(rows)
+    output_file.parent.mkdir(parents=True, exist_ok=True)
+    graph.serialize(destination=output_file, format="turtle")
+
+    statuses = Counter(row["status"] for row in rows)
+    context.add_output_metadata({
+        "path": str(output_file.relative_to(project_root)),
+        "triples": len(graph),
+        "ortholog_pairs": statuses.get("ortholog", 0),
+        # Surfaced, not just counted: an unresolved symbol is a gene whose models stay
+        # invisible to the coverage analysis, and it should be noticed in the run log.
+        "unresolved_symbols": statuses.get("unresolved", 0),
+        "excluded_constructs": statuses.get("excluded", 0),
+    })
+    return output_file
+
+
+@asset(
+    name="model_mutation_vrs",
+    key_prefix=["portal", "rdf"],
+    compute_kind="python",
+    group_name="relationships",
+    deps=[["portal", "rdf", "mutations"]],
+)
+def model_mutation_vrs_asset(context: AssetExecutionContext) -> Path:
+    """Emit nf:mutationVrsId so curated mutations join patient alleles by digest."""
+    from scripts.materialize_model_mutation_vrs import build_graph, read_rows
+
+    project_root = Path(__file__).parent.parent.parent
+    source = project_root / "mappings" / "model_mutation_vrs.tsv"
+    output_file = project_root / "data" / "rdf" / "model_mutation_vrs.ttl"
+
+    rows = read_rows(source)
+    graph = build_graph(rows)
+    output_file.parent.mkdir(parents=True, exist_ok=True)
+    graph.serialize(destination=output_file, format="turtle")
+
+    context.add_output_metadata({
+        "path": str(output_file.relative_to(project_root)),
+        "triples": len(graph),
+        "distinct_alleles": len({r["vrs_id"] for r in rows if r["vrs_id"]}),
+        "rows_without_a_digest": sum(1 for r in rows if not r["vrs_id"]),
+    })
+    return output_file
+
+
+# =============================================================================
 # Generate all assets
 # =============================================================================
 
@@ -508,6 +583,8 @@ def generate_portal_assets() -> List:
     assets.append(nf1_mutation_sets_asset)
     assets.append(observation_links_asset)
     assets.append(specimens_asset)
+    assets.append(orthologs_asset)
+    assets.append(model_mutation_vrs_asset)
     assets.append(create_build_metadata_asset(rdf_asset_keys))
 
     return assets

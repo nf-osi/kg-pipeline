@@ -14,6 +14,13 @@ snapshot history only, never the mutable "in progress" head, so its highest
 `MaterializedView` sources are skipped; they don't support snapshot
 versioning (see NON_VERSIONABLE_TYPES).
 
+Non-Synapse sources are not in `data_sources.yaml` and cannot be: they have no
+snapshot version to compare, only a URL and a content digest. Each one is pinned
+in the fetch script that consumes it (the `fetch_cbioportal_maf.py` pattern), and
+`--check-external` re-hashes those downloads and reports drift. It never edits a
+pin: an external release changing under a stable URL means the contents changed,
+which is a thing to review, not to accept automatically.
+
 Prerequisites:
     - A working Synapse login (for example via SYNAPSE_AUTH_TOKEN)
     - Network access to Synapse
@@ -24,6 +31,7 @@ Usage:
 Examples:
     python scripts/check_source_versions.py --dry-run
     python scripts/check_source_versions.py --summary-out /tmp/summary.md
+    python scripts/check_source_versions.py --check-external   # no Synapse login needed
 """
 
 from __future__ import annotations
@@ -47,6 +55,20 @@ logger = logging.getLogger(__name__)
 DEFAULT_CONFIG = Path("data_sources.yaml")
 VERSIONABLE_TYPES = {"EntityView", "TableEntity"}
 NON_VERSIONABLE_TYPES = {"MaterializedView"}
+
+#: External downloads pinned by content digest rather than by snapshot version. Each
+#: entry points at the module that owns the pin, so there is exactly one place to
+#: change when a release is reviewed and adopted.
+EXTERNAL_SOURCES = [
+    {
+        "name": "Alliance of Genome Resources orthology",
+        "module": "scripts.fetch_orthologs",
+        "url_attr": "ORTHOLOGY_URL",
+        "sha_attr": "ORTHOLOGY_SHA256",
+        "release_attr": "ORTHOLOGY_RELEASE",
+        "consumer": "mappings/orthologs.tsv",
+    },
+]
 
 
 def load_config(path: Path) -> dict[str, Any]:
@@ -171,6 +193,52 @@ def render_summary_markdown(updates: list[dict[str, Any]]) -> str:
     return "\n".join(lines) + "\n"
 
 
+def check_external_sources() -> int:
+    """Re-hash every externally pinned download and report drift.
+
+    Returns the number of sources whose bytes no longer match their pin. Streams and
+    discards rather than caching, so this can run on a schedule without needing the
+    repo's data directory to exist.
+    """
+    import hashlib
+    import importlib
+    import urllib.request
+
+    # Run as `python scripts/check_source_versions.py`, sys.path[0] is scripts/, so the
+    # `scripts.` package the module names are written against is not importable. The
+    # other entry point (`python -m scripts.check_source_versions`) already has it.
+    repo_root = str(Path(__file__).resolve().parent.parent)
+    if repo_root not in sys.path:
+        sys.path.insert(0, repo_root)
+
+    drifted = 0
+    for source in EXTERNAL_SOURCES:
+        module = importlib.import_module(source["module"])
+        url = getattr(module, source["url_attr"])
+        pinned = getattr(module, source["sha_attr"])
+        release = getattr(module, source["release_attr"], None)
+        digest = hashlib.sha256()
+        try:
+            with urllib.request.urlopen(url, timeout=300) as response:
+                while chunk := response.read(1 << 20):
+                    digest.update(chunk)
+        except Exception as e:
+            logger.error("%s: could not fetch %s: %s", source["name"], url, e)
+            drifted += 1
+            continue
+        got = digest.hexdigest()
+        if got == pinned:
+            logger.info("%s (%s): unchanged", source["name"], release or "no release recorded")
+            continue
+        drifted += 1
+        logger.warning(
+            "%s: %s now serves %s, pinned as %s. Review the new release, then update "
+            "the pin in %s and regenerate %s.",
+            source["name"], url, got, pinned, source["module"], source["consumer"],
+        )
+    return drifted
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--config", type=Path, default=DEFAULT_CONFIG, help="Path to data_sources.yaml")
@@ -191,7 +259,17 @@ def main() -> int:
         action="store_true",
         help="Report what would change without modifying data_sources.yaml",
     )
+    parser.add_argument(
+        "--check-external",
+        action="store_true",
+        help="Check digest-pinned non-Synapse downloads (EXTERNAL_SOURCES) instead of "
+             "Synapse snapshots. Needs no Synapse login; never edits a pin. Exits "
+             "non-zero if any source drifted.",
+    )
     args = parser.parse_args()
+
+    if args.check_external:
+        return 1 if check_external_sources() else 0
 
     config = load_config(args.config)
     targets = resolve_versionable_targets(config, args.profiles)

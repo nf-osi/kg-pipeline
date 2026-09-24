@@ -31,11 +31,24 @@ diffable mapping rather than a regex buried in a script.
 | File | Maps | Regenerate with |
 |------|------|-----------------|
 | `cbioportal_sample_specimen.tsv` | cBioPortal `Tumor_Sample_Barcode` → portal `specimenID`/`individualID` | `scripts/map_cbioportal_samples.py` |
+| `orthologs.tsv` | model-organism gene (MGI/ZFIN/RGD) → human gene (HGNC IRI) | `scripts/fetch_orthologs.py` |
+| `model_mutation_vrs.tsv` | curated `humanClinVarMutation` → GRCh38 coordinates → `ga4gh:VA.*` | `scripts/mint_model_mutation_vrs.py` |
 
 Rows whose `method` is not one of the derived values (`strip_last_segment`,
 `prefix_guess`, `unmatched`) are treated as human-authored and preserved on
 regeneration — set `method=manual` to fix a barcode by hand. `scripts/validate_fks.py`
 checks that every specimen named here actually exists.
+
+The last two are the two bridges between the curated model-system layer and the somatic
+variant layer. Both are checked in rather than fetched at build time, because both need the network and neither
+changes on a build cadence. `orthologs.tsv` is ~20 rows keyed to the genes in
+`mutations.csv`, and `model_mutation_vrs.tsv` is 46. They are turned into triples
+offline by `scripts/materialize_orthologs.py` and
+`scripts/materialize_model_mutation_vrs.py`.
+
+`orthologs.tsv` includes a `status` column to make exclusions explicit. 
+Cre driver lines curated under promoter symbols such as `Dhh`, `GFAP`, and `SynI` are marked `status=excluded` with a reason. 
+The source is SHA-256 pinned in `fetch_orthologs.py`, and `check_source_versions.py --check-external` reports source drift without modifying the pin.
 
 ## RML (`rml/`)
 
