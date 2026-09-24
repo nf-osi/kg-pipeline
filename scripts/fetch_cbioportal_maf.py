@@ -336,6 +336,10 @@ def fetch_maf(study_id: str, destination: Path, force: bool = False) -> Path:
         lambda: resolve_lfs_download(source, oid, size),
         size=size,
         label=f"{study_id} MAF",
+        # This module's own download(): same verification, but it goes through
+        # _request(), which keeps the User-Agent, the timeout and the test seam in
+        # one place rather than splitting them across two modules.
+        download=lambda url, dest, digest, expected: download(url, dest, expected, digest),
     )
     reason = accept_candidate(destination, source)
     if reason:

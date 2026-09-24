@@ -136,6 +136,7 @@ def fetch_pinned(
     size: int | None = None,
     label: str = "",
     log: Callable[[str], None] = print,
+    download: Callable[[str, Path, str, int | None], None] = download_verified,
 ) -> Path:
     """Fetch ``digest`` to ``destination``, mirror first and upstream second.
 
@@ -143,6 +144,10 @@ def fetch_pinned(
     URL can itself be the expensive or failing step — for cBioPortal it means a round
     trip to the git-LFS batch endpoint, which is exactly what was down. A mirror hit
     must not pay for it, or trip over it.
+
+    ``download`` is injectable for callers that already own their HTTP path. It must
+    verify against the digest and publish atomically, exactly as `download_verified`
+    does; mirror-first would otherwise become a way to skip verification.
 
     Both paths verify against ``digest``, so which one served the bytes is an
     availability detail and never a correctness one.
@@ -152,7 +157,7 @@ def fetch_pinned(
     url = mirror_url(digest)
     if url:
         try:
-            download_verified(url, destination, digest, size)
+            download(url, destination, digest, size)
             log(f"mirror  {what} -> {destination}")
             return destination
         except SystemExit:
@@ -164,6 +169,6 @@ def fetch_pinned(
             # not there yet. Fall through to upstream and say so.
             log(f"mirror miss for {what} ({exc}); trying upstream")
 
-    download_verified(upstream_url(), destination, digest, size)
+    download(upstream_url(), destination, digest, size)
     log(f"upstream {what} -> {destination}")
     return destination
