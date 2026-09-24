@@ -69,11 +69,11 @@ Cre driver lines curated under promoter symbols such as `Dhh`, `GFAP`, and `SynI
 The source is SHA-256 pinned in `fetch_orthologs.py`, and `check_source_versions.py --check-external` reports source drift without modifying the pin.
 
 `compound_chembl.tsv` is the crosswalk for the portal's two free-text compound fields,
-built for [demo 2](../docs/demos/demo-2-jh-2-002-genotype-to-data.md) and intended to be
-pushed back upstream as file annotations. It covers every file carrying one of the two
-fields, but rows whose strings appear on demo 2's files are marked `in_demo=yes` and
-**sort to the top**, because those are the ones being annotated first and read line by
-line; the portal-wide tail below them is resolved by the same rules but not yet reviewed.
+built for demo 2 and intended to be pushed back upstream as file annotations. It covers
+every file carrying one of the two fields, but rows whose strings appear on demo 2's
+files are marked `in_demo=yes` and **sort to the top**, because those are the ones being
+annotated first and read line by line; the portal-wide tail below them is resolved by
+the same rules but not yet reviewed.
 
 It resolves against a ChEMBL label index exported from the
 [sagebrain-tap](https://github.com/Sage-Bionetworks/sagebrain-tap) Open Targets ingest —
