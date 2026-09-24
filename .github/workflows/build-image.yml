@@ -92,26 +92,6 @@ jobs:
       # what it always was. With it on, the layer lands in data/rdf/variants/, which
       # the default image targets still miss because they glob data/rdf/*.ttl
       # non-recursively -- only the runtime-variants target below picks it up.
-      # ubuntu-latest documents 14 GB of disk and in practice starts with ~21 GB free,
-      # which the variant layer very nearly exhausts (see docs/build-capacity.md for the
-      # arithmetic). Deleting toolchains we never use buys ~16 GB for ~30 s. Inputs are
-      # set explicitly rather than left to the action's defaults so this cannot change
-      # underneath us on an upgrade:
-      #   large-packages       - off: ~3 GB for 2-3 min of apt, not worth it here
-      #   preinstalled-runtimes- off: setup-python and setup-java above depend on them
-      #   swap-storage         - off: removing swap kills jobs under memory pressure
-      - name: Free disk space
-        if: inputs.variants
-        uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v2.0.0
-        with:
-          android: true
-          dotnet: true
-          haskell: true
-          docker-images: true
-          large-packages: false
-          preinstalled-runtimes: false
-          swap-storage: false
-
       - name: Install vrsify
         if: inputs.variants
         run: cargo install --locked --git https://github.com/nf-osi/vrsify --rev "$VRSIFY_REV"
@@ -172,11 +152,13 @@ jobs:
           print(f"All {len(VARIANT_STUDY_IDS)} variant RDF outputs validated")
           PY
 
-      # 3.1 GB of reference and ~740 MB of NDJSON intermediates. Neither is an artifact
-      # nor a build input (.dockerignore keeps both out of the context), and the three
-      # QLever index builds below need the room. The before/after `df` is the
-      # measurement docs/build-capacity.md wants: it is what decides whether this job
-      # ever needs to leave a GitHub-hosted runner.
+      # 3.1 GB of reference and ~740 MB of NDJSON intermediates, neither an artifact nor
+      # a build input (.dockerignore keeps both out of the context).
+      #
+      # Measured on run 35937975360: the runner is a 145 GB volume with 85 GB free, and
+      # the whole variant layer peaks ~5 GB above baseline -- so this is tidiness, not
+      # headroom, and the three index builds below were never at risk. The `df` stays
+      # because it is the only thing that would catch that changing.
       - name: Reclaim disk
         if: inputs.variants
         run: |
