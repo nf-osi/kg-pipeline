@@ -40,13 +40,15 @@ DEFAULT_LOOKUP = Path("mappings/sssom/data_lookup.sssom.tsv")
 DEFAULT_NF1_LOOKUP = Path("mappings/sssom/nf1_genotype_lookup.sssom.tsv")
 DEFAULT_NF2_LOOKUP = Path("mappings/sssom/nf2_genotype_lookup.sssom.tsv")
 
-#: A ChEMBL accession, as the portal's compoundChemblID annotation carries it. Matched
-#: rather than trusted: the prefix below turns whatever is in the column into an IRI,
-#: and a typo would mint a resolvable-looking IRI for a molecule that does not exist.
-CHEMBL_ACCESSION = re.compile(r"^CHEMBL[0-9]+$")
+#: A ChEMBL CURIE, as the portal's compoundChemblID annotation carries it. Matched
+#: rather than trusted: the base below turns whatever is in the column into an IRI, and
+#: a typo would mint a resolvable-looking IRI for a molecule that does not exist. The
+#: prefix's case is part of the pattern because identifiers.org serves it verbatim.
+CHEMBL_CURIE = re.compile(r"^chembl:CHEMBL[0-9]+$")
 #: Same authority and spelling as materialize_orthologs.py uses for HGNC and MGI, so
-#: every external identifier in this graph is an identifiers.org IRI.
-CHEMBL_IRI = "https://identifiers.org/chembl:{}"
+#: every external identifier in this graph is an identifiers.org IRI. The annotation is
+#: already a CURIE, so this appends rather than reformats.
+IDENTIFIERS_IRI = "https://identifiers.org/{}"
 
 
 def chembl_iris(raw: str) -> tuple[list[str], list[str]]:
@@ -56,8 +58,8 @@ def chembl_iris(raw: str) -> tuple[list[str], list[str]]:
     several drugs, and compoundName and experimentalCondition are resolved
     independently.
 
-    Anything that is not a bare ChEMBL accession is reported rather than prefixed. The
-    prefix would turn `CHEMB504` or `chembl:CHEMBL504` into an IRI that looks
+    Anything that is not a ChEMBL CURIE is reported rather than turned into an IRI.
+    Appending would make `CHEMB504` or a bare `CHEMBL504` into an IRI that looks
     resolvable and is not, and a wrong molecule IRI is a wrong drug rather than a near
     miss -- the same reason the upstream resolver refuses ambiguity instead of guessing.
     """
@@ -67,8 +69,8 @@ def chembl_iris(raw: str) -> tuple[list[str], list[str]]:
         part = part.strip()
         if not part:
             continue
-        if CHEMBL_ACCESSION.match(part):
-            iris.append(CHEMBL_IRI.format(part))
+        if CHEMBL_CURIE.match(part):
+            iris.append(IDENTIFIERS_IRI.format(part))
         else:
             malformed.append(part)
     return iris, malformed

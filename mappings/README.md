@@ -72,8 +72,10 @@ two free-text compound fields to ChEMBL is upstream of this repo, not part of it
 moved to [`map-compound-chembl`](https://github.com/nf-osi/jobs/tree/main/map-compound-chembl)
 in nf-osi/jobs, where it can carry a chemistry toolkit without one landing in a graph
 build. This pipeline reads the answer off the file instead: a `compoundChemblID`
-annotation becomes `nf:compound` via `rml/files.rml.ttl`, the same shape as
-`nf:tumorTypeTerm`.
+annotation, carrying a CURIE that matches `^chembl:CHEMBL\d+$`, becomes `nf:compound`
+via `rml/files.rml.ttl`, the same shape as `nf:tumorTypeTerm`. `harmonize_files.py`
+appends the CURIE to the identifiers.org base rather than rebuilding the IRI from
+parts, and reports anything that is not a CURIE instead of minting an IRI from it.
 
 Until that annotation exists on portal files, `nf:compound` is simply absent and
 `nf:compoundName` is all a query has, which is the pre-move state.
