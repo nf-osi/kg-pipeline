@@ -66,6 +66,7 @@ fundingAgency as fundingAgency,
 progressReportNumber as reportMilestone,
 compoundName as compoundName,
 experimentalCondition as experimentalCondition,
+compoundChemblID as compoundChemblID,
 modelSystemName as modelSystemName,
 createdBy as createdBy,
 modifiedBy as modifiedBy
@@ -537,6 +538,17 @@ TABLES: Dict[str, Dict[str, Any]] = {
                 "type": "text+",
                 "transform": "string",
             },
+            # The resolved molecule ids, written onto the fileview by
+            # map-compound-chembl in nf-osi/jobs and new in files v273.
+            # harmonize_files.py turns each into an identifiers.org IRI; without an
+            # entry here (and in FILES_SELECT) the column never reaches the CSV, and
+            # nf:compound is silently empty with nothing downstream to say why. A STRING_LIST column upstream,
+            # hence `string_list`: one file can carry a combination arm, and
+            # compoundName and experimentalCondition resolve independently. The
+            # comma-to-pipe normalisation that makes `string_list` wrong for the two
+            # free-text fields above is harmless here, because a ChEMBL CURIE never
+            # contains a comma.
+            {"target": "compoundChemblID", "source": "compoundChemblID", "type": "text+", "transform": "string_list"},
             {"target": "modelSystemName", "source": "modelSystemName", "type": "text+", "transform": "string_list"},
             # Synapse user who created / last modified the file. These resolve to
             # the same Profile IRIs used by biolink:Person, so they connect file
