@@ -34,6 +34,10 @@ def _expand_curie(curie: str, curie_map: dict[str, str]) -> str:
     return base + local
 
 
+#: SSSOM sentinels meaning "no term was found", never to be expanded into an IRI.
+NO_MATCH_OBJECTS = {"sssom:NoTermFound"}
+
+
 def build_label_to_iri(lookup_file: Path) -> dict[str, str]:
     """Build a case-insensitive label-to-IRI lookup from SSSOM TSV.
 
@@ -72,9 +76,17 @@ def build_label_to_iri(lookup_file: Path) -> dict[str, str]:
     for row in reader:
         label = row.get("subject_label", "").strip()
         object_id = row.get("object_id", "").strip()
-        if label and object_id:
-            iri = _expand_curie(object_id, curie_map)
-            lookup[label.lower()] = iri
+        if not label or not object_id:
+            continue
+        if object_id in NO_MATCH_OBJECTS:
+            # SSSOM's sentinel for "this value has no term". A mapping set that
+            # records its non-matches -- rather than omitting them -- is the more
+            # useful artifact, but the sentinel is not an IRI to emit: expanding it
+            # would put https://w3id.org/sssom/NoTermFound on every unmapped row and
+            # assert a term that does not exist. Skipping leaves the value unmapped,
+            # which is what the row says.
+            continue
+        lookup[label.lower()] = _expand_curie(object_id, curie_map)
 
     return lookup
 

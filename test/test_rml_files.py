@@ -180,8 +180,9 @@ class TestFilesMultiValue:
     def test_compound_name_is_carried_verbatim(self, files_graph, namespaces):
         """compoundName is NOT split. A comma is both a separator and a character
         inside chemical names (`2,6-dimethoxyquinone`, `Acridine, 9-phenoxy-`), so the
-        ingest carries the value whole and mappings/compound_chembl.tsv resolves it,
-        where an attempted split can be checked against ChEMBL before it is believed.
+        ingest carries the value whole and map-compound-chembl (in nf-osi/jobs)
+        resolves it, where an attempted split can be checked against ChEMBL before it
+        is believed. What comes back is nf:compound; see TestCompound below.
         """
         NF = namespaces["nf"]
         query = """
@@ -268,8 +269,8 @@ class TestFilesPlaceholderValues:
         it to 'None' -- and that same guard put literal "None" values on files whose
         compoundName was simply empty. The value is now carried verbatim, and whether
         'none' means a vehicle control or a missing annotation is a curation question,
-        visible as a value_class in mappings/compound_chembl.tsv rather than papered
-        over by a casing rule here.
+        settled upstream in map-compound-chembl's value_class rather than papered over
+        by a casing rule here.
         """
         NF = namespaces["nf"]
         query = """
@@ -532,3 +533,116 @@ class TestFilesEmptyFields:
 
 # Run with: pytest test/test_rml_files.py -v
 
+
+class TestTumorClass:
+    """nf:tumorClass carries the resolved EFO/MONDO term for a tumorType label.
+
+    Additive by design: nf:tumorType keeps the curated string. Most distinct
+    tumorType values in the portal have no exact ontology term, and several of
+    those are clinically meaningful categories (ANNUBP, atypical neurofibroma),
+    so replacing the label -- the way nf:dataType replaces its own -- would delete
+    the tumour type from those files entirely.
+    """
+
+    MONDO = "http://purl.obolibrary.org/obo/MONDO_"
+
+    def test_term_is_an_iri_not_a_literal(self, files_graph, namespaces):
+        terms = list(files_graph.objects(None, namespaces["nf"].tumorClass))
+        assert terms, "expected at least one nf:tumorClass"
+        for term in terms:
+            assert isinstance(term, URIRef), f"{term!r} should be an IRI"
+
+    def test_multi_value_label_yields_one_term_each(self, files_graph, namespaces):
+        """`Neurofibroma|Schwannoma` is two tumour types, so two terms."""
+        NF = namespaces["nf"]
+        subject = next(
+            s for s, o in files_graph.subject_objects(NF.tumorType)
+            if str(o) == "Neurofibroma"
+        )
+        terms = {str(t) for t in files_graph.objects(subject, NF.tumorClass)}
+        assert terms == {self.MONDO + "0016755", self.MONDO + "0002546"}
+
+    def test_label_survives_alongside_the_term(self, files_graph, namespaces):
+        """The string is not replaced -- both predicates are present."""
+        NF = namespaces["nf"]
+        subject = next(
+            s for s, o in files_graph.subject_objects(NF.tumorType)
+            if str(o) == "Neurofibroma"
+        )
+        labels = {str(o) for o in files_graph.objects(subject, NF.tumorType)}
+        assert {"Neurofibroma", "Schwannoma"} <= labels
+
+    def test_unmapped_label_keeps_its_string_and_gets_no_term(self, files_graph, namespaces):
+        """The case that makes this additive rather than a replacement: a label with
+        no exact ontology term must still say what the tumour was."""
+        NF = namespaces["nf"]
+        subjects = [
+            s for s, o in files_graph.subject_objects(NF.tumorType)
+            if str(o) == "Schwannoma"
+            and not list(files_graph.objects(s, NF.tumorClass))
+        ]
+        assert subjects, "expected a file whose tumorType resolved to no term"
+        for subject in subjects:
+            assert str(next(files_graph.objects(subject, NF.tumorType))) == "Schwannoma"
+
+    def test_no_sssom_sentinel_reaches_the_graph(self, files_graph, namespaces):
+        """`sssom:NoTermFound` marks a non-match in the mapping file. Expanding it
+        would assert a disease term that does not exist."""
+        for term in files_graph.objects(None, namespaces["nf"].tumorClass):
+            assert "NoTermFound" not in str(term)
+
+
+class TestCompound:
+    """nf:compound carries the ChEMBL molecule a compound string resolved to.
+
+    The resolution happens upstream, in map-compound-chembl in nf-osi/jobs, and
+    arrives as a compoundChemblID annotation that harmonize_files.py prefixes into
+    an identifiers.org IRI. This mapping only splits and emits, so what is tested
+    here is the split, the IRI-ness, and the additive contract.
+    """
+
+    CH = "https://identifiers.org/chembl:"
+
+    def test_compound_is_an_iri_not_a_literal(self, files_graph, namespaces):
+        compounds = list(files_graph.objects(None, namespaces["nf"].compound))
+        assert compounds, "expected at least one nf:compound"
+        for compound in compounds:
+            assert isinstance(compound, URIRef), f"{compound!r} should be an IRI"
+
+    def test_a_combination_arm_yields_one_object_per_drug(self, files_graph, namespaces):
+        """The reason the column is pipe-joined and split rather than templated: two
+        drugs in one arm are two molecules, and a single unsplit IRI would resolve to
+        nothing."""
+        NF = namespaces["nf"]
+        subject = URIRef(f"{SYN_BASE}syn9999991")
+        compounds = {str(c) for c in files_graph.objects(subject, NF.compound)}
+        assert compounds == {self.CH + "CHEMBL2103875", self.CH + "CHEMBL3545110"}
+
+    def test_a_single_value_yields_one_object(self, files_graph, namespaces):
+        NF = namespaces["nf"]
+        subject = URIRef(f"{SYN_BASE}syn9999993")
+        compounds = [str(c) for c in files_graph.objects(subject, NF.compound)]
+        assert compounds == [self.CH + "CHEMBL504"]
+
+    def test_free_text_survives_alongside_the_molecule(self, files_graph, namespaces):
+        """Additive, like nf:tumorClass. Most distinct compound strings do not
+        resolve, so replacing the string would delete the compound from those files."""
+        NF = namespaces["nf"]
+        subject = URIRef(f"{SYN_BASE}syn9999991")
+        assert [str(o) for o in files_graph.objects(subject, NF.compoundName)] == ["DrugA,DrugB"]
+        assert list(files_graph.objects(subject, NF.compound))
+
+    def test_an_unresolved_string_keeps_its_text_and_gets_no_molecule(
+            self, files_graph, namespaces):
+        """syn9999994's compoundName is the placeholder `none`, which resolves to
+        nothing. The absence of nf:compound must not read as the absence of a
+        compound field -- that is the whole reason this is additive."""
+        NF = namespaces["nf"]
+        subject = URIRef(f"{SYN_BASE}syn9999994")
+        assert list(files_graph.objects(subject, NF.compound)) == []
+        assert [str(o) for o in files_graph.objects(subject, NF.compoundName)] == ["none"]
+
+    def test_empty_column_produces_no_triple(self, files_graph, namespaces):
+        NF = namespaces["nf"]
+        subject = URIRef(f"{SYN_BASE}syn9999992")
+        assert list(files_graph.objects(subject, NF.compound)) == []

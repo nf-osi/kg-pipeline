@@ -425,7 +425,11 @@ biolink:Dataset a owl:Class ;
 
 biolink:ChemicalEntity a owl:Class ;
     rdfs:label "Chemical Entity" ;
-    skos:scopeNote "A chemical entity mentioned in publication text, keyed on its MeSH IRI. An instance means the chemical was mentioned in a paper, not that it was administered, tested, or found active in NF." .
+    skos:scopeNote "A chemical entity. TWO populations of the graph fall under this class and only one of them is typed with it. TYPED: chemicals mentioned in publication text, keyed on their MeSH IRI -- an instance means the chemical was mentioned in a paper, not that it was administered, tested, or found active in NF. NOT TYPED: the ChEMBL molecules that portal files resolve to, which are the range of nf:compound but carry no rdf:type, so `?c a biolink:ChemicalEntity` returns the MeSH text mentions ONLY. To ask what compounds were used in portal experiments, traverse nf:compound; to ask about both populations together you must union the two, and note they are keyed on different authorities (MeSH vs ChEMBL) so the same chemical is two IRIs." .
+
+biolink:Disease a owl:Class ;
+    rdfs:label "Disease" ;
+    skos:scopeNote "For potential use; not implemented yet." .
 
 biolink:Gene a owl:Class ;
     rdfs:label "Gene" ;
@@ -650,8 +654,13 @@ nf:reportMilestone a owl:DatatypeProperty ;
 
 nf:compoundName a owl:DatatypeProperty ;
     rdfs:label "compoundName" ;
-    rdfs:comment "Free text attempting to capture the compound name(s) used in the experiment. A single value may name more than one compound, and some values are doses, plate codes or other text that is not a compound name at all. Treat it as a string to be resolved, not as a compound identifier." ;
+    rdfs:comment "Free text attempting to capture the compound name(s) used in the experiment. A single value may name more than one compound, and some values are doses, plate codes or other text that is not a compound name at all. Treat it as a string to be resolved, not as a compound identifier -- nf:compound carries the resolution where one exists." ;
     rdfs:range xsd:string .
+
+nf:compound a owl:ObjectProperty ;
+    rdfs:label "compound" ;
+    rdfs:comment "A ChEMBL molecule the file's compoundName or experimentalCondition resolves to, as https://identifiers.org/chembl:CHEMBL504." ;
+    rdfs:range biolink:ChemicalEntity .
 
 nf:experimentalCondition a owl:DatatypeProperty ;
     rdfs:label "experimentalCondition" ;
@@ -688,8 +697,12 @@ nf:hasSpecimenIdStatus a owl:ObjectProperty ;
 
 nf:tumorType a owl:DatatypeProperty ;
     rdfs:label "tumorType" ;
-    rdfs:comment "Tumor type of the source biospecimen." ;
+    rdfs:comment "Tumor type of the source biospecimen, as curated free text." ;
     rdfs:range xsd:string .
+
+nf:tumorClass a owl:ObjectProperty ;
+    rdfs:label "tumorClass" ;
+    rdfs:comment "The EFO or MONDO term that a tumorType label maps to. Present only where the label matched exactly; absence means the label had no exact match, NOT necessarily that the file has no tumour type." .
 
 ################################################################################
 # Properties - Study related

@@ -755,6 +755,39 @@ map:FileNf1Genotype a rr:TriplesMap ;
         ]
     ] .
 
+map:FileTumorClass a rr:TriplesMap ;
+    rdfs:label "File TumorClass" ;
+    rml:logicalSource map:PortalFilesSource ;
+    rr:subjectMap [ rr:template "https://www.synapse.org/Synapse:{id}" ; rr:termType rr:IRI ] ;
+    # Additive, unlike nf:dataType: nf:tumorType keeps the curated string and the
+    # resolved EFO/MONDO term goes here. Most distinct tumorType values have no exact
+    # term, and several that do not are the clinically interesting ones, so replacing
+    # the label would delete the tumour type from those files. Split on "\|" because a
+    # file can carry more than one tumour type.
+    rr:predicateObjectMap [
+        rr:predicate nf:tumorClass ;
+        rr:objectMap [
+            a fnml:FunctionTermMap ;
+            rr:termType rr:IRI ;
+            fnml:functionValue [
+                a fno:Execution ;
+                rml:logicalSource map:PortalFilesSource ;
+                rr:predicateObjectMap [
+                    rr:predicate fno:executes ;
+                    rr:objectMap [ rr:constant grel:string_split ; rr:termType rr:IRI ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:valueParameter ;
+                    rr:objectMap [ rml:reference "tumorTypeIRI" ; rr:termType rr:Literal ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:p_string_sep ;
+                    rr:objectMap [ rr:constant "\\|" ; rr:termType rr:Literal ]
+                ]
+            ]
+        ]
+    ] .
+
 map:FileNf2Genotype a rr:TriplesMap ;
     rdfs:label "File NF2 Genotype" ;
     rml:logicalSource map:PortalFilesSource ;
@@ -873,6 +906,36 @@ map:FileCompoundName a rr:TriplesMap ;
     # an empty reference on its own, and the guard was emitting literal "None"
     # values into the graph.
     rr:predicateObjectMap [ rr:predicate nf:compoundName ; rr:objectMap [ rml:reference "compoundName" ; rr:datatype xsd:string ] ] .
+
+map:FileCompound a rr:TriplesMap ;
+    rdfs:label "File Compound" ;
+    rml:logicalSource map:PortalFilesSource ;
+    rr:subjectMap [ rr:template "https://www.synapse.org/Synapse:{id}" ; rr:termType rr:IRI ] ;
+    # The resolved molecule, read off the portal's compoundChemblID annotation (resolution done upstream)
+    # harmonize_files.py has already turned each accession into an identifiers.org IRI and pipe-joined them
+    rr:predicateObjectMap [
+        rr:predicate nf:compound ;
+        rr:objectMap [
+            a fnml:FunctionTermMap ;
+            rr:termType rr:IRI ;
+            fnml:functionValue [
+                a fno:Execution ;
+                rml:logicalSource map:PortalFilesSource ;
+                rr:predicateObjectMap [
+                    rr:predicate fno:executes ;
+                    rr:objectMap [ rr:constant grel:string_split ; rr:termType rr:IRI ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:valueParameter ;
+                    rr:objectMap [ rml:reference "compoundIRI" ; rr:termType rr:Literal ]
+                ] ;
+                rr:predicateObjectMap [
+                    rr:predicate grel:p_string_sep ;
+                    rr:objectMap [ rr:constant "\\|" ; rr:termType rr:Literal ]
+                ]
+            ]
+        ]
+    ] .
 
 map:FileExperimentalCondition a rr:TriplesMap ;
     rdfs:label "File ExperimentalCondition" ;
