@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo 2 — JH-2-002: genotype to measured drug response</title>
+<style>
+/* ---------- tokens (dataviz reference palette; dark = same hues re-stepped) -- */
+:root {
+  color-scheme: light;
+  --page:      #f9f9f7;
+  --surface:   #fcfcfb;
+  --ink:       #0b0b0b;
+  --ink-2:     #52514e;
+  --muted:     #898781;
+  --grid:      #e1e0d9;
+  --baseline:  #c3c2b7;
+  --border:    rgba(11,11,11,0.10);
+  --accent:    #2a78d6;   /* series 1: the story / plexiform neurofibroma */
+  --series-2:  #eb6834;   /* series 2: MPNST */
+  --accent-wash: rgba(42,120,214,0.10);
+  --ctx:       #a5a39b;   /* de-emphasis context marks */
+  --good:      #0ca30c;
+  --critical:  #d03b3b;
+}
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) {
+    color-scheme: dark;
+    --page:      #0d0d0d;
+    --surface:   #1a1a19;
+    --ink:       #ffffff;
+    --ink-2:     #c3c2b7;
+    --muted:     #898781;
+    --grid:      #2c2c2a;
+    --baseline:  #383835;
+    --border:    rgba(255,255,255,0.10);
+    --accent:    #3987e5;
+    --series-2:  #d95926;
+    --accent-wash: rgba(57,135,229,0.14);
+    --ctx:       #6b6a64;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page:      #0d0d0d;
+  --surface:   #1a1a19;
+  --ink:       #ffffff;
+  --ink-2:     #c3c2b7;
+  --muted:     #898781;
+  --grid:      #2c2c2a;
+  --baseline:  #383835;
+  --border:    rgba(255,255,255,0.10);
+  --accent:    #3987e5;
+  --series-2:  #d95926;
+  --accent-wash: rgba(57,135,229,0.14);
+  --ctx:       #6b6a64;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--page);
+  color: var(--ink);
+  font: 15px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif;
+  min-height: 100svh;
+}
+code, .mono { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+
+/* ---------- frame ---------------------------------------------------------- */
+.frame { max-width: 1200px; margin: 0 auto; padding: 20px 28px 64px; }
+header.top { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+.eyebrow {
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--muted);
+}
+h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.02em; margin: 2px 0 0; }
+h1 .pt { color: var(--accent); }
+.top .spacer { flex: 1; }
+.theme-btn {
+  border: 1px solid var(--border); background: var(--surface); color: var(--ink-2);
+  border-radius: 7px; padding: 4px 10px; font-size: 12px; cursor: pointer;
+}
+
+/* ---------- the traversal spine (signature) -------------------------------- */
+.spine-card {
+  margin: 18px 0 22px; background: var(--surface);
+  border: 1px solid var(--border); border-radius: 12px; padding: 14px 18px 8px;
+}
+.spine-svg { width: 100%; height: 86px; display: block; }
+.spine-node-label { font: 600 11.5px system-ui, sans-serif; fill: var(--ink); }
+.spine-node-sub   { font: 10px ui-monospace, Menlo, monospace; fill: var(--muted); }
+.spine-edge { stroke: var(--grid); stroke-width: 2; fill: none; }
+.spine-edge.done { stroke: var(--accent); }
+.spine-edge.drawing {
+  stroke: var(--accent);
+  stroke-dasharray: 240; stroke-dashoffset: 240;
+  animation: draw 0.9s ease forwards;
+}
+@keyframes draw { to { stroke-dashoffset: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .spine-edge.drawing { animation: none; stroke-dashoffset: 0; }
+}
+.spine-dot { fill: var(--surface); stroke: var(--baseline); stroke-width: 2; }
+.spine-dot.done { stroke: var(--accent); fill: var(--accent); }
+.spine-dot.here { stroke: var(--accent); }
+
+/* ---------- layout: rail + stage ------------------------------------------- */
+.cols { display: grid; grid-template-columns: 250px 1fr; gap: 22px; align-items: start; }
+@media (max-width: 900px) { .cols { grid-template-columns: 1fr; } }
+
+nav.rail { position: sticky; top: 16px; display: flex; flex-direction: column; gap: 6px; }
+.railstep {
+  text-align: left; border: 1px solid transparent; background: none; color: var(--ink-2);
+  border-radius: 10px; padding: 9px 12px; cursor: pointer; font: inherit; font-size: 13.5px;
+  display: block; width: 100%;
+}
+.railstep:hover { background: var(--surface); }
+.railstep[aria-current="step"] {
+  background: var(--surface); border-color: var(--border); color: var(--ink);
+}
+.railstep .n { font-family: ui-monospace, Menlo, monospace; font-size: 11px; color: var(--muted); margin-right: 7px; }
+.railstep .scope { display: block; margin-top: 3px; font-family: ui-monospace, Menlo, monospace; font-size: 10px; color: var(--muted); letter-spacing: 0.05em;}
+.railstep .tick { float: right; color: var(--good); font-weight: 700; visibility: hidden; }
+.railstep.done .tick { visibility: visible; }
+
+main.stage { min-width: 0; }
+.panel { display: none; }
+.panel.active { display: block; }
+.hop-eyebrow { margin-bottom: 2px; }
+.panel h2 { font-size: 21px; font-weight: 800; letter-spacing: -0.015em; margin: 0 0 6px; }
+.claim { color: var(--ink-2); max-width: 68ch; margin: 0 0 14px; }
+.claim strong { color: var(--ink); }
+
+.card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 16px 18px; margin-bottom: 14px;
+}
+.viz-title { font-size: 13px; font-weight: 650; margin: 0 0 2px; }
+.viz-sub { font-size: 12px; color: var(--muted); margin: 0 0 12px; }
+
+.runrow { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+.run-btn {
+  background: var(--accent); color: #fff; border: none; border-radius: 8px;
+  padding: 8px 16px; font: 650 13.5px system-ui, sans-serif; cursor: pointer;
+}
+.run-btn:disabled { opacity: 0.45; cursor: default; }
+.ghost-btn {
+  background: none; border: 1px solid var(--border); color: var(--ink-2);
+  border-radius: 8px; padding: 7px 12px; font-size: 12.5px; cursor: pointer;
+}
+.status { font-family: ui-monospace, Menlo, monospace; font-size: 12px; color: var(--muted); }
+.status.err { color: var(--critical); }
+.status.ok { color: var(--good); }
+
+details.qbox { margin-top: 2px; }
+details.qbox summary { cursor: pointer; font-size: 12.5px; color: var(--ink-2); }
+details.qbox pre {
+  background: var(--page); border: 1px solid var(--border); border-radius: 8px;
+  font-size: 11.5px; line-height: 1.5; padding: 12px; overflow-x: auto; color: var(--ink-2);
+}
+
+/* graph-scope badges */
+.scopebar { display: flex; gap: 6px; margin: 0 0 14px; flex-wrap: wrap; }
+.gbadge {
+  font-family: ui-monospace, Menlo, monospace; font-size: 10.5px; letter-spacing: 0.04em;
+  border: 1px solid var(--border); color: var(--muted);
+  border-radius: 999px; padding: 3px 10px;
+}
+.gbadge.on { color: var(--accent); border-color: var(--accent); background: var(--accent-wash); }
+
+/* ---------- viz primitives -------------------------------------------------- */
+/* bar list (hop 2) */
+.barlist { display: grid; grid-template-columns: max-content 1fr max-content; gap: 4px 10px; align-items: center; }
+.bar-label { font-size: 12.5px; color: var(--ink); text-align: right; white-space: nowrap; }
+.bar-label .raw { color: var(--muted); font-family: ui-monospace, Menlo, monospace; font-size: 10.5px; }
+.bar-track { position: relative; height: 24px; display: flex; align-items: center; }
+.bar {
+  height: 16px; border-radius: 0 4px 4px 0; background: var(--ctx); min-width: 2px;
+}
+.bar.hot { background: var(--accent); }
+.bar-val { font-size: 11.5px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.bar-row-hit { display: contents; cursor: default; }
+.legend { display: flex; gap: 18px; margin-top: 12px; font-size: 12px; color: var(--ink-2); flex-wrap: wrap; }
+.key { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 6px; vertical-align: -1.5px; }
+.key.line { height: 3px; border-radius: 2px; vertical-align: 3px; }
+
+/* matrix (hop 1) */
+.matrix { border-collapse: separate; border-spacing: 2px; }
+.matrix th { font-size: 11.5px; font-weight: 600; color: var(--ink-2); padding: 4px 8px; }
+.matrix th.coltop { font-family: ui-monospace, Menlo, monospace; font-size: 10.5px; color: var(--muted); font-weight: 400; }
+.matrix td.cell {
+  width: 92px; height: 34px; border-radius: 4px; background: var(--page);
+  border: 1px solid var(--grid); text-align: center;
+}
+.matrix td.cell.on { background: var(--accent); border-color: var(--accent); }
+.matrix td.rowhead { text-align: right; padding-right: 10px; font-size: 12.5px; white-space: nowrap; }
+.matrix td.rowhead .mono { color: var(--muted); font-size: 10.5px; }
+.matrix .grouphead { font-size: 11px; color: var(--muted); font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; }
+
+/* mechanism link diagram (hop 3) */
+.mech-wrap { overflow-x: auto; }
+.mech-svg { display: block; }
+.mech-chip { font: 600 11.5px system-ui, sans-serif; fill: var(--ink); }
+.mech-chip.dim { fill: var(--muted); font-weight: 400; }
+.mech-colhead { font: 600 10.5px ui-monospace, Menlo, monospace; fill: var(--muted); letter-spacing: 0.08em; }
+.mech-link { fill: none; stroke: var(--grid); stroke-width: 1.5; }
+.mech-link.hot { stroke: var(--accent); stroke-width: 2; }
+.mech-note { font-size: 12px; color: var(--ink-2); margin-top: 10px; max-width: 70ch; }
+
+/* stage dot matrix (hop 4) */
+.stagegrid { border-collapse: separate; border-spacing: 0; }
+.stagegrid th { font-family: ui-monospace, Menlo, monospace; font-size: 10.5px; color: var(--muted); font-weight: 400; padding: 4px 10px; text-align: center;}
+.stagegrid th.approval { color: var(--ink); font-weight: 700; }
+.stagegrid td.drug { font-size: 12.5px; text-align: right; padding: 3px 12px 3px 0; white-space: nowrap; }
+.stagegrid td.slot { text-align: center; min-width: 84px; height: 30px; border-left: 1px solid var(--grid); }
+.stagegrid td.slot.approval-col { background: var(--accent-wash); }
+.dot { display: inline-block; width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--surface); }
+.dot.s1 { background: var(--accent); } .dot.s2 { background: var(--series-2); }
+
+/* tables & tooltip */
+.tblwrap { overflow-x: auto; margin-top: 10px; }
+table.data { border-collapse: collapse; font-size: 12.5px; width: 100%; }
+table.data th { text-align: left; font-weight: 650; color: var(--ink-2); border-bottom: 1px solid var(--baseline); padding: 6px 10px; }
+table.data td { border-bottom: 1px solid var(--grid); padding: 5px 10px; font-variant-numeric: tabular-nums; }
+table.data td.mono { font-size: 11px; color: var(--ink-2); }
+#tooltip {
+  position: fixed; pointer-events: none; z-index: 50; display: none;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.13); padding: 8px 11px; font-size: 12px; max-width: 320px;
+}
+#tooltip .v { font-weight: 700; }
+#tooltip .k { color: var(--ink-2); }
+
+/* setup panel */
+.setup-grid { display: grid; grid-template-columns: 1fr; gap: 10px; max-width: 560px; }
+.setup-grid label { font-size: 12.5px; color: var(--ink-2); }
+.setup-grid input {
+  width: 100%; font-family: ui-monospace, Menlo, monospace; font-size: 12px;
+  border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px;
+  background: var(--page); color: var(--ink);
+}
+.callout {
+  border-left: 3px solid var(--series-2); background: var(--surface);
+  border-radius: 0 10px 10px 0; padding: 10px 14px; font-size: 13px; color: var(--ink-2);
+  max-width: 68ch; margin-top: 16px;
+}
+.callout strong { color: var(--ink); }
+.navbtns { display: flex; gap: 10px; margin-top: 18px; }
+kbd { font-family: ui-monospace, Menlo, monospace; font-size: 11px; border: 1px solid var(--border); border-bottom-width: 2px; border-radius: 5px; padding: 1px 5px; color: var(--muted); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.facts { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 10px; max-width: 72ch;}
+.facts li { padding-left: 20px; position: relative; }
+.facts li::before { content: "→"; position: absolute; left: 0; color: var(--accent); font-weight: 700; }
+</style>
+</head>
+<body>
+<div class="frame">
+
+<header class="top">
+  <div>
+    <div class="eyebrow">nf-osi · sagebrain · demo 2 · n = 1</div>
+    <h1>Patient <span class="pt mono">JH-2-002</span>: genotype to measured drug response</h1>
+  </div>
+  <div class="spacer"></div>
+  <button class="theme-btn" id="themeBtn" type="button">Dark</button>
+</header>
+
+<!-- traversal spine -->
+<div class="spine-card" aria-hidden="true">
+  <svg class="spine-svg" id="spine" viewBox="0 0 1160 86" preserveAspectRatio="xMidYMid meet"></svg>
+</div>
+
+<div class="cols">
+<nav class="rail" id="rail" aria-label="Demo steps"></nav>
+
+<main class="stage" id="stage">
+  <div id="tooltip" role="status"></div>
+
+  <!-- 0 · setup -->
+  <section class="panel" data-step="0">
+    <div class="eyebrow hop-eyebrow">setup</div>
+    <h2>One engine, three graphs</h2>
+    <p class="claim">Every query in this demo runs live against sagebrain’s read-only
+    query API. The three graphs were built by different pipelines and have never been
+    joined until now — the joins below are pure IRI equality, no crosswalks.</p>
+    <div class="card">
+      <div class="setup-grid">
+        <label for="tok">Synapse personal access token
+          <input id="tok" type="password" autocomplete="off" spellcheck="false"
+                 placeholder="paste token, or launch with #token=…">
+        </label>
+        <div class="runrow" style="margin:0">
+          <button class="run-btn" id="connectBtn" type="button">Check connection</button>
+          <span class="status" id="st-0"></span>
+        </div>
+      </div>
+      <div id="viz-0" style="margin-top:12px"></div>
+    </div>
+    <div class="callout"><strong>Framing rule, non-negotiable: n&nbsp;=&nbsp;1, and say so.</strong>
+    Specimen-level overlap between screening and variant data is 0/553; individual-level
+    overlap is exactly this patient. This is a story about what the graph <em>can</em> hold:
+    it already holds the experiment you would have proposed next.</div>
+  </section>
+
+  <!-- 1 · genotype -->
+  <section class="panel" data-step="1">
+    <div class="eyebrow hop-eyebrow">hop 1 · genotype</div>
+    <h2>The textbook NF1 → PRC2 transformation, in one patient</h2>
+    <p class="claim">Four lesions, one exact <span class="mono">VRS</span> allele.
+    <strong>NF1 p.F2083Pfs*15</strong> is present in every lesion sequenced;
+    <strong>SUZ12 p.Q424*</strong> appears only in the two that transformed to MPNST.
+    Traversal, not manual variant matching.</p>
+    <div class="card" id="card-1"></div>
+  </section>
+
+  <!-- 2 · measured response -->
+  <section class="panel" data-step="2">
+    <div class="eyebrow hop-eyebrow">hop 2 · the derived model &amp; screening</div>
+    <h2>Their own cells, already screened</h2>
+    <p class="claim">A cell line derived from this patient’s tumour hangs off the
+    <em>same individual node</em>. Screening files carry ChEMBL IRIs as of the v273
+    build — the free-text labels (<span class="mono">212= trametinib</span>) survive
+    beside the resolved molecule.</p>
+    <div class="card" id="card-2"></div>
+  </section>
+
+  <!-- 3 · mechanism -->
+  <section class="panel" data-step="3">
+    <div class="eyebrow hop-eyebrow">hop 3 · mechanism → pathway · three graphs</div>
+    <h2>No drug reaches NF1. The pathway is the route.</h2>
+    <p class="claim">NF1 is not druggable — no mechanism edge lands on it anywhere in
+    Open Targets. What the screened compounds reach is <strong>MAP2K1/MAP2K2</strong>,
+    downstream of NF1, and Reactome supplies the connection: shared membership in the
+    <strong>RAF/MAP kinase cascade</strong>. One query, three graphs.</p>
+    <div class="card" id="card-3"></div>
+  </section>
+
+  <!-- 4 · indication -->
+  <section class="panel" data-step="4">
+    <div class="eyebrow hop-eyebrow">hop 4 · regulatory status</div>
+    <h2>The drug class is approved — in this exact disease</h2>
+    <p class="claim">Joined on the patient’s own two tumour classes
+    (<span class="mono">EFO_0000658</span> plexiform neurofibroma,
+    <span class="mono">MONDO_0017827</span> MPNST). A stage belongs to a
+    drug–<em>disease</em> pair, never to a drug — this chart never shows one without
+    the other.</p>
+    <div class="card" id="card-4"></div>
+  </section>
+
+  <!-- 5 · close -->
+  <section class="panel" data-step="5">
+    <div class="eyebrow hop-eyebrow">the loop, closed</div>
+    <h2>The graph already held the experiment you’d propose next</h2>
+    <ul class="facts">
+      <li><strong>Genotype.</strong> NF1 <span class="mono">p.F2083Pfs*15</span> in all four lesions;
+        SUZ12 <span class="mono">p.Q424*</span> only in the MPNSTs — one VRS allele, tracked by traversal.</li>
+      <li><strong>Measured response.</strong> The patient’s own cell line, screened against
+        trametinib, TNO155, ribociclib and the TNO155+ribociclib combination, with RNA-seq readout.</li>
+      <li><strong>Mechanism.</strong> Trametinib, selumetinib and mirdametinib hit MAP2K1/2 —
+        in NF1’s own RAF/MAP kinase cascade. Ribociclib’s CDK4/6 shares no NF1 pathway:
+        its rationale is the combination, and the graph says so honestly.</li>
+      <li><strong>Regulatory status.</strong> Two MEK inhibitors at <strong>APPROVAL</strong> for
+        plexiform neurofibroma; trametinib — the one actually screened here — at PHASE_2.</li>
+    </ul>
+    <div class="callout"><strong>Caveats, stated on stage:</strong> n = 1 — one patient, one
+    derived model. Approval facts are per indication and population, never treatment guidance.
+    Most compound free-text in the portal still does not resolve; ambiguity was refused, not guessed.</div>
+  </section>
+
+  <div class="navbtns">
+    <button class="ghost-btn" id="prevBtn" type="button">← Back</button>
+    <button class="ghost-btn" id="nextBtn" type="button">Next →</button>
+    <span class="status" style="align-self:center">or use <kbd>←</kbd> <kbd>→</kbd></span>
+  </div>
+</main>
+</div>
+</div>
+
+<script>
+"use strict";
+/* =================== config =================== */
+const CONFIG = {
+  endpoint: "https://vyar2xyj0k.execute-api.us-east-1.amazonaws.com/prod/query",
+  nf:       "urn:sagebrain:nf:2026-09-28",
+  ot:       "urn:sagebrain:opentargets:2026-09-24",
+  reactome: "urn:sagebrain:reactome:2026-09-22",
+  individual: "JH-2-002",
+  pollMs: 2500,
+  timeoutMs: 90000,
+};
+
+const PREFIXES = `PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX nf: <http://nf-osi.github.com/terms#>
+PREFIX biolink: <https://w3id.org/biolink/vocab/>
+PREFIX obo: <http://purl.obolibrary.org/obo/>
+PREFIX sb: <https://w3id.org/synapse/sagebrain#>
+PREFIX void: <http://rdfs.org/ns/void#>
+PREFIX pav: <http://purl.org/pav/>
+`;
+
+/* Queries mirror scripts/query_demo.py canned queries (source of truth there). */
+const Q = {
+  /* Fast connection check: read each pinned graph's own void:Dataset
+     provenance instead of counting ~85M triples across every graph.
+     Confirms the graph exists AND carries its manifest, in ~1-2s. */
+  pinned: `SELECT ?g ?triples ?version WHERE {
+  VALUES ?g { <${CONFIG.nf}> <${CONFIG.ot}> <${CONFIG.reactome}> }
+  GRAPH ?g { ?d void:triples ?triples . OPTIONAL { ?d pav:version ?version } }
+}`,
+
+  graphs: `SELECT ?g (COUNT(*) AS ?triples)
+WHERE { GRAPH ?g { ?s ?p ?o } }
+GROUP BY ?g ORDER BY DESC(?g)`,
+
+  progressionDetail: `SELECT DISTINCT ?specimenID ?symbol ?change ?vrs ?tumorType
+WHERE {
+  GRAPH <${CONFIG.nf}> {
+    VALUES ?symbol { "NF1" "NF2" "SUZ12" "EED" "TP53" "CDKN2A" }
+    ?gene a biolink:Gene ; nf:geneSymbol ?symbol .
+    ?obs nf:affectedGene ?gene ; nf:observesVariant ?variant ; nf:fromSpecimen ?specimen ;
+         nf:fromIndividual ?individual ; nf:hasConsequence ?so .
+    VALUES ?so {
+      obo:SO_0001583 obo:SO_0001587 obo:SO_0001578 obo:SO_0001589
+      obo:SO_0001822 obo:SO_0001821 obo:SO_0002012
+    }
+    FILTER(STRENDS(STR(?individual), "/${CONFIG.individual}"))
+    ?variant nf:vrsId ?vrs .
+    ?specimen nf:specimenID ?specimenID .
+    OPTIONAL { ?obs nf:aminoacidChange ?change }
+    OPTIONAL { ?specimen nf:hasFile ?f . ?f nf:tumorType ?tumorType }
+  }
+} ORDER BY ?symbol ?specimenID`,
+
+  screening: `SELECT ?compound (SAMPLE(?name) AS ?compoundName)
+       (COUNT(DISTINCT ?file) AS ?files)
+       (GROUP_CONCAT(DISTINCT ?sid; separator=" | ") AS ?specimens)
+WHERE {
+  GRAPH <${CONFIG.nf}> {
+    ?specimen nf:fromIndividual ?individual ; nf:hasFile ?file .
+    FILTER(STRENDS(STR(?individual), "/${CONFIG.individual}"))
+    ?file nf:compound ?compound .
+    OPTIONAL { ?file nf:compoundName ?name }
+    OPTIONAL { ?file nf:specimenID ?sid }
+  }
+}
+GROUP BY ?compound
+ORDER BY DESC(?files)`,
+
+  mechanism: `SELECT ?drug ?action ?targetSymbol ?targetType
+       (GROUP_CONCAT(DISTINCT ?pathwayLabel; separator=" | ") AS ?sharedPathways)
+WHERE {
+  {
+    SELECT DISTINCT ?c WHERE {
+      GRAPH <${CONFIG.nf}> {
+        ?specimen nf:fromIndividual ?individual ; nf:hasFile ?file .
+        FILTER(STRENDS(STR(?individual), "/${CONFIG.individual}"))
+        ?file nf:compound ?c .
+      }
+    }
+  }
+  GRAPH <${CONFIG.ot}> {
+    ?a a biolink:ChemicalAffectsGeneAssociation ;
+       biolink:subject ?c ; biolink:object ?target ;
+       sb:action_type ?action ; sb:target_type ?targetType .
+    ?c rdfs:label ?drug .
+    ?target rdfs:label ?targetSymbol .
+  }
+  OPTIONAL {
+    GRAPH <${CONFIG.reactome}> {
+      ?patientGene rdfs:label "NF1" ; sb:participates_in ?pw .
+      ?target sb:participates_in ?pw .
+      ?pw rdfs:label ?pathwayLabel .
+      FILTER(?pathwayLabel NOT IN ("Disease", "Signal Transduction",
+        "Diseases of signal transduction by growth factor receptors and second messengers"))
+    }
+  }
+}
+GROUP BY ?drug ?action ?targetSymbol ?targetType
+ORDER BY ?drug ?targetSymbol`,
+
+  indication: `SELECT DISTINCT ?drug ?disease ?stage
+WHERE {
+  {
+    SELECT DISTINCT ?c WHERE {
+      GRAPH <${CONFIG.nf}> {
+        ?specimen nf:fromIndividual ?individual ; nf:hasFile ?file .
+        FILTER(STRENDS(STR(?individual), "/${CONFIG.individual}"))
+        ?file nf:compound ?c .
+      }
+    }
+  }
+  {
+    SELECT DISTINCT ?tumorClass WHERE {
+      GRAPH <${CONFIG.nf}> {
+        ?patientFile nf:individualID ?iid ; nf:tumorClass ?tumorClass .
+        FILTER(STR(?iid) = "${CONFIG.individual}")
+      }
+    }
+  }
+  GRAPH <${CONFIG.ot}> {
+    ?a a biolink:ChemicalOrDrugOrTreatmentToDiseaseOrPhenotypicFeatureAssociation ;
+       biolink:subject ?c ; biolink:object ?tumorClass ;
+       sb:max_clinical_stage ?stage .
+    ?c rdfs:label ?drug .
+    ?tumorClass rdfs:label ?disease .
+  }
+}
+ORDER BY ?drug ?disease`,
+};
+
+/* =================== plumbing =================== */
+function token() { return document.getElementById("tok").value.trim(); }
+(function initToken() {
+  const m = location.hash.match(/token=([^&]+)/);
+  const t = m ? decodeURIComponent(m[1]) : sessionStorage.getItem("sb_token") || "";
+  if (m) history.replaceState(null, "", location.pathname + location.search);
+  if (t) document.getElementById("tok").value = t;
+})();
+document.getElementById("tok").addEventListener("change", () =>
+  sessionStorage.setItem("sb_token", token()));
+
+async function runQuery(sparql, statusEl) {
+  const t = token();
+  if (!t) throw new Error("no token — paste a Synapse PAT above (setup step)");
+  const headers = { "Authorization": "Bearer " + t, "X-Source": "kg-pipeline/sagebrain-demo" };
+  const t0 = performance.now();
+  statusEl.textContent = "submitting…"; statusEl.className = "status";
+  const sub = await fetch(CONFIG.endpoint, {
+    method: "POST",
+    headers: { ...headers, "Content-Type": "application/json" },
+    body: JSON.stringify({ query: PREFIXES + sparql }),
+  });
+  if (!sub.ok) throw new Error("submit failed: HTTP " + sub.status);
+  const { job_id } = await sub.json();
+  const deadline = performance.now() + CONFIG.timeoutMs;
+  // fast first polls so short queries return snappily, easing to pollMs
+  const ramp = [700, 1200, 2000];
+  let polls = 0;
+  while (true) {
+    await new Promise(r => setTimeout(r, ramp[polls++] ?? CONFIG.pollMs));
+    const el = ((performance.now() - t0) / 1000).toFixed(0);
+    statusEl.textContent = `job ${job_id.slice(0, 8)}… running · ${el}s`;
+    const poll = await fetch(`${CONFIG.endpoint}/${job_id}`, { headers });
+    if (!poll.ok) throw new Error("poll failed: HTTP " + poll.status);
+    const body = await poll.json();
+    if (body.status === "complete") {
+      const res = JSON.parse(body.results);
+      const secs = ((performance.now() - t0) / 1000).toFixed(1);
+      statusEl.textContent = `complete · ${res.results.bindings.length} rows · ${secs}s`;
+      statusEl.className = "status ok";
+      return res.results.bindings.map(b => {
+        const o = {};
+        for (const k of Object.keys(b)) o[k] = b[k].value;
+        return o;
+      });
+    }
+    if (body.status === "error") throw new Error(body.error || "query error");
+    if (performance.now() > deadline) throw new Error("timed out after 90s");
+  }
+}
+
+/* =================== tooltip =================== */
+const tip = document.getElementById("tooltip");
+function showTip(evt, rows) {
+  tip.replaceChildren();
+  for (const [k, v] of rows) {
+    const d = document.createElement("div");
+    const kv = document.createElement("span"); kv.className = "v"; kv.textContent = v;
+    const kk = document.createElement("span"); kk.className = "k"; kk.textContent = " " + k;
+    d.append(kv, kk); tip.appendChild(d);
+  }
+  tip.style.display = "block";
+  const pad = 14, w = tip.offsetWidth, h = tip.offsetHeight;
+  let x = evt.clientX + pad, y = evt.clientY + pad;
+  if (x + w > innerWidth - 8) x = evt.clientX - w - pad;
+  if (y + h > innerHeight - 8) y = evt.clientY - h - pad;
+  tip.style.left = x + "px"; tip.style.top = y + "px";
+}
+function hideTip() { tip.style.display = "none"; }
+
+/* =================== spine =================== */
+const SPINE = [
+  { label: "individual", sub: "JH-2-002" },
+  { label: "4 lesions", sub: "variant layer" },
+  { label: "cell line", sub: "JH-2-002-CL" },
+  { label: "compound", sub: "chembl:*" },
+  { label: "target · pathway", sub: "hgnc:* · reactome" },
+  { label: "indication", sub: "efo/mondo" },
+];
+/* which spine edge each step completes (edge i = node i -> i+1) */
+/* edges: 0 individual->lesions · 1 lesions->cellline · 2 cellline->compound
+   · 3 compound->target/pathway · 4 target/pathway->indication */
+const STEP_EDGES = { 1: [0], 2: [1, 2], 3: [3], 4: [4] };
+const spineDone = new Set();
+function drawSpine(current) {
+  const svg = document.getElementById("spine");
+  svg.replaceChildren();
+  const n = SPINE.length, W = 1160, y = 34;
+  const xs = SPINE.map((_, i) => 70 + i * (W - 140) / (n - 1));
+  const NS = "http://www.w3.org/2000/svg";
+  // edges: node i -> i+1 (5 edges); edge index for STEP_EDGES: 0..4 but note
+  // hop1 covers individual->lesions AND (conceptually) lesions->cellline? map: see STEP_EDGES
+  for (let i = 0; i < n - 1; i++) {
+    const p = document.createElementNS(NS, "path");
+    p.setAttribute("d", `M ${xs[i] + 9} ${y} H ${xs[i + 1] - 9}`);
+    let cls = "spine-edge";
+    if (spineDone.has(i)) cls += justDrawn.has(i) ? " drawing done" : " done";
+    p.setAttribute("class", cls);
+    svg.appendChild(p);
+  }
+  justDrawn.clear();
+  for (let i = 0; i < n; i++) {
+    const c = document.createElementNS(NS, "circle");
+    c.setAttribute("cx", xs[i]); c.setAttribute("cy", y); c.setAttribute("r", 7);
+    let cls = "spine-dot";
+    const nodeDone = (i === 0 && spineDone.has(0)) || spineDone.has(i - 1) || spineDone.has(i);
+    if (nodeDone) cls += " done";
+    c.setAttribute("class", cls);
+    svg.appendChild(c);
+    const t1 = document.createElementNS(NS, "text");
+    t1.setAttribute("x", xs[i]); t1.setAttribute("y", y + 26); t1.setAttribute("text-anchor", "middle");
+    t1.setAttribute("class", "spine-node-label"); t1.textContent = SPINE[i].label;
+    svg.appendChild(t1);
+    const t2 = document.createElementNS(NS, "text");
+    t2.setAttribute("x", xs[i]); t2.setAttribute("y", y + 41); t2.setAttribute("text-anchor", "middle");
+    t2.setAttribute("class", "spine-node-sub"); t2.textContent = SPINE[i].sub;
+    svg.appendChild(t2);
+  }
+}
+const justDrawn = new Set();
+function completeStepEdges(step) {
+  for (const e of STEP_EDGES[step] || []) {
+    if (!spineDone.has(e)) { spineDone.add(e); justDrawn.add(e); }
+  }
+  drawSpine(cur);
+}
+
+/* =================== step scaffolding =================== */
+const STEPS = [
+  { title: "Setup & connection", scope: "all graphs" },
+  { title: "Genotype: progression", scope: "nf" },
+  { title: "Model & screening", scope: "nf" },
+  { title: "Mechanism → pathway", scope: "nf + opentargets + reactome" },
+  { title: "Indication & stage", scope: "nf + opentargets" },
+  { title: "The loop, closed", scope: "—" },
+];
+const doneSteps = new Set();
+let cur = 0;
+
+const rail = document.getElementById("rail");
+STEPS.forEach((s, i) => {
+  const b = document.createElement("button");
+  b.className = "railstep"; b.type = "button"; b.dataset.step = i;
+  const n = document.createElement("span"); n.className = "n"; n.textContent = i === 0 ? "·" : (i === 5 ? "∎" : i);
+  const tick = document.createElement("span"); tick.className = "tick"; tick.textContent = "✓";
+  b.append(n, document.createTextNode(s.title), tick);
+  const sc = document.createElement("span"); sc.className = "scope"; sc.textContent = s.scope;
+  b.appendChild(sc);
+  b.addEventListener("click", () => go(i));
+  rail.appendChild(b);
+});
+
+function go(i) {
+  cur = Math.max(0, Math.min(STEPS.length - 1, i));
+  document.querySelectorAll(".panel").forEach(p =>
+    p.classList.toggle("active", +p.dataset.step === cur));
+  document.querySelectorAll(".railstep").forEach(b => {
+    b.toggleAttribute("aria-current", false);
+    if (+b.dataset.step === cur) b.setAttribute("aria-current", "step");
+    b.classList.toggle("done", doneSteps.has(+b.dataset.step));
+  });
+  drawSpine(cur);
+  hideTip();
+}
+document.getElementById("prevBtn").addEventListener("click", () => go(cur - 1));
+document.getElementById("nextBtn").addEventListener("click", () => go(cur + 1));
+addEventListener("keydown", e => {
+  if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
+  if (e.key === "ArrowRight") go(cur + 1);
+  if (e.key === "ArrowLeft") go(cur - 1);
+});
+
+/* theme toggle */
+const themeBtn = document.getElementById("themeBtn");
+themeBtn.textContent = matchMedia("(prefers-color-scheme: dark)").matches ? "Light" : "Dark";
+themeBtn.addEventListener("click", () => {
+  const root = document.documentElement;
+  const dark = root.dataset.theme === "dark" ||
+    (!root.dataset.theme && matchMedia("(prefers-color-scheme: dark)").matches);
+  root.dataset.theme = dark ? "light" : "dark";
+  themeBtn.textContent = dark ? "Dark" : "Light";
+});
+
+/* build a run-card: run button + status + collapsible query + viz mount */
+function buildCard(mountId, btnLabel, sparql, onData) {
+  const mount = document.getElementById(mountId);
+  const row = document.createElement("div"); row.className = "runrow";
+  const btn = document.createElement("button"); btn.className = "run-btn"; btn.type = "button";
+  btn.textContent = btnLabel;
+  const st = document.createElement("span"); st.className = "status";
+  row.append(btn, st);
+  const viz = document.createElement("div");
+  const det = document.createElement("details"); det.className = "qbox";
+  const sum = document.createElement("summary"); sum.textContent = "SPARQL (runs verbatim)";
+  const pre = document.createElement("pre"); pre.textContent = sparql;
+  det.append(sum, pre);
+  mount.append(row, viz, det);
+  btn.addEventListener("click", async () => {
+    btn.disabled = true;
+    try {
+      const rows = await runQuery(sparql, st);
+      viz.replaceChildren();
+      onData(rows, viz);
+      const step = +mount.closest(".panel").dataset.step;
+      doneSteps.add(step); completeStepEdges(step); go(cur);
+    } catch (e) {
+      st.textContent = String(e.message || e); st.className = "status err";
+    } finally { btn.disabled = false; }
+  });
+  return { btn, st, viz };
+}
+
+function el(tag, cls, text) {
+  const e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (text !== undefined) e.textContent = text;
+  return e;
+}
+function dataTable(viz, headers, rows) {
+  const det = el("details"); det.className = "qbox";
+  det.appendChild(el("summary", null, "Table view"));
+  const wrap = el("div", "tblwrap");
+  const t = el("table", "data");
+  const tr = el("tr");
+  headers.forEach(h => tr.appendChild(el("th", null, h)));
+  const thead = el("thead"); thead.appendChild(tr); t.appendChild(thead);
+  const tb = el("tbody");
+  rows.forEach(r => {
+    const tr2 = el("tr");
+    r.forEach(v => tr2.appendChild(el("td", null, v)));
+    tb.appendChild(tr2);
+  });
+  t.appendChild(tb); wrap.appendChild(t); det.appendChild(wrap);
+  viz.appendChild(det);
+}
+
+/* =================== step 0: connection =================== */
+document.getElementById("connectBtn").addEventListener("click", async () => {
+  const st = document.getElementById("st-0");
+  const out = document.getElementById("viz-0");
+  try {
+    const rows = await runQuery(Q.pinned, st);
+    out.replaceChildren();
+    const pinned = [CONFIG.nf, CONFIG.ot, CONFIG.reactome];
+    const t = el("table", "data");
+    const h = el("tr");
+    ["pinned graph", "triples (declared)", "release"].forEach(x => h.appendChild(el("th", null, x)));
+    const thead = el("thead"); thead.appendChild(h); t.appendChild(thead);
+    const tb = el("tbody");
+    for (const g of pinned) {
+      const r = rows.find(x => x.g === g);
+      const tr = el("tr");
+      const td1 = el("td", "mono", g);
+      td1.style.color = "var(--ink)"; td1.style.fontWeight = "650";
+      tr.appendChild(td1);
+      if (r) {
+        tr.appendChild(el("td", null, Number(r.triples).toLocaleString()));
+        // Portal snapshots carry no pav:version — their release IS the date
+        // in the urn (urn:sagebrain:nf:2026-09-28 -> 2026-09-28).
+        const urnDate = (g.split(":").pop().match(/^\d{4}-\d{2}-\d{2}$/) || [])[0];
+        tr.appendChild(el("td", null, r.version || urnDate || "—"));
+      } else {
+        const miss = el("td", null, "MISSING — re-pin or re-deposit");
+        miss.style.color = "var(--critical)"; miss.style.fontWeight = "650";
+        miss.colSpan = 2; tr.appendChild(miss);
+      }
+      tb.appendChild(tr);
+    }
+    t.appendChild(tb); out.appendChild(t);
+    out.appendChild(el("p", "viz-sub",
+      "Triple counts come from each graph’s own provenance manifest — read, not counted, so this check is fast."));
+    // full census stays available, explicitly marked slow
+    const censusRow = el("div", "runrow");
+    const censusBtn = el("button", "ghost-btn", "Full census — every loaded graph, counted (slow, ~1 min)");
+    censusBtn.type = "button";
+    const cst = el("span", "status");
+    censusRow.append(censusBtn, cst);
+    const censusOut = el("div");
+    out.append(censusRow, censusOut);
+    censusBtn.addEventListener("click", async () => {
+      censusBtn.disabled = true;
+      try {
+        const all = await runQuery(Q.graphs, cst);
+        censusOut.replaceChildren();
+        const t2 = el("table", "data");
+        const h2 = el("tr");
+        ["named graph", "triples (counted)"].forEach(x => h2.appendChild(el("th", null, x)));
+        const th2 = el("thead"); th2.appendChild(h2); t2.appendChild(th2);
+        const tb2 = el("tbody");
+        for (const r of all) {
+          const tr = el("tr");
+          tr.appendChild(el("td", "mono", r.g));
+          tr.appendChild(el("td", null, Number(r.triples).toLocaleString()));
+          tb2.appendChild(tr);
+        }
+        t2.appendChild(tb2); censusOut.appendChild(t2);
+      } catch (e) {
+        cst.textContent = String(e.message || e); cst.className = "status err";
+      } finally { censusBtn.disabled = false; }
+    });
+    if (rows.length === pinned.length) { doneSteps.add(0); go(cur); }
+    else { st.textContent = "pinned graph missing — see table"; st.className = "status err"; }
+  } catch (e) {
+    st.textContent = String(e.message || e); st.className = "status err";
+  }
+});
+
+/* =================== step 1: progression matrix =================== */
+buildCard("card-1", "Run hop 1 — traverse the variant layer", Q.progressionDetail, (rows, viz) => {
+  // shape: unique alleles (symbol+change) x unique specimens
+  const alleles = [];
+  const specs = new Map(); // specimenID -> tumorTypes set
+  const hit = new Map();   // alleleKey -> Set(specimenID)
+  for (const r of rows) {
+    const key = r.symbol + " " + (r.change || r.vrs);
+    if (!alleles.some(a => a.key === key)) alleles.push({ key, symbol: r.symbol, change: r.change || "", vrs: r.vrs });
+    if (!specs.has(r.specimenID)) specs.set(r.specimenID, new Set());
+    if (r.tumorType) specs.get(r.specimenID).add(r.tumorType);
+    if (!hit.has(key)) hit.set(key, new Set());
+    hit.get(key).add(r.specimenID);
+  }
+  // order columns: plexiform first, then MPNST (transformation reads left->right)
+  const isM = s => [...(specs.get(s) || [])].some(t => /malignant peripheral/i.test(t));
+  const cols = [...specs.keys()].sort((a, b) => (isM(a) - isM(b)) || a.localeCompare(b));
+  alleles.sort((a, b) => hit.get(b.key).size - hit.get(a.key).size);
+
+  viz.appendChild(el("p", "viz-title", "Driver alleles × lesions"));
+  viz.appendChild(el("p", "viz-sub", "A filled cell = this exact VRS allele observed in this specimen. Columns ordered by transformation."));
+  const table = el("table", "matrix");
+  // group header row
+  const g = el("tr");
+  g.appendChild(el("th"));
+  let i = 0;
+  while (i < cols.length) {
+    const grp = isM(cols[i]) ? "MPNST" : "plexiform / nodular";
+    let span = 0, j = i;
+    while (j < cols.length && (isM(cols[j]) ? "MPNST" : "plexiform / nodular") === grp) { span++; j++; }
+    const th = el("th", "grouphead", grp); th.colSpan = span;
+    g.appendChild(th); i = j;
+  }
+  table.appendChild(g);
+  const h = el("tr");
+  h.appendChild(el("th"));
+  cols.forEach(c => h.appendChild(el("th", "coltop", c)));
+  table.appendChild(h);
+  for (const a of alleles) {
+    const tr = el("tr");
+    const rh = el("td", "rowhead");
+    rh.appendChild(el("strong", null, a.symbol + " "));
+    rh.appendChild(el("span", null, a.change));
+    rh.appendChild(el("br"));
+    rh.appendChild(el("span", "mono", a.vrs.slice(0, 26) + "…"));
+    tr.appendChild(rh);
+    for (const c of cols) {
+      const td = el("td", "cell" + (hit.get(a.key).has(c) ? " on" : ""));
+      td.tabIndex = 0;
+      const rowsTip = [
+        [a.symbol + " " + a.change, hit.get(a.key).has(c) ? "observed" : "not observed"],
+        [c, [...(specs.get(c) || [])].join(", ") || "specimen"],
+        [a.vrs, "VRS allele"],
+      ];
+      td.addEventListener("pointermove", e => showTip(e, rowsTip));
+      td.addEventListener("pointerleave", hideTip);
+      td.addEventListener("focus", e => { const r = td.getBoundingClientRect(); showTip({clientX:r.right, clientY:r.top}, rowsTip); });
+      td.addEventListener("blur", hideTip);
+      tr.appendChild(td);
+    }
+    table.appendChild(tr);
+  }
+  viz.appendChild(table);
+  dataTable(viz, ["specimen", "gene", "change", "VRS", "tumor type(s)"],
+    rows.map(r => [r.specimenID, r.symbol, r.change || "", r.vrs, r.tumorType || ""]));
+});
+
+/* =================== step 2: screening bars =================== */
+const STORY_DRUGS = /trametinib|tno155|ribociclib|selumetinib|mirdametinib/i;
+buildCard("card-2", "Run hop 2 — screening files by molecule", Q.screening, (rows, viz) => {
+  rows.forEach(r => r.n = +r.files);
+  rows.sort((a, b) => b.n - a.n);
+  const top = rows.slice(0, 14);
+  const rest = rows.slice(14);
+  const restFiles = rest.reduce((s, r) => s + r.n, 0);
+  const max = Math.max(...top.map(r => r.n));
+
+  viz.appendChild(el("p", "viz-title", "Screening files per resolved molecule — " + rows.length + " molecules for this individual"));
+  viz.appendChild(el("p", "viz-sub", "Story compounds highlighted; the label under each ChEMBL id is the portal’s original free text, kept verbatim."));
+  const grid = el("div", "barlist");
+  for (const r of top) {
+    const hot = STORY_DRUGS.test(r.compoundName || "");
+    const chembl = (r.compound || "").split("/").pop();
+    const lab = el("div", "bar-label");
+    lab.appendChild(el("span", null, chembl));
+    lab.appendChild(el("br"));
+    lab.appendChild(el("span", "raw", r.compoundName ? r.compoundName : "(no free text — from experimentalCondition)"));
+    const track = el("div", "bar-track");
+    const bar = el("div", "bar" + (hot ? " hot" : ""));
+    bar.style.width = (r.n / max * 100) + "%";
+    track.appendChild(bar);
+    const val = el("div", "bar-val", String(r.n));
+    const hitTip = e => showTip(e, [
+      [String(r.n) + " files", chembl],
+      [r.compoundName || "no compoundName", "portal free text"],
+      [r.specimens || "", "specimens"],
+    ]);
+    for (const elm of [lab, track, val]) {
+      elm.addEventListener("pointermove", hitTip);
+      elm.addEventListener("pointerleave", hideTip);
+    }
+    grid.append(lab, track, val);
+  }
+  viz.appendChild(grid);
+  if (rest.length) viz.appendChild(el("p", "viz-sub",
+    `+ ${rest.length} more molecules over ${restFiles} files — full list in the table view.`));
+  const leg = el("div", "legend");
+  const k1 = el("span"); const s1 = el("span", "key"); s1.style.background = "var(--accent)";
+  k1.append(s1, document.createTextNode("story compounds (MEKi, SHP2i, CDK4/6i)"));
+  const k2 = el("span"); const s2 = el("span", "key"); s2.style.background = "var(--ctx)";
+  k2.append(s2, document.createTextNode("other screened molecules"));
+  leg.append(k1, k2); viz.appendChild(leg);
+  dataTable(viz, ["ChEMBL", "portal free text", "files", "specimens"],
+    rows.map(r => [(r.compound || "").split("/").pop(), r.compoundName || "", String(r.n), r.specimens || ""]));
+});
+
+/* =================== step 3: mechanism link diagram =================== */
+buildCard("card-3", "Run hop 3 — one query, three graphs", Q.mechanism, (rows, viz) => {
+  // default: single-protein edges only (the graph's own counting rule);
+  const single = rows.filter(r => r.targetType === "single protein");
+  const withPw = single.filter(r => r.sharedPathways);
+  const noPw = single.filter(r => !r.sharedPathways);
+
+  viz.appendChild(el("p", "viz-title", "Compound → target → pathway shared with NF1"));
+  viz.appendChild(el("p", "viz-sub",
+    "Single-protein mechanism edges. Root pathways excluded — transitive closure puts every signalling gene in “Disease”, so only specific shared membership draws a line."));
+
+  const drugs = [...new Set(withPw.map(r => r.drug))].sort((a, b) => {
+    const ha = STORY_DRUGS.test(a) || a === "BATOPROTAFIB", hb = STORY_DRUGS.test(b) || b === "BATOPROTAFIB";
+    return (hb - ha) || a.localeCompare(b);
+  });
+  const targets = [...new Set(withPw.map(r => r.targetSymbol))].sort((a, b) => {
+    const ma = /^MAP2K/.test(a), mb = /^MAP2K/.test(b);
+    return (mb - ma) || a.localeCompare(b);
+  });
+  const pwCount = new Map();
+  withPw.forEach(r => r.sharedPathways.split(" | ").forEach(p => pwCount.set(p, (pwCount.get(p) || 0) + 1)));
+  const pathways = [...pwCount.keys()].sort((a, b) => pwCount.get(b) - pwCount.get(a));
+
+  const rowH = 26, headH = 34;
+  const H = headH + Math.max(drugs.length, targets.length, pathways.length) * rowH + 10;
+  const W = 900, xD = 10, xT = 380, xP = 560, chipW = 150;
+  const yOf = (list, name) => headH + list.indexOf(name) * rowH + rowH / 2;
+  const NS = "http://www.w3.org/2000/svg";
+  const wrap = el("div", "mech-wrap");
+  const svg = document.createElementNS(NS, "svg");
+  svg.setAttribute("class", "mech-svg");
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  svg.setAttribute("width", W); svg.setAttribute("height", H);
+
+  const isHotDrug = d => STORY_DRUGS.test(d) || d === "BATOPROTAFIB";
+  const hotTargets = new Set(withPw.filter(r => isHotDrug(r.drug)).map(r => r.targetSymbol));
+  const hotPw = new Set();
+  withPw.filter(r => isHotDrug(r.drug)).forEach(r => r.sharedPathways.split(" | ").forEach(p => hotPw.add(p)));
+
+  function colhead(x, text) {
+    const t = document.createElementNS(NS, "text");
+    t.setAttribute("x", x); t.setAttribute("y", 16);
+    t.setAttribute("class", "mech-colhead"); t.textContent = text;
+    svg.appendChild(t);
+  }
+  colhead(xD, "COMPOUND (SCREENED ON THESE CELLS)");
+  colhead(xT, "TARGET");
+  colhead(xP, "REACTOME PATHWAY SHARED WITH NF1");
+
+  // links first (under text)
+  for (const r of withPw) {
+    const y1 = yOf(drugs, r.drug), y2 = yOf(targets, r.targetSymbol);
+    const hot = isHotDrug(r.drug);
+    const p = document.createElementNS(NS, "path");
+    p.setAttribute("d", `M ${xD + chipW} ${y1} C ${xD + chipW + 90} ${y1}, ${xT - 100} ${y2}, ${xT - 8} ${y2}`);
+    p.setAttribute("class", "mech-link" + (hot ? " hot" : ""));
+    svg.appendChild(p);
+    for (const pw of r.sharedPathways.split(" | ")) {
+      const y3 = yOf(pathways, pw);
+      const q = document.createElementNS(NS, "path");
+      q.setAttribute("d", `M ${xT + 70} ${y2} C ${xT + 120} ${y2}, ${xP - 60} ${y3}, ${xP - 8} ${y3}`);
+      q.setAttribute("class", "mech-link" + (hot && hotPw.has(pw) ? " hot" : ""));
+      svg.appendChild(q);
+    }
+  }
+  function chips(list, x, hotSet, subOf) {
+    for (const name of list) {
+      const y = yOf(list, name);
+      const t = document.createElementNS(NS, "text");
+      t.setAttribute("x", x); t.setAttribute("y", y + 4);
+      t.setAttribute("class", "mech-chip" + (hotSet.has(name) ? "" : " dim"));
+      t.textContent = name;
+      svg.appendChild(t);
+    }
+  }
+  chips(drugs, xD, new Set(drugs.filter(isHotDrug)));
+  chips(targets, xT, hotTargets);
+  chips(pathways, xP, hotPw);
+  wrap.appendChild(svg); viz.appendChild(wrap);
+
+  const legend = el("div", "legend");
+  const k1 = el("span"); const s1 = el("span", "key line"); s1.style.background = "var(--accent)";
+  k1.append(s1, document.createTextNode("the story chain: MEKi + SHP2i into NF1’s MAPK cascade"));
+  const k2 = el("span"); const s2 = el("span", "key line"); s2.style.background = "var(--grid)";
+  k2.append(s2, document.createTextNode("other screened compounds with a specific shared pathway"));
+  legend.append(k1, k2);
+  viz.appendChild(legend);
+
+  if (noPw.length) {
+    const names = [...new Set(noPw.map(r => `${r.drug} → ${r.targetSymbol}`))];
+    const note = el("p", "mech-note");
+    note.appendChild(el("strong", null, "Mechanism present, no specific NF1 pathway shared: "));
+    note.appendChild(document.createTextNode(names.join(" · ") +
+      ". Ribociclib is the instructive one — CDK4/6 is not in NF1’s Reactome pathways; its rationale here is the TNO155 combination, and the graph says so honestly."));
+    viz.appendChild(note);
+  }
+  dataTable(viz, ["drug", "action", "target", "target type", "shared pathways (specific)"],
+    rows.map(r => [r.drug, r.action, r.targetSymbol, r.targetType, r.sharedPathways || ""]));
+});
+
+/* =================== step 4: stage dot matrix =================== */
+const STAGE_ORDER = ["EARLY_PHASE_1", "PHASE_1", "PHASE_1_2", "PHASE_2", "PHASE_2_3", "PHASE_3", "APPROVAL"];
+buildCard("card-4", "Run hop 4 — indications on the patient’s own tumour classes", Q.indication, (rows, viz) => {
+  const stages = STAGE_ORDER.filter(s => rows.some(r => r.stage === s));
+  rows.forEach(r => { if (!stages.includes(r.stage)) stages.push(r.stage); });
+  const diseases = [...new Set(rows.map(r => r.disease))].sort();
+  const sOf = d => /plexiform/i.test(d) ? "s1" : "s2";
+  const best = new Map(); // drug -> max stage idx (for row order)
+  rows.forEach(r => {
+    const i = stages.indexOf(r.stage);
+    best.set(r.drug, Math.max(best.get(r.drug) ?? -1, i));
+  });
+  const drugs = [...best.keys()].sort((a, b) => (best.get(b) - best.get(a)) || a.localeCompare(b));
+
+  viz.appendChild(el("p", "viz-title", "Maximum clinical stage per drug–disease pair"));
+  viz.appendChild(el("p", "viz-sub", "Each dot is one drug–disease edge. The stage is a property of the pair — quoting it without its disease misreads the data."));
+  const t = el("table", "stagegrid");
+  const h = el("tr"); h.appendChild(el("th"));
+  stages.forEach(s => {
+    const th = el("th", s === "APPROVAL" ? "approval" : "", s.replaceAll("_", " ").toLowerCase());
+    h.appendChild(th);
+  });
+  const thead = el("thead"); thead.appendChild(h); t.appendChild(thead);
+  const tb = el("tbody");
+  for (const d of drugs) {
+    const tr = el("tr");
+    tr.appendChild(el("td", "drug", d.toLowerCase()));
+    for (const s of stages) {
+      const td = el("td", "slot" + (s === "APPROVAL" ? " approval-col" : ""));
+      const here = rows.filter(r => r.drug === d && r.stage === s);
+      for (const r of here) {
+        const dot = el("span", "dot " + sOf(r.disease));
+        dot.tabIndex = 0;
+        const tipRows = [[r.stage.replaceAll("_", " "), r.drug.toLowerCase()], [r.disease, "indication"]];
+        dot.addEventListener("pointermove", e => showTip(e, tipRows));
+        dot.addEventListener("pointerleave", hideTip);
+        dot.addEventListener("focus", () => { const b = dot.getBoundingClientRect(); showTip({clientX: b.right, clientY: b.top}, tipRows); });
+        dot.addEventListener("blur", hideTip);
+        dot.style.marginInline = "2px";
+        td.appendChild(dot);
+      }
+      tr.appendChild(td);
+    }
+    tb.appendChild(tr);
+  }
+  t.appendChild(tb); viz.appendChild(t);
+  const leg = el("div", "legend");
+  for (const d of diseases) {
+    const k = el("span"); const sw = el("span", "key");
+    sw.style.background = sOf(d) === "s1" ? "var(--accent)" : "var(--series-2)";
+    sw.style.borderRadius = "50%";
+    k.append(sw, document.createTextNode(d));
+    leg.appendChild(k);
+  }
+  viz.appendChild(leg);
+  viz.appendChild(el("p", "viz-sub",
+    "“Approval for NF1” (the disease) is real but out of frame by construction: MONDO_0018975 is not one of this patient’s tumour classes."));
+  dataTable(viz, ["drug", "disease", "max clinical stage"],
+    rows.map(r => [r.drug, r.disease, r.stage]));
+});
+
+/* boot */
+drawSpine(0);
+go(0);
+</script>
+</body>
+</html>
