@@ -517,20 +517,16 @@ TABLES: Dict[str, Dict[str, Any]] = {
                 "type": "text",
                 "transform": "number",
             },
-            # Carried verbatim, NOT split. `string_list` normalises commas to pipes
-            # before splitting, and in these two fields a comma means two different
+            # Note that this is carried verbatim, NOT split. `string_list` normalises commas to pipes
+            # before splitting, and in compound-related fields a comma means two different
             # things:
             #
             #   separator        Dasatinib,Simvastatin
             #   part of a value  2,6-dimethoxyquinone                 IUPAC locants
             #                    Acridine, 9-phenoxy-                 inverted CAS name
-            #                    ...High-Fat, High-Sucrose Diet       prose
             #
             # Splitting turns `11H-Benzo[a]carbazole-1,4-dione, 7,11-dimethyl-` into
-            # four nonsense values, and no rule here can tell the two cases apart. So
-            # the value is kept whole and resolving it is the compound crosswalk's
-            # job, where an attempted split can be checked against ChEMBL before it
-            # is believed. A merged list stays recoverable; a shredded name does not.
+            # four nonsense values.
             {"target": "compoundName", "source": "compoundName", "type": "text+", "transform": "string"},
             {
                 "target": "experimentalCondition",
@@ -538,16 +534,6 @@ TABLES: Dict[str, Dict[str, Any]] = {
                 "type": "text+",
                 "transform": "string",
             },
-            # The resolved molecule ids, written onto the fileview by
-            # map-compound-chembl in nf-osi/jobs and new in files v273.
-            # harmonize_files.py turns each into an identifiers.org IRI; without an
-            # entry here (and in FILES_SELECT) the column never reaches the CSV, and
-            # nf:compound is silently empty with nothing downstream to say why. A STRING_LIST column upstream,
-            # hence `string_list`: one file can carry a combination arm, and
-            # compoundName and experimentalCondition resolve independently. The
-            # comma-to-pipe normalisation that makes `string_list` wrong for the two
-            # free-text fields above is harmless here, because a ChEMBL CURIE never
-            # contains a comma.
             {"target": "compoundChemblID", "source": "compoundChemblID", "type": "text+", "transform": "string_list"},
             {"target": "modelSystemName", "source": "modelSystemName", "type": "text+", "transform": "string_list"},
             # Synapse user who created / last modified the file. These resolve to

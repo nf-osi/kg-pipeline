@@ -911,16 +911,8 @@ map:FileCompound a rr:TriplesMap ;
     rdfs:label "File Compound" ;
     rml:logicalSource map:PortalFilesSource ;
     rr:subjectMap [ rr:template "https://www.synapse.org/Synapse:{id}" ; rr:termType rr:IRI ] ;
-    # The resolved molecule, read off the portal's compoundChemblID annotation rather
-    # than derived here -- map-compound-chembl in nf-osi/jobs owns the resolution, so
-    # every fileview consumer gets the same answer. harmonize_files.py has already
-    # turned each accession into an identifiers.org IRI and pipe-joined them, the same
-    # hand-off as tumorTypeIRI; splitting on "\|" is what makes a combination arm one
-    # object per drug rather than one unusable IRI.
-    #
-    # Additive, like nf:tumorClass: nf:compoundName and nf:experimentalCondition
-    # keep their free text, because most distinct compound strings do not resolve and
-    # replacing the string would delete the compound from those files.
+    # The resolved molecule, read off the portal's compoundChemblID annotation (resolution done upstream)
+    # harmonize_files.py has already turned each accession into an identifiers.org IRI and pipe-joined them
     rr:predicateObjectMap [
         rr:predicate nf:compound ;
         rr:objectMap [

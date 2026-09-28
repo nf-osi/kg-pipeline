@@ -139,8 +139,7 @@ SELECT ?s ?p ?o WHERE {{
     },
     # --- Somatic variant layer (nf-osi/kg-pipeline#95) ----------------------------
     # These only return rows when the variant layer is included in the index; it is
-    # excluded by default (see docs/variant-layer.md). Each corresponds to one of the
-    # use cases the issue is meant to unlock, so they are the layer's acceptance test.
+    # excluded by default. Each corresponds to one of the listd use cases.
     "variant-in-cases": {
         "help": "Has this somatic variant been seen in a case? Specimens, individuals and portal files for a gene + protein change. Params: gene, change",
         "binds": {"gene": "NF1", "change": "p.R1276*"},
@@ -254,21 +253,7 @@ SELECT ?metric (COUNT(DISTINCT ?s) AS ?count) WHERE {
   }
 } GROUP BY ?metric ORDER BY ?metric""",
     },
-    # --- Model-system coverage (docs/demos/demo-1-model-coverage.md) --------------
-    # The inversion of B5: not "which patient allele has a model" but "which recurrent
-    # patient allele has NONE", plus its mirror. All four need the two bridges that
-    # demo built -- nf:mutationVrsId (mappings/model_mutation_vrs.tsv) and
-    # nf:hasOrtholog (mappings/orthologs.tsv) -- and all four label which join tier a
-    # row came from, because the tiers do not mean the same thing:
-    #
-    #   tier 1  allele identity     the curated mutation and the patient call are the
-    #                               same allele: digest == digest, nothing else compared
-    #   tier 2  protein string      the curated HGVS protein change equals the call's,
-    #                               with the gene constrained on BOTH sides (pitfall 2)
-    #
-    # Tier 2 compares protein strings for pairs without an identity match. It can
-    # connect different nucleotide alleles and also supports mutations whose bare
-    # cDNA curation cannot reach tier 1 (see scripts/mint_model_mutation_vrs.py).
+    # --- Model-system coverage demo --------------
     "variant-model-match": {
         "help": "Patient alleles that a curated model system carries, on both join tiers (1 = VRS allele identity, 2 = gene-constrained protein string). Params: gene",
         "binds": {"gene": "NF1"},
@@ -507,9 +492,7 @@ WHERE {
 GROUP BY ?reason ?gene ?curatedProtein ?curatedCdna ?vrsId
 ORDER BY ?reason ?gene ?curatedProtein ?curatedCdna""",
     },
-    # --- Ported from the `demos` branch (commit c5b91510), where variant-layer-demo.md
-    # verified them against a live index. That branch predates this file's rewrite, so
-    # the specs are copied verbatim rather than the branch being merged. Keep as a block.
+    # --- Variant layer demo
     "variant-driver-by-cohort": {
         "help": "Driver-gene sanity check: altered specimens over linked specimens, per variant dataset, for the NF driver panel. The denominator is computed before the consequence filter, and OPTIONAL keeps the zero rows -- a gene with no qualifying call is the interesting case",
         "query": """\

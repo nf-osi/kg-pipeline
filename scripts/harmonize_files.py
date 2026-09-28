@@ -278,10 +278,8 @@ def main(argv: list[str] | None = None) -> int:
             #
             # Additive: nf:tumorType keeps the curated string, and the IRI goes on a
             # separate predicate. Unlike dataType -- where the label is replaced by
-            # its IRI -- most of the distinct tumorType values have no exact term,
-            # and several that do not are the clinically interesting ones (ANNUBP,
-            # atypical neurofibroma). Replacing the string would delete the tumour
-            # type from those files entirely.
+            # its IRI -- bc most of the distinct tumorType values have no exact term 
+            # (ANNUBP, atypical neurofibroma). Replacing the string would lose data.
             tumor_type = row.get("tumorType", "").strip()
             tumor_type_iri = classify_datatype(tumor_type, tumor_type_lookup)
             if tumor_type:
@@ -293,14 +291,8 @@ def main(argv: list[str] | None = None) -> int:
 
             # Turn the compoundChemblID annotation into a ChEMBL IRI.
             #
-            # No lookup: the resolution already happened upstream, in
-            # map-compound-chembl in nf-osi/jobs, and this is only the prefix that
-            # makes the accession an IRI. Multi-valued because one file can carry a
-            # combination arm, and because compoundName and experimentalCondition are
-            # resolved independently.
-            #
-            # Additive, like tumorType: nf:compoundName keeps the free text. Most
-            # distinct compound strings do not resolve, so replacing the string would
+            # Resolution happens upstream. Additive, like tumorType: nf:compoundName keeps the free text. 
+            # Most distinct compound strings do not resolve, so replacing the string would
             # delete the compound from those files.
             iris, malformed = chembl_iris(row.get("compoundChemblID", ""))
             for iri in iris:
@@ -367,9 +359,6 @@ def main(argv: list[str] | None = None) -> int:
         for term, count in tt_unmapped.most_common():
             print(f"  {count:>7}  {term}")
 
-    # Silence here means the annotation is not on portal files yet, which is the
-    # expected state until map-compound-chembl writes it. Say so rather than print
-    # nothing, so an absent column is not read as an absent compound.
     if chembl_counts:
         print(f"\ncompoundChemblID resolved to {len(chembl_counts)} distinct ChEMBL "
               f"molecules over {sum(chembl_counts.values())} file values")
