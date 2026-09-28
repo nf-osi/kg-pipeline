@@ -425,7 +425,11 @@ biolink:Dataset a owl:Class ;
 
 biolink:ChemicalEntity a owl:Class ;
     rdfs:label "Chemical Entity" ;
-    skos:scopeNote "A chemical entity mentioned in publication text, keyed on its MeSH IRI. An instance means the chemical was mentioned in a paper, not that it was administered, tested, or found active in NF." .
+    skos:scopeNote "A chemical entity. TWO populations of the graph fall under this class and only one of them is typed with it. TYPED: chemicals mentioned in publication text, keyed on their MeSH IRI -- an instance means the chemical was mentioned in a paper, not that it was administered, tested, or found active in NF. NOT TYPED: the ChEMBL molecules that portal files resolve to, which are the range of nf:compound but carry no rdf:type, so `?c a biolink:ChemicalEntity` returns the MeSH text mentions ONLY. To ask what compounds were used in portal experiments, traverse nf:compound; to ask about both populations together you must union the two, and note they are keyed on different authorities (MeSH vs ChEMBL) so the same chemical is two IRIs." .
+
+biolink:Disease a owl:Class ;
+    rdfs:label "Disease" ;
+    skos:scopeNote "For potential use; not implemented yet." .
 
 biolink:Gene a owl:Class ;
     rdfs:label "Gene" ;
@@ -655,8 +659,8 @@ nf:compoundName a owl:DatatypeProperty ;
 
 nf:compound a owl:ObjectProperty ;
     rdfs:label "compound" ;
-    rdfs:comment "A ChEMBL molecule the file's compoundName or experimentalCondition resolves to, as https://identifiers.org/chembl:CHEMBL504. Read off the portal's compoundChemblID annotation, which carries the CURIE (chembl:CHEMBL504) so the IRI is the identifiers.org base plus that value verbatim, rather than derived here: the resolution is done upstream by map-compound-chembl in nf-osi/jobs, so this graph and every other fileview consumer get the same answer. Additive like nf:tumorClass -- the free text stays, because most distinct compound strings do not resolve and dropping them would hide the field-hygiene problem. Absence therefore means the string did not resolve or has not been annotated yet, NOT that no compound was used. More than one object per file is normal: a combination arm is one object per drug, and the two source fields are resolved independently. The object is the same IRI the federated compound graph keys its molecule nodes on, so a mechanism or indication lookup joins on it without a crosswalk." ;
-    rdfs:range owl:Thing .
+    rdfs:comment "A ChEMBL molecule the file's compoundName or experimentalCondition resolves to, as https://identifiers.org/chembl:CHEMBL504." ;
+    rdfs:range biolink:ChemicalEntity .
 
 nf:experimentalCondition a owl:DatatypeProperty ;
     rdfs:label "experimentalCondition" ;
@@ -693,13 +697,12 @@ nf:hasSpecimenIdStatus a owl:ObjectProperty ;
 
 nf:tumorType a owl:DatatypeProperty ;
     rdfs:label "tumorType" ;
-    rdfs:comment "Tumor type of the source biospecimen, as curated free text. Kept alongside nf:tumorClass rather than replaced by it, because most distinct values have no exact ontology term and several of those are clinically meaningful categories." ;
+    rdfs:comment "Tumor type of the source biospecimen, as curated free text." ;
     rdfs:range xsd:string .
 
 nf:tumorClass a owl:ObjectProperty ;
     rdfs:label "tumorClass" ;
-    rdfs:comment "The EFO or MONDO disease term a curated tumorType label resolves to, via mappings/sssom/tumor_type_lookup.sssom.tsv. Present only where the label matched a term exactly; its absence means the label had no exact match, NOT that the file has no tumour type. Read it together with nf:tumorType." ;
-    rdfs:range owl:Thing .
+    rdfs:comment "The EFO or MONDO term that a tumorType label maps to. Present only where the label matched exactly; absence means the label had no exact match, NOT necessarily that the file has no tumour type." .
 
 ################################################################################
 # Properties - Study related
