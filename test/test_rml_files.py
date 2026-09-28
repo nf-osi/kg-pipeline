@@ -534,8 +534,8 @@ class TestFilesEmptyFields:
 # Run with: pytest test/test_rml_files.py -v
 
 
-class TestTumorTypeTerm:
-    """nf:tumorTypeTerm carries the resolved EFO/MONDO term for a tumorType label.
+class TestTumorClass:
+    """nf:tumorClass carries the resolved EFO/MONDO term for a tumorType label.
 
     Additive by design: nf:tumorType keeps the curated string. Most distinct
     tumorType values in the portal have no exact ontology term, and several of
@@ -547,8 +547,8 @@ class TestTumorTypeTerm:
     MONDO = "http://purl.obolibrary.org/obo/MONDO_"
 
     def test_term_is_an_iri_not_a_literal(self, files_graph, namespaces):
-        terms = list(files_graph.objects(None, namespaces["nf"].tumorTypeTerm))
-        assert terms, "expected at least one nf:tumorTypeTerm"
+        terms = list(files_graph.objects(None, namespaces["nf"].tumorClass))
+        assert terms, "expected at least one nf:tumorClass"
         for term in terms:
             assert isinstance(term, URIRef), f"{term!r} should be an IRI"
 
@@ -559,7 +559,7 @@ class TestTumorTypeTerm:
             s for s, o in files_graph.subject_objects(NF.tumorType)
             if str(o) == "Neurofibroma"
         )
-        terms = {str(t) for t in files_graph.objects(subject, NF.tumorTypeTerm)}
+        terms = {str(t) for t in files_graph.objects(subject, NF.tumorClass)}
         assert terms == {self.MONDO + "0016755", self.MONDO + "0002546"}
 
     def test_label_survives_alongside_the_term(self, files_graph, namespaces):
@@ -579,7 +579,7 @@ class TestTumorTypeTerm:
         subjects = [
             s for s, o in files_graph.subject_objects(NF.tumorType)
             if str(o) == "Schwannoma"
-            and not list(files_graph.objects(s, NF.tumorTypeTerm))
+            and not list(files_graph.objects(s, NF.tumorClass))
         ]
         assert subjects, "expected a file whose tumorType resolved to no term"
         for subject in subjects:
@@ -588,7 +588,7 @@ class TestTumorTypeTerm:
     def test_no_sssom_sentinel_reaches_the_graph(self, files_graph, namespaces):
         """`sssom:NoTermFound` marks a non-match in the mapping file. Expanding it
         would assert a disease term that does not exist."""
-        for term in files_graph.objects(None, namespaces["nf"].tumorTypeTerm):
+        for term in files_graph.objects(None, namespaces["nf"].tumorClass):
             assert "NoTermFound" not in str(term)
 
 
@@ -625,7 +625,7 @@ class TestCompound:
         assert compounds == [self.CH + "CHEMBL504"]
 
     def test_free_text_survives_alongside_the_molecule(self, files_graph, namespaces):
-        """Additive, like nf:tumorTypeTerm. Most distinct compound strings do not
+        """Additive, like nf:tumorClass. Most distinct compound strings do not
         resolve, so replacing the string would delete the compound from those files."""
         NF = namespaces["nf"]
         subject = URIRef(f"{SYN_BASE}syn9999991")

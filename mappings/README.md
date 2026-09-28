@@ -18,7 +18,7 @@ Two types of mappings convert portal data into RDF, running at different pipelin
 | `tumor_type_lookup.sssom.tsv` | `tumorType` | EFO / MONDO disease IRIs |
 
 `tumor_type_lookup.sssom.tsv` is **additive**, unlike the others: `nf:tumorType` keeps the
-curated string and the resolved term goes on `nf:tumorTypeTerm`. Most of the distinct
+curated string and the resolved term goes on `nf:tumorClass`. Most of the distinct
 `tumorType` values have no exact ontology term, and several that do not are the
 clinically meaningful categories (`ANNUBP`, `Atypical Neurofibroma`, `Recurrent MPNST`),
 so replacing the label the way `dataType` does would delete the tumour type from those
@@ -73,7 +73,7 @@ moved to [`map-compound-chembl`](https://github.com/nf-osi/jobs/tree/main/map-co
 in nf-osi/jobs, where it can carry a chemistry toolkit without one landing in a graph
 build. This pipeline reads the answer off the file instead: a `compoundChemblID`
 annotation, carrying a CURIE that matches `^chembl:CHEMBL\d+$`, becomes `nf:compound`
-via `rml/files.rml.ttl`, the same shape as `nf:tumorTypeTerm`. `harmonize_files.py`
+via `rml/files.rml.ttl`, the same shape as `nf:tumorClass`. `harmonize_files.py`
 appends the CURIE to the identifiers.org base rather than rebuilding the IRI from
 parts, and reports anything that is not a CURIE instead of minting an IRI from it.
 
