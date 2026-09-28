@@ -27,9 +27,7 @@ reason, so what the file refuses to assert is as visible as what it does — the
 `orthologs.tsv` follows with `status=excluded`.
 
 Mapped rows were resolved by exact, case-folded label match against the EFO/MONDO terms
-carried by a pinned Open Targets release, not hand-assigned, hence
-`semapv:LexicalMatching`. Matching against the terms the indication data actually uses is
-deliberate. This is the seed for more systematic tumour-type mapping later on.
+in a pinned Open Targets release. This is the seed for more systematic tumour-type mapping later on.
 
 ## Identifier crosswalks
 
