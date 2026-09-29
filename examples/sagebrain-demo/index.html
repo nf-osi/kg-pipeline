@@ -819,10 +819,10 @@ function bindTip(node, rowsFn) {
 const SPINE = [
   { label: "this patient",            sub: "JH-2-002",               precise: "One individual record in the NF Data Portal" },
   { label: "4 tumours sequenced",     sub: "the DNA changes",        precise: "Variant observations, each keyed by a GA4GH VRS identifier" },
-  { label: "a cell line from one",    sub: "JH-2-002-CL",            precise: "A specimen filed against the same individual" },
-  { label: "drugs screened on it",    sub: "identified by ChEMBL id", precise: "ChEMBL — https://identifiers.org/chembl:…" },
+  { label: "a cell line from a tumor",    sub: "JH-2-002-CL",            precise: "A specimen filed against the same individual" },
+  { label: "drugs screened on the line",    sub: "identified by ChEMBL id", precise: "ChEMBL — https://identifiers.org/chembl:…" },
   { label: "what those drugs act on", sub: "protein, then pathway",  precise: "HGNC gene symbols; Reactome pathways" },
-  { label: "what they’re approved for", sub: "by disease",           precise: "EFO / MONDO disease terms" },
+  { label: "drug approvals", sub: "by disease",           precise: "EFO / MONDO disease terms" },
 ];
 /* which spine edge each step completes (edge i = node i -> i+1) */
 /* edges: 0 individual->lesions · 1 lesions->cellline · 2 cellline->compound
