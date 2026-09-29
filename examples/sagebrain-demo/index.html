@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Demo 2 — JH-2-002: genotype to measured drug response</title>
+<title>JH-2-002 — from genotype to measured drug response</title>
 <style>
 /* ---------- tokens (dataviz reference palette; dark = same hues re-stepped) -- */
 :root {
@@ -61,7 +61,7 @@ html, body { margin: 0; padding: 0; }
 body {
   background: var(--page);
   color: var(--ink);
-  font: 15px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif;
+  font: 16px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif;
   min-height: 100svh;
 }
 code, .mono { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
@@ -71,10 +71,15 @@ code, .mono { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; 
 header.top { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
 .eyebrow {
   font-family: ui-monospace, Menlo, monospace;
-  font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
-  color: var(--muted);
+  font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--ink-2);
 }
-h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.02em; margin: 2px 0 0; }
+h1 { font-size: 27px; font-weight: 800; letter-spacing: -0.02em; margin: 2px 0 0; }
+.standfirst { font-size: 15px; color: var(--ink-2); max-width: 74ch; margin: 7px 0 0; }
+/* B1: plain language is the primary label; the precise identifier sits under it */
+.plain { color: var(--ink); }
+.precise { display: block; font-family: ui-monospace, Menlo, monospace;
+           font-size: 12px; color: var(--ink-2); font-weight: 400; }
 h1 .pt { color: var(--accent); }
 .top .spacer { flex: 1; }
 .theme-btn {
@@ -88,8 +93,9 @@ h1 .pt { color: var(--accent); }
   border: 1px solid var(--border); border-radius: 12px; padding: 14px 18px 8px;
 }
 .spine-svg { width: 100%; height: 86px; display: block; }
-.spine-node-label { font: 600 11.5px system-ui, sans-serif; fill: var(--ink); }
-.spine-node-sub   { font: 10px ui-monospace, Menlo, monospace; fill: var(--muted); }
+.spine-node-label { font: 600 12.5px system-ui, sans-serif; fill: var(--ink-2); }
+.spine-node-label.here { fill: var(--ink); font-weight: 700; }
+.spine-node-sub   { font: 12px ui-monospace, Menlo, monospace; fill: var(--ink-2); }
 .spine-edge { stroke: var(--grid); stroke-width: 2; fill: none; }
 .spine-edge.done { stroke: var(--accent); }
 .spine-edge.drawing {
@@ -103,7 +109,8 @@ h1 .pt { color: var(--accent); }
 }
 .spine-dot { fill: var(--surface); stroke: var(--baseline); stroke-width: 2; }
 .spine-dot.done { stroke: var(--accent); fill: var(--accent); }
-.spine-dot.here { stroke: var(--accent); }
+.spine-dot.here { stroke: var(--accent); stroke-width: 3; fill: var(--surface); }
+.spine-edge.current { stroke: var(--accent); stroke-width: 3; }
 
 /* ---------- layout: rail + stage ------------------------------------------- */
 .cols { display: grid; grid-template-columns: 250px 1fr; gap: 22px; align-items: start; }
@@ -120,7 +127,7 @@ nav.rail { position: sticky; top: 16px; display: flex; flex-direction: column; g
   background: var(--surface); border-color: var(--border); color: var(--ink);
 }
 .railstep .n { font-family: ui-monospace, Menlo, monospace; font-size: 11px; color: var(--muted); margin-right: 7px; }
-.railstep .scope { display: block; margin-top: 3px; font-family: ui-monospace, Menlo, monospace; font-size: 10px; color: var(--muted); letter-spacing: 0.05em;}
+.railstep .scope { display: block; margin-top: 3px; font-size: 12px; color: var(--ink-2); }
 .railstep .tick { float: right; color: var(--good); font-weight: 700; visibility: hidden; }
 .railstep.done .tick { visibility: visible; }
 
@@ -137,24 +144,31 @@ main.stage { min-width: 0; }
   border-radius: 12px; padding: 16px 18px; margin-bottom: 14px;
 }
 .viz-title { font-size: 13px; font-weight: 650; margin: 0 0 2px; }
-.viz-sub { font-size: 12px; color: var(--muted); margin: 0 0 12px; }
+.viz-sub { font-size: 13px; color: var(--ink-2); margin: 0 0 12px; max-width: 80ch; }
 
 .runrow { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
 .run-btn {
-  background: var(--accent); color: #fff; border: none; border-radius: 8px;
-  padding: 8px 16px; font: 650 13.5px system-ui, sans-serif; cursor: pointer;
+  /* blue sequential step 550 — white on it is 6.6:1 (accent itself is 4.1:1, under AA) */
+  background: #1c5cab; color: #fff; border: none; border-radius: 8px;
+  padding: 9px 17px; font: 650 14px system-ui, sans-serif; cursor: pointer;
 }
 .run-btn:disabled { opacity: 0.45; cursor: default; }
 .ghost-btn {
   background: none; border: 1px solid var(--border); color: var(--ink-2);
   border-radius: 8px; padding: 7px 12px; font-size: 12.5px; cursor: pointer;
 }
-.status { font-family: ui-monospace, Menlo, monospace; font-size: 12px; color: var(--muted); }
-.status.err { color: var(--critical); }
-.status.ok { color: var(--good); }
+.status { font-size: 13px; color: var(--ink-2); }
+.status.err { color: var(--critical); font-weight: 600; }
+/* D7: --good is 3.3:1 as text; it rides as a dot mark beside ink-2 text instead */
+.status.ok { color: var(--ink-2); }
+.status.ok::before {
+  content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+  background: var(--good); margin-right: 7px; vertical-align: 1px;
+}
 
 details.qbox { margin-top: 2px; }
-details.qbox summary { cursor: pointer; font-size: 12.5px; color: var(--ink-2); }
+details.qbox summary { cursor: pointer; font-size: 13.5px; color: var(--ink); }
+details.qbox.prov summary { font-family: ui-monospace, Menlo, monospace; font-size: 12px; color: var(--ink-2); }
 details.qbox pre {
   background: var(--page); border: 1px solid var(--border); border-radius: 8px;
   font-size: 11.5px; line-height: 1.5; padding: 12px; overflow-x: auto; color: var(--ink-2);
@@ -163,9 +177,8 @@ details.qbox pre {
 /* graph-scope badges */
 .scopebar { display: flex; gap: 6px; margin: 0 0 14px; flex-wrap: wrap; }
 .gbadge {
-  font-family: ui-monospace, Menlo, monospace; font-size: 10.5px; letter-spacing: 0.04em;
-  border: 1px solid var(--border); color: var(--muted);
-  border-radius: 999px; padding: 3px 10px;
+  font-size: 12px; border: 1px solid var(--border); color: var(--muted);
+  border-radius: 999px; padding: 3px 11px;
 }
 .gbadge.on { color: var(--accent); border-color: var(--accent); background: var(--accent-wash); }
 
@@ -173,14 +186,13 @@ details.qbox pre {
 /* bar list (hop 2) */
 .barlist { display: grid; grid-template-columns: max-content 1fr max-content; gap: 4px 10px; align-items: center; }
 .bar-label { font-size: 12.5px; color: var(--ink); text-align: right; white-space: nowrap; }
-.bar-label .raw { color: var(--muted); font-family: ui-monospace, Menlo, monospace; font-size: 10.5px; }
+.bar-label .raw { color: var(--ink-2); font-family: ui-monospace, Menlo, monospace; font-size: 12px; }
 .bar-track { position: relative; height: 24px; display: flex; align-items: center; }
 .bar {
   height: 16px; border-radius: 0 4px 4px 0; background: var(--ctx); min-width: 2px;
 }
 .bar.hot { background: var(--accent); }
 .bar-val { font-size: 11.5px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
-.bar-row-hit { display: contents; cursor: default; }
 .legend { display: flex; gap: 18px; margin-top: 12px; font-size: 12px; color: var(--ink-2); flex-wrap: wrap; }
 .key { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 6px; vertical-align: -1.5px; }
 .key.line { height: 3px; border-radius: 2px; vertical-align: 3px; }
@@ -188,29 +200,32 @@ details.qbox pre {
 /* matrix (hop 1) */
 .matrix { border-collapse: separate; border-spacing: 2px; }
 .matrix th { font-size: 11.5px; font-weight: 600; color: var(--ink-2); padding: 4px 8px; }
-.matrix th.coltop { font-family: ui-monospace, Menlo, monospace; font-size: 10.5px; color: var(--muted); font-weight: 400; }
+.matrix th.coltop { font-family: ui-monospace, Menlo, monospace; font-size: 12px; color: var(--ink-2); font-weight: 400; }
 .matrix td.cell {
-  width: 92px; height: 34px; border-radius: 4px; background: var(--page);
+  width: 64px; height: 30px; border-radius: 4px; background: var(--page);
   border: 1px solid var(--grid); text-align: center;
 }
-.matrix td.cell.on { background: var(--accent); border-color: var(--accent); }
+/* filled cells wear their column's group colour, so the SUZ12 row reads as
+   "malignant only" in colour and not only in the group header (B4) */
+.matrix td.cell.on.benign    { background: var(--accent);   }
+.matrix td.cell.on.malignant { background: var(--series-2); }
 .matrix td.rowhead { text-align: right; padding-right: 10px; font-size: 12.5px; white-space: nowrap; }
-.matrix td.rowhead .mono { color: var(--muted); font-size: 10.5px; }
-.matrix .grouphead { font-size: 11px; color: var(--muted); font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; }
+.matrix td.rowhead .mono { color: var(--ink-2); font-size: 12px; }
+.matrix .grouphead { font-size: 12px; color: var(--ink-2); font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; }
 
 /* mechanism link diagram (hop 3) */
 .mech-wrap { overflow-x: auto; }
 .mech-svg { display: block; }
 .mech-chip { font: 600 11.5px system-ui, sans-serif; fill: var(--ink); }
-.mech-chip.dim { fill: var(--muted); font-weight: 400; }
-.mech-colhead { font: 600 10.5px ui-monospace, Menlo, monospace; fill: var(--muted); letter-spacing: 0.08em; }
+.mech-chip.dim { fill: var(--ink-2); font-weight: 400; }
+.mech-colhead { font: 600 12px system-ui, sans-serif; fill: var(--ink-2); letter-spacing: 0.06em; }
 .mech-link { fill: none; stroke: var(--grid); stroke-width: 1.5; }
 .mech-link.hot { stroke: var(--accent); stroke-width: 2; }
 .mech-note { font-size: 12px; color: var(--ink-2); margin-top: 10px; max-width: 70ch; }
 
 /* stage dot matrix (hop 4) */
 .stagegrid { border-collapse: separate; border-spacing: 0; }
-.stagegrid th { font-family: ui-monospace, Menlo, monospace; font-size: 10.5px; color: var(--muted); font-weight: 400; padding: 4px 10px; text-align: center;}
+.stagegrid th { font-size: 12px; color: var(--ink-2); font-weight: 400; padding: 5px 10px; text-align: center; }
 .stagegrid th.approval { color: var(--ink); font-weight: 700; }
 .stagegrid td.drug { font-size: 12.5px; text-align: right; padding: 3px 12px 3px 0; white-space: nowrap; }
 .stagegrid td.slot { text-align: center; min-width: 84px; height: 30px; border-left: 1px solid var(--grid); }
@@ -241,12 +256,22 @@ table.data td.mono { font-size: 11px; color: var(--ink-2); }
   background: var(--page); color: var(--ink);
 }
 .callout {
-  border-left: 3px solid var(--series-2); background: var(--surface);
+  border-left: 3px solid var(--baseline); background: var(--surface);
   border-radius: 0 10px 10px 0; padding: 10px 14px; font-size: 13px; color: var(--ink-2);
   max-width: 68ch; margin-top: 16px;
 }
 .callout strong { color: var(--ink); }
-.navbtns { display: flex; gap: 10px; margin-top: 18px; }
+.presenter-note {
+  display: none; border-left: 3px solid var(--baseline); background: var(--surface);
+  border-radius: 0 8px 8px 0; padding: 9px 13px; margin: 0 0 14px;
+  font-size: 13.5px; color: var(--ink-2); max-width: 78ch;
+}
+body.notes .presenter-note { display: block; }
+.presenter-note b { color: var(--ink); font-weight: 650; }
+.recorded-stamp {
+  color: var(--critical); font-weight: 650; font-size: 13px; margin: 0 0 10px;
+}
+.navbtns { display: flex; gap: 10px; margin-top: 18px; align-items: center; flex-wrap: wrap; }
 kbd { font-family: ui-monospace, Menlo, monospace; font-size: 11px; border: 1px solid var(--border); border-bottom-width: 2px; border-radius: 5px; padding: 1px 5px; color: var(--muted); }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .facts { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 10px; max-width: 72ch;}
@@ -259,31 +284,36 @@ kbd { font-family: ui-monospace, Menlo, monospace; font-size: 11px; border: 1px 
 
 <header class="top">
   <div>
-    <div class="eyebrow">nf-osi · sagebrain · demo 2 · n = 1</div>
+    <div class="eyebrow">NF Data Portal · queried live · one patient</div>
     <h1>Patient <span class="pt mono">JH-2-002</span>: genotype to measured drug response</h1>
+    <p class="standfirst">One patient. One cell line grown from one of their tumours.
+    Everything on this screen is that single case. The claim is what the data already
+    connects, not how many people it covers.</p>
   </div>
   <div class="spacer"></div>
   <button class="theme-btn" id="themeBtn" type="button">Dark</button>
 </header>
 
 <!-- traversal spine -->
-<div class="spine-card" aria-hidden="true">
-  <svg class="spine-svg" id="spine" viewBox="0 0 1160 86" preserveAspectRatio="xMidYMid meet"></svg>
+<div class="spine-card">
+  <svg class="spine-svg" id="spine" viewBox="0 0 1160 86" preserveAspectRatio="xMidYMid meet"
+       role="img" aria-label="Traversal map"></svg>
 </div>
 
 <div class="cols">
 <nav class="rail" id="rail" aria-label="Demo steps"></nav>
 
 <main class="stage" id="stage">
-  <div id="tooltip" role="status"></div>
+  <div id="tooltip" role="tooltip" aria-hidden="true"></div>
 
   <!-- 0 · setup -->
   <section class="panel" data-step="0">
     <div class="eyebrow hop-eyebrow">setup</div>
-    <h2>One engine, three graphs</h2>
-    <p class="claim">Every query in this demo runs live against sagebrain’s read-only
-    query API. The three graphs were built by different pipelines and have never been
-    joined until now — the joins below are pure IRI equality, no crosswalks.</p>
+    <h2>Three datasets, one live query</h2>
+    <p class="claim">Every number in this demo is fetched while you watch, from a
+    read-only query service. The three datasets below were built by separate pipelines
+    and have never been queried together before. Nothing was matched up by hand: they
+    line up because they use the same public identifiers for genes, drugs and diseases.</p>
     <div class="card">
       <div class="setup-grid">
         <label for="tok">Synapse personal access token
@@ -297,54 +327,73 @@ kbd { font-family: ui-monospace, Menlo, monospace; font-size: 11px; border: 1px 
       </div>
       <div id="viz-0" style="margin-top:12px"></div>
     </div>
-    <div class="callout"><strong>Framing rule, non-negotiable: n&nbsp;=&nbsp;1, and say so.</strong>
-    Specimen-level overlap between screening and variant data is 0/553; individual-level
-    overlap is exactly this patient. This is a story about what the graph <em>can</em> hold:
-    it already holds the experiment you would have proposed next.</div>
+    <div class="callout"><strong>This is one patient.</strong> Across the whole portal, no
+    single specimen has both a drug screen and sequencing: the overlap is 0 of 553. At the
+    level of people, the overlap is exactly this one patient. So this is a demonstration of
+    what the data can connect, not a result. It already holds the experiment you would have
+    proposed next.</div>
   </section>
 
   <!-- 1 · genotype -->
   <section class="panel" data-step="1">
-    <div class="eyebrow hop-eyebrow">hop 1 · genotype</div>
-    <h2>The textbook NF1 → PRC2 transformation, in one patient</h2>
-    <p class="claim">Four lesions, one exact <span class="mono">VRS</span> allele.
-    <strong>NF1 p.F2083Pfs*15</strong> is present in every lesion sequenced;
-    <strong>SUZ12 p.Q424*</strong> appears only in the two that transformed to MPNST.
-    Traversal, not manual variant matching.</p>
+    <div class="eyebrow hop-eyebrow">step 1 · genotype</div>
+    <h2>The textbook route to malignancy, in one patient</h2>
+    <p class="claim">Four tumours from this patient were sequenced.
+    <strong>NF1 p.F2083Pfs*15</strong> is in all four. <strong>SUZ12 p.Q424*</strong> is
+    in only the two that turned malignant, the second event textbooks associate with this
+    transformation. Nobody matched these by hand. Each is the same change down to the base,
+    identified by a GA4GH VRS id: a checksum of the exact DNA change, not a gene name.</p>
+    <div class="scopebar" data-scope="nf"></div>
+    <div class="presenter-note"><b>Expect:</b> NF1 p.F2083Pfs*15 in 4 specimens; SUZ12
+    p.Q424* in 2, MPNST only. Point at the SUZ12 row.</div>
     <div class="card" id="card-1"></div>
   </section>
 
   <!-- 2 · measured response -->
   <section class="panel" data-step="2">
-    <div class="eyebrow hop-eyebrow">hop 2 · the derived model &amp; screening</div>
+    <div class="eyebrow hop-eyebrow">step 2 · model and screening</div>
     <h2>Their own cells, already screened</h2>
-    <p class="claim">A cell line derived from this patient’s tumour hangs off the
-    <em>same individual node</em>. Screening files carry ChEMBL IRIs as of the v273
-    build — the free-text labels (<span class="mono">212= trametinib</span>) survive
-    beside the resolved molecule.</p>
+    <p class="claim">A cell line grown from one of this patient’s tumours is filed against
+    the same patient record. Drug screens had already been run on those cells, and each
+    screening file now carries a public ChEMBL drug identifier alongside whatever the lab
+    originally typed, <span class="mono">212= trametinib</span> and all. That identifier is
+    what the next two steps travel on.</p>
+    <div class="scopebar" data-scope="nf"></div>
+    <div class="presenter-note"><b>Expect:</b> 35 molecules across five of this patient’s
+    specimens. The -CL cohort alone is 26 molecules over 188 files. Point at trametinib,
+    TNO155, ribociclib.</div>
     <div class="card" id="card-2"></div>
   </section>
 
   <!-- 3 · mechanism -->
   <section class="panel" data-step="3">
-    <div class="eyebrow hop-eyebrow">hop 3 · mechanism → pathway · three graphs</div>
+    <div class="eyebrow hop-eyebrow">step 3 · mechanism and pathway</div>
     <h2>No drug reaches NF1. The pathway is the route.</h2>
-    <p class="claim">NF1 is not druggable — no mechanism edge lands on it anywhere in
-    Open Targets. What the screened compounds reach is <strong>MAP2K1/MAP2K2</strong>,
-    downstream of NF1, and Reactome supplies the connection: shared membership in the
-    <strong>RAF/MAP kinase cascade</strong>. One query, three graphs.</p>
+    <p class="claim">No drug in Open Targets acts on NF1 itself; it is not a druggable
+    protein. What the screened drugs do act on is <strong>MAP2K1 and MAP2K2</strong>, the
+    MEK proteins, immediately downstream. Reactome is what proves the connection: MEK and
+    NF1 sit in the same signalling chain, the <strong>RAF/MAP kinase cascade</strong>.
+    Three datasets, one query.</p>
+    <div class="scopebar" data-scope="nf ot reactome"></div>
+    <div class="presenter-note"><b>Expect:</b> trametinib, selumetinib, mirdametinib →
+    MAP2K1/MAP2K2; batoprotafib (TNO155) → PTPN11; shared pathways include RAF/MAP kinase
+    cascade and Oncogenic MAPK signaling. Ribociclib appears in the footnote, not the
+    diagram.</div>
     <div class="card" id="card-3"></div>
   </section>
 
   <!-- 4 · indication -->
   <section class="panel" data-step="4">
-    <div class="eyebrow hop-eyebrow">hop 4 · regulatory status</div>
-    <h2>The drug class is approved — in this exact disease</h2>
-    <p class="claim">Joined on the patient’s own two tumour classes
-    (<span class="mono">EFO_0000658</span> plexiform neurofibroma,
-    <span class="mono">MONDO_0017827</span> MPNST). A stage belongs to a
-    drug–<em>disease</em> pair, never to a drug — this chart never shows one without
-    the other.</p>
+    <div class="eyebrow hop-eyebrow">step 4 · regulatory status</div>
+    <h2>The drug class is approved, in this exact disease</h2>
+    <p class="claim">Joined on the two tumour types recorded for this patient:
+    <strong>plexiform neurofibroma</strong> and <strong>malignant peripheral nerve sheath
+    tumour</strong>. A clinical stage belongs to a drug <em>and a disease</em> together, so
+    every dot below carries both.</p>
+    <div class="scopebar" data-scope="nf ot"></div>
+    <div class="presenter-note"><b>Expect:</b> 16 rows. Mirdametinib and selumetinib
+    approved for plexiform neurofibroma; trametinib phase 2; the MPNST side tops out at
+    phase 3 chemotherapy.</div>
     <div class="card" id="card-4"></div>
   </section>
 
@@ -353,25 +402,30 @@ kbd { font-family: ui-monospace, Menlo, monospace; font-size: 11px; border: 1px 
     <div class="eyebrow hop-eyebrow">the loop, closed</div>
     <h2>The graph already held the experiment you’d propose next</h2>
     <ul class="facts">
-      <li><strong>Genotype.</strong> NF1 <span class="mono">p.F2083Pfs*15</span> in all four lesions;
-        SUZ12 <span class="mono">p.Q424*</span> only in the MPNSTs — one VRS allele, tracked by traversal.</li>
-      <li><strong>Measured response.</strong> The patient’s own cell line, screened against
-        trametinib, TNO155, ribociclib and the TNO155+ribociclib combination, with RNA-seq readout.</li>
-      <li><strong>Mechanism.</strong> Trametinib, selumetinib and mirdametinib hit MAP2K1/2 —
-        in NF1’s own RAF/MAP kinase cascade. Ribociclib’s CDK4/6 shares no NF1 pathway:
-        its rationale is the combination, and the graph says so honestly.</li>
-      <li><strong>Regulatory status.</strong> Two MEK inhibitors at <strong>APPROVAL</strong> for
-        plexiform neurofibroma; trametinib — the one actually screened here — at PHASE_2.</li>
+      <li><strong>Genotype.</strong> NF1 <span class="mono">p.F2083Pfs*15</span> in all four
+        tumours; SUZ12 <span class="mono">p.Q424*</span> in only the two malignant ones. The
+        same DNA change each time, matched by identifier rather than by eye.</li>
+      <li><strong>Measured response.</strong> The patient’s own cell line, already screened
+        against trametinib, TNO155, ribociclib and the TNO155 + ribociclib combination, with
+        RNA-seq readout.</li>
+      <li><strong>Mechanism.</strong> Trametinib, selumetinib and mirdametinib act on
+        MAP2K1/2, in the same signalling cascade as NF1. Ribociclib’s targets, CDK4 and CDK6,
+        share none of NF1’s pathways. It was screened as half of a combination, and the data
+        says so.</li>
+      <li><strong>Regulatory status.</strong> Two MEK inhibitors are approved for plexiform
+        neurofibroma. Trametinib, the MEK inhibitor actually screened on these cells, has
+        reached phase 2 in the same disease.</li>
     </ul>
-    <div class="callout"><strong>Caveats, stated on stage:</strong> n = 1 — one patient, one
-    derived model. Approval facts are per indication and population, never treatment guidance.
-    Most compound free-text in the portal still does not resolve; ambiguity was refused, not guessed.</div>
+    <div class="callout"><strong>Caveats, stated on stage.</strong> One patient, one derived
+    model. Approval facts belong to a specific indication and population, and are not treatment
+    guidance. Most drug free-text in the portal still does not resolve to an identifier; where a
+    label named several molecules, it was left for a curator rather than guessed.</div>
   </section>
 
   <div class="navbtns">
     <button class="ghost-btn" id="prevBtn" type="button">← Back</button>
     <button class="ghost-btn" id="nextBtn" type="button">Next →</button>
-    <span class="status" style="align-self:center">or use <kbd>←</kbd> <kbd>→</kbd></span>
+    <span class="status">or <kbd>←</kbd> <kbd>→</kbd> · <kbd>n</kbd> presenter notes · <kbd>r</kbd> reset</span>
   </div>
 </main>
 </div>
@@ -510,29 +564,55 @@ ORDER BY ?drug ?disease`,
 };
 
 /* =================== plumbing =================== */
+/* sessionStorage throws outright on an opaque origin — which is what some
+   browsers call a file:// page, the way this app is meant to be opened. Never
+   let storage take the whole script down with it. */
+const store = {
+  get(k) { try { return sessionStorage.getItem(k); } catch { return null; } },
+  set(k, v) { try { sessionStorage.setItem(k, v); } catch { /* not available */ } },
+};
+
 function token() { return document.getElementById("tok").value.trim(); }
 (function initToken() {
   const m = location.hash.match(/token=([^&]+)/);
-  const t = m ? decodeURIComponent(m[1]) : sessionStorage.getItem("sb_token") || "";
+  const t = m ? decodeURIComponent(m[1]) : store.get("sb_token") || "";
   if (m) history.replaceState(null, "", location.pathname + location.search);
   if (t) document.getElementById("tok").value = t;
 })();
 document.getElementById("tok").addEventListener("change", () =>
-  sessionStorage.setItem("sb_token", token()));
+  store.set("sb_token", token()));
+
+/* D6: audience-facing wording for the failures that actually happen on stage */
+function friendlyHttp(status) {
+  if (status === 401 || status === 403)
+    return "Not authorised. The access token must belong to a member of the Sage Brain team.";
+  if (status === 429)
+    return "The query service is rate-limiting. Wait a moment and run it again.";
+  if (status >= 500)
+    return "Could not reach the query service. Check the connection on the setup step.";
+  return "The query service returned an unexpected response (HTTP " + status + ").";
+}
 
 async function runQuery(sparql, statusEl) {
   const t = token();
-  if (!t) throw new Error("no token — paste a Synapse PAT above (setup step)");
+  if (!t) throw new Error("No access token yet — add one on the setup step.");
   const headers = { "Authorization": "Bearer " + t, "X-Source": "kg-pipeline/sagebrain-demo" };
   const t0 = performance.now();
-  statusEl.textContent = "submitting…"; statusEl.className = "status";
-  const sub = await fetch(CONFIG.endpoint, {
-    method: "POST",
-    headers: { ...headers, "Content-Type": "application/json" },
-    body: JSON.stringify({ query: PREFIXES + sparql }),
-  });
-  if (!sub.ok) throw new Error("submit failed: HTTP " + sub.status);
+  statusEl.textContent = "Submitting…"; statusEl.className = "status";
+  let sub;
+  try {
+    sub = await fetch(CONFIG.endpoint, {
+      method: "POST",
+      headers: { ...headers, "Content-Type": "application/json" },
+      body: JSON.stringify({ query: PREFIXES + sparql }),
+    });
+  } catch (e) {
+    console.error(e);
+    throw new Error("Could not reach the query service. Check the connection on the setup step.");
+  }
+  if (!sub.ok) throw new Error(friendlyHttp(sub.status));
   const { job_id } = await sub.json();
+  console.info("sagebrain job", job_id);
   const deadline = performance.now() + CONFIG.timeoutMs;
   // fast first polls so short queries return snappily, easing to pollMs
   const ramp = [700, 1200, 2000];
@@ -540,14 +620,22 @@ async function runQuery(sparql, statusEl) {
   while (true) {
     await new Promise(r => setTimeout(r, ramp[polls++] ?? CONFIG.pollMs));
     const el = ((performance.now() - t0) / 1000).toFixed(0);
-    statusEl.textContent = `job ${job_id.slice(0, 8)}… running · ${el}s`;
-    const poll = await fetch(`${CONFIG.endpoint}/${job_id}`, { headers });
-    if (!poll.ok) throw new Error("poll failed: HTTP " + poll.status);
+    statusEl.textContent = `Running · ${el}s`;
+    let poll;
+    try {
+      poll = await fetch(`${CONFIG.endpoint}/${job_id}`, { headers });
+    } catch (e) {
+      console.error(e);
+      throw new Error("Lost the connection to the query service while the query was running.");
+    }
+    if (!poll.ok) throw new Error(friendlyHttp(poll.status));
     const body = await poll.json();
     if (body.status === "complete") {
       const res = JSON.parse(body.results);
       const secs = ((performance.now() - t0) / 1000).toFixed(1);
-      statusEl.textContent = `complete · ${res.results.bindings.length} rows · ${secs}s`;
+      const clock = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+      statusEl.textContent =
+        `Live result · ${res.results.bindings.length} rows · ${secs} s · ${clock}`;
       statusEl.className = "status ok";
       return res.results.bindings.map(b => {
         const o = {};
@@ -555,14 +643,18 @@ async function runQuery(sparql, statusEl) {
         return o;
       });
     }
-    if (body.status === "error") throw new Error(body.error || "query error");
-    if (performance.now() > deadline) throw new Error("timed out after 90s");
+    if (body.status === "error") {
+      console.error("query error:", body.error);
+      throw new Error("The query service could not complete this query. Try it again.");
+    }
+    if (performance.now() > deadline)
+      throw new Error(`The query did not return within ${CONFIG.timeoutMs / 1000} seconds.`);
   }
 }
 
 /* =================== tooltip =================== */
 const tip = document.getElementById("tooltip");
-function showTip(evt, rows) {
+function fillTip(rows) {
   tip.replaceChildren();
   for (const [k, v] of rows) {
     const d = document.createElement("div");
@@ -571,22 +663,31 @@ function showTip(evt, rows) {
     d.append(kv, kk); tip.appendChild(d);
   }
   tip.style.display = "block";
+}
+function moveTip(evt) {
   const pad = 14, w = tip.offsetWidth, h = tip.offsetHeight;
   let x = evt.clientX + pad, y = evt.clientY + pad;
   if (x + w > innerWidth - 8) x = evt.clientX - w - pad;
   if (y + h > innerHeight - 8) y = evt.clientY - h - pad;
   tip.style.left = x + "px"; tip.style.top = y + "px";
 }
+function showTip(evt, rows) { fillTip(rows); moveTip(evt); }
 function hideTip() { tip.style.display = "none"; }
+/* Content is built once on enter; pointermove only repositions. */
+function bindTip(node, rowsFn) {
+  node.addEventListener("pointerenter", e => { fillTip(rowsFn()); moveTip(e); });
+  node.addEventListener("pointermove", moveTip);
+  node.addEventListener("pointerleave", hideTip);
+}
 
 /* =================== spine =================== */
 const SPINE = [
-  { label: "individual", sub: "JH-2-002" },
-  { label: "4 lesions", sub: "variant layer" },
-  { label: "cell line", sub: "JH-2-002-CL" },
-  { label: "compound", sub: "chembl:*" },
-  { label: "target · pathway", sub: "hgnc:* · reactome" },
-  { label: "indication", sub: "efo/mondo" },
+  { label: "this patient",            sub: "JH-2-002",               precise: "One individual record in the NF Data Portal" },
+  { label: "4 tumours sequenced",     sub: "the DNA changes",        precise: "Variant observations, each keyed by a GA4GH VRS identifier" },
+  { label: "a cell line from one",    sub: "JH-2-002-CL",            precise: "A specimen filed against the same individual" },
+  { label: "drugs screened on it",    sub: "identified by ChEMBL id", precise: "ChEMBL — https://identifiers.org/chembl:…" },
+  { label: "what those drugs act on", sub: "protein, then pathway",  precise: "HGNC gene symbols; Reactome pathways" },
+  { label: "what they’re approved for", sub: "by disease",           precise: "EFO / MONDO disease terms" },
 ];
 /* which spine edge each step completes (edge i = node i -> i+1) */
 /* edges: 0 individual->lesions · 1 lesions->cellline · 2 cellline->compound
@@ -599,34 +700,49 @@ function drawSpine(current) {
   const n = SPINE.length, W = 1160, y = 34;
   const xs = SPINE.map((_, i) => 70 + i * (W - 140) / (n - 1));
   const NS = "http://www.w3.org/2000/svg";
-  // edges: node i -> i+1 (5 edges); edge index for STEP_EDGES: 0..4 but note
-  // hop1 covers individual->lesions AND (conceptually) lesions->cellline? map: see STEP_EDGES
+  // edge i connects node i to node i+1; STEP_EDGES says which edges each step completes.
+  const currentEdges = new Set(STEP_EDGES[current] || []);
   for (let i = 0; i < n - 1; i++) {
     const p = document.createElementNS(NS, "path");
     p.setAttribute("d", `M ${xs[i] + 9} ${y} H ${xs[i + 1] - 9}`);
     let cls = "spine-edge";
     if (spineDone.has(i)) cls += justDrawn.has(i) ? " drawing done" : " done";
+    else if (currentEdges.has(i)) cls += " current";
     p.setAttribute("class", cls);
     svg.appendChild(p);
   }
   justDrawn.clear();
+  // a node is "here" when it is an endpoint of the current step's edge(s)
+  const hereNodes = new Set();
+  for (const e of currentEdges) { hereNodes.add(e); hereNodes.add(e + 1); }
   for (let i = 0; i < n; i++) {
+    const g = document.createElementNS(NS, "g");
+    const ttl = document.createElementNS(NS, "title");
+    ttl.textContent = SPINE[i].precise;
+    g.appendChild(ttl);
     const c = document.createElementNS(NS, "circle");
-    c.setAttribute("cx", xs[i]); c.setAttribute("cy", y); c.setAttribute("r", 7);
+    c.setAttribute("cx", xs[i]); c.setAttribute("cy", y); c.setAttribute("r", hereNodes.has(i) ? 9 : 7);
     let cls = "spine-dot";
     const nodeDone = (i === 0 && spineDone.has(0)) || spineDone.has(i - 1) || spineDone.has(i);
     if (nodeDone) cls += " done";
+    if (hereNodes.has(i)) cls += " here";
     c.setAttribute("class", cls);
-    svg.appendChild(c);
+    g.appendChild(c);
     const t1 = document.createElementNS(NS, "text");
     t1.setAttribute("x", xs[i]); t1.setAttribute("y", y + 26); t1.setAttribute("text-anchor", "middle");
-    t1.setAttribute("class", "spine-node-label"); t1.textContent = SPINE[i].label;
-    svg.appendChild(t1);
+    t1.setAttribute("class", "spine-node-label" + (hereNodes.has(i) ? " here" : ""));
+    t1.textContent = SPINE[i].label;
+    g.appendChild(t1);
     const t2 = document.createElementNS(NS, "text");
     t2.setAttribute("x", xs[i]); t2.setAttribute("y", y + 41); t2.setAttribute("text-anchor", "middle");
     t2.setAttribute("class", "spine-node-sub"); t2.textContent = SPINE[i].sub;
-    svg.appendChild(t2);
+    g.appendChild(t2);
+    svg.appendChild(g);
   }
+  svg.setAttribute("aria-label",
+    "Traversal: " + SPINE.map(s => s.label).join(" → ") +
+    `. Steps completed: ${spineDone.size} of ${n - 1}.` +
+    (STEPS[current] ? ` Currently on ${STEPS[current].title}.` : ""));
 }
 const justDrawn = new Set();
 function completeStepEdges(step) {
@@ -638,13 +754,35 @@ function completeStepEdges(step) {
 
 /* =================== step scaffolding =================== */
 const STEPS = [
-  { title: "Setup & connection", scope: "all graphs" },
-  { title: "Genotype: progression", scope: "nf" },
-  { title: "Model & screening", scope: "nf" },
-  { title: "Mechanism → pathway", scope: "nf + opentargets + reactome" },
-  { title: "Indication & stage", scope: "nf + opentargets" },
-  { title: "The loop, closed", scope: "—" },
+  { title: "Setup and connection", scope: "all three datasets" },
+  { title: "Genotype",             scope: "portal" },
+  { title: "Model and screening",  scope: "portal" },
+  { title: "Mechanism and pathway", scope: "portal + Open Targets + Reactome" },
+  { title: "Regulatory status",    scope: "portal + Open Targets" },
+  { title: "The loop, closed",     scope: "—" },
 ];
+
+/* C2: which datasets each step actually queries, shown as pills under the claim */
+const DATASETS = { nf: "NF Data Portal", ot: "Open Targets", reactome: "Reactome" };
+const DATASET_LABEL = {
+  nf: "NF Data Portal — patients, specimens, files",
+  opentargets: "Open Targets — drug targets and indications",
+  reactome: "Reactome — biological pathways",
+};
+function paintScopebars() {
+  for (const bar of document.querySelectorAll(".scopebar")) {
+    if (bar.dataset.painted) continue;
+    const on = new Set((bar.dataset.scope || "").split(/\s+/).filter(Boolean));
+    for (const [key, label] of Object.entries(DATASETS)) {
+      const pill = document.createElement("span");
+      pill.className = "gbadge" + (on.has(key) ? " on" : "");
+      pill.textContent = label;
+      if (!on.has(key)) pill.style.opacity = "0.45";
+      bar.appendChild(pill);
+    }
+    bar.dataset.painted = "1";
+  }
+}
 const doneSteps = new Set();
 let cur = 0;
 
@@ -679,44 +817,96 @@ addEventListener("keydown", e => {
   if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
   if (e.key === "ArrowRight") go(cur + 1);
   if (e.key === "ArrowLeft") go(cur - 1);
+  if (e.key === "n") document.body.classList.toggle("notes");
+  if (e.key === "r") resetRun();
 });
+
+/* C7: start the talk over without reloading (the token survives) */
+function resetRun() {
+  doneSteps.clear(); spineDone.clear(); justDrawn.clear();
+  for (const c of document.querySelectorAll(".card")) {
+    for (const v of c.querySelectorAll(".viz-mount")) v.replaceChildren();
+    for (const s of c.querySelectorAll(".status")) { s.textContent = ""; s.className = "status"; }
+    for (const b of c.querySelectorAll(".fallback-btn")) b.style.display = "none";
+  }
+  const v0 = document.getElementById("viz-0");
+  if (v0) v0.replaceChildren();
+  const s0 = document.getElementById("st-0");
+  if (s0) { s0.textContent = ""; s0.className = "status"; }
+  go(0);
+}
 
 /* theme toggle */
 const themeBtn = document.getElementById("themeBtn");
-themeBtn.textContent = matchMedia("(prefers-color-scheme: dark)").matches ? "Light" : "Dark";
-themeBtn.addEventListener("click", () => {
+function isDark() {
   const root = document.documentElement;
-  const dark = root.dataset.theme === "dark" ||
+  return root.dataset.theme === "dark" ||
     (!root.dataset.theme && matchMedia("(prefers-color-scheme: dark)").matches);
-  root.dataset.theme = dark ? "light" : "dark";
-  themeBtn.textContent = dark ? "Dark" : "Light";
+}
+function syncThemeBtn() {
+  const dark = isDark();
+  themeBtn.textContent = dark ? "Light" : "Dark";
+  themeBtn.setAttribute("aria-label", dark ? "Switch to light theme" : "Switch to dark theme");
+}
+(function restoreTheme() {
+  const saved = store.get("sb_theme");
+  if (saved) document.documentElement.dataset.theme = saved;
+  syncThemeBtn();
+})();
+themeBtn.addEventListener("click", () => {
+  document.documentElement.dataset.theme = isDark() ? "light" : "dark";
+  store.set("sb_theme", document.documentElement.dataset.theme);
+  syncThemeBtn();
 });
 
-/* build a run-card: run button + status + collapsible query + viz mount */
-function buildCard(mountId, btnLabel, sparql, onData) {
+/* Verified results from the 2026-09-28 run. Used only when a live query fails and
+   the presenter explicitly asks for it — never silently, and always stamped. */
+const FALLBACK = {"progression":[{"specimenID":"JH-2-002-354A1","symbol":"NF1","change":"p.F2083Pfs*15","vrs":"ga4gh:VA.dNs0W9wot2js98yv5U1IfcLKVxbCsTiE","tumorType":"Plexiform Neurofibroma"},{"specimenID":"JH-2-002-94FAA","symbol":"NF1","change":"p.F2083Pfs*15","vrs":"ga4gh:VA.dNs0W9wot2js98yv5U1IfcLKVxbCsTiE","tumorType":"Malignant Peripheral Nerve Sheath Tumor"},{"specimenID":"JH-2-002-FF824","symbol":"NF1","change":"p.F2083Pfs*15","vrs":"ga4gh:VA.dNs0W9wot2js98yv5U1IfcLKVxbCsTiE","tumorType":"Plexiform Neurofibroma"},{"specimenID":"JH-2-002-GAF53","symbol":"NF1","change":"p.F2083Pfs*15","vrs":"ga4gh:VA.dNs0W9wot2js98yv5U1IfcLKVxbCsTiE","tumorType":"Malignant Peripheral Nerve Sheath Tumor"},{"specimenID":"JH-2-002-94FAA","symbol":"SUZ12","change":"p.Q424*","vrs":"ga4gh:VA._zUtdhUarQuL6dJ0TylUNTUEeg1-2ir0","tumorType":"Malignant Peripheral Nerve Sheath Tumor"},{"specimenID":"JH-2-002-GAF53","symbol":"SUZ12","change":"p.Q424*","vrs":"ga4gh:VA._zUtdhUarQuL6dJ0TylUNTUEeg1-2ir0","tumorType":"Malignant Peripheral Nerve Sheath Tumor"}],"screening":[{"compound":"https://identifiers.org/chembl:CHEMBL450449","compoundName":"trabectedin","files":"40","specimens":"JH-2-002 | JH-2-002-MIC | JH-2-002-CL | JH-2-002-CL-MIC | JHU-2-002-MIC"},{"compound":"https://identifiers.org/chembl:CHEMBL4650521","compoundName":"tno155 plus ribociclib","files":"36","specimens":"JH-2-002-CL | JH-2-002"},{"compound":"https://identifiers.org/chembl:CHEMBL507361","compoundName":"mirdametinib","files":"35","specimens":"JH-2-002 | JH-2-002-MIC | JH-2-002-CL | JHU-2-002-MIC"},{"compound":"https://identifiers.org/chembl:CHEMBL3545110","compoundName":"tno155 plus ribociclib","files":"34","specimens":"JH-2-002-CL | JH-2-002 | JH-2-002-MIC | JH-2-002-CL-MIC | JHU-2-002-MIC"},{"compound":"https://identifiers.org/chembl:CHEMBL2103875","compoundName":"trametinib","files":"34","specimens":"JH-2-002 | JH-2-002-MIC | JH-2-002-CL | JH-2-002-CL-MIC | JHU-2-002-MIC"},{"compound":"https://identifiers.org/chembl:CHEMBL1614701","compoundName":"selumetinib","files":"29","specimens":"JH-2-002 | JH-2-002-MIC | JH-2-002-CL | JH-2-002-CL-MIC | JHU-2-002-MIC"},{"compound":"https://identifiers.org/chembl:CHEMBL521686","compoundName":"olaparib","files":"29","specimens":"JH-2-002 | JH-2-002-MIC | JH-2-002-CL | JH-2-002-CL-MIC | JHU-2-002-MIC"},{"compound":"https://identifiers.org/chembl:CHEMBL504","compoundName":"nodrug= DMSO","files":"24","specimens":"JH-2-002-CL | JHU-2-002-MIC | JH-2-002-CL-MIC"},{"compound":"https://identifiers.org/chembl:CHEMBL98","compoundName":"vorinostat","files":"23","specimens":"JH-2-002 | JH-2-002-MIC | JH-2-002-CL | JH-2-002-CL-MIC | JHU-2-002-MIC"},{"compound":"https://identifiers.org/chembl:CHEMBL1751","files":"22","specimens":"JH-2-002-MIC | JH-2-002-CL | JHU-2-002-MIC"},{"compound":"https://identifiers.org/chembl:CHEMBL53463","compoundName":"doxorubicin","files":"15","specimens":"JH-2-002 | JH-2-002-MIC | JH-2-002-CL-MIC | JHU-2-002-MIC"},{"compound":"https://identifiers.org/chembl:CHEMBL5314346","compoundName":"verteporfin","files":"12","specimens":"JH-2-002 | JH-2-002-MIC | JH-2-002-CL | JH-2-002-CL-MIC | JHU-2-002-MIC"},{"compound":"https://identifiers.org/chembl:CHEMBL4060033","files":"9","specimens":"JH-2-002-MIC | JHU-2-002-MIC | JH-2-002-CL-MIC"},{"compound":"https://identifiers.org/chembl:CHEMBL1024","compoundName":"ifosfamide","files":"8","specimens":"JH-2-002 | JH-2-002-MIC | JH-2-002-CL | JH-2-002-CL-MIC | JHU-2-002-MIC"},{"compound":"https://identifiers.org/chembl:CHEMBL189963","compoundName":"palbociclib","files":"8","specimens":"JH-2-002"},{"compound":"https://identifiers.org/chembl:CHEMBL481","compoundName":"irinotecan","files":"8","specimens":"JH-2-002 | JH-2-002-MIC | JH-2-002-CL | JHU-2-002-MIC | JH-2-002-CL-MIC"},{"compound":"https://identifiers.org/chembl:CHEMBL3188267","compoundName":"capmatinib","files":"8","specimens":"JH-2-002"},{"compound":"https://identifiers.org/chembl:CHEMBL1200699","compoundName":"doxycycline= 300ng/ml","files":"6","specimens":"JH-2-002-CL"},{"compound":"https://identifiers.org/chembl:CHEMBL1201129","compoundName":"decitabine","files":"4","specimens":"JH-2-002"},{"compound":"https://identifiers.org/chembl:CHEMBL5314427","compoundName":"RMC4630","files":"4","specimens":"JH-2-002"},{"compound":"https://identifiers.org/chembl:CHEMBL3622533","files":"4","specimens":"JH-2-002-MIC | JH-2-002-CL | JHU-2-002-MIC"},{"compound":"https://identifiers.org/chembl:CHEMBL3545311","files":"4","specimens":"JH-2-002-MIC | JH-2-002-CL | JH-2-002-CL-MIC | JHU-2-002-MIC"},{"compound":"https://identifiers.org/chembl:CHEMBL3545097","files":"4","specimens":"JH-2-002-MIC | JH-2-002-CL | JH-2-002-CL-MIC | JHU-2-002-MIC"},{"compound":"https://identifiers.org/chembl:CHEMBL3813873","compoundName":"pexidartinib","files":"4","specimens":"JH-2-002"},{"compound":"https://identifiers.org/chembl:CHEMBL476","files":"3","specimens":"JH-2-002-MIC | JH-2-002-CL-MIC | JHU-2-002-MIC"},{"compound":"https://identifiers.org/chembl:CHEMBL2105717","files":"3","specimens":"JH-2-002-MIC | JH-2-002-CL | JHU-2-002-MIC"},{"compound":"https://identifiers.org/chembl:CHEMBL325041","files":"3","specimens":"JH-2-002-MIC | JH-2-002-CL-MIC"},{"compound":"https://identifiers.org/chembl:CHEMBL553","files":"3","specimens":"JH-2-002-MIC | JH-2-002-CL | JHU-2-002-MIC"},{"compound":"https://identifiers.org/chembl:CHEMBL417","files":"3","specimens":"JH-2-002-MIC | JH-2-002-CL-MIC | JHU-2-002-MIC"},{"compound":"https://identifiers.org/chembl:CHEMBL1683590","files":"3","specimens":"JH-2-002-MIC | JH-2-002-CL-MIC | JHU-2-002-MIC"},{"compound":"https://identifiers.org/chembl:CHEMBL413","files":"3","specimens":"JH-2-002-MIC | JH-2-002-CL | JHU-2-002-MIC"},{"compound":"https://identifiers.org/chembl:CHEMBL4116008","files":"2","specimens":"JH-2-002-MIC | JHU-2-002-MIC"},{"compound":"https://identifiers.org/chembl:CHEMBL1351","files":"2","specimens":"JH-2-002-MIC | JHU-2-002-MIC"},{"compound":"https://identifiers.org/chembl:CHEMBL4216467","files":"2","specimens":"JH-2-002-MIC | JHU-2-002-MIC"},{"compound":"https://identifiers.org/chembl:CHEMBL44657","files":"2","specimens":"JH-2-002-MIC | JHU-2-002-MIC"}],"mechanism":[{"drug":"BATOPROTAFIB","action":"INHIBITOR","targetSymbol":"PTPN11","targetType":"single protein","sharedPathways":"MAPK family signaling cascades | MAPK1/MAPK3 signaling"},{"drug":"BORTEZOMIB","action":"INHIBITOR","targetSymbol":"ADRM1","targetType":"protein complex","sharedPathways":"Regulation of RAS by GAPs | RAF/MAP kinase cascade | MAPK family signaling cascades | MAPK1/MAPK3 signaling"},{"drug":"BORTEZOMIB","action":"INHIBITOR","targetSymbol":"PSMA1","targetType":"protein complex","sharedPathways":"Regulation of RAS by GAPs | MAPK family signaling cascades | MAPK1/MAPK3 signaling | RAF/MAP kinase cascade"},{"drug":"BORTEZOMIB","action":"INHIBITOR","targetSymbol":"PSMA2","targetType":"protein complex","sharedPathways":"Regulation of RAS by GAPs | MAPK family signaling cascades | MAPK1/MAPK3 signaling | RAF/MAP kinase cascade"},{"drug":"BORTEZOMIB","action":"INHIBITOR","targetSymbol":"PSMA3","targetType":"protein complex","sharedPathways":"Regulation of RAS by GAPs | MAPK family signaling cascades | MAPK1/MAPK3 signaling | RAF/MAP kinase cascade"},{"drug":"BORTEZOMIB","action":"INHIBITOR","targetSymbol":"PSMA4","targetType":"protein complex","sharedPathways":"Regulation of RAS by GAPs | MAPK family signaling cascades | MAPK1/MAPK3 signaling | RAF/MAP kinase cascade"},{"drug":"BORTEZOMIB","action":"INHIBITOR","targetSymbol":"PSMA5","targetType":"protein complex","sharedPathways":"Regulation of RAS by GAPs | RAF/MAP kinase cascade | MAPK family signaling cascades | MAPK1/MAPK3 signaling"},{"drug":"BORTEZOMIB","action":"INHIBITOR","targetSymbol":"PSMA6","targetType":"protein complex","sharedPathways":"Regulation of RAS by GAPs | RAF/MAP kinase cascade | MAPK family signaling cascades | MAPK1/MAPK3 signaling"},{"drug":"BORTEZOMIB","action":"INHIBITOR","targetSymbol":"PSMA7","targetType":"protein complex","sharedPathways":"MAPK1/MAPK3 signaling | RAF/MAP kinase cascade | MAPK family signaling cascades | Regulation of RAS by GAPs"},{"drug":"BORTEZOMIB","action":"INHIBITOR","targetSymbol":"PSMA8","targetType":"protein complex","sharedPathways":""},{"drug":"BORTEZOMIB","action":"INHIBITOR","targetSymbol":"PSMB1","targetType":"protein complex","sharedPathways":"MAPK1/MAPK3 signaling | RAF/MAP kinase cascade | MAPK family signaling cascades | Regulation of RAS by GAPs"},{"drug":"BORTEZOMIB","action":"INHIBITOR","targetSymbol":"PSMB10","targetType":"protein complex","sharedPathways":""},{"drug":"BORTEZOMIB","action":"INHIBITOR","targetSymbol":"PSMB11","targetType":"protein complex","sharedPathways":""},{"drug":"BORTEZOMIB","action":"INHIBITOR","targetSymbol":"PSMB2","targetType":"protein complex","sharedPathways":"MAPK1/MAPK3 signaling | RAF/MAP kinase cascade | MAPK family signaling cascades | Regulation of RAS by GAPs"},{"drug":"BORTEZOMIB","action":"INHIBITOR","targetSymbol":"PSMB3","targetType":"protein complex","sharedPathways":"Regulation of RAS by GAPs | MAPK1/MAPK3 signaling | RAF/MAP kinase cascade | MAPK family signaling cascades"},{"drug":"BORTEZOMIB","action":"INHIBITOR","targetSymbol":"PSMB4","targetType":"protein complex","sharedPathways":"MAPK1/MAPK3 signaling | RAF/MAP kinase cascade | MAPK family signaling cascades | Regulation of RAS by GAPs"},{"drug":"BORTEZOMIB","action":"INHIBITOR","targetSymbol":"PSMB5","targetType":"protein complex","sharedPathways":"Regulation of RAS by GAPs | MAPK1/MAPK3 signaling | RAF/MAP kinase cascade | MAPK family signaling cascades"},{"drug":"BORTEZOMIB","action":"INHIBITOR","targetSymbol":"PSMB6","targetType":"protein complex","sharedPathways":"Regulation of RAS by GAPs | MAPK1/MAPK3 signaling | RAF/MAP kinase cascade | MAPK family signaling cascades"},{"drug":"BORTEZOMIB","action":"INHIBITOR","targetSymbol":"PSMB7","targetType":"protein complex","sharedPathways":"Regulation of RAS by GAPs | MAPK1/MAPK3 signaling | RAF/MAP kinase cascade | MAPK family signaling cascades"},{"drug":"BORTEZOMIB","action":"INHIBITOR","targetSymbol":"PSMB8","targetType":"protein complex","sharedPathways":""},{"drug":"BORTEZOMIB","action":"INHIBITOR","targetSymbol":"PSMB9","targetType":"protein complex","sharedPathways":""},{"drug":"BORTEZOMIB","action":"INHIBITOR","targetSymbol":"PSMC1","targetType":"protein complex","sharedPathways":"Regulation of RAS by GAPs | MAPK1/MAPK3 signaling | RAF/MAP kinase cascade | MAPK family signaling cascades"},{"drug":"BORTEZOMIB","action":"INHIBITOR","targetSymbol":"PSMC2","targetType":"protein complex","sharedPathways":"Regulation of RAS by GAPs | MAPK1/MAPK3 signaling | RAF/MAP kinase cascade | MAPK family signaling cascades"},{"drug":"BORTEZOMIB","action":"INHIBITOR","targetSymbol":"PSMC3","targetType":"protein complex","sharedPathways":"Regulation of RAS by GAPs | MAPK1/MAPK3 signaling | RAF/MAP kinase cascade | MAPK family signaling cascades"},{"drug":"BORTEZOMIB","action":"INHIBITOR","targetSymbol":"PSMC4","targetType":"protein complex","sharedPathways":"Regulation of RAS by GAPs | MAPK1/MAPK3 signaling | RAF/MAP kinase cascade | MAPK family signaling cascades"},{"drug":"BORTEZOMIB","action":"INHIBITOR","targetSymbol":"PSMC5","targetType":"protein complex","sharedPathways":"Regulation of RAS by GAPs | MAPK1/MAPK3 signaling | RAF/MAP kinase cascade | MAPK family signaling cascades"},{"drug":"BORTEZOMIB","action":"INHIBITOR","targetSymbol":"PSMC6","targetType":"protein complex","sharedPathways":"Regulation of RAS by GAPs | MAPK family signaling cascades | RAF/MAP kinase cascade | MAPK1/MAPK3 signaling"},{"drug":"BORTEZOMIB","action":"INHIBITOR","targetSymbol":"PSMD1","targetType":"protein complex","sharedPathways":"Regulation of RAS by GAPs | MAPK family signaling cascades | RAF/MAP kinase cascade | MAPK1/MAPK3 signaling"},{"drug":"BORTEZOMIB","action":"INHIBITOR","targetSymbol":"PSMD11","targetType":"protein complex","sharedPathways":"Regulation of RAS by GAPs | MAPK family signaling cascades | RAF/MAP kinase cascade | MAPK1/MAPK3 signaling"},{"drug":"BORTEZOMIB","action":"INHIBITOR","targetSymbol":"PSMD12","targetType":"protein complex","sharedPathways":"Regulation of RAS by GAPs | MAPK family signaling cascades | RAF/MAP kinase cascade | MAPK1/MAPK3 signaling"},{"drug":"BORTEZOMIB","action":"INHIBITOR","targetSymbol":"PSMD13","targetType":"protein complex","sharedPathways":"Regulation of RAS by GAPs | RAF/MAP kinase cascade | MAPK family signaling cascades | MAPK1/MAPK3 signaling"},{"drug":"BORTEZOMIB","action":"INHIBITOR","targetSymbol":"PSMD14","targetType":"protein complex","sharedPathways":"Regulation of RAS by GAPs | RAF/MAP kinase cascade | MAPK family signaling cascades | MAPK1/MAPK3 signaling"},{"drug":"BORTEZOMIB","action":"INHIBITOR","targetSymbol":"PSMD2","targetType":"protein complex","sharedPathways":"Regulation of RAS by GAPs | MAPK family signaling cascades | RAF/MAP kinase cascade | MAPK1/MAPK3 signaling"},{"drug":"BORTEZOMIB","action":"INHIBITOR","targetSymbol":"PSMD3","targetType":"protein complex","sharedPathways":"MAPK1/MAPK3 signaling | RAF/MAP kinase cascade | MAPK family signaling cascades | Regulation of RAS by GAPs"},{"drug":"BORTEZOMIB","action":"INHIBITOR","targetSymbol":"PSMD4","targetType":"protein complex","sharedPathways":""},{"drug":"BORTEZOMIB","action":"INHIBITOR","targetSymbol":"PSMD6","targetType":"protein complex","sharedPathways":"MAPK1/MAPK3 signaling | RAF/MAP kinase cascade | MAPK family signaling cascades | Regulation of RAS by GAPs"},{"drug":"BORTEZOMIB","action":"INHIBITOR","targetSymbol":"PSMD7","targetType":"protein complex","sharedPathways":"Regulation of RAS by GAPs | RAF/MAP kinase cascade | MAPK family signaling cascades | MAPK1/MAPK3 signaling"},{"drug":"BORTEZOMIB","action":"INHIBITOR","targetSymbol":"PSMD8","targetType":"protein complex","sharedPathways":"Regulation of RAS by GAPs | RAF/MAP kinase cascade | MAPK family signaling cascades | MAPK1/MAPK3 signaling"},{"drug":"BORTEZOMIB","action":"INHIBITOR","targetSymbol":"SEM1","targetType":"protein complex","sharedPathways":"Regulation of RAS by GAPs | MAPK1/MAPK3 signaling | RAF/MAP kinase cascade | MAPK family signaling cascades"},{"drug":"BRIGATINIB","action":"INHIBITOR","targetSymbol":"ALK","targetType":"single protein","sharedPathways":""},{"drug":"BRIGATINIB","action":"INHIBITOR","targetSymbol":"EGFR","targetType":"single protein","sharedPathways":"RAF/MAP kinase cascade | MAPK family signaling cascades | MAPK1/MAPK3 signaling"},{"drug":"CABOZANTINIB","action":"INHIBITOR","targetSymbol":"KDR","targetType":"single protein","sharedPathways":""},{"drug":"CABOZANTINIB","action":"INHIBITOR","targetSymbol":"MET","targetType":"single protein","sharedPathways":"RAF/MAP kinase cascade | MAPK family signaling cascades | MAPK1/MAPK3 signaling"},{"drug":"CAPMATINIB","action":"INHIBITOR","targetSymbol":"MET","targetType":"single protein","sharedPathways":"RAF/MAP kinase cascade | MAPK family signaling cascades | MAPK1/MAPK3 signaling"},{"drug":"CERDULATINIB","action":"INHIBITOR","targetSymbol":"JAK1","targetType":"single protein","sharedPathways":"MAPK family signaling cascades | MAPK1/MAPK3 signaling | RAF/MAP kinase cascade"},{"drug":"CERDULATINIB","action":"INHIBITOR","targetSymbol":"JAK3","targetType":"single protein","sharedPathways":"MAPK family signaling cascades | MAPK1/MAPK3 signaling | RAF/MAP kinase cascade"},{"drug":"CERDULATINIB","action":"INHIBITOR","targetSymbol":"SYK","targetType":"single protein","sharedPathways":""},{"drug":"CERDULATINIB","action":"INHIBITOR","targetSymbol":"TYK2","targetType":"single protein","sharedPathways":"MAPK family signaling cascades | MAPK1/MAPK3 signaling"},{"drug":"DECITABINE","action":"INHIBITOR","targetSymbol":"DNMT1","targetType":"single protein","sharedPathways":""},{"drug":"DECITABINE","action":"INHIBITOR","targetSymbol":"DNMT3A","targetType":"single protein","sharedPathways":""},{"drug":"DIGOXIN","action":"INHIBITOR","targetSymbol":"ATP1A1","targetType":"protein complex group","sharedPathways":""},{"drug":"DIGOXIN","action":"INHIBITOR","targetSymbol":"ATP1A2","targetType":"protein complex group","sharedPathways":""},{"drug":"DIGOXIN","action":"INHIBITOR","targetSymbol":"ATP1A3","targetType":"protein complex group","sharedPathways":""},{"drug":"DIGOXIN","action":"INHIBITOR","targetSymbol":"ATP1A4","targetType":"protein complex group","sharedPathways":""},{"drug":"DIGOXIN","action":"INHIBITOR","targetSymbol":"ATP1B1","targetType":"protein complex group","sharedPathways":""},{"drug":"DIGOXIN","action":"INHIBITOR","targetSymbol":"ATP1B2","targetType":"protein complex group","sharedPathways":""},{"drug":"DIGOXIN","action":"INHIBITOR","targetSymbol":"ATP1B3","targetType":"protein complex group","sharedPathways":""},{"drug":"DIGOXIN","action":"INHIBITOR","targetSymbol":"FXYD2","targetType":"protein complex group","sharedPathways":""},{"drug":"DOXORUBICIN","action":"INHIBITOR","targetSymbol":"TOP2A","targetType":"single protein","sharedPathways":""},{"drug":"DOXYCYCLINE","action":"INHIBITOR","targetSymbol":"MMP1","targetType":"single protein","sharedPathways":""},{"drug":"DOXYCYCLINE","action":"INHIBITOR","targetSymbol":"MMP13","targetType":"single protein","sharedPathways":""},{"drug":"DOXYCYCLINE","action":"INHIBITOR","targetSymbol":"MMP7","targetType":"single protein","sharedPathways":""},{"drug":"DOXYCYCLINE","action":"INHIBITOR","targetSymbol":"MMP8","targetType":"single protein","sharedPathways":""},{"drug":"ERIBULIN","action":"INHIBITOR","targetSymbol":"TUBA1A","targetType":"protein complex group","sharedPathways":""},{"drug":"ERIBULIN","action":"INHIBITOR","targetSymbol":"TUBA1B","targetType":"protein complex group","sharedPathways":""},{"drug":"ERIBULIN","action":"INHIBITOR","targetSymbol":"TUBA1C","targetType":"protein complex group","sharedPathways":""},{"drug":"ERIBULIN","action":"INHIBITOR","targetSymbol":"TUBA3C","targetType":"protein complex group","sharedPathways":""},{"drug":"ERIBULIN","action":"INHIBITOR","targetSymbol":"TUBA3E","targetType":"protein complex group","sharedPathways":""},{"drug":"ERIBULIN","action":"INHIBITOR","targetSymbol":"TUBA4A","targetType":"protein complex group","sharedPathways":""},{"drug":"ERIBULIN","action":"INHIBITOR","targetSymbol":"TUBB","targetType":"protein complex group","sharedPathways":""},{"drug":"ERIBULIN","action":"INHIBITOR","targetSymbol":"TUBB1","targetType":"protein complex group","sharedPathways":""},{"drug":"ERIBULIN","action":"INHIBITOR","targetSymbol":"TUBB2A","targetType":"protein complex group","sharedPathways":""},{"drug":"ERIBULIN","action":"INHIBITOR","targetSymbol":"TUBB2B","targetType":"protein complex group","sharedPathways":""},{"drug":"ERIBULIN","action":"INHIBITOR","targetSymbol":"TUBB3","targetType":"protein complex group","sharedPathways":""},{"drug":"ERIBULIN","action":"INHIBITOR","targetSymbol":"TUBB4A","targetType":"protein complex group","sharedPathways":""},{"drug":"ERIBULIN","action":"INHIBITOR","targetSymbol":"TUBB4B","targetType":"protein complex group","sharedPathways":""},{"drug":"ERIBULIN","action":"INHIBITOR","targetSymbol":"TUBB6","targetType":"protein complex group","sharedPathways":""},{"drug":"ERIBULIN","action":"INHIBITOR","targetSymbol":"TUBB8","targetType":"protein complex group","sharedPathways":""},{"drug":"ERLOTINIB","action":"INHIBITOR","targetSymbol":"EGFR","targetType":"single protein","sharedPathways":"RAF/MAP kinase cascade | MAPK family signaling cascades | MAPK1/MAPK3 signaling"},{"drug":"ETOPOSIDE","action":"INHIBITOR","targetSymbol":"TOP2A","targetType":"protein family","sharedPathways":""},{"drug":"ETOPOSIDE","action":"INHIBITOR","targetSymbol":"TOP2B","targetType":"protein family","sharedPathways":""},{"drug":"FIMEPINOSTAT","action":"INHIBITOR","targetSymbol":"HDAC1","targetType":"protein family","sharedPathways":""},{"drug":"FIMEPINOSTAT","action":"INHIBITOR","targetSymbol":"HDAC10","targetType":"protein family","sharedPathways":""},{"drug":"FIMEPINOSTAT","action":"INHIBITOR","targetSymbol":"HDAC11","targetType":"protein family","sharedPathways":""},{"drug":"FIMEPINOSTAT","action":"INHIBITOR","targetSymbol":"HDAC2","targetType":"protein family","sharedPathways":""},{"drug":"FIMEPINOSTAT","action":"INHIBITOR","targetSymbol":"HDAC3","targetType":"protein family","sharedPathways":""},{"drug":"FIMEPINOSTAT","action":"INHIBITOR","targetSymbol":"HDAC4","targetType":"protein family","sharedPathways":""},{"drug":"FIMEPINOSTAT","action":"INHIBITOR","targetSymbol":"HDAC5","targetType":"protein family","sharedPathways":""},{"drug":"FIMEPINOSTAT","action":"INHIBITOR","targetSymbol":"HDAC6","targetType":"protein family","sharedPathways":""},{"drug":"FIMEPINOSTAT","action":"INHIBITOR","targetSymbol":"HDAC7","targetType":"protein family","sharedPathways":""},{"drug":"FIMEPINOSTAT","action":"INHIBITOR","targetSymbol":"HDAC8","targetType":"protein family","sharedPathways":""},{"drug":"FIMEPINOSTAT","action":"INHIBITOR","targetSymbol":"HDAC9","targetType":"protein family","sharedPathways":""},{"drug":"FIMEPINOSTAT","action":"INHIBITOR","targetSymbol":"PIK3CA","targetType":"single protein","sharedPathways":"RAF/MAP kinase cascade | MAPK family signaling cascades | MAPK1/MAPK3 signaling"},{"drug":"FIMEPINOSTAT","action":"INHIBITOR","targetSymbol":"PIK3CB","targetType":"single protein","sharedPathways":"RAF/MAP kinase cascade | MAPK family signaling cascades | MAPK1/MAPK3 signaling"},{"drug":"FIMEPINOSTAT","action":"INHIBITOR","targetSymbol":"PIK3CD","targetType":"single protein","sharedPathways":""},{"drug":"IRINOTECAN","action":"INHIBITOR","targetSymbol":"TOP1","targetType":"single protein","sharedPathways":""},{"drug":"MIRDAMETINIB","action":"INHIBITOR","targetSymbol":"MAP2K1","targetType":"single protein","sharedPathways":"MAPK family signaling cascades | MAPK1/MAPK3 signaling | Oncogenic MAPK signaling | RAF/MAP kinase cascade"},{"drug":"MIRDAMETINIB","action":"INHIBITOR","targetSymbol":"MAP2K2","targetType":"single protein","sharedPathways":"MAPK family signaling cascades | MAPK1/MAPK3 signaling | Oncogenic MAPK signaling | RAF/MAP kinase cascade"},{"drug":"OLAPARIB","action":"INHIBITOR","targetSymbol":"PARP1","targetType":"protein family","sharedPathways":""},{"drug":"OLAPARIB","action":"INHIBITOR","targetSymbol":"PARP2","targetType":"protein family","sharedPathways":""},{"drug":"OLAPARIB","action":"INHIBITOR","targetSymbol":"PARP3","targetType":"protein family","sharedPathways":""},{"drug":"PALBOCICLIB","action":"INHIBITOR","targetSymbol":"CCND1","targetType":"protein complex","sharedPathways":""},{"drug":"PALBOCICLIB","action":"INHIBITOR","targetSymbol":"CDK4","targetType":"protein complex","sharedPathways":""},{"drug":"PALBOCICLIB","action":"INHIBITOR","targetSymbol":"CDK6","targetType":"protein complex","sharedPathways":""},{"drug":"PEXIDARTINIB","action":"INHIBITOR","targetSymbol":"CSF1R","targetType":"single protein","sharedPathways":""},{"drug":"PEXIDARTINIB","action":"INHIBITOR","targetSymbol":"FLT3","targetType":"single protein","sharedPathways":"RAF/MAP kinase cascade | MAPK family signaling cascades | MAPK1/MAPK3 signaling"},{"drug":"PEXIDARTINIB","action":"INHIBITOR","targetSymbol":"KIT","targetType":"single protein","sharedPathways":"RAF/MAP kinase cascade | MAPK family signaling cascades | MAPK1/MAPK3 signaling"},{"drug":"RIBOCICLIB","action":"INHIBITOR","targetSymbol":"CDK4","targetType":"single protein","sharedPathways":""},{"drug":"RIBOCICLIB","action":"INHIBITOR","targetSymbol":"CDK6","targetType":"single protein","sharedPathways":""},{"drug":"RIPRETINIB","action":"INHIBITOR","targetSymbol":"KIT","targetType":"single protein","sharedPathways":"RAF/MAP kinase cascade | MAPK family signaling cascades | MAPK1/MAPK3 signaling"},{"drug":"RIPRETINIB","action":"INHIBITOR","targetSymbol":"PDGFRA","targetType":"single protein","sharedPathways":"RAF/MAP kinase cascade | MAPK family signaling cascades | MAPK1/MAPK3 signaling"},{"drug":"SAPANISERTIB","action":"INHIBITOR","targetSymbol":"MTOR","targetType":"single protein","sharedPathways":""},{"drug":"SELUMETINIB","action":"INHIBITOR","targetSymbol":"MAP2K1","targetType":"single protein","sharedPathways":"MAPK family signaling cascades | MAPK1/MAPK3 signaling | Oncogenic MAPK signaling | RAF/MAP kinase cascade"},{"drug":"SELUMETINIB","action":"INHIBITOR","targetSymbol":"MAP2K2","targetType":"single protein","sharedPathways":"MAPK family signaling cascades | MAPK1/MAPK3 signaling | Oncogenic MAPK signaling | RAF/MAP kinase cascade"},{"drug":"SIROLIMUS","action":"INHIBITOR","targetSymbol":"FKBP1A","targetType":"single protein","sharedPathways":""},{"drug":"TRAMETINIB","action":"INHIBITOR","targetSymbol":"MAP2K1","targetType":"protein family","sharedPathways":"MAPK family signaling cascades | MAPK1/MAPK3 signaling | Oncogenic MAPK signaling | RAF/MAP kinase cascade"},{"drug":"TRAMETINIB","action":"INHIBITOR","targetSymbol":"MAP2K1","targetType":"single protein","sharedPathways":"MAPK family signaling cascades | MAPK1/MAPK3 signaling | Oncogenic MAPK signaling | RAF/MAP kinase cascade"},{"drug":"TRAMETINIB","action":"INHIBITOR","targetSymbol":"MAP2K2","targetType":"protein family","sharedPathways":"MAPK family signaling cascades | MAPK1/MAPK3 signaling | Oncogenic MAPK signaling | RAF/MAP kinase cascade"},{"drug":"TRAMETINIB","action":"INHIBITOR","targetSymbol":"MAP2K2","targetType":"single protein","sharedPathways":"MAPK family signaling cascades | MAPK1/MAPK3 signaling | Oncogenic MAPK signaling | RAF/MAP kinase cascade"},{"drug":"VORINOSTAT","action":"INHIBITOR","targetSymbol":"HDAC1","targetType":"single protein","sharedPathways":""},{"drug":"VORINOSTAT","action":"INHIBITOR","targetSymbol":"HDAC2","targetType":"single protein","sharedPathways":""},{"drug":"VORINOSTAT","action":"INHIBITOR","targetSymbol":"HDAC3","targetType":"single protein","sharedPathways":""},{"drug":"VORINOSTAT","action":"INHIBITOR","targetSymbol":"HDAC6","targetType":"single protein","sharedPathways":""}],"indication":[{"drug":"CABOZANTINIB","disease":"plexiform neurofibroma","stage":"PHASE_2"},{"drug":"DACARBAZINE","disease":"malignant peripheral nerve sheath tumor","stage":"PHASE_3"},{"drug":"DECITABINE","disease":"malignant peripheral nerve sheath tumor","stage":"PHASE_2"},{"drug":"EPIRUBICIN","disease":"malignant peripheral nerve sheath tumor","stage":"PHASE_3"},{"drug":"ETOPOSIDE","disease":"malignant peripheral nerve sheath tumor","stage":"PHASE_3"},{"drug":"IFOSFAMIDE","disease":"malignant peripheral nerve sheath tumor","stage":"PHASE_3"},{"drug":"MIRDAMETINIB","disease":"malignant peripheral nerve sheath tumor","stage":"EARLY_PHASE_1"},{"drug":"MIRDAMETINIB","disease":"plexiform neurofibroma","stage":"APPROVAL"},{"drug":"PEXIDARTINIB","disease":"malignant peripheral nerve sheath tumor","stage":"PHASE_1_2"},{"drug":"SELUMETINIB","disease":"malignant peripheral nerve sheath tumor","stage":"PHASE_2"},{"drug":"SELUMETINIB","disease":"plexiform neurofibroma","stage":"APPROVAL"},{"drug":"SIROLIMUS","disease":"malignant peripheral nerve sheath tumor","stage":"PHASE_2"},{"drug":"SIROLIMUS","disease":"plexiform neurofibroma","stage":"PHASE_2"},{"drug":"TRABECTEDIN","disease":"malignant peripheral nerve sheath tumor","stage":"PHASE_3"},{"drug":"TRAMETINIB","disease":"plexiform neurofibroma","stage":"PHASE_2"},{"drug":"VORINOSTAT","disease":"malignant peripheral nerve sheath tumor","stage":"EARLY_PHASE_1"}]};
+
+/* build a run-card: run button + status + viz mount + table/SPARQL disclosures */
+function buildCard(mountId, btnLabel, sparql, onData, fallbackKey) {
   const mount = document.getElementById(mountId);
   const row = document.createElement("div"); row.className = "runrow";
   const btn = document.createElement("button"); btn.className = "run-btn"; btn.type = "button";
   btn.textContent = btnLabel;
-  const st = document.createElement("span"); st.className = "status";
-  row.append(btn, st);
-  const viz = document.createElement("div");
-  const det = document.createElement("details"); det.className = "qbox";
-  const sum = document.createElement("summary"); sum.textContent = "SPARQL (runs verbatim)";
+  const st = document.createElement("span");
+  st.className = "status"; st.setAttribute("aria-live", "polite");
+  const fbBtn = document.createElement("button");
+  fbBtn.className = "ghost-btn fallback-btn"; fbBtn.type = "button";
+  fbBtn.textContent = "Show the recorded result instead";
+  fbBtn.style.display = "none";
+  row.append(btn, st, fbBtn);
+  const viz = document.createElement("div"); viz.className = "viz-mount";
+  const det = document.createElement("details"); det.className = "qbox prov";
+  const sum = document.createElement("summary"); sum.textContent = "The exact query that just ran (SPARQL)";
   const pre = document.createElement("pre"); pre.textContent = sparql;
   det.append(sum, pre);
   mount.append(row, viz, det);
+
+  const markDone = () => {
+    const step = +mount.closest(".panel").dataset.step;
+    doneSteps.add(step); completeStepEdges(step); go(cur);
+  };
   btn.addEventListener("click", async () => {
     btn.disabled = true;
     try {
       const rows = await runQuery(sparql, st);
       viz.replaceChildren();
       onData(rows, viz);
-      const step = +mount.closest(".panel").dataset.step;
-      doneSteps.add(step); completeStepEdges(step); go(cur);
+      fbBtn.style.display = "none";
+      markDone();
     } catch (e) {
-      st.textContent = String(e.message || e); st.className = "status err";
+      st.textContent = String(e.message || e);
+      st.className = "status err"; st.setAttribute("role", "alert");
+      if (fallbackKey && FALLBACK[fallbackKey]) fbBtn.style.display = "";
     } finally { btn.disabled = false; }
+  });
+  fbBtn.addEventListener("click", () => {
+    viz.replaceChildren();
+    const stamp = el("p", "recorded-stamp", "Recorded 2026-09-28, not live.");
+    viz.appendChild(stamp);
+    onData(FALLBACK[fallbackKey].map(r => ({ ...r })), viz);
+    markDone();
   });
   return { btn, st, viz };
 }
@@ -729,7 +919,7 @@ function el(tag, cls, text) {
 }
 function dataTable(viz, headers, rows) {
   const det = el("details"); det.className = "qbox";
-  det.appendChild(el("summary", null, "Table view"));
+  det.appendChild(el("summary", null, "Every row, as a table"));
   const wrap = el("div", "tblwrap");
   const t = el("table", "data");
   const tr = el("tr");
@@ -755,14 +945,17 @@ document.getElementById("connectBtn").addEventListener("click", async () => {
     const pinned = [CONFIG.nf, CONFIG.ot, CONFIG.reactome];
     const t = el("table", "data");
     const h = el("tr");
-    ["pinned graph", "triples (declared)", "release"].forEach(x => h.appendChild(el("th", null, x)));
+    ["dataset", "facts", "version"].forEach(x => h.appendChild(el("th", null, x)));
     const thead = el("thead"); thead.appendChild(h); t.appendChild(thead);
     const tb = el("tbody");
     for (const g of pinned) {
       const r = rows.find(x => x.g === g);
       const tr = el("tr");
-      const td1 = el("td", "mono", g);
-      td1.style.color = "var(--ink)"; td1.style.fontWeight = "650";
+      // plain name first, the exact graph name underneath (B1)
+      const td1 = el("td");
+      const plain = el("span", "plain", DATASET_LABEL[g.split(":")[2]] || g);
+      plain.style.fontWeight = "650";
+      td1.append(plain, el("span", "precise", g));
       tr.appendChild(td1);
       if (r) {
         tr.appendChild(el("td", null, Number(r.triples).toLocaleString()));
@@ -771,7 +964,7 @@ document.getElementById("connectBtn").addEventListener("click", async () => {
         const urnDate = (g.split(":").pop().match(/^\d{4}-\d{2}-\d{2}$/) || [])[0];
         tr.appendChild(el("td", null, r.version || urnDate || "—"));
       } else {
-        const miss = el("td", null, "MISSING — re-pin or re-deposit");
+        const miss = el("td", null, "Not loaded");
         miss.style.color = "var(--critical)"; miss.style.fontWeight = "650";
         miss.colSpan = 2; tr.appendChild(miss);
       }
@@ -779,10 +972,13 @@ document.getElementById("connectBtn").addEventListener("click", async () => {
     }
     t.appendChild(tb); out.appendChild(t);
     out.appendChild(el("p", "viz-sub",
-      "Triple counts come from each graph’s own provenance manifest — read, not counted, so this check is fast."));
+      "A fact is one statement, like “this file was screened with trametinib”. Each dataset " +
+      "publishes its own count, so this check reads three numbers instead of counting every " +
+      "statement in all three. It comes back in about a second. (Technically: named graphs, " +
+      "triples, and each graph’s void:Dataset manifest.)"));
     // full census stays available, explicitly marked slow
     const censusRow = el("div", "runrow");
-    const censusBtn = el("button", "ghost-btn", "Full census — every loaded graph, counted (slow, ~1 min)");
+    const censusBtn = el("button", "ghost-btn", "Count every dataset on the server (slow — counts each statement one by one)");
     censusBtn.type = "button";
     const cst = el("span", "status");
     censusRow.append(censusBtn, cst);
@@ -809,15 +1005,65 @@ document.getElementById("connectBtn").addEventListener("click", async () => {
         cst.textContent = String(e.message || e); cst.className = "status err";
       } finally { censusBtn.disabled = false; }
     });
-    if (rows.length === pinned.length) { doneSteps.add(0); go(cur); }
-    else { st.textContent = "pinned graph missing — see table"; st.className = "status err"; }
+    // D1: test membership, not row count — a graph with two manifest rows is still present
+    const found = new Set(rows.map(r => r.g));
+    if (pinned.every(g => found.has(g))) {
+      doneSteps.add(0); go(cur);
+      out.appendChild(rehearseRow());
+    } else {
+      st.textContent = "One of the three datasets is not loaded — the rest of the demo will not run.";
+      st.className = "status err"; st.setAttribute("role", "alert");
+      console.warn("missing pinned graph(s):", pinned.filter(g => !found.has(g)),
+                   "— re-pin CONFIG, or re-deposit the snapshot");
+    }
   } catch (e) {
-    st.textContent = String(e.message || e); st.className = "status err";
+    st.textContent = String(e.message || e);
+    st.className = "status err"; st.setAttribute("role", "alert");
   }
 });
 
+/* C5: run all four steps once before the talk, so a slow query or an expired
+   token is discovered in rehearsal rather than on stage. */
+function rehearseRow() {
+  const row = el("div", "runrow");
+  row.style.marginTop = "14px";
+  const btn = el("button", "ghost-btn", "Rehearse — run all four steps now");
+  btn.type = "button";
+  const st = el("span", "status"); st.setAttribute("aria-live", "polite");
+  const hint = el("span", "viz-sub");
+  hint.style.margin = "0";
+  hint.textContent = "Run this before the talk. Each step still re-runs live when you get to it.";
+  row.append(btn, st);
+  const wrap = el("div"); wrap.append(row, hint);
+  btn.addEventListener("click", async () => {
+    btn.disabled = true;
+    let ok = 0; const failed = [];
+    for (let i = 1; i <= 4; i++) {
+      st.textContent = `Rehearsing step ${i} of 4…`; st.className = "status";
+      const card = document.getElementById("card-" + i);
+      const runBtn = card && card.querySelector(".run-btn");
+      if (!runBtn) continue;
+      runBtn.click();
+      // wait for this card's status line to settle
+      const stEl = card.querySelector(".status");
+      await new Promise(res => {
+        const iv = setInterval(() => {
+          if (!runBtn.disabled) { clearInterval(iv); res(); }
+        }, 300);
+      });
+      if (stEl && stEl.classList.contains("ok")) ok++; else failed.push(i);
+    }
+    st.textContent = failed.length
+      ? `${ok} of 4 returned — step ${failed.join(", ")} failed. Check the message on that step.`
+      : "4 of 4 returned.";
+    st.className = failed.length ? "status err" : "status ok";
+    btn.disabled = false;
+  });
+  return wrap;
+}
+
 /* =================== step 1: progression matrix =================== */
-buildCard("card-1", "Run hop 1 — traverse the variant layer", Q.progressionDetail, (rows, viz) => {
+buildCard("card-1", "Run step 1 — find this patient’s variants", Q.progressionDetail, (rows, viz) => {
   // shape: unique alleles (symbol+change) x unique specimens
   const alleles = [];
   const specs = new Map(); // specimenID -> tumorTypes set
@@ -835,8 +1081,11 @@ buildCard("card-1", "Run hop 1 — traverse the variant layer", Q.progressionDet
   const cols = [...specs.keys()].sort((a, b) => (isM(a) - isM(b)) || a.localeCompare(b));
   alleles.sort((a, b) => hit.get(b.key).size - hit.get(a.key).size);
 
-  viz.appendChild(el("p", "viz-title", "Driver alleles × lesions"));
-  viz.appendChild(el("p", "viz-sub", "A filled cell = this exact VRS allele observed in this specimen. Columns ordered by transformation."));
+  viz.appendChild(el("p", "viz-title", "DNA changes × tumours sampled"));
+  viz.appendChild(el("p", "viz-sub",
+    "A filled cell means this exact DNA change was found in that tumour. Columns run left " +
+    "to right, benign to malignant. Hover a cell for the specimen, its tumour type and the " +
+    "VRS identifier."));
   const table = el("table", "matrix");
   // group header row
   const g = el("tr");
@@ -863,16 +1112,20 @@ buildCard("card-1", "Run hop 1 — traverse the variant layer", Q.progressionDet
     rh.appendChild(el("span", "mono", a.vrs.slice(0, 26) + "…"));
     tr.appendChild(rh);
     for (const c of cols) {
-      const td = el("td", "cell" + (hit.get(a.key).has(c) ? " on" : ""));
+      const on = hit.get(a.key).has(c);
+      const group = isM(c) ? "malignant" : "benign";
+      const td = el("td", "cell" + (on ? " on " + group : ""));
       td.tabIndex = 0;
+      const tumour = [...(specs.get(c) || [])].join(", ") || "specimen";
       const rowsTip = [
-        [a.symbol + " " + a.change, hit.get(a.key).has(c) ? "observed" : "not observed"],
-        [c, [...(specs.get(c) || [])].join(", ") || "specimen"],
-        [a.vrs, "VRS allele"],
+        [a.symbol + " " + a.change, on ? "observed" : "not observed"],
+        [c, tumour],
+        [a.vrs, "VRS identifier"],
       ];
-      td.addEventListener("pointermove", e => showTip(e, rowsTip));
-      td.addEventListener("pointerleave", hideTip);
-      td.addEventListener("focus", e => { const r = td.getBoundingClientRect(); showTip({clientX:r.right, clientY:r.top}, rowsTip); });
+      td.setAttribute("aria-label",
+        `${a.symbol} ${a.change}, ${on ? "observed" : "not observed"} in ${c} (${tumour})`);
+      bindTip(td, () => rowsTip);
+      td.addEventListener("focus", () => { const r = td.getBoundingClientRect(); showTip({clientX: r.right, clientY: r.top}, rowsTip); });
       td.addEventListener("blur", hideTip);
       tr.appendChild(td);
     }
@@ -881,11 +1134,21 @@ buildCard("card-1", "Run hop 1 — traverse the variant layer", Q.progressionDet
   viz.appendChild(table);
   dataTable(viz, ["specimen", "gene", "change", "VRS", "tumor type(s)"],
     rows.map(r => [r.specimenID, r.symbol, r.change || "", r.vrs, r.tumorType || ""]));
-});
+}, "progression");
 
 /* =================== step 2: screening bars =================== */
 const STORY_DRUGS = /trametinib|tno155|ribociclib|selumetinib|mirdametinib/i;
-buildCard("card-2", "Run hop 2 — screening files by molecule", Q.screening, (rows, viz) => {
+/* Open Targets uses each molecule's preferred name; the audience heard TNO155 in
+   step 2, so carry the familiar name alongside it. Raw labels stay in the table. */
+const DISPLAY_NAME = { "BATOPROTAFIB": "batoprotafib (TNO155)" };
+const drugName = d => DISPLAY_NAME[d] || d.toLowerCase();
+/* Clinical stage enums, rendered readably. PHASE_1_2 must not read "phase 1 2". */
+const STAGE_LABEL = {
+  EARLY_PHASE_1: "early phase 1", PHASE_1: "phase 1", PHASE_1_2: "phase 1/2",
+  PHASE_2: "phase 2", PHASE_2_3: "phase 2/3", PHASE_3: "phase 3", APPROVAL: "approved",
+};
+const stageLabel = s => STAGE_LABEL[s] || s.replaceAll("_", " ").toLowerCase();
+buildCard("card-2", "Run step 2 — find drugs screened on their cells", Q.screening, (rows, viz) => {
   rows.forEach(r => r.n = +r.files);
   rows.sort((a, b) => b.n - a.n);
   const top = rows.slice(0, 14);
@@ -893,30 +1156,38 @@ buildCard("card-2", "Run hop 2 — screening files by molecule", Q.screening, (r
   const restFiles = rest.reduce((s, r) => s + r.n, 0);
   const max = Math.max(...top.map(r => r.n));
 
-  viz.appendChild(el("p", "viz-title", "Screening files per resolved molecule — " + rows.length + " molecules for this individual"));
-  viz.appendChild(el("p", "viz-sub", "Story compounds highlighted; the label under each ChEMBL id is the portal’s original free text, kept verbatim."));
+  viz.appendChild(el("p", "viz-title",
+    "Screening files per molecule — " + rows.length + " molecules for this patient"));
+  viz.appendChild(el("p", "viz-sub",
+    "Each row is one molecule named on this patient’s own screening files. The grey line " +
+    "is its ChEMBL identifier, the public id that lets the next two steps reach Open " +
+    "Targets. Portal text is shown exactly as it was recorded."));
   const grid = el("div", "barlist");
   for (const r of top) {
     const hot = STORY_DRUGS.test(r.compoundName || "");
     const chembl = (r.compound || "").split("/").pop();
     const lab = el("div", "bar-label");
-    lab.appendChild(el("span", null, chembl));
-    lab.appendChild(el("br"));
-    lab.appendChild(el("span", "raw", r.compoundName ? r.compoundName : "(no free text — from experimentalCondition)"));
+    // plain name leads; the identifier sits under it (B1/A5)
+    if (r.compoundName) {
+      lab.appendChild(el("span", "plain", r.compoundName));
+      lab.appendChild(el("br"));
+      lab.appendChild(el("span", "raw", chembl));
+    } else {
+      lab.appendChild(el("span", "plain", chembl));
+      lab.appendChild(el("br"));
+      lab.appendChild(el("span", "raw", "no drug name on the file — identified from the experiment’s condition field"));
+    }
     const track = el("div", "bar-track");
     const bar = el("div", "bar" + (hot ? " hot" : ""));
     bar.style.width = (r.n / max * 100) + "%";
     track.appendChild(bar);
     const val = el("div", "bar-val", String(r.n));
-    const hitTip = e => showTip(e, [
-      [String(r.n) + " files", chembl],
-      [r.compoundName || "no compoundName", "portal free text"],
+    const tipRows = () => [
+      [String(r.n) + " files", r.compoundName || chembl],
+      [chembl, "ChEMBL identifier"],
       [r.specimens || "", "specimens"],
-    ]);
-    for (const elm of [lab, track, val]) {
-      elm.addEventListener("pointermove", hitTip);
-      elm.addEventListener("pointerleave", hideTip);
-    }
+    ];
+    for (const elm of [lab, track, val]) bindTip(elm, tipRows);
     grid.append(lab, track, val);
   }
   viz.appendChild(grid);
@@ -924,24 +1195,28 @@ buildCard("card-2", "Run hop 2 — screening files by molecule", Q.screening, (r
     `+ ${rest.length} more molecules over ${restFiles} files — full list in the table view.`));
   const leg = el("div", "legend");
   const k1 = el("span"); const s1 = el("span", "key"); s1.style.background = "var(--accent)";
-  k1.append(s1, document.createTextNode("story compounds (MEKi, SHP2i, CDK4/6i)"));
+  k1.append(s1, document.createTextNode("drugs this demo follows"));
   const k2 = el("span"); const s2 = el("span", "key"); s2.style.background = "var(--ctx)";
-  k2.append(s2, document.createTextNode("other screened molecules"));
+  k2.append(s2, document.createTextNode("other molecules screened on these cells"));
   leg.append(k1, k2); viz.appendChild(leg);
   dataTable(viz, ["ChEMBL", "portal free text", "files", "specimens"],
     rows.map(r => [(r.compound || "").split("/").pop(), r.compoundName || "", String(r.n), r.specimens || ""]));
-});
+}, "screening");
 
 /* =================== step 3: mechanism link diagram =================== */
-buildCard("card-3", "Run hop 3 — one query, three graphs", Q.mechanism, (rows, viz) => {
+buildCard("card-3", "Run step 3 — connect those drugs to NF1’s pathway", Q.mechanism, (rows, viz) => {
   // default: single-protein edges only (the graph's own counting rule);
   const single = rows.filter(r => r.targetType === "single protein");
   const withPw = single.filter(r => r.sharedPathways);
   const noPw = single.filter(r => !r.sharedPathways);
 
-  viz.appendChild(el("p", "viz-title", "Compound → target → pathway shared with NF1"));
+  viz.appendChild(el("p", "viz-title", "What each drug acts on, and where that meets NF1"));
   viz.appendChild(el("p", "viz-sub",
-    "Single-protein mechanism edges. Root pathways excluded — transitive closure puts every signalling gene in “Disease”, so only specific shared membership draws a line."));
+    "Only relationships where the drug acts on one named protein. A line on the right means " +
+    "that protein and NF1 belong to the same specific pathway. Very broad pathways " +
+    "(“Disease”, “Signal transduction”) are excluded: nearly every signalling gene is in " +
+    "them, so they would connect everything to everything. Open Targets uses each " +
+    "molecule’s preferred name — TNO155’s is batoprotafib."));
 
   const drugs = [...new Set(withPw.map(r => r.drug))].sort((a, b) => {
     const ha = STORY_DRUGS.test(a) || a === "BATOPROTAFIB", hb = STORY_DRUGS.test(b) || b === "BATOPROTAFIB";
@@ -957,7 +1232,10 @@ buildCard("card-3", "Run hop 3 — one query, three graphs", Q.mechanism, (rows,
 
   const rowH = 26, headH = 34;
   const H = headH + Math.max(drugs.length, targets.length, pathways.length) * rowH + 10;
-  const W = 900, xD = 10, xT = 380, xP = 560, chipW = 150;
+  const xD = 10, xT = 380, xP = 560, chipW = 150;
+  // size the canvas to the longest pathway name — never clip the evidence (B5)
+  const longest = Math.max(0, ...pathways.map(p => p.length));
+  const W = Math.max(900, xP + longest * 6.4 + 16);
   const yOf = (list, name) => headH + list.indexOf(name) * rowH + rowH / 2;
   const NS = "http://www.w3.org/2000/svg";
   const wrap = el("div", "mech-wrap");
@@ -977,9 +1255,9 @@ buildCard("card-3", "Run hop 3 — one query, three graphs", Q.mechanism, (rows,
     t.setAttribute("class", "mech-colhead"); t.textContent = text;
     svg.appendChild(t);
   }
-  colhead(xD, "COMPOUND (SCREENED ON THESE CELLS)");
-  colhead(xT, "TARGET");
-  colhead(xP, "REACTOME PATHWAY SHARED WITH NF1");
+  colhead(xD, "DRUG SCREENED ON THESE CELLS");
+  colhead(xT, "PROTEIN IT ACTS ON");
+  colhead(xP, "PATHWAY SHARED WITH NF1 (REACTOME)");
 
   // links first (under text)
   for (const r of withPw) {
@@ -997,44 +1275,50 @@ buildCard("card-3", "Run hop 3 — one query, three graphs", Q.mechanism, (rows,
       svg.appendChild(q);
     }
   }
-  function chips(list, x, hotSet, subOf) {
+  function chips(list, x, hotSet, display) {
     for (const name of list) {
       const y = yOf(list, name);
       const t = document.createElementNS(NS, "text");
       t.setAttribute("x", x); t.setAttribute("y", y + 4);
       t.setAttribute("class", "mech-chip" + (hotSet.has(name) ? "" : " dim"));
-      t.textContent = name;
+      t.textContent = display ? display(name) : name;
       svg.appendChild(t);
     }
   }
-  chips(drugs, xD, new Set(drugs.filter(isHotDrug)));
-  chips(targets, xT, hotTargets);
+  chips(drugs, xD, new Set(drugs.filter(isHotDrug)), drugName);
+  chips(targets, xT, hotTargets);           // gene/protein symbols stay upper case
   chips(pathways, xP, hotPw);
   wrap.appendChild(svg); viz.appendChild(wrap);
 
   const legend = el("div", "legend");
   const k1 = el("span"); const s1 = el("span", "key line"); s1.style.background = "var(--accent)";
-  k1.append(s1, document.createTextNode("the story chain: MEKi + SHP2i into NF1’s MAPK cascade"));
+  k1.append(s1, document.createTextNode("the chain this demo follows: MEK and SHP2 inhibitors into NF1’s own cascade"));
   const k2 = el("span"); const s2 = el("span", "key line"); s2.style.background = "var(--grid)";
-  k2.append(s2, document.createTextNode("other screened compounds with a specific shared pathway"));
+  k2.append(s2, document.createTextNode("other screened drugs that share a specific pathway with NF1"));
   legend.append(k1, k2);
   viz.appendChild(legend);
 
   if (noPw.length) {
-    const names = [...new Set(noPw.map(r => `${r.drug} → ${r.targetSymbol}`))];
+    const names = [...new Set(noPw.map(r => `${drugName(r.drug)} → ${r.targetSymbol}`))];
     const note = el("p", "mech-note");
-    note.appendChild(el("strong", null, "Mechanism present, no specific NF1 pathway shared: "));
+    note.appendChild(el("strong", null, "Acts on a known protein, but shares no specific NF1 pathway: "));
     note.appendChild(document.createTextNode(names.join(" · ") +
-      ". Ribociclib is the instructive one — CDK4/6 is not in NF1’s Reactome pathways; its rationale here is the TNO155 combination, and the graph says so honestly."));
+      ". Ribociclib is the useful one: CDK4 and CDK6 are in none of NF1’s specific pathways. " +
+      "It was screened as half of a combination with TNO155, and the data does not pretend otherwise."));
     viz.appendChild(note);
   }
   dataTable(viz, ["drug", "action", "target", "target type", "shared pathways (specific)"],
     rows.map(r => [r.drug, r.action, r.targetSymbol, r.targetType, r.sharedPathways || ""]));
-});
+}, "mechanism");
 
 /* =================== step 4: stage dot matrix =================== */
 const STAGE_ORDER = ["EARLY_PHASE_1", "PHASE_1", "PHASE_1_2", "PHASE_2", "PHASE_2_3", "PHASE_3", "APPROVAL"];
-buildCard("card-4", "Run hop 4 — indications on the patient’s own tumour classes", Q.indication, (rows, viz) => {
+/* the precise term stays reachable, in the legend and the hover (B1) */
+const DISEASE_ID = {
+  "plexiform neurofibroma": "EFO_0000658",
+  "malignant peripheral nerve sheath tumor": "MONDO_0017827",
+};
+buildCard("card-4", "Run step 4 — check regulatory status", Q.indication, (rows, viz) => {
   const stages = STAGE_ORDER.filter(s => rows.some(r => r.stage === s));
   rows.forEach(r => { if (!stages.includes(r.stage)) stages.push(r.stage); });
   const diseases = [...new Set(rows.map(r => r.disease))].sort();
@@ -1046,54 +1330,76 @@ buildCard("card-4", "Run hop 4 — indications on the patient’s own tumour cla
   });
   const drugs = [...best.keys()].sort((a, b) => (best.get(b) - best.get(a)) || a.localeCompare(b));
 
-  viz.appendChild(el("p", "viz-title", "Maximum clinical stage per drug–disease pair"));
-  viz.appendChild(el("p", "viz-sub", "Each dot is one drug–disease edge. The stage is a property of the pair — quoting it without its disease misreads the data."));
+  viz.appendChild(el("p", "viz-title", "The furthest each drug has got, per disease"));
+  viz.appendChild(el("p", "viz-sub",
+    "Each dot is one drug paired with one disease, placed at the furthest stage that " +
+    "pairing has reached. Nothing is “approved” in general — it is approved for something, " +
+    "and the legend names which."));
   const t = el("table", "stagegrid");
   const h = el("tr"); h.appendChild(el("th"));
   stages.forEach(s => {
-    const th = el("th", s === "APPROVAL" ? "approval" : "", s.replaceAll("_", " ").toLowerCase());
+    const th = el("th", s === "APPROVAL" ? "approval" : "", stageLabel(s));
     h.appendChild(th);
   });
   const thead = el("thead"); thead.appendChild(h); t.appendChild(thead);
   const tb = el("tbody");
   for (const d of drugs) {
     const tr = el("tr");
-    tr.appendChild(el("td", "drug", d.toLowerCase()));
+    tr.appendChild(el("td", "drug", drugName(d)));
     for (const s of stages) {
       const td = el("td", "slot" + (s === "APPROVAL" ? " approval-col" : ""));
       const here = rows.filter(r => r.drug === d && r.stage === s);
       for (const r of here) {
         const dot = el("span", "dot " + sOf(r.disease));
         dot.tabIndex = 0;
-        const tipRows = [[r.stage.replaceAll("_", " "), r.drug.toLowerCase()], [r.disease, "indication"]];
-        dot.addEventListener("pointermove", e => showTip(e, tipRows));
-        dot.addEventListener("pointerleave", hideTip);
+        const tipRows = [[stageLabel(r.stage), drugName(r.drug)],
+                         [r.disease, DISEASE_ID[r.disease] || "indication"]];
+        dot.setAttribute("aria-label",
+          `${drugName(r.drug)}, ${r.disease}: ${stageLabel(r.stage)}`);
         dot.addEventListener("focus", () => { const b = dot.getBoundingClientRect(); showTip({clientX: b.right, clientY: b.top}, tipRows); });
         dot.addEventListener("blur", hideTip);
         dot.style.marginInline = "2px";
         td.appendChild(dot);
+      }
+      // D5: the 84x30 cell is the hit target, not the 12px dot
+      if (here.length) {
+        bindTip(td, () => here.flatMap(r => [
+          [stageLabel(r.stage), drugName(r.drug)],
+          [r.disease, DISEASE_ID[r.disease] || "indication"],
+        ]));
       }
       tr.appendChild(td);
     }
     tb.appendChild(tr);
   }
   t.appendChild(tb); viz.appendChild(t);
+  // C6: the punchline, on the chart that shows it
+  const punch = el("p", "mech-note");
+  punch.appendChild(document.createTextNode(
+    "The two approved drugs, mirdametinib and selumetinib, are not the MEK inhibitor these " +
+    "cells were screened with. That one, trametinib, is at phase 2 for the same disease."));
+  viz.appendChild(punch);
+
   const leg = el("div", "legend");
   for (const d of diseases) {
     const k = el("span"); const sw = el("span", "key");
     sw.style.background = sOf(d) === "s1" ? "var(--accent)" : "var(--series-2)";
     sw.style.borderRadius = "50%";
-    k.append(sw, document.createTextNode(d));
+    k.append(sw, document.createTextNode(
+      DISEASE_ID[d] ? `${d} · ${DISEASE_ID[d]}` : d));
     leg.appendChild(k);
   }
   viz.appendChild(leg);
   viz.appendChild(el("p", "viz-sub",
-    "“Approval for NF1” (the disease) is real but out of frame by construction: MONDO_0018975 is not one of this patient’s tumour classes."));
+    "These drugs are also approved for neurofibromatosis type 1 itself. That is off this " +
+    "chart on purpose: the query asks only about the two tumour types recorded for this " +
+    "patient, and NF1-the-disease is not one of them."));
   dataTable(viz, ["drug", "disease", "max clinical stage"],
     rows.map(r => [r.drug, r.disease, r.stage]));
-});
+}, "indication");
 
 /* boot */
+paintScopebars();
 drawSpine(0);
 go(0);
 </script>

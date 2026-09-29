@@ -36,4 +36,21 @@ Pinned graph versions live in the `CONFIG` object at the top of the script in
 `index.html`. When a newer snapshot is deposited, re-pin there (the setup step's
 connection check flags a missing pinned graph).
 
-Keyboard: `←`/`→` to move between steps.
+## Before the talk
+
+Run **Rehearse — run all four steps now** on the setup step once. It runs all four
+queries in sequence and reports `4 of 4 returned`, so a slow query, an unloaded
+dataset, or an expired token turns up in rehearsal rather than on stage.
+
+If a live query fails during the talk, each step offers **Show the recorded result
+instead** — the verified 2026-09-28 results, embedded in the file. It renders the
+same chart, stamped `Recorded 2026-09-28, not live.` It is never used silently and
+never substitutes for a failure message.
+
+## Keyboard
+
+| Key | |
+|---|---|
+| `←` `→` | move between steps |
+| `n` | presenter notes — the expected result for each step, and what to point at |
+| `r` | reset the run (keeps the token, clears every result) |
