@@ -14,9 +14,10 @@ No build, no server needed — the query API has open CORS:
 xdg-open "file://$PWD/examples/sagebrain-demo/index.html#token=$SYNAPSE_AUTH_TOKEN"
 ```
 
-or open `index.html` directly and paste a Synapse PAT into the setup step.
-The token must belong to a member of the Sage Brain team; it is kept in
-`sessionStorage` only (gone when the tab closes).
+or open `index.html` directly and paste a Synapse PAT into the key panel — the
+**Token** button top right, or **Access token** on the setup step, opens a side
+drawer for it (`k` on the keyboard). The token must belong to a member of the
+Sage Brain team; it is kept in `sessionStorage` only (gone when the tab closes).
 
 ## What each step runs
 
@@ -54,3 +55,4 @@ never substitutes for a failure message.
 | `←` `→` | move between steps |
 | `n` | presenter notes — the expected result for each step, and what to point at |
 | `r` | reset the run (keeps the token, clears every result) |
+| `k` | open the token panel (`Esc` shuts it) |

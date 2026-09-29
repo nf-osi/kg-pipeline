@@ -249,12 +249,61 @@ table.data td.mono { font-size: 11px; color: var(--ink-2); }
 
 /* setup panel */
 .setup-grid { display: grid; grid-template-columns: 1fr; gap: 10px; max-width: 560px; }
-.setup-grid label { font-size: 12.5px; color: var(--ink-2); }
-.setup-grid input {
-  width: 100%; font-family: ui-monospace, Menlo, monospace; font-size: 12px;
+
+/* ---------- token drawer (Colab-style key panel) --------------------------- */
+.key-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  border: 1px solid var(--border); background: var(--surface); color: var(--ink-2);
+  border-radius: 7px; padding: 4px 10px; font: inherit; font-size: 12px; cursor: pointer;
+}
+.key-btn:hover { color: var(--ink); }
+.key-btn svg { width: 14px; height: 14px; }
+/* the dot is the only thing that says "a token is loaded" once the panel is shut */
+.key-dot {
+  width: 7px; height: 7px; border-radius: 50%; background: var(--grid);
+}
+.key-btn.has-token .key-dot { background: var(--good); }
+
+.drawer-scrim {
+  position: fixed; inset: 0; z-index: 60; background: rgba(15, 23, 34, 0.28);
+  opacity: 0; pointer-events: none; transition: opacity 0.2s ease;
+}
+.drawer-scrim.open { opacity: 1; pointer-events: auto; }
+.drawer {
+  position: fixed; top: 0; right: 0; bottom: 0; z-index: 61; width: min(380px, 92vw);
+  background: var(--surface); border-left: 1px solid var(--border);
+  box-shadow: -8px 0 28px rgba(0,0,0,0.16);
+  display: flex; flex-direction: column;
+  transform: translateX(100%); visibility: hidden;
+  transition: transform 0.22s ease, visibility 0.22s ease;
+}
+.drawer.open { transform: none; visibility: visible; }
+@media (prefers-reduced-motion: reduce) {
+  .drawer, .drawer-scrim { transition: none; }
+}
+.drawer-head {
+  display: flex; align-items: center; gap: 9px;
+  padding: 14px 16px; border-bottom: 1px solid var(--border);
+}
+.drawer-head svg { width: 16px; height: 16px; color: var(--accent); flex: none; }
+.drawer-head h2 { font-size: 14px; font-weight: 700; margin: 0; letter-spacing: 0; }
+.drawer-head .spacer { flex: 1; }
+.drawer-close {
+  border: none; background: none; color: var(--ink-2); cursor: pointer;
+  font-size: 15px; line-height: 1; padding: 4px 6px; border-radius: 6px;
+}
+.drawer-close:hover { background: var(--page); color: var(--ink); }
+.drawer-body { padding: 16px; overflow-y: auto; display: grid; gap: 10px; align-content: start; }
+.drawer-body label { font-size: 12.5px; color: var(--ink-2); }
+.drawer-body input {
+  width: 100%; box-sizing: border-box;
+  font-family: ui-monospace, Menlo, monospace; font-size: 12px;
   border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px;
   background: var(--page); color: var(--ink);
 }
+.drawer-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.drawer-note { font-size: 12px; color: var(--ink-2); margin: 2px 0 0; }
+.drawer-note + .drawer-note { margin-top: -2px; }
 .callout {
   border-left: 3px solid var(--baseline); background: var(--surface);
   border-radius: 0 10px 10px 0; padding: 10px 14px; font-size: 13px; color: var(--ink-2);
@@ -282,6 +331,32 @@ kbd { font-family: ui-monospace, Menlo, monospace; font-size: 11px; border: 1px 
 <body>
 <div class="frame">
 
+<!-- token drawer: the access token lives here, not on the stage -->
+<div class="drawer-scrim" id="keyScrim"></div>
+<aside class="drawer" id="keyPanel" role="dialog" aria-modal="true"
+       aria-labelledby="keyPanelTitle" inert>
+  <div class="drawer-head">
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.65 10A6 6 0 1 0 12.65 14H17v4h4v-4h2v-4H12.65zM7 14a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/></svg>
+    <h2 id="keyPanelTitle">Access token</h2>
+    <div class="spacer"></div>
+    <button class="drawer-close" id="keyClose" type="button" aria-label="Close token panel">&#x2715;</button>
+  </div>
+  <div class="drawer-body">
+    <label for="tok">Synapse personal access token</label>
+    <input id="tok" type="password" autocomplete="off" spellcheck="false"
+           placeholder="paste token, or launch with #token=&hellip;">
+    <div class="drawer-row">
+      <button class="ghost-btn" id="tokShow" type="button" aria-pressed="false">Show</button>
+      <button class="ghost-btn" id="tokClear" type="button">Clear</button>
+      <div class="spacer" style="flex:1"></div>
+      <button class="run-btn" id="keyDone" type="button">Done</button>
+    </div>
+    <p class="drawer-note">Held in this browser tab only, and sent to nothing but the
+    query service. It disappears when the tab closes.</p>
+    <p class="drawer-note">The token must belong to a member of the Sage Brain team.</p>
+  </div>
+</aside>
+
 <header class="top">
   <div>
     <div class="eyebrow">Sage Brain · queried live · one patient</div>
@@ -290,6 +365,11 @@ kbd { font-family: ui-monospace, Menlo, monospace; font-size: 11px; border: 1px 
     Connected to drug screens and indications.</p>
   </div>
   <div class="spacer"></div>
+  <button class="key-btn" id="keyBtn" type="button" aria-controls="keyPanel"
+          aria-expanded="false" title="Synapse access token">
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.65 10A6 6 0 1 0 12.65 14H17v4h4v-4h2v-4H12.65zM7 14a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/></svg>
+    <span>Token</span><span class="key-dot" aria-hidden="true"></span>
+  </button>
   <button class="theme-btn" id="themeBtn" type="button">Dark</button>
 </header>
 
@@ -313,12 +393,13 @@ kbd { font-family: ui-monospace, Menlo, monospace; font-size: 11px; border: 1px 
     read-only query service.</p>
     <div class="card">
       <div class="setup-grid">
-        <label for="tok">Synapse personal access token
-          <input id="tok" type="password" autocomplete="off" spellcheck="false"
-                 placeholder="paste token, or launch with #token=…">
-        </label>
         <div class="runrow" style="margin:0">
           <button class="run-btn" id="connectBtn" type="button">Check connection</button>
+          <button class="key-btn" id="keyBtnSetup" type="button" aria-controls="keyPanel"
+                  aria-expanded="false">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.65 10A6 6 0 1 0 12.65 14H17v4h4v-4h2v-4H12.65zM7 14a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/></svg>
+            <span>Access token</span><span class="key-dot" aria-hidden="true"></span>
+          </button>
           <span class="status" id="st-0"></span>
         </div>
       </div>
@@ -575,8 +656,66 @@ function token() { return document.getElementById("tok").value.trim(); }
   if (m) history.replaceState(null, "", location.pathname + location.search);
   if (t) document.getElementById("tok").value = t;
 })();
-document.getElementById("tok").addEventListener("change", () =>
-  store.set("sb_token", token()));
+document.getElementById("tok").addEventListener("input", () => {
+  store.set("sb_token", token());
+  markTokenState();
+});
+
+/* ---- the token drawer: a key panel, shut by default, never on the stage ---- */
+const keyPanel = document.getElementById("keyPanel");
+const keyScrim = document.getElementById("keyScrim");
+const keyBtns = [document.getElementById("keyBtn"), document.getElementById("keyBtnSetup")];
+let keyOpener = null;
+
+/* the dot on both buttons is the only "a token is loaded" signal once it is shut */
+function markTokenState() {
+  const has = !!token();
+  for (const b of keyBtns) b.classList.toggle("has-token", has);
+}
+
+function openKeyPanel(opener) {
+  keyOpener = opener || keyBtns[0];
+  keyPanel.classList.add("open");
+  keyPanel.removeAttribute("inert");
+  keyScrim.classList.add("open");
+  for (const b of keyBtns) b.setAttribute("aria-expanded", "true");
+  hideTip();
+  const inp = document.getElementById("tok");
+  inp.focus(); inp.select();
+}
+function closeKeyPanel() {
+  keyPanel.classList.remove("open");
+  keyScrim.classList.remove("open");
+  for (const b of keyBtns) b.setAttribute("aria-expanded", "false");
+  // blur before inert, or the focused input is left inside an inert subtree
+  if (keyPanel.contains(document.activeElement)) document.activeElement.blur();
+  keyPanel.setAttribute("inert", "");
+  if (keyOpener) { keyOpener.focus(); keyOpener = null; }
+}
+for (const b of keyBtns) b.addEventListener("click", () =>
+  keyPanel.classList.contains("open") ? closeKeyPanel() : openKeyPanel(b));
+document.getElementById("keyClose").addEventListener("click", closeKeyPanel);
+document.getElementById("keyDone").addEventListener("click", closeKeyPanel);
+keyScrim.addEventListener("click", closeKeyPanel);
+document.getElementById("tok").addEventListener("keydown", e => {
+  if (e.key === "Enter") { e.preventDefault(); closeKeyPanel(); }
+});
+document.getElementById("tokShow").addEventListener("click", e => {
+  const inp = document.getElementById("tok");
+  const show = inp.type === "password";
+  inp.type = show ? "text" : "password";
+  e.currentTarget.textContent = show ? "Hide" : "Show";
+  e.currentTarget.setAttribute("aria-pressed", String(show));
+});
+document.getElementById("tokClear").addEventListener("click", () => {
+  const inp = document.getElementById("tok");
+  inp.value = ""; store.set("sb_token", ""); markTokenState(); inp.focus();
+});
+/* Escape has to fire from inside the input too, so it sits in its own listener */
+addEventListener("keydown", e => {
+  if (e.key === "Escape" && keyPanel.classList.contains("open")) closeKeyPanel();
+});
+markTokenState();
 
 /* D6: audience-facing wording for the failures that actually happen on stage */
 function friendlyHttp(status) {
@@ -591,7 +730,7 @@ function friendlyHttp(status) {
 
 async function runQuery(sparql, statusEl) {
   const t = token();
-  if (!t) throw new Error("No access token yet — add one on the setup step.");
+  if (!t) throw new Error("No access token yet — add one in the key panel, top right.");
   const headers = { "Authorization": "Bearer " + t, "X-Source": "kg-pipeline/sagebrain-demo" };
   const t0 = performance.now();
   statusEl.textContent = "Submitting…"; statusEl.className = "status";
@@ -815,6 +954,7 @@ addEventListener("keydown", e => {
   if (e.key === "ArrowLeft") go(cur - 1);
   if (e.key === "n") document.body.classList.toggle("notes");
   if (e.key === "r") resetRun();
+  if (e.key === "k") openKeyPanel(document.getElementById("keyBtn"));
 });
 
 /* C7: start the talk over without reloading (the token survives) */
