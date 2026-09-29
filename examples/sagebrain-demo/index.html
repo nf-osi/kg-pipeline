@@ -284,11 +284,10 @@ kbd { font-family: ui-monospace, Menlo, monospace; font-size: 11px; border: 1px 
 
 <header class="top">
   <div>
-    <div class="eyebrow">NF Data Portal · queried live · one patient</div>
+    <div class="eyebrow">Sage Brain · queried live · one patient</div>
     <h1>Patient <span class="pt mono">JH-2-002</span>: genotype to measured drug response</h1>
     <p class="standfirst">One patient. One cell line grown from one of their tumours.
-    Everything on this screen is that single case. The claim is what the data already
-    connects, not how many people it covers.</p>
+    Connected to drug screens and indications.</p>
   </div>
   <div class="spacer"></div>
   <button class="theme-btn" id="themeBtn" type="button">Dark</button>
@@ -310,10 +309,8 @@ kbd { font-family: ui-monospace, Menlo, monospace; font-size: 11px; border: 1px 
   <section class="panel" data-step="0">
     <div class="eyebrow hop-eyebrow">setup</div>
     <h2>Three datasets, one live query</h2>
-    <p class="claim">Every number in this demo is fetched while you watch, from a
-    read-only query service. The three datasets below were built by separate pipelines
-    and have never been queried together before. Nothing was matched up by hand: they
-    line up because they use the same public identifiers for genes, drugs and diseases.</p>
+    <p class="claim">Every number in this demo is fetched live from a
+    read-only query service.</p>
     <div class="card">
       <div class="setup-grid">
         <label for="tok">Synapse personal access token
@@ -327,10 +324,9 @@ kbd { font-family: ui-monospace, Menlo, monospace; font-size: 11px; border: 1px 
       </div>
       <div id="viz-0" style="margin-top:12px"></div>
     </div>
-    <div class="callout"><strong>This is one patient.</strong> Across the whole portal, no
-    single specimen has both a drug screen and sequencing: the overlap is 0 of 553. At the
-    level of people, the overlap is exactly this one patient. So this is a demonstration of
-    what the data can connect, not a result. It already holds the experiment you would have
+    <div class="callout">This is a demonstration of
+    what the data can connect for <strong>one patient.</strong> 
+    It already holds the experiment that would have
     proposed next.</div>
   </section>
 
@@ -754,8 +750,8 @@ function completeStepEdges(step) {
 
 /* =================== step scaffolding =================== */
 const STEPS = [
-  { title: "Setup and connection", scope: "all three datasets" },
-  { title: "Genotype",             scope: "portal" },
+  { title: "Setup and connection", scope: "latest releases" },
+  { title: "Genotype",             scope: "data" },
   { title: "Model and screening",  scope: "portal" },
   { title: "Mechanism and pathway", scope: "portal + Open Targets + Reactome" },
   { title: "Regulatory status",    scope: "portal + Open Targets" },
@@ -878,7 +874,7 @@ function buildCard(mountId, btnLabel, sparql, onData, fallbackKey) {
   row.append(btn, st, fbBtn);
   const viz = document.createElement("div"); viz.className = "viz-mount";
   const det = document.createElement("details"); det.className = "qbox prov";
-  const sum = document.createElement("summary"); sum.textContent = "The exact query that just ran (SPARQL)";
+  const sum = document.createElement("summary"); sum.textContent = "Query run (SPARQL)";
   const pre = document.createElement("pre"); pre.textContent = sparql;
   det.append(sum, pre);
   mount.append(row, viz, det);
