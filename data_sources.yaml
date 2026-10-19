@@ -35,13 +35,13 @@ profiles:
         concrete_type: EntityView
         note: File-level annotations (assay, platform, data type, diagnosis, species,
           tissue, etc.)
-        source_version: 273
+        source_version: 277
       mutations:
         synapse_id: syn26486835
         concrete_type: TableEntity
         note: Mutation details (affected gene, allele type, mutation method, sequence/protein
           variation)
-        source_version: 11
+        source_version: 13
       genetic_reagents:
         synapse_id: syn26486832
         concrete_type: TableEntity
@@ -53,25 +53,25 @@ profiles:
         concrete_type: TableEntity
         note: Animal model details (strain, nomenclature, manifestation, genetic disorder,
           transplantation)
-        source_version: 35
+        source_version: 39
       cell_lines:
         synapse_id: syn26486823
         concrete_type: TableEntity
         note: Cell line details (origin, organ, tissue, manifestation, resistance,
           genetic disorder)
-        source_version: 53
+        source_version: 60
       donors:
         synapse_id: syn26486829
         concrete_type: TableEntity
         note: Donor demographics (species, race, sex, age, parent/transplantation
           donor links)
-        source_version: 29
+        source_version: 33
       antibodies:
         synapse_id: syn26486811
         concrete_type: TableEntity
         note: Antibody details (UniProt ID, clone, reactive species, host organism,
           target antigen)
-        source_version: 20
+        source_version: 22
       observations:
         synapse_id: syn26486836
         concrete_type: TableEntity
@@ -82,7 +82,7 @@ profiles:
         concrete_type: TableEntity
         note: Junction table linking development records to resources, investigators,
           publications, and funders
-        source_version: 48
+        source_version: 50
       funders:
         synapse_id: syn26486830
         concrete_type: TableEntity
@@ -99,7 +99,7 @@ profiles:
         concrete_type: TableEntity
         note: Publication details (title, DOI, PMID, abstract, journal, authors, date);
           linked from development table via publicationId
-        source_version: 17
+        source_version: 21
         collection_name: ToolsCentralPublications
         collection_label: NF Research Tools Central publications
         collection_comment: 'Publications catalogued by NF Research Tools Central
@@ -119,7 +119,7 @@ profiles:
         synapse_id: syn26486834
         concrete_type: TableEntity
         note: Junction table linking mutations to animal models and cell lines
-        source_version: 21
+        source_version: 23
       biobanks:
         synapse_id: syn26486821
         concrete_type: TableEntity
@@ -131,19 +131,19 @@ profiles:
         concrete_type: TableEntity
         note: Clinical assessment tool details (assessment type, scoring, validated
           languages, psychometric properties, etc.)
-        source_version: 15
+        source_version: 17
       patient_derived_models:
         synapse_id: syn73709228
         concrete_type: TableEntity
         note: Patient derived model details (PDX, model system type, tumor type, molecular
           characterization, donor link, etc.)
-        source_version: 22
+        source_version: 24
       organoid_protocols:
         synapse_id: syn73709227
         concrete_type: TableEntity
         note: Organoid protocol details (model type, derivation source, culture system,
           cell types, etc.)
-        source_version: 24
+        source_version: 26
       computational_tools:
         synapse_id: syn73709226
         concrete_type: TableEntity
